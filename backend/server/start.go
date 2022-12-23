@@ -8,18 +8,19 @@ type Server struct {
 	posts string
 }
 
+// Start returns http.Handler with all routes
 func Start() http.Handler {
 	server := Server{posts: "POSTS"}
 
 	router := http.NewServeMux()
 
-	router.HandleFunc("/api/posts", server.postsHandler)
-	router.HandleFunc("/api/posts/", server.postHandler)
+	// /api/posts, /api/posts/{id}, /api/posts/{id}/comments, /api/posts/{id}/like, /api/posts/{id}/dislike
+	router.HandleFunc("/api/posts/", server.postsHandler)
 
 	router.HandleFunc("/api/create", server.createHandler)
 
-	router.HandleFunc("/api/auth/login", server.postHandler)
-	router.HandleFunc("/api/auth/signup", server.loginHandler)
+	router.HandleFunc("/api/auth/login", server.loginHandler)
+	router.HandleFunc("/api/auth/signup", server.signUpHandler)
 	router.HandleFunc("/api/auth/logout", server.logoutHandler)
 
 	return router
