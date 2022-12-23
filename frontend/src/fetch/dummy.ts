@@ -1,16 +1,20 @@
 import { Post, User } from "../custom"
 
-export const users: User[] = [
-  { name: "Max", id: 0 },
-  { name: "Cat", id: 1 },
-]
+export const user = {
+  id: 1,
+  name: "Max",
+  email: "max@mer.pw",
+}
+
+export const users: User[] = [user, { name: "Cat", id: 1 }]
+
 export const posts: Post[] = [
   {
     id: 0,
     title: "Post 1",
     content:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam euismod imperdiet dictum. Sed aliquam lacus neque, in efficitur diam ultrices quis. Nam viverra varius quam, a dictum purus congue eu. Vivamus at vehicula massa. Pellentesque non eros augue. Praesent ut ante quis dui hendrerit iaculis ut pretium velit. Vivamus sed ante aliquam, accumsan ipsum nec, suscipit lorem. Ut eu diam nec mi mattis imperdiet. Vivamus massa est, cursus vitae felis sed, congue semper lectus. Proin placerat gravida nisi, malesuada pulvinar ligula semper non. Sed rhoncus augue id tempus congue. In laoreet a mi nec pharetra. Praesent tempor erat et eros bibendum porttitor at et erat. Proin aliquet pellentesque lacus, non ullamcorper mi placerat pulvinar.",
-    author: { id: 0, name: "Max" },
+    author: users[0],
     date: "2022-12-22T19:36:18.166Z",
     likes: 0,
     dislikes: 0,
