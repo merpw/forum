@@ -3,7 +3,7 @@ import { User } from "../../custom"
 
 import { getUserLocal, getUsersLocal } from "../../fetch/server-side"
 
-const PostPage: NextPage<{ user: User }> = ({ user }) => {
+const UserPage: NextPage<{ user: User }> = ({ user }) => {
   return (
     <div>
       <h1 className={"text-xl"}>{user.name}</h1>
@@ -17,6 +17,7 @@ export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
     paths: users.map((user) => {
       return { params: { id: user.id.toString() } }
     }),
+    // TODO: maybe remove
     fallback: "blocking", // fallback tries to regenerate ArtistPage if Artist did not exist during building
   }
 }
@@ -25,9 +26,9 @@ export const getStaticProps: GetStaticProps<{ user: User }, { id: string }> = as
   params,
 }) => {
   if (params == undefined) {
-    return { notFound: true, revalidate: 60 }
+    return { notFound: true }
   }
   const user = await getUserLocal(+params.id)
-  return user ? { props: { user: user }, revalidate: 10 } : { notFound: true, revalidate: 60 }
+  return user ? { props: { user: user } } : { notFound: true }
 }
-export default PostPage
+export default UserPage

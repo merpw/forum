@@ -24,20 +24,29 @@ const Home: NextPage<{ posts: Post[] }> = ({ posts }) => {
 }
 
 const PostCard = (post: Post, key: number) => (
-  <div key={key} className={"border rounded-lg sm:m-5 p-7"}>
-    <div className={"mb-3"}>
-      <Link href={`/post/${post.id}`}>
-        <h1 className={"text-2xl"}>{post.title}</h1>
-      </Link>
-      <hr className={"mt-2"} />
+  <div
+    key={key}
+    className={"rounded-lg border opacity-90 hover:opacity-100 hover:shadow dark:shadow-white mb-4"}
+  >
+    <div className={"m-5"}>
+      <div className={"mb-3"}>
+        <h1 className={"text-2xl hover:opacity-50 w-fit"}>
+          <Link href={`/post/${post.id}`}>{post.title}</Link>
+        </h1>
+        <hr className={"mt-2"} />
+      </div>
+
+      <p>{post.content}</p>
     </div>
-    <p>{post.content}</p>
-    <hr className={"mt-4"} />
-    <div>
-      <span>{new Date(Date.parse(post.date)).toLocaleString("fi")}</span> by{" "}
-      <Link href={`/user/${post.author.id}`}>
-        <span className={"text-xl"}>{post.author.name}</span>
-      </Link>
+
+    <div className={"border-t px-5 py-2 flex justify-between"}>
+      <span>{new Date(Date.parse(post.date)).toLocaleString("fi")}</span>
+      <span>
+        {"by "}
+        <Link href={`/user/${post.author.id}`}>
+          <span className={"text-xl hover:opacity-50"}>{post.author.name}</span>
+        </Link>
+      </span>
     </div>
   </div>
   // <div className={"mx-auto my-2 text-center p-1 w-max"} key={key}>
@@ -61,7 +70,6 @@ export const getStaticProps: GetStaticProps<{ posts: Post[] }> = async () => {
 
   return {
     props: { posts: posts },
-    revalidate: 60,
   }
 }
 

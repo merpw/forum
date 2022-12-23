@@ -17,7 +17,7 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
         <span>{new Date(Date.parse(post.date)).toLocaleString("fi")}</span>
         {" by "}
         <Link href={`/user/${post.author.id}`}>
-          <span className={"text-xl"}>{post.author.name}</span>
+          <span className={"text-xl hover:opacity-50"}>{post.author.name}</span>
         </Link>
       </div>
       <h2 className={"text-2xl my-4"}>Comments:</h2>
@@ -26,7 +26,7 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
           post.comments.map((comment, key) => (
             <div className={"border m-2 rounded p-5"} key={key}>
               <Link href={`/user/${comment.author.id}`}>
-                <h3 className={"text-lg"}>{comment.author.name}</h3>
+                <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
               </Link>
               <p>{comment.text}</p>
               <span>{new Date(Date.parse(comment.date)).toLocaleString("fi")}</span>
@@ -46,6 +46,7 @@ export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
     paths: posts.map((post) => {
       return { params: { id: post.id.toString() } }
     }),
+    // TODO: maybe remove
     fallback: "blocking", // fallback tries to regenerate ArtistPage if Artist did not exist during building
   }
 }
@@ -54,9 +55,9 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
   params,
 }) => {
   if (params == undefined) {
-    return { notFound: true, revalidate: 60 }
+    return { notFound: true }
   }
   const post = await getPostLocal(+params.id)
-  return post ? { props: { post: post }, revalidate: 10 } : { notFound: true, revalidate: 60 }
+  return post ? { props: { post: post } } : { notFound: true }
 }
 export default PostPage
