@@ -17,18 +17,38 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// /api/posts/id -> [id], /api/posts/id/comments -> [id, comments]
-	commands := strings.Split(strings.TrimPrefix(url, "/api/posts/"), "/")
-
-	postId, err := strconv.Atoi(commands[0])
-	if err != nil {
-		errorResponse(w, 404)
-		return
-	}
+	// /api/posts/id ->                    [id] ... show one post with comments
+	// /api/posts/create ->                [create] ... create post
+	// /api/posts/id/like ->               [id, like] ... like post
+	// /api/posts/id/dislike ->            [id, dislike] ... dislike post
+	// /api/posts/id/create ->             [id, create] ... create comment for the post
+	// /api/posts/id/comment_id/like ->    [id, comment_id, like] ... like comment of the post
+	// /api/posts/id/comment_id/dislike -> [id, comment_id, dislike] ... dislike comment of the post
+	var commands = strings.Split(strings.TrimPrefix(url, "/api/posts/"), "/")
+	var postId int
+	var err error
+	postId, err = strconv.Atoi(commands[0])
 
 	if len(commands) == 1 { // /api/posts/id
 		srv.postHandler(w, r, postId)
 		return
+	}
+
+	switch len(commands) {
+	case 1:
+		switch commands[0] {
+		case "create":
+			srv.createHandler(w, r)
+		default:
+			if err != nil {
+				errorResponse(w, 400)
+				return
+			}
+			srv.postHandler(w, r, postId)
+			return
+		}
+	case 2:
+
 	}
 
 	switch commands[1] {
