@@ -12,8 +12,8 @@ func errorResponse(w http.ResponseWriter, code int) {
 	http.Error(w, fmt.Sprintf("%v %v", code, http.StatusText(code)), code)
 }
 
-// errorCheck handle basic request errors
-func errorBasicCheck(w http.ResponseWriter, r *http.Request, pathToCheck string) {
+// errorCheck handle basic request errors for the POST request
+func errorBasicCheckPOST(w http.ResponseWriter, r *http.Request, pathToCheck string) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Printf("ERROR %d. %v\n", http.StatusInternalServerError, err)
