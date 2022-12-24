@@ -8,7 +8,7 @@ RUN go build .
 FROM alpine
 
 # RUN apk add curl
-
+# todo audit question with high chance requires that container executable was executed like  "./server", but not an "app/bin/forum"
 COPY --from=builder /app/forum /app/bin/
 CMD /app/bin/forum
 
