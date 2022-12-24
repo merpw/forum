@@ -1,6 +1,6 @@
 # FORUM-BACKEND
 
-RESTful API server to get data about artists and their concerts
+RESTful API server to manage data about users, posts
 
 ---
 
