@@ -83,7 +83,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) createCommentHandler(w http.ResponseWriter, r *http.Request, postId int) {
-	sendObject(w, "create comment")
+	sendObject(w, fmt.Sprintf("create post %v comment", postId))
 }
 
 func (srv *Server) likeCommentHandler(w http.ResponseWriter, r *http.Request, postId, commentId int) {
