@@ -44,18 +44,18 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	switch lens {
 	case 1:
 		if err != nil {
-			srv.createPostHandler(w, r)
+			srv.createPostHandler(w, r, url)
 		} else {
-			srv.showPostHandler(w, r, postId)
+			srv.showPostHandler(w, r, postId, url)
 		}
 	case 2:
 		switch commands[1] {
 		case "like":
-			srv.likePostHandler(w, r, postId)
+			srv.likePostHandler(w, r, postId, url)
 		case "dislike":
-			srv.dislikePostHandler(w, r, postId)
+			srv.dislikePostHandler(w, r, postId, url)
 		case "create":
-			srv.createCommentHandler(w, r, postId)
+			srv.createCommentHandler(w, r, postId, url)
 		default:
 			errorResponse(w, http.StatusBadRequest)
 		}
@@ -71,9 +71,9 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 
 		switch commands[2] {
 		case "like":
-			srv.likeCommentHandler(w, r, postId, cid)
+			srv.likeCommentHandler(w, r, postId, cid, url)
 		case "dislike":
-			srv.dislikeCommentHandler(w, r, postId, cid)
+			srv.dislikeCommentHandler(w, r, postId, cid, url)
 		default:
 			errorResponse(w, http.StatusBadRequest)
 		}
@@ -82,31 +82,59 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (srv *Server) createCommentHandler(w http.ResponseWriter, r *http.Request, postId int) {
+func (srv *Server) createCommentHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "create comment" + Error handling during managing data
+
 	sendObject(w, fmt.Sprintf("create post %v comment", postId))
 }
 
-func (srv *Server) likeCommentHandler(w http.ResponseWriter, r *http.Request, postId, commentId int) {
+func (srv *Server) likeCommentHandler(w http.ResponseWriter, r *http.Request, postId, commentId int, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "like comment" + Error handling during managing data
+
 	sendObject(w, fmt.Sprintf("like post %v comment %v", postId, commentId))
 }
 
-func (srv *Server) dislikeCommentHandler(w http.ResponseWriter, r *http.Request, postId int, commentId int) {
+func (srv *Server) dislikeCommentHandler(w http.ResponseWriter, r *http.Request, postId int, commentId int, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "dislike comment" + Error handling during managing data
+
 	sendObject(w, fmt.Sprintf("dislike post %v comment %v", postId, commentId))
 }
 
 // post
-func (srv *Server) createPostHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) createPostHandler(w http.ResponseWriter, r *http.Request, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "create post" + Error handling during managing data
+
 	sendObject(w, "create post")
 }
 
-func (srv *Server) likePostHandler(w http.ResponseWriter, r *http.Request, postId int) {
+func (srv *Server) likePostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "signup" + Error handling during managing data
+
 	sendObject(w, fmt.Sprintf("like post %v", postId))
 }
 
-func (srv *Server) dislikePostHandler(w http.ResponseWriter, r *http.Request, postId int) {
+func (srv *Server) dislikePostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "dislike post" + Error handling during managing data
+
 	sendObject(w, fmt.Sprintf("dislike post %v", postId))
 }
 
-func (srv *Server) showPostHandler(w http.ResponseWriter, r *http.Request, postId int) {
+func (srv *Server) showPostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "show post" + Error handling during managing data
+
 	sendObject(w, fmt.Sprintf("show post %v", postId))
 }
