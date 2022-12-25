@@ -5,7 +5,6 @@ import (
 )
 
 func (srv *Server) signUpHandler(w http.ResponseWriter, r *http.Request) {
-
 	errorBasicCheckPOST(w, r, "/api/signup")
 
 	// todo database stuff for "signup" + Error handling during managing data
@@ -14,7 +13,6 @@ func (srv *Server) signUpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
-
 	errorBasicCheckPOST(w, r, "/api/login")
 
 	// todo database stuff for "login" + Error handling during managing data
@@ -23,7 +21,6 @@ func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
-
 	errorBasicCheckPOST(w, r, "/api/logout")
 
 	// todo database stuff for "logout" + Error handling during managing data
