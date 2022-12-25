@@ -17,7 +17,7 @@ func Start() http.Handler {
 	// /api/posts, /api/posts/{id}, /api/posts/{id}/comments, /api/posts/{id}/like, /api/posts/{id}/dislike
 	router.HandleFunc("/api/posts/", server.postsHandler)
 
-	router.HandleFunc("/api/create", server.createHandler)
+	// router.HandleFunc("/api/create", server.createHandler)
 
 	router.HandleFunc("/api/auth/login", server.loginHandler)
 	router.HandleFunc("/api/auth/signup", server.signUpHandler)
