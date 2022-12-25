@@ -82,6 +82,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// comment
 func (srv *Server) createCommentHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
 	errorBasicCheckPOST(w, r, pathToCheck)
 
