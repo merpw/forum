@@ -1,42 +1,57 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import { Post } from "../../custom"
+import { Post, Comment } from "../../custom"
 
 import { getPostLocal, getPostsLocal } from "../../fetch/server-side"
 import Link from "next/link"
+import { FC } from "react"
+import Head from "next/head"
 
 const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   return (
-    <div className={"m-5 "}>
-      <div className={"mb-3"}>
-        <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
-        <hr />
+    <>
+      <Head>
+        <title>{post.title} - Forum</title>
+      </Head>
+      <div className={"m-5 "}>
+        <div className={"mb-3"}>
+          <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
+          <hr />
+        </div>
+        <p>{post.content}</p>
+        <hr className={"mt-4"} />
+        <div>
+          <span>{new Date(Date.parse(post.date)).toLocaleString("fi")}</span>
+          {" by "}
+          <Link href={`/user/${post.author.id}`}>
+            <span className={"text-xl hover:opacity-50"}>{post.author.name}</span>
+          </Link>
+        </div>
+        <h2 className={"text-2xl my-4"}>Comments:</h2>
+        <div>
+          <Comments comments={post.comments} />
+        </div>
       </div>
-      <p>{post.content}</p>
-      <hr className={"mt-4"} />
-      <div>
-        <span>{new Date(Date.parse(post.date)).toLocaleString("fi")}</span>
-        {" by "}
-        <Link href={`/user/${post.author.id}`}>
-          <span className={"text-xl hover:opacity-50"}>{post.author.name}</span>
-        </Link>
-      </div>
-      <h2 className={"text-2xl my-4"}>Comments:</h2>
-      <div>
-        {post.comments.length > 0 ? (
-          post.comments.map((comment, key) => (
-            <div className={"border m-2 rounded p-5"} key={key}>
-              <Link href={`/user/${comment.author.id}`}>
-                <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
-              </Link>
-              <p>{comment.text}</p>
-              <span>{new Date(Date.parse(comment.date)).toLocaleString("fi")}</span>
-            </div>
-          ))
-        ) : (
-          <div>There are no comments yet, write one first!</div>
-        )}
-      </div>
-    </div>
+    </>
+  )
+}
+
+const Comments: FC<{ comments: Comment[] }> = ({ comments }) => {
+  if (comments.length == 0) {
+    return <div>There are no comments yet, write one first!</div>
+  }
+
+  return (
+    <>
+      {comments.map((comment, key) => (
+        <div className={"border m-2 rounded p-5"} key={key}>
+          <Link href={`/user/${comment.author.id}`}>
+            <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
+          </Link>
+          <p>{comment.text}</p>
+          <span>{new Date(Date.parse(comment.date)).toLocaleString("fi")}</span>
+        </div>
+      ))}
+    </>
   )
 }
 
