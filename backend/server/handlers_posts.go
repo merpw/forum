@@ -17,13 +17,15 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// /api/posts/id ->                    [id] ... show one post with comments
-	// /api/posts/create ->                [create] ... create post
-	// /api/posts/id/like ->               [id, like] ... like post
-	// /api/posts/id/dislike ->            [id, dislike] ... dislike post
-	// /api/posts/id/create ->             [id, create] ... create comment for the post
-	// /api/posts/id/comment_id/like ->    [id, comment_id, like] ... like comment of the post
-	// /api/posts/id/comment_id/dislike -> [id, comment_id, dislike] ... dislike comment of the post
+	// /api/posts/create ->                  [create] ... create post
+	// /api/posts/id ->                      [id] ... show one post with comments
+	// /api/posts/id/like ->                 [id, like] ... like post
+	// /api/posts/id/dislike ->              [id, dislike] ... dislike post
+	// /api/posts/id/comments ->             [id, comments] ... show all comments of the post
+	// /api/posts/id/create ->               [id, create] ... create comment for the post
+	// /api/posts/category/{facts|rumors|created|liked} -> [category, facts|rumors|created|liked] ... show all posts with chosen category
+	// /api/posts/id/comment_id/like ->      [id, comment_id, like] ... like comment of the post
+	// /api/posts/id/comment_id/dislike ->   [id, comment_id, dislike] ... dislike comment of the post
 	commands := strings.Split(strings.TrimPrefix(url, "/api/posts/"), "/")
 	postId, err := strconv.Atoi(commands[0])
 	lens := len(commands)
@@ -32,6 +34,19 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 		switch lens {
 		case 1:
 			if commands[0] != "create" {
+				errorResponse(w, http.StatusBadRequest)
+				return
+			}
+		case 2:
+			switch commands[1] {
+			case "facts", "rumors", "created", "liked":
+				switch commands[0] {
+				case "category":
+				default:
+					errorResponse(w, http.StatusBadRequest)
+					return
+				}
+			default:
 				errorResponse(w, http.StatusBadRequest)
 				return
 			}
@@ -56,6 +71,10 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 			srv.dislikePostHandler(w, r, postId, url)
 		case "create":
 			srv.createCommentHandler(w, r, postId, url)
+		case "comments":
+			srv.showCommentsHandler(w, r, postId, url)
+		case "facts", "rumors":
+			srv.categoryPostHandler(w, r, commands[1], url)
 		default:
 			errorResponse(w, http.StatusBadRequest)
 		}
@@ -83,6 +102,14 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // comment
+func (srv *Server) showCommentsHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "show comments" + Error handling during managing data
+
+	sendObject(w, fmt.Sprintf("show post %v", postId))
+}
+
 func (srv *Server) createCommentHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
 	errorBasicCheckPOST(w, r, pathToCheck)
 
@@ -138,4 +165,13 @@ func (srv *Server) showPostHandler(w http.ResponseWriter, r *http.Request, postI
 	// todo database stuff for "show post" + Error handling during managing data
 
 	sendObject(w, fmt.Sprintf("show post %v", postId))
+}
+
+// plan four categories only "facts" and "rumors", also "created" and "liked" posts, should be enough
+func (srv *Server) categoryPostHandler(w http.ResponseWriter, r *http.Request, category, pathToCheck string) {
+	errorBasicCheckPOST(w, r, pathToCheck)
+
+	// todo database stuff for "category post" + Error handling during managing data
+
+	sendObject(w, fmt.Sprintf("show %v posts", category))
 }
