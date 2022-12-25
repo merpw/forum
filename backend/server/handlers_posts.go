@@ -23,7 +23,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	// /api/posts/id/dislike ->              [id, dislike] ... dislike post
 	// /api/posts/id/comments ->             [id, comments] ... show all comments of the post
 	// /api/posts/id/create ->               [id, create] ... create comment for the post
-	// /api/posts/category/{facts|rumors|created|liked} -> [category, facts|rumors|created|liked] ... show all posts with chosen category
+	// /api/posts/category/{facts|rumors|created|liked} -> [category, facts|rumors|created|liked] ... show all posts with chosen category. To satisfy task requirements
 	// /api/posts/id/comment_id/like ->      [id, comment_id, like] ... like comment of the post
 	// /api/posts/id/comment_id/dislike ->   [id, comment_id, dislike] ... dislike comment of the post
 	commands := strings.Split(strings.TrimPrefix(url, "/api/posts/"), "/")
@@ -73,26 +73,22 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 			srv.createCommentHandler(w, r, postId, url)
 		case "comments":
 			srv.showCommentsHandler(w, r, postId, url)
-		case "facts", "rumors":
+		case "facts", "rumors", "created", "liked":
 			srv.categoryPostHandler(w, r, commands[1], url)
 		default:
 			errorResponse(w, http.StatusBadRequest)
 		}
 	case 3:
-		comment_id := strings.Split(commands[1], "_")
-		if len(comment_id) != 2 {
-			errorResponse(w, http.StatusBadRequest)
-		}
-		cid, err := strconv.Atoi(comment_id[1])
-		if err != nil || comment_id[0] != "comment" {
+		commentId, err := strconv.Atoi(commands[1])
+		if err != nil {
 			errorResponse(w, http.StatusBadRequest)
 		}
 
 		switch commands[2] {
 		case "like":
-			srv.likeCommentHandler(w, r, postId, cid, url)
+			srv.likeCommentHandler(w, r, postId, commentId, url)
 		case "dislike":
-			srv.dislikeCommentHandler(w, r, postId, cid, url)
+			srv.dislikeCommentHandler(w, r, postId, commentId, url)
 		default:
 			errorResponse(w, http.StatusBadRequest)
 		}
