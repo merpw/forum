@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -28,10 +29,10 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	// /api/posts/id/comment_id/dislike ->   [id, comment_id, dislike] ... dislike comment of the post
 	commands := strings.Split(strings.TrimPrefix(url, "/api/posts/"), "/")
 	postId, err := strconv.Atoi(commands[0])
-	lens := len(commands)
+	lenOfCommands := len(commands)
 
 	if err != nil {
-		switch lens {
+		switch lenOfCommands {
 		case 1:
 			if commands[0] != "create" {
 				errorResponse(w, http.StatusBadRequest)
@@ -56,7 +57,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	switch lens {
+	switch lenOfCommands {
 	case 1:
 		if err != nil {
 			srv.createPostHandler(w, r, url)
@@ -133,10 +134,14 @@ func (srv *Server) dislikeCommentHandler(w http.ResponseWriter, r *http.Request,
 // post
 func (srv *Server) createPostHandler(w http.ResponseWriter, r *http.Request, pathToCheck string) {
 	errorBasicCheckPOST(w, r, pathToCheck)
-
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		log.Println(err)
+		return
+	}
 	// todo database stuff for "create post" + Error handling during managing data
 
-	sendObject(w, "create post")
+	sendObject(w, "create post, token: "+cookie.Value)
 }
 
 func (srv *Server) likePostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
