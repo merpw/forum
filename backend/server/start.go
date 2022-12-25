@@ -14,7 +14,7 @@ func Start() http.Handler {
 
 	router := http.NewServeMux()
 
-	// /api/posts, /api/posts/{id}, /api/posts/{id}/comments, /api/posts/{id}/like, /api/posts/{id}/dislike
+	// /api/posts ... see the postHandler variable commands description
 	router.HandleFunc("/api/posts/", server.postsHandler)
 
 	// router.HandleFunc("/api/create", server.createHandler)
