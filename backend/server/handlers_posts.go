@@ -119,7 +119,7 @@ func (srv *Server) createPostHandler(w http.ResponseWriter, r *http.Request, pat
 func (srv *Server) likePostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
 	errorBasicCheckPOST(w, r, pathToCheck)
 
-	// todo database stuff for "signup" + Error handling during managing data
+	// todo database stuff for "like post" + Error handling during managing data
 
 	sendObject(w, fmt.Sprintf("like post %v", postId))
 }
