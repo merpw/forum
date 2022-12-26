@@ -7,7 +7,7 @@ import { logIn, useUser } from "../fetch/user"
 const LoginPage: NextPage = () => {
   const router = useRouter()
 
-  const { isLoggedIn, mutate } = useUser()
+  const { isLoading, isLoggedIn, mutate } = useUser()
 
   const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
@@ -15,11 +15,11 @@ const LoginPage: NextPage = () => {
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
   useEffect(() => {
-    if (isLoggedIn && !isRedirecting) {
+    if (!isLoading && isLoggedIn && !isRedirecting) {
       setIsRedirecting(true)
       router.push("/me")
     }
-  }, [router, isLoggedIn, isRedirecting])
+  }, [router, isLoggedIn, isRedirecting, isLoading])
 
   return (
     <div>
