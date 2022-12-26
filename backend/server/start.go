@@ -1,6 +1,7 @@
 package server
 
 import (
+	"log"
 	"net/http"
 )
 
@@ -22,6 +23,17 @@ func Start() http.Handler {
 	router.HandleFunc("/api/auth/login", server.loginHandler)
 	router.HandleFunc("/api/auth/signup", server.signUpHandler)
 	router.HandleFunc("/api/auth/logout", server.logoutHandler)
+
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Printf("ERROR %d. %v\n", http.StatusInternalServerError, err)
+				errorResponse(w, http.StatusInternalServerError) // 500 ERROR
+			}
+		}()
+
+		router.ServeHTTP(w, r)
+	})
 
 	return router
 }
