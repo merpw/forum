@@ -34,6 +34,4 @@ func Start() http.Handler {
 
 		router.ServeHTTP(w, r)
 	})
-
-	return router
 }
