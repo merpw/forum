@@ -3,7 +3,7 @@ import { User } from "../custom"
 import { user as dummy_user } from "./dummy"
 
 export const useUser = () => {
-  const { data, mutate, error } = useSWR("/api/me", getUser)
+  const { data, mutate, error } = useSWR<{ user: User | undefined }>("/api/me", getUser)
 
   return {
     isError: error != undefined,
@@ -23,13 +23,13 @@ const getUser = async (): Promise<{ user: User | undefined }> => {
 
 export const logIn = async (login: string, password: string): Promise<void> => {
   if (login == "admin" && password == "admin") {
-    document.cookie = "forum-test-token=admin;"
+    document.cookie = "forum-test-token=admin;path=/;"
     return Promise.resolve()
   }
   return Promise.reject("Invalid login or password")
 }
 
 export const logOut = async (): Promise<void> => {
-  document.cookie = "forum-test-token=; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+  document.cookie = "forum-test-token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;"
   return Promise.resolve()
 }
