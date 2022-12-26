@@ -10,6 +10,16 @@ export const users: User[] = [user, { name: "Cat", id: 2 }]
 
 export const posts: Post[] = [
   {
+    id: 3,
+    title: "Post 3",
+    content: "Short one",
+    author: users[0],
+    date: "2022-12-26T15:58:18.166Z",
+    likes: 0,
+    dislikes: 0,
+    comments: [],
+  },
+  {
     id: 1,
     title: "Post 1",
     content:

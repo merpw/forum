@@ -1,3 +1,4 @@
+import moment from "moment"
 import Link from "next/link"
 import { FC } from "react"
 import { Post } from "../custom"
@@ -26,7 +27,7 @@ const PostCard = (post: Post, key: number) => (
     </div>
 
     <div className={"border-t px-5 py-2 flex justify-between"}>
-      <span>{new Date(Date.parse(post.date)).toLocaleString("fi")}</span>
+      <span>{moment(post.date).fromNow()}</span>
       <span>
         {"by "}
         <Link href={`/user/${post.author.id}`}>
