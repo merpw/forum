@@ -10,7 +10,7 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   return (
     <>
       <Head>
-        <title>{post.title} - Forum</title>
+        <title>{`${post.title} - Forum`}</title>
       </Head>
       <div className={"m-5 "}>
         <div className={"mb-3"}>

@@ -4,6 +4,7 @@ export default function Document() {
   return (
     <Html lang={"en"}>
       <Head>
+        {/* TODO: add favincon */}
         <link href={"/favicon.ico"} rel={"icon"} media={"(prefers-color-scheme: light)"} />
         <link href={"/faviconDark.png"} rel={"icon"} media={"(prefers-color-scheme: dark)"} />
       </Head>
