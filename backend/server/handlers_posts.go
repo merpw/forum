@@ -100,7 +100,6 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 
 // comment
 func (srv *Server) showCommentsHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "show comments" + Error handling during managing data
 
@@ -108,7 +107,6 @@ func (srv *Server) showCommentsHandler(w http.ResponseWriter, r *http.Request, p
 }
 
 func (srv *Server) createCommentHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "create comment" + Error handling during managing data
 
@@ -116,7 +114,6 @@ func (srv *Server) createCommentHandler(w http.ResponseWriter, r *http.Request, 
 }
 
 func (srv *Server) likeCommentHandler(w http.ResponseWriter, r *http.Request, postId, commentId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "like comment" + Error handling during managing data
 
@@ -124,7 +121,6 @@ func (srv *Server) likeCommentHandler(w http.ResponseWriter, r *http.Request, po
 }
 
 func (srv *Server) dislikeCommentHandler(w http.ResponseWriter, r *http.Request, postId int, commentId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "dislike comment" + Error handling during managing data
 
@@ -133,7 +129,6 @@ func (srv *Server) dislikeCommentHandler(w http.ResponseWriter, r *http.Request,
 
 // post
 func (srv *Server) createPostHandler(w http.ResponseWriter, r *http.Request, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		log.Println(err)
@@ -145,7 +140,6 @@ func (srv *Server) createPostHandler(w http.ResponseWriter, r *http.Request, pat
 }
 
 func (srv *Server) likePostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "like post" + Error handling during managing data
 
@@ -153,7 +147,6 @@ func (srv *Server) likePostHandler(w http.ResponseWriter, r *http.Request, postI
 }
 
 func (srv *Server) dislikePostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "dislike post" + Error handling during managing data
 
@@ -161,7 +154,6 @@ func (srv *Server) dislikePostHandler(w http.ResponseWriter, r *http.Request, po
 }
 
 func (srv *Server) showPostHandler(w http.ResponseWriter, r *http.Request, postId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "show post" + Error handling during managing data
 
@@ -170,7 +162,6 @@ func (srv *Server) showPostHandler(w http.ResponseWriter, r *http.Request, postI
 
 // plan four categories only "facts" and "rumors", also "created" and "liked" posts, should be enough
 func (srv *Server) categoryPostHandler(w http.ResponseWriter, r *http.Request, category, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "category post" + Error handling during managing data
 

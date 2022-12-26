@@ -12,7 +12,6 @@ func (srv *Server) usersHandler(w http.ResponseWriter, r *http.Request) {
 	url := strings.TrimRight(r.URL.String(), "/")
 	if url == "/api/user" {
 		r.Cookies()
-		errorBasicCheckPOST(w, r, url)
 
 		// todo database stuff for "user info" + Error handling during managing data
 
@@ -45,7 +44,6 @@ func (srv *Server) usersHandler(w http.ResponseWriter, r *http.Request) {
 
 // Handling own user's info
 func (srv *Server) userHandler(w http.ResponseWriter, r *http.Request, userId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "own user's info" + Error handling during managing data
 
@@ -54,7 +52,6 @@ func (srv *Server) userHandler(w http.ResponseWriter, r *http.Request, userId in
 
 // Handling user's posts by Id
 func (srv *Server) userPostsByIdHandler(w http.ResponseWriter, r *http.Request, userId int, pathToCheck string) {
-	errorBasicCheckPOST(w, r, pathToCheck)
 
 	// todo database stuff for "posts by user's Id" + Error handling during managing data
 

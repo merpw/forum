@@ -32,6 +32,16 @@ func Start() http.Handler {
 			}
 		}()
 
+		switch r.Method {
+		case http.MethodGet:
+
+		case http.MethodPost:
+
+		default:
+			log.Printf("ERROR: %d\n", http.StatusMethodNotAllowed)
+			errorResponse(w, http.StatusMethodNotAllowed) // 405 ERROR
+		}
+
 		router.ServeHTTP(w, r)
 	})
 }
