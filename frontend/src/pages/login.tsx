@@ -1,5 +1,6 @@
 import { motion } from "framer-motion"
 import { NextPage } from "next"
+import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { logIn, useUser } from "../api/auth"
@@ -22,7 +23,10 @@ const LoginPage: NextPage = () => {
   }, [router, isLoggedIn, isRedirecting, isLoading])
 
   return (
-    <div>
+    <>
+      <Head>
+        <title>Login - Forum</title>
+      </Head>
       <form
         onSubmit={async (e) => {
           e.preventDefault()
@@ -87,7 +91,7 @@ const LoginPage: NextPage = () => {
             Remember me
           </label>
         </div> */}
-        {formError != null && (
+        {formError && (
           <motion.div
             className={
               "transition ease-in-out -translate-y-1 p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-inherit dark:border-2 dark:border-red-900 dark:text-white"
@@ -110,7 +114,7 @@ const LoginPage: NextPage = () => {
           Submit
         </button>
       </form>
-    </div>
+    </>
   )
 }
 
