@@ -5,6 +5,7 @@ import { getPostLocal, getPostsLocal } from "../../fetch/server-side"
 import Link from "next/link"
 import { FC } from "react"
 import Head from "next/head"
+import {getPostLocal, getPostsLocal} from "../../api/posts/fetch";
 
 const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   return (

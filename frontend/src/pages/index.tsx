@@ -1,9 +1,9 @@
 import { GetStaticProps, NextPage } from "next"
-import { getPostsLocal } from "../fetch/server-side"
 
 import Head from "next/head"
 import { Post } from "../custom"
 import { PostList } from "../components/posts"
+import { getPostsLocal } from "../api/posts/fetch"
 
 const Home: NextPage<{ posts: Post[] }> = ({ posts }) => {
   return (

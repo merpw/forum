@@ -2,7 +2,7 @@ import { motion } from "framer-motion"
 import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { logIn, useUser } from "../fetch/user"
+import { logIn, useUser } from "../api/auth"
 
 const LoginPage: NextPage = () => {
   const router = useRouter()

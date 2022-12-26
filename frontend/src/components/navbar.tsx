@@ -1,6 +1,6 @@
 import { NextComponentType } from "next"
 import Link from "next/link"
-import { logOut, useUser } from "../fetch/user"
+import { logOut, useUser } from "../api/auth"
 
 const Navbar: NextComponentType = () => {
   return (

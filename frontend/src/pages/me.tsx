@@ -3,8 +3,8 @@ import { useRouter } from "next/router"
 import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
 import { PostList } from "../components/posts"
-import { useUserPosts } from "../fetch/server-side"
-import { useUser } from "../fetch/user"
+import { useUser } from "../api/auth"
+import { useUserPosts } from "../api/posts/fetch"
 
 const UserPage: NextPage = () => {
   const router = useRouter()

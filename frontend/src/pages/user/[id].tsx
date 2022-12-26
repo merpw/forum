@@ -5,8 +5,9 @@ import { useEffect, useState } from "react"
 import { PostList } from "../../components/posts"
 import { Post, User } from "../../custom"
 
-import { getUserLocal, getUserPosts, getUsersLocal } from "../../fetch/server-side"
-import { useUser } from "../../fetch/user"
+import { getUserLocal, getUsersLocal } from "../../api/users/fetch"
+import { useUser } from "../../api/auth"
+import { getUserPosts } from "../../api/posts/fetch"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   const router = useRouter()

@@ -1,7 +1,7 @@
 import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { useUser } from "../fetch/user"
+import { useUser } from "../api/auth"
 
 const CreatePost: NextPage = () => {
   const { isLoggedIn } = useUser()
