@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -34,30 +35,47 @@ func Start() http.Handler {
 		}()
 
 		// todo add to regexp all variants for urls for GET method, to check incoming request urls fast
-		reGet := regexp.MustCompile("")
+		reGet := regexp.MustCompile(`\/api\/(?:user\/[[:digit:]]+(?:\/posts(?:\/liked)?)?|posts(?:\/(?:rumor|fact)s)?|me(?:\/liked)?)\/?$`)
 
 		// todo add to regexp all variants for urls for POST method, to check incoming request urls fast
-		rePost := regexp.MustCompile("")
+		rePost := regexp.MustCompile(`\/api\/post(?:\/[[:digit:]]+/(?:(?:comment\/[[:digit:]]+\/)?dislike|(?:comment\/[[:digit:]]\/)?like|comment))?\/?$`)
 
-		// todo natkim, ask maxim what wrong here.
+		// todo cococore, ask maxim what wrong here.
 		// i need to sleep now :x . And this code section i plan to use for checking
 		// the wrong method used for incoming requests. Every regexp include all
 		// allowed url schemes for each of two methods, to check once. Perhaps it is wrong
 		// place for this block of code
-		switch r.Method {
-		case http.MethodGet:
-			if !reGet.Match([]byte(r.Method)) {
+
+		//not completed, wrong errors. need to be fixed
+		if reGet.Match([]byte(r.URL.Path)) {
+			if r.Method != http.MethodGet {
 				errorResponse(w, http.StatusMethodNotAllowed)
 			}
-		case http.MethodPost:
-			if !rePost.Match([]byte(r.Method)) {
+		} else if rePost.Match([]byte(r.URL.Path)) {
+			if r.Method != http.MethodPost {
+
 				errorResponse(w, http.StatusMethodNotAllowed)
 			}
-		default:
-			log.Printf("ERROR: %d\n", http.StatusMethodNotAllowed)
-			errorResponse(w, http.StatusMethodNotAllowed) // 405 ERROR
+		} else {
+			fmt.Println("TEST")
+			errorResponse(w, http.StatusNotFound)
 		}
 
+		/*
+			switch r.Method {
+			case http.MethodGet:
+				if !reGet.Match([]byte(r.Method)) {
+					errorResponse(w, http.StatusNotFound)
+				}
+			case http.MethodPost:
+				if !rePost.Match([]byte(r.Method)) {
+					errorResponse(w, http.StatusMethodNotAllowed)
+				}
+			default:
+				log.Printf("ERROR: %d\n", http.StatusMethodNotAllowed)
+				errorResponse(w, http.StatusMethodNotAllowed) // 405 ERROR
+			}
+		*/
 		router.ServeHTTP(w, r)
 	})
 }
