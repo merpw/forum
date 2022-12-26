@@ -27,7 +27,9 @@ const PostCard = (post: Post, key: number) => (
     </div>
 
     <div className={"border-t px-5 py-2 flex justify-between"}>
-      <span>{moment(post.date).fromNow()}</span>
+      <span title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}>
+        {moment(post.date).fromNow()}
+      </span>
       <span>
         {"by "}
         <Link href={`/user/${post.author.id}`}>

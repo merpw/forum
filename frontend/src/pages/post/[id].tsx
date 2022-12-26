@@ -1,10 +1,10 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { Post, Comment } from "../../custom"
 
-import { getPostLocal, getPostsLocal } from "../../fetch/server-side"
 import Link from "next/link"
 import { FC } from "react"
 import Head from "next/head"
+import moment from "moment"
 import {getPostLocal, getPostsLocal} from "../../api/posts/fetch";
 
 const PostPage: NextPage<{ post: Post }> = ({ post }) => {
@@ -20,12 +20,16 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
         </div>
         <p>{post.content}</p>
         <hr className={"mt-4"} />
-        <div>
-          <span>{new Date(Date.parse(post.date)).toLocaleString("fi")}</span>
-          {" by "}
-          <Link href={`/user/${post.author.id}`}>
-            <span className={"text-xl hover:opacity-50"}>{post.author.name}</span>
-          </Link>
+        <div className={"border-t py-2 flex justify-between"}>
+          <span title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}>
+            {moment(post.date).fromNow()}
+          </span>
+          <span>
+            {"by "}
+            <Link href={`/user/${post.author.id}`}>
+              <span className={"text-xl hover:opacity-50"}>{post.author.name}</span>
+            </Link>
+          </span>
         </div>
         <h2 className={"text-2xl my-4"}>Comments:</h2>
         <div>
