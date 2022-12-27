@@ -9,6 +9,8 @@ type Server struct {
 	posts string
 }
 
+// todo add endpoint regex as constants for easy manage endpoints changes later
+
 // Start returns http.Handler with all routes
 func Start() http.Handler {
 	server := Server{posts: "POSTS"}
