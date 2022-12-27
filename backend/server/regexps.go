@@ -5,40 +5,31 @@ import (
 	"strings"
 )
 
-// TODO: maybe refactor, create regexp for all routes as a variables and use them in the following regexp arrays
+// method get
+var reApiUser = regexp.MustCompile(`^\/api\/user\/?$`)
+var reApiUserLikedPosts = regexp.MustCompile(`^\/api\/user\/liked\/posts\/?$`)
+var reApiUserId = regexp.MustCompile(`^\/api\/user\/[[:digit:]]+\/?$`)
+var reApiUserIdPosts = regexp.MustCompile(`^\/api\/user\/[[:digit:]]+\/posts\/?$`)
+var reApiPosts = regexp.MustCompile(`^\/api\/posts\/?$`)
+var reApiPostsCategories = regexp.MustCompile(`^\/api\/posts\/categories\/?$`)
+var reApiPostsCategoriesFacts = regexp.MustCompile(`^\/api\/posts\/categories\/facts\/?$`)
+var reApiPostsCategoriesRumors = regexp.MustCompile(`^\/api\/posts\/categories\/rumors\/?$`)
+var reApiPostsId = regexp.MustCompile(`^\/api\/posts\/[[:digit:]]+\/?$`)
 
-const reApiMe = `^\/api\/me\/?$`
-const reApiMeLikedPosts = `^\/api\/me\/liked\/posts\/?$`
-const reApiUserId = `^\/api\/user\/[[:digit:]]+\/?$`
-const reApiUserIdPosts = `^\/api\/user\/[[:digit:]]+\/posts\/?$`
-const reApiPosts = `^\/api\/posts\/?$`
-const reApiPostsCategories = `^\/api\/posts\/categories\/?$`
-const reApiPostsCategoryFacts = `^\/api\/posts\/category\/facts\/?$`
-const reApiPostsCategoryRumors = `^\/api\/posts\/category\/rumors\/?$`
-const reApiPostsId = `^\/api\/posts\/[[:digit:]]+\/?$`
-
-const reApiPostsCreate = `^\/api\/posts\/create\/?$`
-const reApiPostsIdLike = `^\/api\/posts\/[[:digit:]]+\/like\/?$`
-const reApiPostsIdDislike = `^\/api\/posts\/[[:digit:]]+\/dislike\/?$`
-const reApiPostsIdComment = `^\/api\/posts\/[[:digit:]]+\/comment\/?$`
-const reApiPostsIdCommentIdLike = `^\/api\/posts\/[[:digit:]]+\/comment\/[[:digit:]]+\/like\/?$`
-const reApiPostsIdCommentIdDislike = `^\/api\/posts\/[[:digit:]]+\/comment\/[[:digit:]]+\/dislike\/?$`
-const reApiSignup = `^\/api\/signup\/?$`
-const reApiLogin = `^\/api\/login\/?$`
-const reApiLogout = `^\/api\/logout\/?$`
-
-// var getRegexps = []string{
-// 	`^\/api\/(?:post(?:s\/category\/[a-zA-Z0-9_.-]+|\/[[:digit:]]+)\/?|posts\/categories\/?|me\/liked\/posts\/?|user\/[[:digit:]]+(?:\/(?:posts\/?)?)?|posts\/?|me\/?)$`,
-// }
+// method post
+var reApiPostsCreate = regexp.MustCompile(`^\/api\/posts\/create\/?$`)
+var reApiPostsIdLike = regexp.MustCompile(`^\/api\/posts\/[[:digit:]]+\/like\/?$`)
+var reApiPostsIdDislike = regexp.MustCompile(`^\/api\/posts\/[[:digit:]]+\/dislike\/?$`)
+var reApiPostsIdComment = regexp.MustCompile(`^\/api\/posts\/[[:digit:]]+\/comment\/?$`)
+var reApiPostsIdCommentIdLike = regexp.MustCompile(`^\/api\/posts\/[[:digit:]]+\/comment\/[[:digit:]]+\/like\/?$`)
+var reApiPostsIdCommentIdDislike = regexp.MustCompile(`^\/api\/posts\/[[:digit:]]+\/comment\/[[:digit:]]+\/dislike\/?$`)
+var reApiSignup = regexp.MustCompile(`^\/api\/signup\/?$`)
+var reApiLogin = regexp.MustCompile(`^\/api\/login\/?$`)
+var reApiLogout = regexp.MustCompile(`^\/api\/logout\/?$`)
 
 var getRegexps = []string{
-	reApiMe, reApiMeLikedPosts, reApiUserId, reApiUserIdPosts, reApiPosts, reApiPostsCategories, reApiPostsCategoryFacts, reApiPostsCategoryRumors, reApiPostsId}
-
+	reApiUser.String(), reApiUserLikedPosts.String(), reApiUserId.String(), reApiUserIdPosts.String(), reApiPosts.String(), reApiPostsCategories.String(), reApiPostsCategoriesFacts.String(), reApiPostsCategoriesRumors.String(), reApiPostsId.String()}
 var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 
-//	var postRegexps = []string{
-//		`^\/api\/post(?:\/(?:[[:digit:]]+\/(?:(?:comment\/[[:digit:]]+\/)?dislike\/?|(?:comment\/[[:digit:]]+\/)?like\/?|comment\/?))?)?$`,
-//	}
-var postRegexps = []string{reApiPostsCreate, reApiPostsIdLike, reApiPostsIdDislike, reApiPostsIdComment, reApiPostsIdCommentIdLike, reApiPostsIdCommentIdDislike, reApiSignup, reApiLogin, reApiLogout}
-
+var postRegexps = []string{reApiPostsCreate.String(), reApiPostsIdLike.String(), reApiPostsIdDislike.String(), reApiPostsIdComment.String(), reApiPostsIdCommentIdLike.String(), reApiPostsIdCommentIdDislike.String(), reApiSignup.String(), reApiLogin.String(), reApiLogout.String()}
 var PostRegexp = regexp.MustCompile(strings.Join(postRegexps, "|"))
