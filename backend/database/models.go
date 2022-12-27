@@ -1,12 +1,12 @@
 package database
 
-type ApiMe struct {
+type ApiUser struct {
 	Id    int    `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
-type ApiMeLikedPosts struct {
+type ApiUserLikedPosts struct {
 }
 
 type ApiUserId struct {
