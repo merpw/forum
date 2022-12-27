@@ -18,7 +18,7 @@ const LoginPage: NextPage = () => {
   useEffect(() => {
     if (!isLoading && isLoggedIn && !isRedirecting) {
       setIsRedirecting(true)
-      router.push("/me")
+      router.replace("/me")
     }
   }, [router, isLoggedIn, isRedirecting, isLoading])
 

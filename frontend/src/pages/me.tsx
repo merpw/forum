@@ -3,7 +3,6 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
-import { PostList } from "../components/posts"
 import { useUser } from "../api/auth"
 import { useUserPosts } from "../api/posts/fetch"
 import { PostList } from "../components/posts/list"
@@ -28,7 +27,7 @@ const UserPage: NextPage = () => {
         <title>{`Profile - Forum`}</title>
       </Head>
       <UserInfo />
-      <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1"}>
+      <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1 w-fit"}>
         <span className={"my-auto"}>
           <svg
             xmlns={"http://www.w3.org/2000/svg"}

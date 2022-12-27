@@ -58,7 +58,7 @@ const UserInfo = () => {
           <span className={"font-bold hover:opacity-50"}>{user?.name}</span>
         </Link>
       </div>
-      <div
+      <button
         className={"cursor-pointer hover:opacity-50 m-auto"}
         onClick={() => logOut().then(() => mutate())}
       >
@@ -79,7 +79,7 @@ const UserInfo = () => {
             }
           />
         </svg>
-      </div>
+      </button>
     </div>
   )
 }
