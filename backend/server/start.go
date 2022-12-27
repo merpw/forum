@@ -9,8 +9,6 @@ type Server struct {
 	posts string
 }
 
-// todo add endpoint regex as constants for easy manage endpoints changes later
-
 // Start returns http.Handler with all routes
 func Start() http.Handler {
 	server := Server{posts: "POSTS"}
@@ -20,14 +18,14 @@ func Start() http.Handler {
 	// Master-handler for:
 	// /api/posts, /api/posts/{id}, /api/posts/{id}/like, /api/posts/{id}/dislike
 	// /api/posts/{id}/comment, /api/posts/{id}/comment/{id}/like, /api/posts/{id}/comment/{id}/dislike
-	router.HandleFunc("/api/posts/", server.postsHandler)
+	router.HandleFunc("/api/posts/", server.apiPostsHandler)
 
 	// Master-handler for:
 	// /api/user, /api/user/{id}, /api/user/{id}/posts, /api/user/{id}
-	router.HandleFunc("/api/user/", server.usersHandler)
+	router.HandleFunc("/api/user/", server.apiUserHandler)
 
 	router.HandleFunc("/api/auth/login", server.loginHandler)
-	router.HandleFunc("/api/auth/signup", server.signUpHandler)
+	router.HandleFunc("/api/auth/signup", server.signupHandler)
 	router.HandleFunc("/api/auth/logout", server.logoutHandler)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
