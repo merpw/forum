@@ -49,21 +49,52 @@ func Start() http.Handler {
 		// place for this block of code
 
 		//not completed, wrong errors. need to be fixed
-		fmt.Println("r.URL.Path = ", r.URL.Path, "len", len(r.URL.Path))
-		if reGet.Match([]byte(r.URL.Path)) {
+		fmt.Println("r.URL.Path = ", r.URL.Path, "len", len(r.URL.Path)) // todo remove later
+
+		switch {
+		case reGet.Match([]byte(r.URL.Path)):
 			if r.Method != http.MethodGet {
 				fmt.Println("===TEST inside GET regex fired\n") // todo remove later
 				errorResponse(w, http.StatusMethodNotAllowed)
 			}
-		} else if rePost.Match([]byte(r.URL.Path)) {
+		case rePost.Match([]byte(r.URL.Path)):
 			if r.Method != http.MethodPost {
 				fmt.Println("===TEST inside POST regex fired\n") // todo remove later
 				errorResponse(w, http.StatusMethodNotAllowed)
 			}
-		} else {
+		default:
 			fmt.Println("===TEST inside no get no post regex fired\n") // todo remove later
 			errorResponse(w, http.StatusNotFound)
 		}
+
+		// todo create the regex for every endpoint separately,
+		// then using switch check bottom the r.URL.Path for every
+		//endpoint and if it returns true, then call appropriate handler. It allows to us to use something like
+		//wild cards (dynamic values managing in url) without external libraries which is outside standart library.
+		// F.e. "/api/user/{magic}" cannot be used in "router.HandleFunc("/api/user/", server.usersHandler)",
+		// so we can use
+		// switch {
+		// case reApiUserMagic.Match([]byte(r.URL.Path)):
+		// 	server.usersHandler(w, r)
+		// case blabla:
+		//	...etc
+		// } 99% it will work : )
+		// also some new handlers should be added, because new endpoints was added, and some code will be removed, because no needed anymore, ... later
+
+		// if reGet.Match([]byte(r.URL.Path)) {
+		// 	if r.Method != http.MethodGet {
+		// 		fmt.Println("===TEST inside GET regex fired\n") // todo remove later
+		// 		errorResponse(w, http.StatusMethodNotAllowed)
+		// 	}
+		// } else if rePost.Match([]byte(r.URL.Path)) {
+		// 	if r.Method != http.MethodPost {
+		// 		fmt.Println("===TEST inside POST regex fired\n") // todo remove later
+		// 		errorResponse(w, http.StatusMethodNotAllowed)
+		// 	}
+		// } else {
+		// 	fmt.Println("===TEST inside no get no post regex fired\n") // todo remove later
+		// 	errorResponse(w, http.StatusNotFound)
+		// }
 
 		/*
 			switch r.Method {
