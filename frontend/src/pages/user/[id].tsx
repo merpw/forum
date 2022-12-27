@@ -18,7 +18,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
     // Redirect to /me if user is logged in and is viewing their own profile
     if (!isRedirecting && req_user?.id == user.id) {
       setIsRedirecting(true)
-      router.push("/me")
+      router.replace("/me")
     }
   }, [router, isRedirecting, req_user?.id, user.id])
 
