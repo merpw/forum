@@ -33,3 +33,7 @@ export const logOut = async (): Promise<void> => {
   document.cookie = "forum-test-token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;"
   return Promise.resolve()
 }
+
+export const SignUp = async (name: string, email: string, password: string): Promise<void> => {
+  return Promise.reject("Not connected to backend yet")
+}

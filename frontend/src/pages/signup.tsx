@@ -1,18 +1,19 @@
 import { motion } from "framer-motion"
 import { NextPage } from "next"
 import Head from "next/head"
-import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { logIn, useUser } from "../api/auth"
+import { SignUp, useUser } from "../api/auth"
 
-const LoginPage: NextPage = () => {
+const SignupPage: NextPage = () => {
   const router = useRouter()
 
   const { isLoading, isLoggedIn, mutate } = useUser()
 
-  const [login, setLogin] = useState("")
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+
   const [formError, setFormError] = useState<string | null>(null)
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
@@ -26,33 +27,51 @@ const LoginPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Login - Forum</title>
+        <title>Sign Up - Forum</title>
       </Head>
       <form
         onSubmit={async (e) => {
           e.preventDefault()
           if (formError != null) setFormError(null)
 
-          logIn(login, password)
+          SignUp(name, email, password)
             .then(() => mutate())
             .catch((error) => setFormError(error))
         }}
       >
         <div className={"mb-6"}>
           <label
-            htmlFor={"login"}
+            htmlFor={"username"}
             className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
           >
-            Your email or username
+            Username
           </label>
           <input
-            type={login.match("@") ? "email" : "text"}
-            id={"login"}
+            type={"text"}
+            id={"username"}
             className={
               "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             }
-            onInput={(e) => setLogin(e.currentTarget.value)}
-            placeholder={"Email or username"}
+            onInput={(e) => setName(e.currentTarget.value)}
+            placeholder={"Username"}
+            required
+          />
+        </div>
+        <div className={"mb-6"}>
+          <label
+            htmlFor={"email"}
+            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
+          >
+            Your email
+          </label>
+          <input
+            type={"email"}
+            id={"email"}
+            className={
+              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            }
+            onInput={(e) => setEmail(e.currentTarget.value)}
+            placeholder={"Email"}
             required
           />
         </div>
@@ -61,7 +80,7 @@ const LoginPage: NextPage = () => {
             htmlFor={"password"}
             className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
           >
-            Your password
+            Create password
           </label>
           <input
             onInput={(e) => setPassword(e.currentTarget.value)}
@@ -73,25 +92,6 @@ const LoginPage: NextPage = () => {
             required
           />
         </div>
-        {/* <div className={"flex items-start mb-6"}>
-          <div className={"flex items-center h-5"}>
-            <input
-              id={"remember"}
-              type={"checkbox"}
-              value={""}
-              className={
-                "w-4 h-4 bg-gray-50 rounded border border-gray-300 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
-              }
-              required
-            />
-          </div>
-          <label
-            htmlFor={"remember"}
-            className={"ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"}
-          >
-            Remember me
-          </label>
-        </div> */}
         {formError && (
           <motion.div
             className={
@@ -106,28 +106,17 @@ const LoginPage: NextPage = () => {
             <span className={"font-medium"}>{formError}</span>
           </motion.div>
         )}
-        <span className={"flex flex-wrap gap-2"}>
-          <span>
-            <button
-              type={"submit"}
-              className={
-                "mb-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              }
-            >
-              Submit
-            </button>
-          </span>
-
-          <span className={"ml-auto text-right"}>
-            <div className={"font-light"}>{"Don't have an account yet?"}</div>
-            <Link className={"text-2xl hover:opacity-50 "} href={"/signup"}>
-              Sign Up!
-            </Link>
-          </span>
-        </span>
+        <button
+          type={"submit"}
+          className={
+            "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          }
+        >
+          Submit
+        </button>
       </form>
     </>
   )
 }
 
-export default LoginPage
+export default SignupPage
