@@ -35,10 +35,12 @@ func Start() http.Handler {
 		}()
 
 		// todo add to regexp all variants for urls for GET method, to check incoming request urls fast
-		reGet := regexp.MustCompile(`\/api\/(?:user\/[[:digit:]]+(?:\/posts(?:\/liked)?)?|posts(?:\/(?:rumor|fact)s)?|me(?:\/liked)?)\/?$`)
+		// reGet := regexp.MustCompile(`\/api\/(?:user\/[[:digit:]]+(?:\/posts(?:\/liked)?)?|posts(?:\/(?:rumor|fact)s)?|me(?:\/liked)?)\/?$`)
+		reGet := regexp.MustCompile(`^\/api\/(?:post(?:s\/category\/[a-zA-Z0-9_.-]+|\/[[:digit:]]+)\/?|posts\/categories\/?|me\/liked\/posts\/?|user\/[[:digit:]]+(?:\/(?:posts\/?)?)?|posts\/?|me\/?)$`)
 
 		// todo add to regexp all variants for urls for POST method, to check incoming request urls fast
-		rePost := regexp.MustCompile(`\/api\/post(?:\/[[:digit:]]+/(?:(?:comment\/[[:digit:]]+\/)?dislike|(?:comment\/[[:digit:]]\/)?like|comment))?\/?$`)
+		// rePost := regexp.MustCompile(`\/api\/post(?:\/[[:digit:]]+/(?:(?:comment\/[[:digit:]]+\/)?dislike|(?:comment\/[[:digit:]]\/)?like|comment))?\/?$`) // perhaps this regexp, made by natkim does the same filtering
+		rePost := regexp.MustCompile(`^\/api\/post(?:\/(?:[[:digit:]]+\/(?:(?:comment\/[[:digit:]]+\/)?dislike\/?|(?:comment\/[[:digit:]]+\/)?like\/?|comment\/?))?)?$`)
 
 		// todo cococore, ask maxim what wrong here.
 		// i need to sleep now :x . And this code section i plan to use for checking
@@ -47,17 +49,19 @@ func Start() http.Handler {
 		// place for this block of code
 
 		//not completed, wrong errors. need to be fixed
+		fmt.Println("r.URL.Path = ", r.URL.Path, "len", len(r.URL.Path))
 		if reGet.Match([]byte(r.URL.Path)) {
 			if r.Method != http.MethodGet {
+				fmt.Println("===TEST inside GET regex fired\n") // todo remove later
 				errorResponse(w, http.StatusMethodNotAllowed)
 			}
 		} else if rePost.Match([]byte(r.URL.Path)) {
 			if r.Method != http.MethodPost {
-
+				fmt.Println("===TEST inside POST regex fired\n") // todo remove later
 				errorResponse(w, http.StatusMethodNotAllowed)
 			}
 		} else {
-			fmt.Println("TEST")
+			fmt.Println("===TEST inside no get no post regex fired\n") // todo remove later
 			errorResponse(w, http.StatusNotFound)
 		}
 
