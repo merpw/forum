@@ -52,6 +52,10 @@ func TestGet(t *testing.T) {
 		{"/api/posts/1/like", http.StatusMethodNotAllowed},
 		{"/api/posts/1/dislike", http.StatusMethodNotAllowed},
 		{"/api/posts/1/comment", http.StatusMethodNotAllowed},
+
+		{"/api/auth/login", http.StatusMethodNotAllowed},
+		{"/api/auth/signup", http.StatusMethodNotAllowed},
+		{"/api/auth/logout", http.StatusMethodNotAllowed},
 	}
 	for _, test := range tests {
 		t.Run(test.url, func(t *testing.T) {
