@@ -1,5 +1,5 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import { Post, Comment } from "../../custom"
+import { Post } from "../../custom"
 
 import Link from "next/link"
 import { FC, useState } from "react"
@@ -9,6 +9,7 @@ import { getPostLocal, getPostsLocal } from "../../api/posts/fetch"
 import { useUser } from "../../api/auth"
 import { motion } from "framer-motion"
 import { CreateComment } from "../../api/posts/comment"
+import { ReactionsButtons } from "../../components/posts/reactions"
 
 const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   return (
@@ -23,23 +24,24 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
         </div>
         <p>{post.content}</p>
         <hr className={"mt-4"} />
-        <div className={"border-t py-2 flex justify-between"}>
-          <span title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}>
-            {moment(post.date).fromNow()}
-          </span>
-          <span>
-            {"by "}
-            <Link href={`/user/${post.author.id}`}>
-              <span className={"text-xl hover:opacity-50"}>{post.author.name}</span>
-            </Link>
+        <div className={"border-t py-2 flex flex-wrap"}>
+          <ReactionsButtons post={post} />
+
+          <span className={"ml-auto"}>
+            <span title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}>
+              {moment(post.date).fromNow()}
+            </span>
+            {" by "}
+            <span className={"text-xl hover:opacity-50"}>
+              <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
+            </span>
           </span>
         </div>
         <div>
           <h2 className={"text-2xl my-4"}>Comments:</h2>
           <CommentForm post={post} />
-          <Comments comments={post.comments} />
+          <Comments post={post} />
         </div>
-        <div></div>
       </div>
     </>
   )
@@ -113,21 +115,28 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
   )
 }
 
-const Comments: FC<{ comments: Comment[] }> = ({ comments }) => {
-  if (comments.length == 0) {
+const Comments: FC<{ post: Post }> = ({ post }) => {
+  if (post.comments.length == 0) {
     return <div>There are no comments yet, write one first!</div>
   }
 
   return (
     <div className={"flex flex-col gap-3"}>
-      {comments.map((comment, key) => (
+      {post.comments.map((comment, key) => (
         <div className={"border rounded p-5"} key={key}>
           <Link href={`/user/${comment.author.id}`}>
             <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
           </Link>
           <p>{comment.text}</p>
-          <span title={moment(comment.date).local().format("DD.MM.YYYY HH:mm:ss")}>
-            {moment(comment.date).fromNow()}
+          <hr className={"mt-4 mb-2"}></hr>
+          <span className={"flex"}>
+            <ReactionsButtons post={post} comment={comment} />
+            <span
+              className={"ml-auto"}
+              title={moment(comment.date).local().format("DD.MM.YYYY HH:mm:ss")}
+            >
+              {moment(comment.date).fromNow()}
+            </span>
           </span>
         </div>
       ))}

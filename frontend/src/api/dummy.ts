@@ -17,6 +17,7 @@ export const posts: Post[] = [
     date: "2022-12-26T15:58:18.166Z",
     likes: 0,
     dislikes: 0,
+    user_reaction: 1,
     comments: [],
   },
   {
@@ -28,16 +29,21 @@ export const posts: Post[] = [
     date: "2022-12-22T19:36:18.166Z",
     likes: 0,
     dislikes: 0,
+    user_reaction: 0,
     comments: [
       {
         author: users[0],
         text: "Donec neque diam, sodales eget aliquam vel, fringilla nec eros. Proin tincidunt felis arcu, a tempus ante hendrerit eget. Vestibulum eget nisi eget tellus porttitor interdum a nec velit.",
         date: "2022-12-22T21:36:18.166Z",
+        user_reaction: 0,
+        likes: 5,
       },
       {
         author: users[1],
         text: "Bruh...",
         date: "2022-12-23T20:36:18.166Z",
+        user_reaction: 0,
+        likes: 0,
       },
     ],
   },
@@ -50,6 +56,7 @@ export const posts: Post[] = [
     date: "2022-12-22T19:36:18.166Z",
     likes: 0,
     dislikes: 0,
+    user_reaction: 0,
     comments: [],
   },
 ]

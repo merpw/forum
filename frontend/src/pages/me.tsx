@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { PostList } from "../components/posts"
 import { useUser } from "../api/auth"
 import { useUserPosts } from "../api/posts/fetch"
+import { PostList } from "../components/posts/list"
 
 /* TODO: add placeholders */
 

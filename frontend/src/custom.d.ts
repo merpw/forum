@@ -6,6 +6,7 @@ export type Post = {
   dislikes: number
   date: string
   author: User
+  user_reaction: number | undefined
   comments: Comment[]
 }
 
@@ -18,4 +19,6 @@ export type Comment = {
   author: User
   text: string
   date: string
+  likes: number
+  user_reaction: number | undefined
 }

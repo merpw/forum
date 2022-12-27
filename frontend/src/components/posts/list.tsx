@@ -1,7 +1,7 @@
 import moment from "moment"
 import Link from "next/link"
 import { FC } from "react"
-import { Post } from "../custom"
+import { Post } from "../../custom"
 
 export const PostList: FC<{ posts: Post[] }> = ({ posts }) => {
   if (posts.length == 0) {
