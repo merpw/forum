@@ -2,13 +2,20 @@ package server
 
 import (
 	"encoding/json"
+	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/mail"
 	"strings"
+	"time"
 )
 
 func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
+	if srv.isLoggedIn(r) {
+		http.Error(w, "You are already logged in", http.StatusBadRequest)
+		return
+	}
+
 	requestBody := struct {
 		Name     string `json:"name"`
 		Email    string `json:"email"`
@@ -55,13 +62,73 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database stuff for "login" + Error handling during managing data
-	sendObject(w, "login")
+	if srv.isLoggedIn(r) {
+		http.Error(w, "You are already logged in", http.StatusBadRequest)
+		return
+	}
+
+	requestBody := struct {
+		Login    string `json:"login"`
+		Password string `json:"password"`
+	}{}
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(w, "Body is not valid", http.StatusBadRequest)
+		return
+	}
+
+	user := srv.DB.GetUserByLogin(requestBody.Login)
+	if user == nil {
+		http.Error(w, "Invalid login or password", http.StatusBadRequest)
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))
+	if err != nil {
+		http.Error(w, "Invalid password", http.StatusBadRequest)
+		return
+	}
+	token, err := uuid.NewV4()
+	if err != nil {
+		panic(err)
+	}
+	expire := time.Now().Add(24 * time.Hour)
+
+	srv.DB.AddSession(token.String(), int(expire.Unix()), user.Id)
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "forum-token",
+		Value:   token.String(),
+		Expires: expire,
+		Path:    "/",
+		//	TODO: add secure on production
+	})
 }
 
 func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	r.Cookies()
-	// todo database stuff for "logout" + Error handling during managing data
-	w.WriteHeader(http.StatusUnauthorized)
-	sendObject(w, "logout")
+	cookie, err := r.Cookie("forum-token")
+	if err != nil {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+	srv.DB.RemoveSession(cookie.Value)
+
+	http.SetCookie(w, &http.Cookie{
+		Name:    "forum-token",
+		Value:   "",
+		Expires: time.Now(),
+		Path:    "/",
+	})
+}
+
+func (srv *Server) isLoggedIn(r *http.Request) bool {
+	cookie, err := r.Cookie("forum-token")
+	if err != nil {
+		return false
+	}
+	user := srv.DB.CheckSession(cookie.Value)
+	if user == nil {
+		return false
+	}
+	return true
 }

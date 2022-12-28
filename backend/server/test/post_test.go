@@ -26,7 +26,7 @@ func TestAuth(t *testing.T) {
 
 	t.Run("signup", func(t *testing.T) {
 		resp, err := cli.Post(testServer.URL+"/api/signup", "application/json",
-			strings.NewReader(`{ "name": "max", "email": "max@mer.pw", "password": "notapassword" }`))
+			strings.NewReader(`{ "name": "test", "email": "test@test.com", "password": "notapassword" }`))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -35,12 +35,32 @@ func TestAuth(t *testing.T) {
 		}
 	})
 
+	var cookies []*http.Cookie
 	t.Run("login", func(t *testing.T) {
-		resp, err := cli.Post(testServer.URL+"/api/login", "application/json", nil)
+		resp, err := cli.Post(testServer.URL+"/api/login", "application/json",
+			strings.NewReader(`{ "login": "test@test.com", "password": "notapassword" }`))
 		if err != nil {
 			t.Fatal(err)
 		}
+		cookies = resp.Cookies()
+
 		// TODO: add request body
+		if resp.StatusCode != 200 {
+			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
+		}
+	})
+
+	t.Run("logout", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/logout", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookies[0])
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if resp.StatusCode != 200 {
 			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 		}
@@ -83,4 +103,5 @@ func TestPost(t *testing.T) {
 			}
 		})
 	}
+	//	TODO: add POST tests with auth
 }

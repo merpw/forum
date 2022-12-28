@@ -17,10 +17,19 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
+	if !srv.isLoggedIn(r) {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
 	sendObject(w, "Me")
 }
 
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
+	if !srv.isLoggedIn(r) {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+
 	sendObject(w, "Me posts")
 }
 

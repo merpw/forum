@@ -1,7 +1,5 @@
 package database
 
-import "time"
-
 type Post struct {
 	Id            int
 	Title         string
@@ -32,8 +30,8 @@ type Comment struct {
 }
 
 type Session struct {
-	Id        int64
-	Uuid      string
-	ExpiredAt time.Time
-	UserId    int64
+	Id     int
+	Token  string
+	Expire int
+	UserId int
 }

@@ -136,6 +136,11 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 
 // postsCreateHandler creates a new post in the database
 func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
+	if !srv.isLoggedIn(r) {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+
 	requestBody := struct {
 		Title   string `json:"title"`
 		Content string `json:"content"`

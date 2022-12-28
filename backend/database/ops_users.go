@@ -25,6 +25,27 @@ func (db DB) GetUserById(id int) *User {
 	return &user
 }
 
+// GetUserByLogin returns user with specified login
+//
+// returns nil if user not found
+func (db DB) GetUserByLogin(login string) *User {
+	query, err := db.Query("SELECT * FROM users WHERE email = ?", login)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer query.Close()
+
+	if !query.Next() {
+		return nil
+	}
+	var user User
+	err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+	if err != nil {
+		log.Panic(err)
+	}
+	return &user
+}
+
 // AddUser adds user to database, returns id of new user
 func (db DB) AddUser(name, email, password string) int {
 	result, err := db.Exec(`INSERT INTO users (name, email, password) VALUES (?, ?, ?)`, name, email, password)
@@ -41,7 +62,7 @@ func (db DB) AddUser(name, email, password string) int {
 
 // IsEmailTaken checks if email is already in use
 func (db DB) IsEmailTaken(email string) bool {
-	query, err := db.Query("SELECT * FROM users WHERE email = ?", email)
+	query, err := db.Query("SELECT 1 FROM users WHERE email = ?", email)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -49,3 +70,5 @@ func (db DB) IsEmailTaken(email string) bool {
 
 	return query.Next()
 }
+
+// TODO: maybe add IsNameTaken

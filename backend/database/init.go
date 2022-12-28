@@ -48,5 +48,15 @@ func (db DB) InitDatabase() error {
 		return err
 	}
 
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS sessions (
+						id INTEGER PRIMARY KEY,
+						token TEXT,
+						expire INTEGER,
+						user_id INTEGER,
+						FOREIGN KEY(user_id) REFERENCES users(id))`)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
