@@ -78,8 +78,6 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	//   }
 	// ]
 
-	fmt.Println("I reached in postsHandler") //-debug line
-
 	db := database.OpenDB()
 
 	// Execute the query to retrieve the posts
@@ -90,20 +88,37 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	// Create a slice to store the posts
-	var posts []database.Post
+	posts := make([]database.Post, 0)
 
 	// Iterate over the rows and append each post to the slice
 	for rows.Next() {
-		var post database.Post
-		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.CommentsCount)
+		post := database.Post{}
+		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.UserReactions, &post.CommentsCount)
 		if err != nil {
 			sendObject(w, err)
 		}
 		posts = append(posts, post)
 	}
 
+	fmt.Println(posts)
+	fmt.Println(len(posts))
+
+	// marshal the posts slice into json
+	jsonPosts, err := json.Marshal(posts)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// set the content type to json
+	w.Header().Set("Content-Type", "application/json")
+	// set the status code to 200
+	w.WriteHeader(http.StatusOK)
+	// write the json data to the response
+	w.Write(jsonPosts)
+
 	// Return the list of posts as a response to the client
-	sendObject(w, posts)
+	// sendObject(w, posts)
 	// sendObject(w, srv.posts)
 }
 
