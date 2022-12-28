@@ -2,16 +2,17 @@ package server
 
 import (
 	"encoding/json"
-	"github.com/gofrs/uuid"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/mail"
 	"strings"
 	"time"
+
+	"github.com/gofrs/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.isLoggedIn(r) {
+	if srv.getUserId(r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -62,7 +63,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.isLoggedIn(r) {
+	if srv.getUserId(r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -121,14 +122,11 @@ func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (srv *Server) isLoggedIn(r *http.Request) bool {
+func (srv *Server) getUserId(r *http.Request) int {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
-		return false
+		return -1
 	}
-	user := srv.DB.CheckSession(cookie.Value)
-	if user == nil {
-		return false
-	}
-	return true
+	userId := srv.DB.CheckSession(cookie.Value)
+	return userId
 }

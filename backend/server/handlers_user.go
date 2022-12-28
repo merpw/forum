@@ -17,7 +17,7 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
-	if !srv.isLoggedIn(r) {
+	if srv.getUserId(r) == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
@@ -25,7 +25,7 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
-	if !srv.isLoggedIn(r) {
+	if srv.getUserId(r) == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}

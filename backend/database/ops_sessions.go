@@ -15,15 +15,15 @@ func (db DB) AddSession(token string, expire, userId int) {
 
 // CheckSession checks if session is valid
 //
-// returns User if session is valid or nil if not
-func (db DB) CheckSession(token string) *User {
+// returns UserId if session is valid or -1 if not
+func (db DB) CheckSession(token string) int {
 	query, err := db.Query("SELECT * FROM sessions WHERE token = ?", token)
 	if err != nil {
 		log.Panic(err)
 	}
 
 	if !query.Next() {
-		return nil
+		return -1
 	}
 	var session Session
 	err = query.Scan(&session.Id, &session.Token, &session.Expire, &session.UserId)
@@ -34,9 +34,9 @@ func (db DB) CheckSession(token string) *User {
 
 	if session.Expire < int(time.Now().Unix()) {
 		db.RemoveExpiredSessions()
-		return nil
+		return -1
 	}
-	return db.GetUserById(session.UserId)
+	return session.UserId
 }
 
 func (db DB) RemoveExpiredSessions() {
