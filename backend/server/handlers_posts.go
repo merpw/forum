@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"forum/database"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -75,11 +76,23 @@ func (srv *Server) postsCategoriesRumorsHandler(w http.ResponseWriter, r *http.R
 
 // postsPostsIdHandler returns a single post from the database that matches the incoming id of the post in the url
 func (srv *Server) postsPostsIdHandler(w http.ResponseWriter, r *http.Request) {
-	post, err := GetSinglePostByPostId(r.URL.Path[len("/api/posts/"):])
+	// Get the post ID from the URL path
+	idStr := r.URL.Path[len("/api/posts/"):]
+	// Parse the post ID into an int
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		return
+	}
+
+	// Get the post from the database
+	post, err := GetSinglePostByPostId(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	// Send the post back to the client
 	sendObject(w, post)
 }
 
