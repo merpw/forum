@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"forum/database"
 	"forum/server"
 	"log"
 	"net"
@@ -20,6 +21,7 @@ func main() {
 	}
 
 	log.Printf("Server started on http://localhost:%v\n", *port)
+	database.InitDatabase()
 	err = http.Serve(listen, server.Start())
 	if err != nil {
 		log.Fatal(err)

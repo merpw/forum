@@ -1,12 +1,12 @@
 package database
 
-type ApiUser struct {
+type ApiMe struct {
 	Id    int    `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 
-type ApiUserLikedPosts struct {
+type ApiMeLikedPosts struct {
 }
 
 type ApiUserId struct {
@@ -28,9 +28,19 @@ type Post struct {
 	CommentsCount int    `json:"comments_count"`
 }
 type Author struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id   int    `json:"user_id"`
+	Name string `json:"user_name"`
 }
+
+type User struct {
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Posts    []int  `json:"posts_id"`
+	Comments []int  `json:"comments_id"`
+}
+
 type ApiPosts []Post
 
 type ApiPostsCategories struct {
@@ -55,6 +65,7 @@ type ApiPostsId struct {
 }
 type Comment struct {
 	Author Author `json:"author"`
+	PostId int    `json:"post_id"`
 	Text   string `json:"text"`
 	Date   string `json:"date"`
 }
