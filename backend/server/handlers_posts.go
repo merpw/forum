@@ -73,7 +73,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	//     "comments_count": 2
 	//   }
 	// ]
-	
+
 	// todo database post fetching
 	sendObject(w, srv.posts)
 }
@@ -122,6 +122,28 @@ func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request)
 
 // postsIdCommentIdLikeHandler likes a comment on a post in the database
 func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Request) {
+	// requirement: the user needs to be logged in to do this.
+	// step1: check if the user is logged in
+	// step2: check if the post exists
+	// step3: check if the comment exists
+	//
+	// step4: check if the user has already his id in the list of user_reactions
+	// if user_id not in user_reactions{
+	// 	user_reaction[user_id]=1 // like
+	// 	like++ // for the post like number
+	// }else{ // user_id inside database
+	// 	switch user_reaction[user_id] { // old reaction from database
+	// 	case 1: //according to request, because it is "like" handler so like press happens here
+	// 		like-- // decrease like
+	// 		delete(user_reaction[user_id])
+	// 	case -1: // was dislike
+	// 		dislike--
+	// 		like++
+	// 	}
+	// }
+	// step 5: send the updated number of likes/dislikes on post to the frontend
+	// reaction = user_reaction[user_id] // 1 like -1 dislike 0- if no key inside map, then send it to the frontend
+	// todo database managing etc
 	// todo database managing etc
 	sendObject(w, "postsIdCommentIdLikeHandler")
 }
