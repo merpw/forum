@@ -1,6 +1,8 @@
 package database
 
 import (
+	"encoding/json"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -133,40 +135,50 @@ func insertSampleData() error {
 		return err
 	}
 
+	// make an empty map of user reactions
+	uRs := make(map[int]int)
+	// Convert the map to a JSON string.
+	jsonData, err := json.Marshal(uRs)
+	if err != nil {
+		return err
+	}
+	uRsStr := string(jsonData)
+
 	// Insert sample posts
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 1, "First Post", "This is the first post", 1, "2022-01-01", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 1, "First Post", "This is the first post", 1, "2022-01-01", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 2, "Second Post", "This is the second post", 1, "2022-01-02", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 2, "Second Post", "This is the second post", 1, "2022-01-02", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 3, "Third Post", "This is the third post", 1, "2022-01-03", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 3, "Third Post", "This is the third post", 1, "2022-01-03", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 4, "Fourth Post", "This is the fourth post", 2, "2022-01-04", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 4, "Fourth Post", "This is the fourth post", 2, "2022-01-04", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 5, "Fifth Post", "This is the fifth post", 2, "2022-01-05", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 5, "Fifth Post", "This is the fifth post", 2, "2022-01-05", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 6, "Sixth Post", "This is the sixth post", 2, "2022-01-06", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 6, "Sixth Post", "This is the sixth post", 2, "2022-01-06", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 7, "Seventh Post", "This is the seventh post", 3, "2022-01-07", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 7, "Seventh Post", "This is the seventh post", 3, "2022-01-07", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 8, "Eighth Post", "This is the eighth post", 3, "2022-01-08", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 8, "Eighth Post", "This is the eighth post", 3, "2022-01-08", 0, 0, uRsStr, 1)
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 9, "Ninth Post", "This is the ninth post", 3, "2022-01-09", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, 9, "Ninth Post", "This is the ninth post", 3, "2022-01-09", 0, 0, uRsStr, 1)
+	_ = uRsStr
 	if err != nil {
 		return err
 	}

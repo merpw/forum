@@ -248,7 +248,7 @@ func GetAllPosts() ([]database.Post, error) {
 		post.Likes = p.Likes
 		post.Dislikes = p.Dislikes
 		// make a UserReactions []UserReaction from the string p.UserReactions
-		u := []database.UserReaction{}
+		u := make(map[int]int)
 		// unmarshal the string p.UserReactions into the UserReaction struct
 		err = json.Unmarshal([]byte(p.UserReactions), &u)
 		if err != nil {
