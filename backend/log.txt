@@ -1,0 +1,30 @@
+main.go:33: Server started on http://localhost:8080
+main.go:36: UNIQUE constraint failed: users.id
+main.go:34: Server started on http://localhost:8080
+main.go:37: UNIQUE constraint failed: users.id
+main.go:34: Server started on http://localhost:8080
+init.go:80: UNIQUE constraint failed: users.id
+main.go:37: UNIQUE constraint failed: users.id
+main.go:34: Server started on http://localhost:8080
+init.go:156: sql: converting argument $10 type: unsupported type []int, a slice of int
+main.go:37: sql: converting argument $10 type: unsupported type []int, a slice of int
+main.go:34: Server started on http://localhost:8080
+init.go:80: UNIQUE constraint failed: users.id
+main.go:37: UNIQUE constraint failed: users.id
+main.go:34: Server started on http://localhost:8080
+main.go:34: Server started on http://localhost:8080
+init.go:145: 8 values for 5 columns
+main.go:37: 8 values for 5 columns
+main.go:34: Server started on http://localhost:8080
+init.go:145: table comments has no column named likes
+main.go:37: table comments has no column named likes
+main.go:34: Server started on http://localhost:8080
+main.go:34: Server started on http://localhost:8080
+init.go:177: sql: converting argument $10 type: unsupported type []int, a slice of int
+main.go:37: sql: converting argument $10 type: unsupported type []int, a slice of int
+main.go:34: Server started on http://localhost:8080
+init.go:145: near ")": syntax error
+main.go:37: near ")": syntax error
+main.go:34: Server started on http://localhost:8080
+main.go:34: Server started on http://localhost:8080
+main.go:34: Server started on http://localhost:8080

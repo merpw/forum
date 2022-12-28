@@ -46,32 +46,6 @@ func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, r *http.Request
 	sendObject(w, "posts categories list")
 }
 
-// return data in json format, like below:
-// 	[
-//   {
-//     "id": 1,
-//     "title": "Post 1",
-//     "content": "Content One",
-//     "author": { "id": 1, "name": "Max" },
-//     "date": "2022-12-22T19:36:18.166Z",
-//     "likes": 1,
-//     "dislikes": 0,
-// 		"user_reaction": 1, // add only if user is logged in, -1=user disliked, 1=user liked, 0=nothing
-//     "comments_count": 2
-//   },
-//   {
-//     "id": 2,
-//     "title": "Post 2",
-//     "content": "Content Two.",
-//     "author": { "id": 2, "name": "Cat" },
-//     "date": "2022-12-22T19:36:18.166Z",
-//     "likes": 0,
-//     "dislikes": 0,
-// 		"user_reaction": 0, // add only if user is logged in, -1=user disliked, 1=user liked, 0=nothing
-//     "comments_count": 2
-//   }
-// ]
-
 // postsHandler returns a json list of all posts from the database
 func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	// no need of user to be logged in to see all posts
@@ -101,8 +75,12 @@ func (srv *Server) postsCategoriesRumorsHandler(w http.ResponseWriter, r *http.R
 
 // postsPostsIdHandler returns a single post from the database that matches the incoming id of the post in the url
 func (srv *Server) postsPostsIdHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database managing etc
-	sendObject(w, "postsPostsIdHandler")
+	post, err := GetSinglePostByPostId(r.URL.Path[len("/api/posts/"):])
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	sendObject(w, post)
 }
 
 // postsCreateHandler creates a new post in the database
@@ -225,18 +203,22 @@ func GetAllPosts() ([]database.Post, error) {
 	for rows.Next() {
 		post := database.Post{}
 		type prestruct struct {
-			Id            int
-			Title         string
-			Content       string
-			Author        int
-			Date          string
-			Likes         int
-			Dislikes      int
-			UserReactions string
-			CommentsCount int
+			Id                 int
+			Title              string
+			Content            string
+			Author             int
+			Date               string
+			Likes              int
+			Dislikes           int
+			UserReactions      string
+			CommentsCount      int
+			CommentsReceiver   string
+			Comments           []int
+			CategoriesReceiver string
+			Categories         []string
 		}
 		p := prestruct{}
-		err := rows.Scan(&p.Id, &p.Title, &p.Content, &p.Author, &p.Date, &p.Likes, &p.Dislikes, &p.UserReactions, &p.CommentsCount)
+		err := rows.Scan(&p.Id, &p.Title, &p.Content, &p.Author, &p.Date, &p.Likes, &p.Dislikes, &p.UserReactions, &p.CommentsCount, &p.CommentsReceiver, &p.CategoriesReceiver)
 		if err != nil {
 			return nil, err
 		}
@@ -256,9 +238,77 @@ func GetAllPosts() ([]database.Post, error) {
 		}
 		post.UserReactions = u
 		post.CommentsCount = p.CommentsCount
+		p.Comments = make([]int, 0)
+		// unmarshal the string p.CommentsReceiver into the []int p.Comments
+		err = json.Unmarshal([]byte(p.CommentsReceiver), &p.Comments)
+		if err != nil {
+			return nil, err
+		}
+		post.Comments = p.Comments
+		p.Categories = make([]string, 0)
+		// unmarshal the string p.CategoriesReceiver into the []string p.Categories
+		err = json.Unmarshal([]byte(p.CategoriesReceiver), &p.Categories)
+		if err != nil {
+			return nil, err
+		}
+		post.Categories = p.Categories
 		posts = append(posts, post)
 	}
 
 	// Return the list of posts and a nil error
 	return posts, nil
+}
+
+func GetSinglePostByPostId(postId int) (database.Post, error) {
+	// Open a connection to the database
+	db := database.OpenDB()
+
+	// Execute the query to retrieve the post
+	row := db.QueryRow("SELECT * FROM posts WHERE id = $1", postId)
+
+	// Create a variable to store the post
+	post := database.Post{}
+
+	type prestruct struct {
+		UserReactions      string
+		CommentsReceiver   string
+		CategoriesReceiver string
+	}
+	p := prestruct{}
+
+	// Scan the row into the post variable
+	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &p.UserReactions, &post.CommentsCount, &p.CommentsReceiver, &p.CategoriesReceiver)
+	if err != nil {
+		return database.Post{}, err
+	}
+
+	// Make a UserReactions map from the string post.UserReactions
+	u := make(map[int]int)
+	// Unmarshal the string post.UserReactions into the UserReaction struct
+	err = json.Unmarshal([]byte(p.UserReactions), &u)
+	if err != nil {
+		return database.Post{}, err
+	}
+	post.UserReactions = u
+
+	// Make a Comments []int from the string post.CommentsReceiver
+	comments := make([]int, 0)
+	// Unmarshal the string post.CommentsReceiver into the []int comments
+	err = json.Unmarshal([]byte(p.CommentsReceiver), &comments)
+	if err != nil {
+		return database.Post{}, err
+	}
+	post.Comments = comments
+
+	// Make a Categories []string from the string post.CategoriesReceiver
+	categories := make([]string, 0)
+	// Unmarshal the string post.CategoriesReceiver into the []string categories
+	err = json.Unmarshal([]byte(p.CategoriesReceiver), &categories)
+	if err != nil {
+		return database.Post{}, err
+	}
+	post.Categories = categories
+
+	// Return the post and a nil error
+	return post, nil
 }
