@@ -23,7 +23,7 @@ func main() {
 	}
 	log.Printf("Server started on http://localhost:%v\n", *port)
 
-	db, err := sql.Open("sqlite3", *dbFile)
+	db, err := sql.Open("sqlite3", *dbFile+"?_foreign_keys=true") // enable foreign keys
 	if err != nil {
 		log.Fatal(err)
 	}

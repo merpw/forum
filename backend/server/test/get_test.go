@@ -2,7 +2,6 @@ package server
 
 import (
 	"database/sql"
-	"forum/database"
 	"forum/server"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +10,7 @@ import (
 
 // TestGet tests all GET routes for valid status codes
 func TestGet(t *testing.T) {
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -27,8 +26,8 @@ func TestGet(t *testing.T) {
 
 	cli := testServer.Client()
 
-	srv.DB.AddPost(database.Post{Title: "test", Content: "test"})
-	srv.DB.AddUser(database.User{Name: "Steve", Email: "steve@apple.com", Password: "@@@l1sa@@@"})
+	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
+	srv.DB.AddPost("test", "test", userId)
 
 	tests := []struct {
 		url          string
@@ -68,9 +67,9 @@ func TestGet(t *testing.T) {
 		{"/api/posts/1/dislike", http.StatusMethodNotAllowed},
 		{"/api/posts/1/comment", http.StatusMethodNotAllowed},
 
-		{"/api/auth/login", http.StatusMethodNotAllowed},
-		{"/api/auth/signup", http.StatusMethodNotAllowed},
-		{"/api/auth/logout", http.StatusMethodNotAllowed},
+		{"/api/login", http.StatusMethodNotAllowed},
+		{"/api/signup", http.StatusMethodNotAllowed},
+		{"/api/logout", http.StatusMethodNotAllowed},
 	}
 	for _, test := range tests {
 		t.Run(test.url, func(t *testing.T) {

@@ -5,12 +5,15 @@ import (
 	"forum/server"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
+// TODO: move server init to separate func (to prevent `email is already taken` false test fail)
+
 // TestAuth tests auth routes
 func TestAuth(t *testing.T) {
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,18 +25,18 @@ func TestAuth(t *testing.T) {
 	cli := testServer.Client()
 
 	t.Run("signup", func(t *testing.T) {
-		resp, err := cli.Post(testServer.URL+"/api/auth/signup", "application/json", nil)
+		resp, err := cli.Post(testServer.URL+"/api/signup", "application/json",
+			strings.NewReader(`{ "name": "max", "email": "max@mer.pw", "password": "notapassword" }`))
 		if err != nil {
 			t.Fatal(err)
 		}
-		// TODO: add request body
 		if resp.StatusCode != 200 {
 			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 		}
 	})
 
 	t.Run("login", func(t *testing.T) {
-		resp, err := cli.Post(testServer.URL+"/api/auth/login", "application/json", nil)
+		resp, err := cli.Post(testServer.URL+"/api/login", "application/json", nil)
 		if err != nil {
 			t.Fatal(err)
 		}

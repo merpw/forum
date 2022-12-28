@@ -8,7 +8,7 @@ import (
 )
 
 func TestStart(t *testing.T) {
-	db, err := sql.Open("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
 	if err != nil {
 		t.Fatal(err)
 	}

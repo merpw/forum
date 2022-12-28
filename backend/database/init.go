@@ -26,9 +26,8 @@ func (db DB) InitDatabase() error {
 						content TEXT,
 						author INTEGER,
 						date TEXT,
-						likes INTEGER,
-						dislikes INTEGER,
-						user_reactions TEXT,
+						likes_count INTEGER,
+						dislikes_count INTEGER,
 						comments_count INTEGER,
 						FOREIGN KEY(author) REFERENCES users(id))`)
 	if err != nil {
@@ -41,8 +40,8 @@ func (db DB) InitDatabase() error {
 						author INTEGER,					
 						text TEXT,
 						date TEXT,
-						likes INTEGER,
-						dislikes INTEGER,
+						likes_count INTEGER,
+						dislikes_count INTEGER,
     	   				FOREIGN KEY(post) REFERENCES posts(id),
 						FOREIGN KEY(author) REFERENCES users(id))`)
 	if err != nil {

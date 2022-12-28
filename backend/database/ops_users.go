@@ -12,6 +12,8 @@ func (db DB) GetUserById(id int) *User {
 	if err != nil {
 		log.Panic(err)
 	}
+	defer query.Close()
+
 	var user User
 	if !query.Next() {
 		return nil
@@ -24,14 +26,26 @@ func (db DB) GetUserById(id int) *User {
 }
 
 // AddUser adds user to database, returns id of new user
-func (db DB) AddUser(user User) int64 {
-	result, err := db.Exec(`INSERT INTO users (name, email, password) VALUES (?, ?, ?)`, user.Name, user.Email, user.Password)
+func (db DB) AddUser(name, email, password string) int {
+	result, err := db.Exec(`INSERT INTO users (name, email, password) VALUES (?, ?, ?)`, name, email, password)
 	if err != nil {
 		log.Panic(err)
 	}
+
 	id, err := result.LastInsertId()
 	if err != nil {
 		log.Panic(err)
 	}
-	return id
+	return int(id)
+}
+
+// IsEmailTaken checks if email is already in use
+func (db DB) IsEmailTaken(email string) bool {
+	query, err := db.Query("SELECT * FROM users WHERE email = ?", email)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer query.Close()
+
+	return query.Next()
 }

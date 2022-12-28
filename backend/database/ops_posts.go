@@ -9,17 +9,20 @@ import (
 //
 // panics if error occurs
 func (db DB) GetPosts() []Post {
-	q, err := db.Query("SELECT * FROM posts")
+	query, err := db.Query("SELECT * FROM posts")
 	if err != nil {
 		log.Panic(err)
 	}
+	defer query.Close()
+
 	var posts []Post
-	for q.Next() {
+	for query.Next() {
 		var post Post
-		err = q.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.UsersReactions, &post.CommentsCount)
+		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount)
 		if err != nil {
 			log.Panic(err)
 		}
+		post.Author = db.GetUserById(post.AuthorId)
 		posts = append(posts, post)
 	}
 	return posts
@@ -30,21 +33,24 @@ func (db DB) GetPostById(id int) *Post {
 	if err != nil {
 		log.Panic(err)
 	}
+	defer query.Close()
+
 	var post Post
 	if !query.Next() {
 		return nil
 	}
-	err = query.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.UsersReactions, &post.CommentsCount)
+	err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount)
 	if err != nil {
 		log.Panic(err)
 	}
+	post.Author = db.GetUserById(post.AuthorId)
 	return &post
 }
 
 // AddPost adds post to database, returns id of new post
-func (db DB) AddPost(post Post) int64 {
-	result, err := db.Exec(`INSERT INTO posts (title, content, author, date, likes, dislikes, user_reactions, comments_count) 
-	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, post.Title, post.Content, post.Author, time.Now().Format(time.RFC3339), 0, 0, "", 0)
+func (db DB) AddPost(title, content string, authorId int) int {
+	result, err := db.Exec(`INSERT INTO posts (title, content, author, date, likes_count, dislikes_count, comments_count) 
+								  VALUES (?, ?, ?, ?, ?, ?, ?)`, title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -52,5 +58,5 @@ func (db DB) AddPost(post Post) int64 {
 	if err != nil {
 		log.Panic(err)
 	}
-	return id
+	return int(id)
 }

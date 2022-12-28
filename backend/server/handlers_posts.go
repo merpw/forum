@@ -2,11 +2,15 @@ package server
 
 import (
 	"encoding/json"
-	"forum/database"
 	"net/http"
 	"strconv"
 	"strings"
 )
+
+type SafeUser struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
 
 func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) {
 	switch {
@@ -55,7 +59,30 @@ func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, r *http.Request
 
 // postsHandler returns a json list of all posts from the database
 func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
-	sendObject(w, srv.DB.GetPosts())
+	posts := srv.DB.GetPosts()
+	type ResponsePost struct {
+		Id            int      `json:"id"`
+		Title         string   `json:"title"`
+		Content       string   `json:"content"`
+		Author        SafeUser `json:"author"`
+		CommentsCount int      `json:"comments_count"`
+		LikesCount    int      `json:"likes_count"`
+	}
+
+	var response []ResponsePost
+
+	for _, post := range posts {
+		response = append(response, ResponsePost{
+			Id:            post.Id,
+			Title:         post.Title,
+			Content:       post.Content,
+			Author:        SafeUser{Id: post.Author.Id, Name: post.Author.Name},
+			CommentsCount: post.CommentsCount,
+			LikesCount:    post.LikesCount,
+		})
+	}
+
+	sendObject(w, response)
 }
 
 // postsCategoriesFactsHandler returns a json list of all posts from the database that match the category "facts"
@@ -72,6 +99,15 @@ func (srv *Server) postsCategoriesRumorsHandler(w http.ResponseWriter, r *http.R
 
 // postsIdHandler returns a single post from the database that matches the incoming id of the post in the url
 func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
+	type Response struct {
+		Id            int      `json:"id"`
+		Title         string   `json:"title"`
+		Content       string   `json:"content"`
+		Author        SafeUser `json:"author"`
+		CommentsCount int      `json:"comments_count"`
+		LikesCount    int      `json:"likes_count"`
+	}
+
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -87,26 +123,35 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Send the post back to the client
-	sendObject(w, post)
+	sendObject(w, Response{
+		Id:            post.Id,
+		Title:         post.Title,
+		Content:       post.Content,
+		Author:        SafeUser{Id: post.Author.Id, Name: post.Author.Name},
+		CommentsCount: post.CommentsCount,
+		LikesCount:    post.LikesCount,
+	},
+	)
 }
 
 // postsCreateHandler creates a new post in the database
 func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	var post database.Post
-	err := json.NewDecoder(r.Body).Decode(&post)
+	requestBody := struct {
+		Title   string `json:"title"`
+		Content string `json:"content"`
+	}{}
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
-	post.Author = 1 // TODO: remove when add auth
 
-	if post.Title == "" || post.Content == "" || post.Author == 0 {
+	if requestBody.Title == "" || requestBody.Content == "" {
 		http.Error(w, "Invalid post data", http.StatusBadRequest)
 		return
 	}
 
-	id := srv.DB.AddPost(post)
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, 1)
 	sendObject(w, id)
 }
 
