@@ -77,43 +77,9 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	//     "comments_count": 2
 	//   }
 	// ]
-
-	fmt.Println("I reached in postsHandler") //-debug line
-
-	db := database.OpenDB()
-
-	// Execute the query to retrieve the posts
-	rows, err := db.Query("SELECT * FROM posts")
-	if err != nil {
-		sendObject(w, err)
-	}
-	defer rows.Close()
-
-	// Create a slice to store the posts
-	var posts []database.Post
-
-	// Iterate over the rows and append each post to the slice
-	for rows.Next() {
-		var post database.Post
-		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.CommentsCount)
-		if err != nil {
-			sendObject(w, err)
-		}
-		posts = append(posts, post)
-	}
-
-	// Make a json object of the posts
-	jsonPosts, err := json.Marshal(posts)
-	if err != nil {
-		sendObject(w, err)
-	}
-
-	// Print the json object
-	fmt.Println(string(jsonPosts))
-
-	// Return the list of posts as a response to the client
-	sendObject(w, posts)
-	// sendObject(w, srv.posts)
+	
+	// todo database post fetching
+	sendObject(w, srv.posts)
 }
 
 // postsCategoriesFactsHandler returns a json list of all posts from the database that match the category "facts"
@@ -186,6 +152,28 @@ func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request)
 
 // postsIdCommentIdLikeHandler likes a comment on a post in the database
 func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Request) {
+	// requirement: the user needs to be logged in to do this.
+	// step1: check if the user is logged in
+	// step2: check if the post exists
+	// step3: check if the comment exists
+	//
+	// step4: check if the user has already his id in the list of user_reactions
+	// if user_id not in user_reactions{
+	// 	user_reaction[user_id]=1 // like
+	// 	like++ // for the post like number
+	// }else{ // user_id inside database
+	// 	switch user_reaction[user_id] { // old reaction from database
+	// 	case 1: //according to request, because it is "like" handler so like press happens here
+	// 		like-- // decrease like
+	// 		delete(user_reaction[user_id])
+	// 	case -1: // was dislike
+	// 		dislike--
+	// 		like++
+	// 	}
+	// }
+	// step 5: send the updated number of likes/dislikes on post to the frontend
+	// reaction = user_reaction[user_id] // 1 like -1 dislike 0- if no key inside map, then send it to the frontend
+	// todo database managing etc
 	// todo database managing etc
 	sendObject(w, "postsIdCommentIdLikeHandler")
 }
