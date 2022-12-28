@@ -28,6 +28,7 @@ func TestGet(t *testing.T) {
 	cli := testServer.Client()
 
 	srv.DB.AddPost(database.Post{Title: "test", Content: "test"})
+	srv.DB.AddUser(database.User{Name: "Steve", Email: "steve@apple.com", Password: "@@@l1sa@@@"})
 
 	tests := []struct {
 		url          string
