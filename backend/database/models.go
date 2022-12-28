@@ -2,6 +2,11 @@ package database
 
 import "time"
 
+// TODO: remove structs that will be used only once in handler (such as ApiMe)
+// Move them to handlers instead
+// Leave only global structs such as Post, User, Comment...
+// Structures for reading from database also should be inside database functions
+
 type ApiMe struct {
 	Id    int    `json:"id"`
 	Name  string `json:"name"`
@@ -29,17 +34,17 @@ type Session struct {
 var AllCategories = []string{"Technology", "Facts", "Rumors", "Science", "Politics", "Sports", "Entertainment", "Health", "Business", "Other"}
 
 type Post struct {
-	Id            int         `json:"id"`
-	Title         string      `json:"title"`
-	Content       string      `json:"content"`
-	Author        int         `json:"author_id"` // this is a user id
-	Date          string      `json:"date"`
-	Likes         int         `json:"likes"`
-	Dislikes      int         `json:"dislikes"`
-	UserReactions map[int]int `json:"user_reactions"` // map of user id to reaction value of -1 or 1
-	CommentsCount int         `json:"comments_count"`
-	Comments      []int       `json:"comments_ids"`
-	Categories    []string    `json:"categories"`
+	Id             int      `json:"id"`
+	Title          string   `json:"title"`
+	Content        string   `json:"content"`
+	Author         int      `json:"author_id"` // this is a user id
+	Date           string   `json:"date"`
+	Likes          int      `json:"likes"`
+	Dislikes       int      `json:"dislikes"`
+	UsersReactions string   `json:"users_reactions"`
+	CommentsCount  int      `json:"comments_count"`
+	Comments       []int    `json:"comments_ids"`
+	Categories     []string `json:"categories"`
 }
 
 type UserReaction struct {

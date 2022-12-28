@@ -1,46 +1,53 @@
 package database
 
-// type Post struct {
-// 	Id            int    `json:"id"`
-// 	Title         string `json:"title"`
-// 	Content       string `json:"content"`
-// 	Author        Author `json:"author"`
-// 	Date          string `json:"date"`
-// 	Likes         int    `json:"likes"`
-// 	Dislikes      int    `json:"dislikes"`
-// 	UserReaction  int    `json:"user_reaction"`
-// 	CommentsCount int    `json:"comments_count"`
-// }
+import (
+	"log"
+	"time"
+)
 
-// Add a method Add to the Post struct, that adds a post to the database
-func (p *Post) Add() error {
-	// Open a connection to the database
-	// db := Opendb()
-
-	// // Prepare the INSERT statement
-	// stmt, err := db.Prepare("INSERT INTO posts (id, title, content, author, date, likes, dislikes, user_reaction, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
-	// if err != nil {
-	// 	return err
-	// }
-	// defer stmt.Finalize()
-
-	// // Bind the values of the fields of the Post struct to the placeholders in the INSERT statement
-	// _, err = stmt.Bind(p.Id, p.Title, p.Content, p.Author, p.Date, p.Likes, p.Dislikes, p.UserReaction, p.CommentsCount)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// // Execute the INSERT statement
-	// _, err = stmt.Step()
-	// if err != nil {
-	// 	return err
-	// }
-
-	return nil
+// GetPosts reads all posts from database
+//
+// panics if error occurs
+func (db DB) GetPosts() []Post {
+	q, err := db.Query("SELECT * FROM posts")
+	if err != nil {
+		log.Panic(err)
+	}
+	var posts []Post
+	for q.Next() {
+		var post Post
+		err = q.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.UsersReactions, &post.CommentsCount)
+		if err != nil {
+			log.Panic(err)
+		}
+		posts = append(posts, post)
+	}
+	return posts
 }
 
-// Add a method Get to the Post struct, that gets a post from the database
-func (p *Post) Get() error {
-	//TODO: implement
-	return nil
+func (db DB) GetPostById(id int) *Post {
+	query, err := db.Query("SELECT * FROM posts WHERE id = ?", id)
+	if err != nil {
+		return nil
+	}
+	var post Post
+	err = query.Scan(&post)
+	if err != nil {
+		return nil
+	}
+	return &post
+}
+
+// AddPost adds post to database, returns id of new post
+func (db DB) AddPost(post Post) int64 {
+	result, err := db.Exec(`INSERT INTO posts (title, content, author, date, likes, dislikes, user_reactions, comments_count) 
+	VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, post.Title, post.Content, post.Author, time.Now().Format(time.RFC3339), 0, 0, "", 0)
+	if err != nil {
+		log.Panic(err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Panic(err)
+	}
+	return id
 }

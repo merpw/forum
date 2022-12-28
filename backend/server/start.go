@@ -1,32 +1,37 @@
 package server
 
 import (
+	"database/sql"
+	"forum/database"
 	"log"
 	"net/http"
 )
 
 type Server struct {
-	posts string
+	DB database.DB
+}
+
+// Connect returns Server with connected database
+func Connect(db *sql.DB) *Server {
+	return &Server{DB: database.DB{DB: db}}
 }
 
 // Start returns http.Handler with all routes
-func Start() http.Handler {
-	server := Server{posts: "POSTS"}
-
+func (srv *Server) Start() http.Handler {
 	router := http.NewServeMux()
 
 	// Master-handler for:
 	// /api/posts, /api/posts/{id}, /api/posts/{id}/like, /api/posts/{id}/dislike
 	// /api/posts/{id}/comment, /api/posts/{id}/comment/{id}/like, /api/posts/{id}/comment/{id}/dislike
-	router.HandleFunc("/api/posts/", server.apiPostsHandler)
+	router.HandleFunc("/api/posts/", srv.apiPostsMasterHandler)
 
 	// Master-handler for:
 	// /api/user, /api/user/{id}, /api/user/{id}/posts, /api/user/{id}
-	router.HandleFunc("/api/user/", server.apiUserHandler)
+	router.HandleFunc("/api/user/", srv.apiUserHandler)
 
-	router.HandleFunc("/api/auth/login", server.loginHandler)
-	router.HandleFunc("/api/auth/signup", server.signupHandler)
-	router.HandleFunc("/api/auth/logout", server.logoutHandler)
+	router.HandleFunc("/api/auth/login", srv.loginHandler)
+	router.HandleFunc("/api/auth/signup", srv.signupHandler)
+	router.HandleFunc("/api/auth/logout", srv.logoutHandler)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {

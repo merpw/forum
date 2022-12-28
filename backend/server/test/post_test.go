@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"forum/server"
 	"net/http"
 	"net/http/httptest"
@@ -9,14 +10,19 @@ import (
 
 // TestAuth tests auth routes
 func TestAuth(t *testing.T) {
-	router := server.Start()
-	srv := httptest.NewServer(router)
-	defer srv.Close()
+	db, err := sql.Open("sqlite3", "./test.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv := server.Connect(db)
+	router := srv.Start()
+	testServer := httptest.NewServer(router)
+	defer testServer.Close()
 
-	cli := srv.Client()
+	cli := testServer.Client()
 
 	t.Run("signup", func(t *testing.T) {
-		resp, err := cli.Post(srv.URL+"/api/auth/signup", "application/json", nil)
+		resp, err := cli.Post(testServer.URL+"/api/auth/signup", "application/json", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -27,7 +33,7 @@ func TestAuth(t *testing.T) {
 	})
 
 	t.Run("login", func(t *testing.T) {
-		resp, err := cli.Post(srv.URL+"/api/auth/login", "application/json", nil)
+		resp, err := cli.Post(testServer.URL+"/api/auth/login", "application/json", nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -40,11 +46,16 @@ func TestAuth(t *testing.T) {
 
 // TestPost tests post routes
 func TestPost(t *testing.T) {
-	router := server.Start()
-	srv := httptest.NewServer(router)
-	defer srv.Close()
+	db, err := sql.Open("sqlite3", "./test.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv := server.Connect(db)
+	router := srv.Start()
+	testServer := httptest.NewServer(router)
+	defer testServer.Close()
 
-	cli := srv.Client()
+	cli := testServer.Client()
 
 	tests := []struct {
 		url string
@@ -60,7 +71,7 @@ func TestPost(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.url, func(t *testing.T) {
-			resp, err := cli.Post(srv.URL+test.url, "application/json", nil)
+			resp, err := cli.Post(testServer.URL+test.url, "application/json", nil)
 			if err != nil {
 				t.Fatal(err)
 			}

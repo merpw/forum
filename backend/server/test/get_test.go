@@ -1,6 +1,8 @@
 package server
 
 import (
+	"database/sql"
+	"forum/database"
 	"forum/server"
 	"net/http"
 	"net/http/httptest"
@@ -9,11 +11,23 @@ import (
 
 // TestGet tests all GET routes for valid status codes
 func TestGet(t *testing.T) {
-	router := server.Start()
-	srv := httptest.NewServer(router)
-	defer srv.Close()
+	db, err := sql.Open("sqlite3", "./test.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv := server.Connect(db)
+	err = srv.DB.InitDatabase()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	cli := srv.Client()
+	router := srv.Start()
+	testServer := httptest.NewServer(router)
+	defer testServer.Close()
+
+	cli := testServer.Client()
+
+	srv.DB.AddPost(database.Post{Title: "test", Content: "test"})
 
 	tests := []struct {
 		url          string
@@ -24,8 +38,8 @@ func TestGet(t *testing.T) {
 
 		{"/api/posts/1", 200},
 
-		{"/api/users/1", 200},
-		{"/api/users/1/posts", 200},
+		{"/api/user/1", 200},
+		{"/api/user/1/posts", 200},
 
 		{"/api/posts/categories", 200},
 		{"/api/posts/categories/rumors", 200},
@@ -33,10 +47,10 @@ func TestGet(t *testing.T) {
 		{"/api/posts/-1", 404},
 		{"/api/posts/cat", 404},
 
-		{"/api/users/-1", 404},
-		{"/api/users/cat", 404},
-		{"/api/users/cat/posts", 404},
-		{"/api/users/", 404},
+		{"/api/user/-1", 404},
+		{"/api/user/cat", 404},
+		{"/api/user/cat/posts", 404},
+		{"/api/user/", 404},
 
 		{"/api/posts/categories/cat", 404},
 
@@ -59,7 +73,7 @@ func TestGet(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.url, func(t *testing.T) {
-			resp, err := cli.Get(srv.URL + test.url)
+			resp, err := cli.Get(testServer.URL + test.url)
 			if err != nil {
 				t.Fatal(err)
 			}
