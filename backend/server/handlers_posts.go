@@ -21,7 +21,7 @@ func (srv *Server) apiPostsHandler(w http.ResponseWriter, r *http.Request) {
 	case reApiPostsIdLike.MatchString(r.URL.Path):
 		srv.postsIdLikeHandler(w, r)
 	case reApiPostsIdDislike.MatchString(r.URL.Path):
-		srv.postsPostsIdDislikeHandler(w, r)
+		srv.postsIdDislikeHandler(w, r)
 	case reApiPostsIdComment.MatchString(r.URL.Path):
 		srv.postsIdCommentHandler(w, r)
 	case reApiPostsIdCommentIdLike.MatchString(r.URL.Path):
@@ -80,9 +80,9 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // postsPostsIdDislikeHandler dislikes a post in the database
-func (srv *Server) postsPostsIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
-	sendObject(w, "postsPostsIdDislikeHandler")
+	sendObject(w, "postsIdDislikeHandler")
 }
 
 // postsIdCommentHandler comments on a post in the database
@@ -94,7 +94,7 @@ func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request)
 // postsIdCommentIdLikeHandler likes a comment on a post in the database
 func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
-	sendObject(w, "postsPostsIdCommentIdLikeHandler")
+	sendObject(w, "postsIdCommentIdLikeHandler")
 }
 
 // postsIdCommentIdDislikeHandler dislikes a comment on a post in the database
