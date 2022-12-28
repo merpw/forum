@@ -17,15 +17,20 @@ type ApiUserId struct {
 // type ApiUserIdPosts []Post
 
 type Post struct {
-	Id            int    `json:"id"`
-	Title         string `json:"title"`
-	Content       string `json:"content"`
-	Author        Author `json:"author"`
-	Date          string `json:"date"`
-	Likes         int    `json:"likes"`
-	Dislikes      int    `json:"dislikes"`
-	UserReaction  int    `json:"user_reaction"`
-	CommentsCount int    `json:"comments_count"`
+	Id            int            `json:"id"`
+	Title         string         `json:"title"`
+	Content       string         `json:"content"`
+	Author        Author         `json:"author"`
+	Date          string         `json:"date"`
+	Likes         int            `json:"likes"`
+	Dislikes      int            `json:"dislikes"`
+	UserReactions []UserReaction `json:"user_reactions"`
+	CommentsCount int            `json:"comments_count"`
+}
+
+type UserReaction struct {
+	UserId         int `json:"user_id"`
+	Reaction_Value int `json:"reaction_value"` // 1 for like, -1 for dislike, 0 for no reaction
 }
 type Author struct {
 	Id   int    `json:"user_id"`

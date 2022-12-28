@@ -52,7 +52,7 @@ func InitDatabase() error {
 	// date TEXT, 												// 	Date          string `json:"date"`
 	// likes INTEGER, 											// 	Likes         int    `json:"likes"`
 	// dislikes INTEGER, 										// 	Dislikes      int    `json:"dislikes"`
-	// user_reaction INTEGER, 									// 	UserReaction  int    `json:"user_reaction"`
+	// user_reactions TEXT, 									// 	UserReactions  []UserReaction    `json:"user_reactions"`
 	// comments_count INTEGER, 									// 	CommentsCount int    `json:"comments_count"`
 	// FOREIGN KEY(author) REFERENCES users(id))`)				// to link to the users table
 	// Create the posts table
@@ -64,7 +64,7 @@ func InitDatabase() error {
 					date TEXT, 
 					likes INTEGER, 
 					dislikes INTEGER, 
-					user_reaction INTEGER, 
+					user_reactions TEXT, 
 					comments_count INTEGER, 
 					FOREIGN KEY(author) REFERENCES users(id))`)
 	if err != nil {
