@@ -1,7 +1,11 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
+	"forum/database"
 	"net/http"
+	"time"
 )
 
 func (srv *Server) apiPostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,9 +77,43 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	//     "comments_count": 2
 	//   }
 	// ]
-	
-	// todo database post fetching
-	sendObject(w, srv.posts)
+
+	fmt.Println("I reached in postsHandler") //-debug line
+
+	db := database.OpenDB()
+
+	// Execute the query to retrieve the posts
+	rows, err := db.Query("SELECT * FROM posts")
+	if err != nil {
+		sendObject(w, err)
+	}
+	defer rows.Close()
+
+	// Create a slice to store the posts
+	var posts []database.Post
+
+	// Iterate over the rows and append each post to the slice
+	for rows.Next() {
+		var post database.Post
+		err := rows.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.CommentsCount)
+		if err != nil {
+			sendObject(w, err)
+		}
+		posts = append(posts, post)
+	}
+
+	// Make a json object of the posts
+	jsonPosts, err := json.Marshal(posts)
+	if err != nil {
+		sendObject(w, err)
+	}
+
+	// Print the json object
+	fmt.Println(string(jsonPosts))
+
+	// Return the list of posts as a response to the client
+	sendObject(w, posts)
+	// sendObject(w, srv.posts)
 }
 
 // postsCategoriesFactsHandler returns a json list of all posts from the database that match the category "facts"
@@ -98,8 +136,34 @@ func (srv *Server) postsPostsIdHandler(w http.ResponseWriter, r *http.Request) {
 
 // postsCreateHandler creates a new post in the database
 func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database managing etc
-	sendObject(w, "postsCreateHandler")
+	// Parse the request body to get the post data
+	var newPost database.Post
+	err := json.NewDecoder(r.Body).Decode(&newPost)
+	if err != nil {
+		http.Error(w, "Error parsing request body", http.StatusBadRequest)
+		return
+	}
+
+	// Validate the post data
+	if newPost.Title == "" || newPost.Content == "" || newPost.Author.Id == 0 {
+		http.Error(w, "Invalid post data", http.StatusBadRequest)
+		return
+	}
+
+	// Connect to the database
+	db := database.OpenDB()
+
+	// Insert the new post into the database
+	_, err = db.Exec(`INSERT INTO posts (title, content, author, date, likes, dislikes, user_reactions, comments_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, newPost.Title, newPost.Content, newPost.Author.Id, time.Now().Format(time.RFC3339), 0, 0, "", 0)
+	if err != nil {
+		http.Error(w, "Error inserting post into the database", http.StatusInternalServerError)
+		return
+	}
+
+	// Return success to the client
+	// w.WriteHeader(http.StatusOK)
+	sendObject(w, http.StatusOK) // compromise for now, negotiate with the client to send the new post id back to the client if possible
+	// sendObject(w, "postsCreateHandler")
 }
 
 // postsIdLikeHandler likes a post in the database
@@ -129,8 +193,8 @@ func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Re
 // postsIdCommentIdDislikeHandler dislikes a comment on a post in the database
 func (srv *Server) postsIdCommentIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
 	// the user needs to be logged in to do this.
-	// step1: check if the user is logged in
-	// check if the post exists
+	// todo step1: check if the user is logged in
+	// todo step2: check if the post exists
 	// check if the comment exists
 	//
 	// check if the user has already his id in the list of user_reactions
@@ -147,6 +211,6 @@ func (srv *Server) postsIdCommentIdDislikeHandler(w http.ResponseWriter, r *http
 	// send the updated number of likes/dislikes on post to the frontend
 	// send the updated user_reaction for the user_id to the frontend.
 	// if user_if is now not in the list of user_reactions, send 0 to the frontend
-	// todo database managing etc
+	// todo
 	sendObject(w, "postsIdCommentIdDislikeHandler")
 }
