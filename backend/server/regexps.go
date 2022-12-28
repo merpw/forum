@@ -5,15 +5,14 @@ import (
 	"strings"
 )
 
-// this takes in a string and wherever it finds "/" it adds \ before it
+// addSlashes escapes all slashes in a string ( / -> \/ )
 func addSlashes(s string) string {
 	return strings.Replace(s, "/", "\\/", -1)
 }
 
 // method get
-var reApiUser = regexp.MustCompile(addSlashes(`^/api/user/?$`))
-
-// var reApiUser = regexp.MustCompile(`^\/api\/user\/?$`)
+var reApiMe = regexp.MustCompile(addSlashes(`^/api/me/?$`))
+var reApiMePosts = regexp.MustCompile(addSlashes(`^/api/me/posts/?$`))
 
 var reApiUserLikedPosts = regexp.MustCompile(addSlashes(`^/api/user/liked/posts/?$`))
 var reApiUserId = regexp.MustCompile(addSlashes(`^/api/user/[[:digit:]]+/?$`))
@@ -36,7 +35,7 @@ var reApiLogin = regexp.MustCompile(addSlashes(`^/api/login/?$`))
 var reApiLogout = regexp.MustCompile(addSlashes(`^/api/logout/?$`))
 
 var getRegexps = []string{
-	reApiUser.String(), reApiUserLikedPosts.String(), reApiUserId.String(), reApiUserIdPosts.String(), reApiPosts.String(), reApiPostsCategories.String(), reApiPostsCategoriesFacts.String(), reApiPostsCategoriesRumors.String(), reApiPostsId.String()}
+	reApiMe.String(), reApiMePosts.String(), reApiUserLikedPosts.String(), reApiUserId.String(), reApiUserIdPosts.String(), reApiPosts.String(), reApiPostsCategories.String(), reApiPostsCategoriesFacts.String(), reApiPostsCategoriesRumors.String(), reApiPostsId.String()}
 var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 
 var postRegexps = []string{reApiPostsCreate.String(), reApiPostsIdLike.String(), reApiPostsIdDislike.String(), reApiPostsIdComment.String(), reApiPostsIdCommentIdLike.String(), reApiPostsIdCommentIdDislike.String(), reApiSignup.String(), reApiLogin.String(), reApiLogout.String()}

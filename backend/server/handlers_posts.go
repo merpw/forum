@@ -5,6 +5,7 @@ import (
 	"forum/database"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +23,7 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 		srv.postsCategoriesRumorsHandler(w, r)
 
 	case reApiPostsId.MatchString(r.URL.Path):
-		srv.postsPostsIdHandler(w, r)
+		srv.postsIdHandler(w, r)
 
 	case reApiPostsCreate.MatchString(r.URL.Path):
 		srv.postsCreateHandler(w, r)
@@ -69,14 +70,12 @@ func (srv *Server) postsCategoriesRumorsHandler(w http.ResponseWriter, r *http.R
 	sendObject(w, "postsCategoriesRumorsHandler")
 }
 
-// postsPostsIdHandler returns a single post from the database that matches the incoming id of the post in the url
-func (srv *Server) postsPostsIdHandler(w http.ResponseWriter, r *http.Request) {
-	// Get the post ID from the URL path
-	idStr := r.URL.Path[len("/api/posts/"):]
-	// Parse the post ID into an int
+// postsIdHandler returns a single post from the database that matches the incoming id of the post in the url
+func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
+	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid post ID", http.StatusBadRequest)
+		errorResponse(w, http.StatusNotFound)
 		return
 	}
 

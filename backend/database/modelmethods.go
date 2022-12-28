@@ -28,12 +28,15 @@ func (db DB) GetPosts() []Post {
 func (db DB) GetPostById(id int) *Post {
 	query, err := db.Query("SELECT * FROM posts WHERE id = ?", id)
 	if err != nil {
-		return nil
+		log.Panic(err)
 	}
 	var post Post
-	err = query.Scan(&post)
-	if err != nil {
+	if !query.Next() {
 		return nil
+	}
+	err = query.Scan(&post.Id, &post.Title, &post.Content, &post.Author, &post.Date, &post.Likes, &post.Dislikes, &post.UsersReactions, &post.CommentsCount)
+	if err != nil {
+		log.Panic(err)
 	}
 	return &post
 }

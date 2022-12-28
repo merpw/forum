@@ -26,8 +26,11 @@ func (srv *Server) Start() http.Handler {
 	router.HandleFunc("/api/posts/", srv.apiPostsMasterHandler)
 
 	// Master-handler for:
-	// /api/user, /api/user/{id}, /api/user/{id}/posts, /api/user/{id}
+	// /api/user/{id}, /api/user/{id}/posts, /api/user/{id}
 	router.HandleFunc("/api/user/", srv.apiUserHandler)
+
+	router.HandleFunc("/api/me/", srv.apiMeHandler)
+	router.HandleFunc("/api/me/posts", srv.apiMePostsHandler)
 
 	router.HandleFunc("/api/auth/login", srv.loginHandler)
 	router.HandleFunc("/api/auth/signup", srv.signupHandler)
