@@ -3,12 +3,15 @@ package database
 import (
 	"encoding/json"
 	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 // InitDatabase initializes the database
 func InitDatabase() error {
+	DeleteDatabaseFile()
+
 	db := OpenDB()
 
 	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS users (
@@ -69,6 +72,15 @@ func InitDatabase() error {
 		return err
 	}
 
+	return nil
+}
+
+// delete the database file
+func DeleteDatabaseFile() error {
+	err := os.Remove("./database/database.db")
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

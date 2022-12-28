@@ -23,3 +23,6 @@ go.work
 
 # ignore database files
 *.db
+
+# ignore log
+log.txt
