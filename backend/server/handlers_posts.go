@@ -37,46 +37,67 @@ func (srv *Server) apiPostsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// postsCatergoriesHandler returns a json list of all categories from the database
 func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database post fetching
 	sendObject(w, "posts categories list")
 }
+
+// postsHandler returns a json list of all posts from the database
 func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database post fetching
 	sendObject(w, srv.posts)
 }
+
+// postsCategoriesFactsHandler returns a json list of all posts from the database that match the category "facts"
 func (srv *Server) postsCategoriesFactsHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsCategoriesFactsHandler")
 }
+
+// postsCategoriesRumorsHandler returns a json list of all posts from the database that match the category "rumors"
 func (srv *Server) postsCategoriesRumorsHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsCategoriesRumorsHandler")
 }
+
+// postsPostsIdHandler returns a single post from the database that matches the incoming id of the post in the url
 func (srv *Server) postsPostsIdHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsPostsIdHandler")
 }
+
+// postsCreateHandler creates a new post in the database
 func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsCreateHandler")
 }
+
+// postsIdLikeHandler likes a post in the database
 func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsIdLikeHandler")
 }
+
+// postsPostsIdDislikeHandler dislikes a post in the database
 func (srv *Server) postsPostsIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsPostsIdDislikeHandler")
 }
+
+// postsIdCommentHandler comments on a post in the database
 func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsIdCommentHandler")
 }
+
+// postsIdCommentIdLikeHandler likes a comment on a post in the database
 func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsPostsIdCommentIdLikeHandler")
 }
+
+// postsIdCommentIdDislikeHandler dislikes a comment on a post in the database
 func (srv *Server) postsIdCommentIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
 	sendObject(w, "postsIdCommentIdDislikeHandler")
