@@ -102,15 +102,6 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 		posts = append(posts, post)
 	}
 
-	// Make a json object of the posts
-	jsonPosts, err := json.Marshal(posts)
-	if err != nil {
-		sendObject(w, err)
-	}
-
-	// Print the json object
-	fmt.Println(string(jsonPosts))
-
 	// Return the list of posts as a response to the client
 	sendObject(w, posts)
 	// sendObject(w, srv.posts)

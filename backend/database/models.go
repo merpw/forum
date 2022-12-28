@@ -68,11 +68,13 @@ type ApiPostsId struct {
 	UserReaction int       `json:"user_reaction"`
 	Comments     []Comment `json:"comments"`
 }
+
 type Comment struct {
-	Author Author `json:"author"`
-	PostId int    `json:"post_id"`
-	Text   string `json:"text"`
-	Date   string `json:"date"`
+	Id     int    `json:"id"`      // comment id
+	PostId int    `json:"post_id"` // post id
+	Author Author `json:"author"`  // author id
+	Text   string `json:"text"`    // comment text
+	Date   string `json:"date"`    // comment date
 }
 
 type ApiPostsCreate struct {

@@ -36,8 +36,9 @@ func InitDatabase() error {
 	// 	name TEXT 												 // 	Name string `json:"user_name"`
 	// )`)
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS author (
-		id INTEGER PRIMARY KEY,
-		name TEXT
+		id INTEGER,
+		name TEXT,
+		FOREIGN KEY(id) REFERENCES users(id)
 	)`)
 	if err != nil {
 		return err
@@ -92,17 +93,9 @@ func InitDatabase() error {
 		return err
 	}
 
-	// if the tables are empty, insert sample data
-	var count int
-	err = db.QueryRow(`SELECT COUNT(*) FROM users`).Scan(&count)
+	err = insertSampleData()
 	if err != nil {
 		return err
-	}
-	if count == 0 {
-		err = insertSampleData()
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -178,40 +171,36 @@ func insertSampleData() error {
 		return err
 	}
 
+	// (id INTEGER PRIMARY KEY,
+	// 	post INTEGER,
+	// 	author INTEGER,
+	// 	text TEXT,
+	// 	date TEXT,
+	// 	FOREIGN KEY(post) REFERENCES posts(id),
+	// 	FOREIGN KEY(author) REFERENCES users(id))`)
+
 	// Insert sample comments
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 1, "This is a comment on the first post", 1, "2022-01-01", 0, 0, "[]", 1)
+	_, err = db.Exec(`INSERT INTO comments (id, post, author, text, date) VALUES (?, ?, ?, ?, ?)`, 1, 1, 1, "This is a comment on the 1st post", "2022-01-01")
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 2, "This is a comment on the second post", 1, "2022-01-02", 0, 0, "[]", 2)
+	_, err = db.Exec(`INSERT INTO comments (id, post, author, text, date) VALUES (?, ?, ?, ?, ?)`, 2, 1, 1, "This is a comment on the 1st post", "2022-01-02")
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 3, "This is a comment on the third post", 1, "2022-01-03", 0, 0, "[]", 3)
+	_, err = db.Exec(`INSERT INTO comments (id, post, author, text, date) VALUES (?, ?, ?, ?, ?)`, 3, 1, 1, "This is a comment on the 1st post", "2022-01-03")
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 4, "This is a comment on the fourth post", 2, "2022-01-04", 0, 0, "[]", 4)
+	_, err = db.Exec(`INSERT INTO comments (id, post, author, text, date) VALUES (?, ?, ?, ?, ?)`, 4, 2, 2, "This is a comment on the 2nd post", "2022-01-04")
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 5, "This is a comment on the fifth post", 2, "2022-01-05", 0, 0, "[]", 5)
+	_, err = db.Exec(`INSERT INTO comments (id, post, author, text, date) VALUES (?, ?, ?, ?, ?)`, 5, 2, 2, "This is a comment on the 2nd post", "2022-01-05")
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 6, "This is a comment on the sixth post", 2, "2022-01-06", 0, 0, "[]", 6)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 7, "This is a comment on the seventh post", 3, "2022-01-07", 0, 0, "[]", 7)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 8, "This is a comment on the eighth post", 3, "2022-01-08", 0, 0, "[]", 8)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec(`INSERT INTO comments (id, content, author, date, likes, dislikes, user_reactions, post_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, 9, "This is a comment on the ninth post", 3, "2022-01-09", 0, 0, "[]", 9)
+	_, err = db.Exec(`INSERT INTO comments (id, post, author, text, date) VALUES (?, ?, ?, ?, ?)`, 6, 2, 2, "This is a comment on the 2nd post", "2022-01-06")
 	if err != nil {
 		return err
 	}
