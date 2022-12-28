@@ -20,7 +20,7 @@ type Post struct {
 	Id            int            `json:"id"`
 	Title         string         `json:"title"`
 	Content       string         `json:"content"`
-	Author        Author         `json:"author"`
+	Author        int            `json:"author_id"`
 	Date          string         `json:"date"`
 	Likes         int            `json:"likes"`
 	Dislikes      int            `json:"dislikes"`
@@ -61,7 +61,7 @@ type ApiPostsId struct {
 	Id           int       `json:"id"`
 	Title        string    `json:"title"`
 	Content      string    `json:"content"`
-	Author       Author    `json:"author"`
+	Author       int       `json:"author_id"`
 	Date         string    `json:"date"`
 	Likes        int       `json:"likes"`
 	Dislikes     int       `json:"dislikes"`
@@ -70,11 +70,11 @@ type ApiPostsId struct {
 }
 
 type Comment struct {
-	Id     int    `json:"id"`      // comment id
-	PostId int    `json:"post_id"` // post id
-	Author Author `json:"author"`  // author id
-	Text   string `json:"text"`    // comment text
-	Date   string `json:"date"`    // comment date
+	Id     int    `json:"id"`        // comment id
+	PostId int    `json:"post_id"`   // post id
+	Author int    `json:"author_id"` // author id
+	Text   string `json:"text"`      // comment text
+	Date   string `json:"date"`      // comment date
 }
 
 type ApiPostsCreate struct {

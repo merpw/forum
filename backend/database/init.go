@@ -76,7 +76,7 @@ func InitDatabase() error {
 	// _, err = db.Exec(`CREATE TABLE IF NOT EXISTS comments    // type Comment struct {
 	// (id INTEGER PRIMARY KEY, 				 			    // 	Id      int    `json:"id"`
 	// 	post INTEGER, 											// 	Post    Post   `json:"post"`
-	// 	author INTEGER, 										// 	Author  Author `json:"author"`
+	// 	author INTEGER, 										// 	Author  int `json:"author"`
 	// 	text TEXT, 												// 	Text    string `json:"text"`
 	// 	date TEXT, 												// 	Date    string `json:"date"`
 	// 	FOREIGN KEY(post) REFERENCES posts(id), 				// to link to the posts table
