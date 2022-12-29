@@ -21,7 +21,20 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
-	sendObject(w, "Me")
+
+	user := srv.DB.GetUserById(userId)
+
+	response := struct {
+		Id    int    `json:"id"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+	}{
+		Id:    user.Id,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	sendObject(w, response)
 }
 
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -30,8 +43,33 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
+	user := srv.DB.GetUserById(userId)
+	posts := srv.DB.GetUserPosts(userId)
 
-	sendObject(w, "Me posts")
+	type ResponsePost struct {
+		Id            int      `json:"id"`
+		Title         string   `json:"title"`
+		Author        SafeUser `json:"author"` // TODO: maybe remove
+		Date          string   `json:"date"`
+		CommentsCount int      `json:"comments_count"`
+		LikesCount    int      `json:"likes_count"`
+		DislikesCount int      `json:"dislikes_count"`
+	}
+
+	response := make([]ResponsePost, 0)
+	for _, post := range posts {
+		response = append(response, ResponsePost{
+			Id:            post.Id,
+			Title:         post.Title,
+			Author:        SafeUser{Id: user.Id, Name: user.Name},
+			Date:          post.Date,
+			CommentsCount: post.CommentsCount,
+			LikesCount:    post.LikesCount,
+			DislikesCount: post.DislikesCount,
+		})
+	}
+
+	sendObject(w, response)
 }
 
 func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +120,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 		Id            int      `json:"id"`
 		Title         string   `json:"title"`
 		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"`
+		Author        SafeUser `json:"author"` // TODO: maybe remove
 		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
 		LikesCount    int      `json:"likes_count"`
