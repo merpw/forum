@@ -36,10 +36,13 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Name is too long", http.StatusBadRequest)
 		return
 	}
-
+	if requestBody.Name != strings.TrimSpace(requestBody.Name) {
+		http.Error(w, "Name is not valid", http.StatusBadRequest)
+		return
+	}
 	// check if email is a valid email
 	_, err = mail.ParseAddress(requestBody.Email)
-	if err != nil {
+	if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) {
 		http.Error(w, "Email is not valid", http.StatusBadRequest)
 		return
 	}
