@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,6 +34,8 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+	// /api/user/1 -> 1
+
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		errorResponse(w, http.StatusNotFound)
@@ -59,7 +60,46 @@ func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request) {
-	userId, _ := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
-	// todo database stuff for "posts by user's Id" + Error handling during managing data
-	sendObject(w, fmt.Sprintf("show posts by user with Id %v", userId))
+	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
+	// /api/user/1/posts -> 1
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	user := srv.DB.GetUserById(userId)
+	if user == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	type ResponsePost struct {
+		Id            int      `json:"id"`
+		Title         string   `json:"title"`
+		Content       string   `json:"content"`
+		Author        SafeUser `json:"author"`
+		Date          string   `json:"date"`
+		CommentsCount int      `json:"comments_count"`
+		LikesCount    int      `json:"likes_count"`
+	}
+
+	posts := srv.DB.GetUserPosts(userId)
+
+	var response []ResponsePost
+	for _, post := range posts {
+		response = append(response, ResponsePost{
+			Id:            post.Id,
+			Title:         post.Title,
+			Content:       post.Content,
+			Author:        SafeUser{user.Id, user.Name},
+			Date:          post.Date,
+			CommentsCount: post.CommentsCount,
+			LikesCount:    post.LikesCount,
+		})
+	}
+
+	sendObject(w, response)
 }

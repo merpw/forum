@@ -61,22 +61,22 @@ func (db DB) AddPost(title, content string, authorId int) int {
 	return int(id)
 }
 
-//func (db DB) GetUserPosts(userId int) []Post {
-//	query, err := db.Query("SELECT * FROM posts WHERE author = ?", userId)
-//	if err != nil {
-//		log.Panic(err)
-//	}
-//
-//	var posts []Post
-//	for query.Next() {
-//		var post Post
-//		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount)
-//		if err != nil {
-//			log.Panic(err)
-//		}
-//		posts = append(posts, post)
-//	}
-//	query.Close()
-//
-//	return posts
-//}
+func (db DB) GetUserPosts(userId int) []Post {
+	query, err := db.Query("SELECT * FROM posts WHERE author = ?", userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var posts []Post
+	for query.Next() {
+		var post Post
+		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount)
+		if err != nil {
+			log.Panic(err)
+		}
+		posts = append(posts, post)
+	}
+	query.Close()
+
+	return posts
+}
