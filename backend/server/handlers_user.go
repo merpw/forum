@@ -128,7 +128,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 
 	posts := srv.DB.GetUserPosts(userId)
 
-	var response []ResponsePost
+	response := make([]ResponsePost, 0)
 	for _, post := range posts {
 		response = append(response, ResponsePost{
 			Id:            post.Id,

@@ -70,8 +70,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 		LikesCount    int      `json:"likes_count"`
 	}
 
-	var response []ResponsePost
-
+	response := make([]ResponsePost, 0)
 	for _, post := range posts {
 		postAuthor := srv.DB.GetUserById(post.AuthorId)
 		response = append(response, ResponsePost{
