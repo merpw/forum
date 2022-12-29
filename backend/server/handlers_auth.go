@@ -12,7 +12,7 @@ import (
 )
 
 func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.getUserId(r) != -1 {
+	if srv.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -63,7 +63,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.getUserId(r) != -1 {
+	if srv.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -122,11 +122,22 @@ func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (srv *Server) getUserId(r *http.Request) int {
+func (srv *Server) getUserId(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
 		return -1
 	}
 	userId := srv.DB.CheckSession(cookie.Value)
+
+	if userId == -1 {
+		http.SetCookie(w, &http.Cookie{
+			Name:    "forum-token",
+			Value:   "",
+			Expires: time.Now(),
+			Path:    "/",
+		})
+		return -1
+	}
+
 	return userId
 }

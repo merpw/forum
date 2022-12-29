@@ -16,7 +16,8 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 }
 
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.getUserId(r) == -1 {
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
@@ -24,7 +25,8 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.getUserId(r) == -1 {
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}

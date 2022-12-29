@@ -12,6 +12,22 @@ func (db DB) AddPostReaction(postId, userId, reaction int) {
 	}
 }
 
+// UpdatePostLikesCount changes post's likes_count value
+func (db DB) UpdatePostLikesCount(postId int, change int) {
+	_, err := db.Exec("UPDATE posts SET likes_count = likes_count + ? WHERE id = ?", change, postId)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+// UpdatePostDislikeCount changes post's dislikes_count value
+func (db DB) UpdatePostDislikeCount(postId int, change int) {
+	_, err := db.Exec("UPDATE posts SET dislikes_count = posts.dislikes_count + ? WHERE id = ?", change, postId)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
 // RemovePostReaction removes user's post reaction
 func (db DB) RemovePostReaction(postId, userId int) {
 	_, err := db.Exec("DELETE FROM post_reactions WHERE post_id = ? AND author_id = ?", postId, userId)
