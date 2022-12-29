@@ -59,12 +59,13 @@ func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, r *http.Request
 
 // postsHandler returns a json list of all posts from the database
 func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
-	posts := srv.DB.GetPosts()
+	posts := srv.DB.GetAllPosts()
 	type ResponsePost struct {
 		Id            int      `json:"id"`
 		Title         string   `json:"title"`
 		Content       string   `json:"content"`
 		Author        SafeUser `json:"author"`
+		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
 		LikesCount    int      `json:"likes_count"`
 	}
@@ -72,11 +73,13 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	var response []ResponsePost
 
 	for _, post := range posts {
+		postAuthor := srv.DB.GetUserById(post.AuthorId)
 		response = append(response, ResponsePost{
 			Id:            post.Id,
 			Title:         post.Title,
 			Content:       post.Content,
-			Author:        SafeUser{Id: post.Author.Id, Name: post.Author.Name},
+			Date:          post.Date,
+			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
 		})
@@ -104,8 +107,14 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		Title         string   `json:"title"`
 		Content       string   `json:"content"`
 		Author        SafeUser `json:"author"`
+		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
-		LikesCount    int      `json:"likes_count"`
+		Comments      []struct {
+			Id      int      `json:"id"`
+			Content string   `json:"content"`
+			Author  SafeUser `json:"author"`
+		} `json:"comments"`
+		LikesCount int `json:"likes_count"`
 	}
 
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
@@ -123,13 +132,21 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	postAuthor := srv.DB.GetUserById(post.AuthorId)
+
 	sendObject(w, Response{
 		Id:            post.Id,
 		Title:         post.Title,
 		Content:       post.Content,
-		Author:        SafeUser{Id: post.Author.Id, Name: post.Author.Name},
+		Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+		Date:          post.Date,
 		CommentsCount: post.CommentsCount,
-		LikesCount:    post.LikesCount,
+		Comments: []struct {
+			Id      int      `json:"id"`
+			Content string   `json:"content"`
+			Author  SafeUser `json:"author"`
+		}{},
+		LikesCount: post.LikesCount,
 	},
 	)
 }

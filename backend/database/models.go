@@ -5,7 +5,6 @@ type Post struct {
 	Title         string
 	Content       string
 	AuthorId      int
-	Author        *User
 	Date          string
 	LikesCount    int
 	DislikesCount int

@@ -12,7 +12,6 @@ func (db DB) GetUserById(id int) *User {
 	if err != nil {
 		log.Panic(err)
 	}
-	defer query.Close()
 
 	var user User
 	if !query.Next() {
@@ -22,6 +21,8 @@ func (db DB) GetUserById(id int) *User {
 	if err != nil {
 		log.Panic(err)
 	}
+	query.Close()
+
 	return &user
 }
 
@@ -33,7 +34,6 @@ func (db DB) GetUserByLogin(login string) *User {
 	if err != nil {
 		log.Panic(err)
 	}
-	defer query.Close()
 
 	if !query.Next() {
 		return nil
@@ -43,6 +43,8 @@ func (db DB) GetUserByLogin(login string) *User {
 	if err != nil {
 		log.Panic(err)
 	}
+	query.Close()
+
 	return &user
 }
 
@@ -66,9 +68,10 @@ func (db DB) IsEmailTaken(email string) bool {
 	if err != nil {
 		log.Panic(err)
 	}
-	defer query.Close()
+	isTaken := query.Next()
+	query.Close()
 
-	return query.Next()
+	return isTaken
 }
 
 // TODO: maybe add IsNameTaken

@@ -5,15 +5,14 @@ import (
 	"time"
 )
 
-// GetPosts reads all posts from database
+// GetAllPosts reads all posts from database (reads only userId, not user object)
 //
 // panics if error occurs
-func (db DB) GetPosts() []Post {
+func (db DB) GetAllPosts() []Post {
 	query, err := db.Query("SELECT * FROM posts")
 	if err != nil {
 		log.Panic(err)
 	}
-	defer query.Close()
 
 	var posts []Post
 	for query.Next() {
@@ -22,9 +21,10 @@ func (db DB) GetPosts() []Post {
 		if err != nil {
 			log.Panic(err)
 		}
-		post.Author = db.GetUserById(post.AuthorId)
 		posts = append(posts, post)
 	}
+	query.Close()
+
 	return posts
 }
 
@@ -33,7 +33,6 @@ func (db DB) GetPostById(id int) *Post {
 	if err != nil {
 		log.Panic(err)
 	}
-	defer query.Close()
 
 	var post Post
 	if !query.Next() {
@@ -43,7 +42,8 @@ func (db DB) GetPostById(id int) *Post {
 	if err != nil {
 		log.Panic(err)
 	}
-	post.Author = db.GetUserById(post.AuthorId)
+	query.Close()
+
 	return &post
 }
 

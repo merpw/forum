@@ -43,8 +43,8 @@ func (db DB) InitDatabase() error {
 						date TEXT,
 						likes_count INTEGER,
 						dislikes_count INTEGER,
-    	   				FOREIGN KEY(post) REFERENCES posts(id),
-						FOREIGN KEY(author) REFERENCES users(id))`)
+    	   				FOREIGN KEY(post_id) REFERENCES posts(id),
+						FOREIGN KEY(author_id) REFERENCES users(id))`)
 	if err != nil {
 		return err
 	}
