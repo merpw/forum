@@ -37,8 +37,8 @@ func (db DB) InitDatabase() error {
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS comments (
 						id INTEGER PRIMARY KEY,
-						post INTEGER,
-						author INTEGER,					
+						post_id INTEGER,
+						author_id INTEGER,					
 						text TEXT,
 						date TEXT,
 						likes_count INTEGER,

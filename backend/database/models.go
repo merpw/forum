@@ -22,7 +22,7 @@ type User struct {
 type Comment struct {
 	Id       int
 	PostId   int
-	Author   int
+	AuthorId int
 	Text     string
 	Date     string
 	Likes    int
