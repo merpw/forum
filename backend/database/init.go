@@ -61,8 +61,9 @@ func (db DB) InitDatabase() error {
 
 	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS likes (
 		id INTEGER PRIMARY KEY,
-		post_like INTEGER,
 		parent_id INTEGER,
+		author_id INTEGER,
+		post_like INTEGER,
 		value INTEGER)`)
 	if err != nil {
 		return err
