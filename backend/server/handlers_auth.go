@@ -78,7 +78,7 @@ func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := srv.DB.GetUserByLogin(requestBody.Login)
+	user := srv.DB.GetUserByLogin(strings.ToLower(requestBody.Login))
 	if user == nil {
 		http.Error(w, "Invalid login or password", http.StatusBadRequest)
 		return
