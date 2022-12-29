@@ -155,7 +155,7 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid post data", http.StatusBadRequest)
 		return
 	}
-
+	// TODO in some purposes the userId is hardcoded, do not forget to use srv.getUserId()
 	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, 1)
 	sendObject(w, id)
 }
