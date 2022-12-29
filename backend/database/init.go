@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -54,6 +55,15 @@ func (db DB) InitDatabase() error {
 						expire INTEGER,
 						user_id INTEGER,
 						FOREIGN KEY(user_id) REFERENCES users(id))`)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS likes (
+		id INTEGER PRIMARY KEY,
+		post_like INTEGER,
+		parent_id INTEGER,
+		value INTEGER)`)
 	if err != nil {
 		return err
 	}

@@ -35,3 +35,10 @@ type Session struct {
 	Expire int
 	UserId int
 }
+
+type Like struct {
+	Id       int
+	PostLike int // 1 (like for post) 0 (like for the comment)
+	ParentId int // id of the parent node (post or comment). Not a foreign key, because two types of id from post or comment
+	Value    int // 1 (like) -1 (dislike)
+}
