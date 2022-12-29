@@ -167,11 +167,14 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	requestBody.Title = strings.TrimSpace(requestBody.Title)
+	requestBody.Content = strings.TrimSpace(requestBody.Content)
+
 	if requestBody.Title == "" || requestBody.Content == "" {
 		http.Error(w, "Invalid post data", http.StatusBadRequest)
 		return
 	}
-	// TODO in some purposes the userId is hardcoded, do not forget to use srv.getUserId()
+
 	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, srv.getUserId(w, r))
 	sendObject(w, id)
 }
