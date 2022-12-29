@@ -1,0 +1,22 @@
+{
+  "plugins": ["@typescript-eslint", "react"],
+  "extends": [
+    "next/core-web-vitals",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:react/recommended"
+  ],
+  "rules": {
+    "react/react-in-jsx-scope": 0,
+    "react/prop-types": 0,
+    // TODO: Maybe remove
+    "no-unused-vars": 0,
+    "react/jsx-curly-brace-presence": [
+      1,
+      {
+        "props": "always",
+        "children": "ignore"
+      }
+    ]
+  }
+}

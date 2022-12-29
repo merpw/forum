@@ -1,0 +1,14 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: backend
+  frontend:
+    environment:
+      - FORUM_BACKEND_LOCALHOST=backend:8080
+    build:
+      context: frontend
+    depends_on:
+      - backend
+    ports:
+      - 80:3000
