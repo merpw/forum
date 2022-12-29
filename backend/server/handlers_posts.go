@@ -163,7 +163,18 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 // postsIdLikeHandler likes a post in the database
 func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 	// todo database managing etc
-	sendObject(w, "postsIdLikeHandler")
+	userId := srv.getUserId(r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+	}
+	srv.DB.LikePost(srv.DB.GetPostById(postId).Id, srv.DB.GetUserById(userId).Id)
+
+	sendObject(w, 1)
 }
 
 // postsPostsIdDislikeHandler dislikes a post in the database
