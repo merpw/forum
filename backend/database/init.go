@@ -59,12 +59,13 @@ func (db DB) InitDatabase() error {
 		return err
 	}
 
-	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS likes (
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS post_reactions (
 		id INTEGER PRIMARY KEY,
-		parent_id INTEGER,
+		post_id INTEGER,
 		author_id INTEGER,
-		post_like INTEGER,
-		value INTEGER)`)
+		reaction INTEGER,
+		FOREIGN KEY(author_id) REFERENCES users(id),
+    	FOREIGN KEY(post_id) REFERENCES posts(id))`)
 	if err != nil {
 		return err
 	}

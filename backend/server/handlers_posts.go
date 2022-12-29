@@ -179,25 +179,82 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // postsIdLikeHandler likes a post in the database
 func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database managing etc
 	userId := srv.getUserId(r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
-	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
+	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+	postIdStr = strings.TrimSuffix(postIdStr, "/like")
+	// /api/posts/1/like -> 1
+
+	postId, err := strconv.Atoi(postIdStr)
 	if err != nil {
 		errorResponse(w, http.StatusNotFound)
 	}
-	srv.DB.LikePost(srv.DB.GetPostById(postId).Id, srv.DB.GetUserById(userId).Id)
 
-	sendObject(w, 1)
+	post := srv.DB.GetPostById(postId)
+	if post == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	reaction := srv.DB.GetPostReaction(userId, postId)
+
+	switch reaction {
+	case 0: // if not reacted, add like
+		srv.DB.AddPostReaction(postId, userId, 1)
+		sendObject(w, 1)
+
+	case 1: // if already liked, unlike
+		srv.DB.RemovePostReaction(postId, userId)
+		sendObject(w, 0)
+
+	case -1: // if disliked, remove dislike and add like
+		srv.DB.RemovePostReaction(postId, userId)
+		srv.DB.AddPostReaction(postId, userId, 1)
+		sendObject(w, 1)
+	}
 }
 
 // postsPostsIdDislikeHandler dislikes a post in the database
 func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database managing etc
-	sendObject(w, "postsIdDislikeHandler")
+	userId := srv.getUserId(r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+	postIdStr = strings.TrimSuffix(postIdStr, "/dislike")
+	// /api/posts/1/dislike -> 1
+
+	postId, err := strconv.Atoi(postIdStr)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+	}
+
+	post := srv.DB.GetPostById(postId)
+	if post == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	reaction := srv.DB.GetPostReaction(userId, postId)
+
+	switch reaction {
+	case 0: // if not reacted, add dislike
+		srv.DB.AddPostReaction(postId, userId, -1)
+		sendObject(w, -1)
+
+	case -1: // if already disliked, remove dislike
+		srv.DB.RemovePostReaction(postId, userId)
+		sendObject(w, 0)
+
+	case 1: // if liked, remove like and add dislike
+		srv.DB.RemovePostReaction(postId, userId)
+		srv.DB.AddPostReaction(postId, userId, -1)
+		sendObject(w, -1)
+	}
 }
 
 // postsIdCommentHandler comments on a post in the database
