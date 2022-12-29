@@ -2,11 +2,11 @@ export type Post = {
   id: number
   title: string
   content: string
-  likes: number
-  dislikes: number
+  likes_count: number
+  dislikes_count: number
+  comments_count: number
   date: string
   author: User
-  user_reaction: number | undefined
   comments: Comment[]
 }
 
@@ -20,5 +20,4 @@ export type Comment = {
   text: string
   date: string
   likes: number
-  user_reaction: number | undefined
 }

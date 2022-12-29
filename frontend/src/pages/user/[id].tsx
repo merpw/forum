@@ -4,14 +4,14 @@ import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { Post, User } from "../../custom"
 
-import { getUserLocal, getUsersLocal } from "../../api/users/fetch"
-import { useUser } from "../../api/auth"
-import { getUserPosts } from "../../api/posts/fetch"
+import { getUserLocal } from "../../api/users/fetch"
+import { useMe } from "../../api/auth"
+import { getUserPostsLocal } from "../../api/posts/fetch"
 import { PostList } from "../../components/posts/list"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   const router = useRouter()
-  const { user: req_user } = useUser()
+  const { user: req_user } = useMe()
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
         <h1 className={"text-2xl mb-5"}>{user.name}</h1>
         <div>
           <h2 className={"text-xl mb-2"}>Recent posts:</h2>
-          <PostList posts={posts} />
+          <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
         </div>
       </div>
     </>
@@ -39,12 +39,8 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
 }
 
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
-  const users = await getUsersLocal()
   return {
-    paths: users.map((user) => {
-      return { params: { id: user.id.toString() } }
-    }),
-    // TODO: maybe remove
+    paths: [],
     fallback: "blocking", // fallback tries to regenerate ArtistPage if Artist did not exist during building
   }
 }
@@ -60,7 +56,7 @@ export const getStaticProps: GetStaticProps<
   if (user == undefined) {
     return { notFound: true }
   }
-  const { posts } = await getUserPosts(user.id)
+  const { posts } = await getUserPostsLocal(user.id)
 
   return { props: { user: user, posts: posts } }
 }

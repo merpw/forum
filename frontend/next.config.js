@@ -12,7 +12,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: `http://${process.env.FORUM_BACKEND_LOCALHOST}/api/:path*/`,
+        destination: `http://${process.env.FORUM_BACKEND_LOCALHOST}/api/:path*`,
       },
     ]
   },

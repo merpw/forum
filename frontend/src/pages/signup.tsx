@@ -1,18 +1,20 @@
-import { motion } from "framer-motion"
+import { AxiosError } from "axios"
 import { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { SignUp, useUser } from "../api/auth"
+import { SignUp, useMe } from "../api/auth"
+import { FormError } from "../components/error"
 
 const SignupPage: NextPage = () => {
   const router = useRouter()
 
-  const { isLoading, isLoggedIn, mutate } = useUser()
+  const { isLoading, isLoggedIn } = useMe()
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [passwordConfirm, setPasswordConfirm] = useState("")
 
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -34,9 +36,24 @@ const SignupPage: NextPage = () => {
           e.preventDefault()
           if (formError != null) setFormError(null)
 
+          if (password != passwordConfirm) {
+            setFormError("Passwords don't match")
+            return
+          }
+
           SignUp(name, email, password)
-            .then(() => mutate())
-            .catch((error) => setFormError(error))
+            .then((response) => {
+              if (response.status == 200) {
+                router.replace("/login")
+              }
+            })
+            .catch((err: AxiosError) => {
+              if (err.code == "ERR_BAD_REQUEST") {
+                setFormError(err.response?.data as string)
+              } else {
+                // TODO: unexpected error
+              }
+            })
         }}
       >
         <div className={"mb-6"}>
@@ -75,7 +92,7 @@ const SignupPage: NextPage = () => {
             required
           />
         </div>
-        <div className={"mb-6"}>
+        <div className={"mb-3"}>
           <label
             htmlFor={"password"}
             className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
@@ -92,20 +109,24 @@ const SignupPage: NextPage = () => {
             required
           />
         </div>
-        {formError && (
-          <motion.div
-            className={
-              "transition ease-in-out -translate-y-1 p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-inherit dark:border-2 dark:border-red-900 dark:text-white"
-            }
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ ease: "easeOut", duration: 0.25 }}
-            exit={{ opacity: 0 }}
-            role={"alert"}
+        <div className={"mb-6"}>
+          <label
+            htmlFor={"repeat-password"}
+            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
           >
-            <span className={"font-medium"}>{formError}</span>
-          </motion.div>
-        )}
+            Repeat password
+          </label>
+          <input
+            onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
+            type={"password"}
+            id={"repeat-password"}
+            className={
+              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            }
+            required
+          />
+        </div>
+        <FormError error={formError} />
         <button
           type={"submit"}
           className={

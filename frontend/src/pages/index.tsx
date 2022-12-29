@@ -14,7 +14,7 @@ const Home: NextPage<{ posts: Post[] }> = ({ posts }) => {
         <meta property={"og:title"} content={"FORUM"} key={"title"} />
         <meta name={"og:description"} content={"The friendliest forum"} />
       </Head>
-      <PostList posts={posts} />
+      <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
     </>
   )
 }
@@ -24,6 +24,7 @@ export const getStaticProps: GetStaticProps<{ posts: Post[] }> = async () => {
 
   return {
     props: { posts: posts },
+    revalidate: 10,
   }
 }
 

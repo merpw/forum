@@ -6,7 +6,7 @@ import { FC, useState } from "react"
 import Head from "next/head"
 import moment from "moment"
 import { getPostLocal, getPostsLocal } from "../../api/posts/fetch"
-import { useUser } from "../../api/auth"
+import { useMe } from "../../api/auth"
 import { motion } from "framer-motion"
 import { CreateComment } from "../../api/posts/comment"
 import { ReactionsButtons } from "../../components/posts/reactions"
@@ -17,7 +17,7 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
       <Head>
         <title>{`${post.title} - Forum`}</title>
       </Head>
-      <div className={"m-5 "}>
+      <div className={"m-5"}>
         <div className={"mb-3"}>
           <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
           <hr />
@@ -48,7 +48,7 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
 }
 
 const CommentForm: FC<{ post: Post }> = ({ post }) => {
-  const { isLoggedIn } = useUser()
+  const { isLoggedIn } = useMe()
   const [text, setText] = useState("")
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -162,6 +162,6 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
     return { notFound: true }
   }
   const post = await getPostLocal(+params.id)
-  return post ? { props: { post: post } } : { notFound: true }
+  return post ? { props: { post: post }, revalidate: 10 } : { notFound: true }
 }
 export default PostPage

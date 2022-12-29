@@ -1,25 +1,19 @@
-import {Post} from "../../custom";
-import {posts} from "../dummy";
-import useSWR from "swr";
+import { Post } from "../../custom"
+import axios from "axios"
 
-export const getPostsLocal = (): Promise<Post[]> => Promise.resolve(posts)
+export const getPostsLocal = (): Promise<Post[]> =>
+  axios(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/posts`).then((res) => res.data)
 
-export const getPostLocal = (id: number): Promise<Post | undefined> =>
-    Promise.resolve(posts.find((post) => post.id == id))
+export const getPostLocal = (id: number) =>
+  axios<Post | undefined>(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/posts/${id}`)
+    .then((res) => res.data)
+    .catch(() => undefined)
 
-export const getUserPosts = (user_id: number): Promise<{ posts: Post[] }> => {
-    return Promise.resolve({ posts: posts.filter((post) => post.author.id == user_id) })
-}
-
-export const useUserPosts = (user_id: number | undefined) => {
-    const { data, error } = useSWR<{ posts: Post[] }>(
-        user_id ? `/api/user/${user_id}/posts` : null,
-        () => getUserPosts(user_id || -1)
-    )
-
-    return {
-        isError: error != undefined,
-        isLoading: !error && !data,
-        posts: data?.posts,
-    }
-}
+export const getUserPostsLocal = (user_id: number) =>
+  axios<Post[]>(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/user/${user_id}/posts`)
+    .then((res) => {
+      return { posts: res.data }
+    })
+    .catch(() => {
+      return { posts: [] as Post[] }
+    })

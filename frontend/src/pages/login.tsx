@@ -1,15 +1,16 @@
-import { motion } from "framer-motion"
+import { AxiosError } from "axios"
 import { NextPage } from "next"
 import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { logIn, useUser } from "../api/auth"
+import { logIn, useMe } from "../api/auth"
+import { FormError } from "../components/error"
 
 const LoginPage: NextPage = () => {
   const router = useRouter()
 
-  const { isLoading, isLoggedIn, mutate } = useUser()
+  const { isLoading, isLoggedIn, mutate } = useMe()
 
   const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
@@ -34,8 +35,13 @@ const LoginPage: NextPage = () => {
           if (formError != null) setFormError(null)
 
           logIn(login, password)
-            .then(() => mutate())
-            .catch((error) => setFormError(error))
+            .then(() => {
+              mutate()
+              router.replace("/me")
+            })
+            .catch((err: AxiosError) => {
+              setFormError(err.response?.data as string)
+            })
         }}
       >
         <div className={"mb-6"}>
@@ -92,20 +98,7 @@ const LoginPage: NextPage = () => {
             Remember me
           </label>
         </div> */}
-        {formError && (
-          <motion.div
-            className={
-              "transition ease-in-out -translate-y-1 p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-inherit dark:border-2 dark:border-red-900 dark:text-white"
-            }
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ ease: "easeOut", duration: 0.25 }}
-            exit={{ opacity: 0 }}
-            role={"alert"}
-          >
-            <span className={"font-medium"}>{formError}</span>
-          </motion.div>
-        )}
+        <FormError error={formError} />
         <span className={"flex flex-wrap gap-2"}>
           <span>
             <button

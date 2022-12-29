@@ -1,6 +1,7 @@
+import axios from "axios"
 import { User } from "../../custom"
-import { users } from "../dummy"
 
-export const getUsersLocal = (): Promise<User[]> => Promise.resolve(users)
-export const getUserLocal = (id: number): Promise<User | undefined> =>
-  Promise.resolve(users.find((user) => user.id == id))
+export const getUserLocal = (id: number) =>
+  axios<User | undefined>(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/user/${id}`)
+    .then((res) => res.data)
+    .catch(() => undefined)

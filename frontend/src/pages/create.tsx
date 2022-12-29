@@ -1,13 +1,14 @@
-import { motion } from "framer-motion"
+import { AxiosError } from "axios"
 import { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { useUser } from "../api/auth"
+import { useMe } from "../api/auth"
 import { CreatePost } from "../api/posts/create"
+import { FormError } from "../components/error"
 
 const CreatePostPage: NextPage = () => {
-  const { isLoading, isLoggedIn } = useUser()
+  const { isLoading, isLoggedIn } = useMe()
   const router = useRouter()
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
@@ -41,11 +42,17 @@ const CreatePostForm = () => {
         e.preventDefault()
         setFormError(null)
         CreatePost(title, content)
-          .then((id) => {
-            router.push(`/post/${id}`)
+          .then((response) => {
+            if (response.status == 200) {
+              router.push(`/post/${response.data}`)
+            }
           })
           .catch((err) => {
-            setFormError(err)
+            if (err.code == "ERR_BAD_REQUEST") {
+              setFormError(err.response?.data as string)
+            } else {
+              // TODO: unexpected error
+            }
           })
       }}
     >
@@ -73,20 +80,7 @@ const CreatePostForm = () => {
           required
         />
       </div>
-      {formError != null && (
-        <motion.div
-          className={
-            "transition ease-in-out -translate-y-1 p-4 mb-3 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-inherit dark:border-2 dark:border-red-900 dark:text-white"
-          }
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ ease: "easeOut", duration: 0.25 }}
-          exit={{ opacity: 0 }}
-          role={"alert"}
-        >
-          <span className={"font-medium"}>{formError}</span>
-        </motion.div>
-      )}
+      <FormError error={formError} />
       <button
         type={"submit"}
         className={

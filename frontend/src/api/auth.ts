@@ -1,10 +1,9 @@
+import axios from "axios"
 import useSWR from "swr"
 import { User } from "../custom"
-import { user as dummy_user } from "./dummy"
 
-export const useUser = () => {
-  const { data, mutate, error } = useSWR<{ user: User | undefined }>("/api/me", getUser)
-
+export const useMe = () => {
+  const { data, mutate, error } = useSWR<{ user: User | undefined }>("/api/me", getMe)
   return {
     isError: error != undefined,
     isLoading: !error && !data,
@@ -14,26 +13,23 @@ export const useUser = () => {
   }
 }
 
-const getUser = async (): Promise<{ user: User | undefined }> => {
-  if (document.cookie.includes("forum-test-token=admin")) {
-    return Promise.resolve({ user: dummy_user })
-  }
-  return Promise.resolve({ user: undefined })
-}
+const getMe = async () =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .get<User>("/api/me/", { withCredentials: true })
+        .then((res) => {
+          return { user: res.data }
+        })
+        .catch(() => {
+          return { user: undefined }
+        })
+    : { user: undefined }
 
-export const logIn = async (login: string, password: string): Promise<void> => {
-  if (login == "admin" && password == "admin") {
-    document.cookie = "forum-test-token=admin;path=/;"
-    return Promise.resolve()
-  }
-  return Promise.reject("Invalid login or password")
-}
+export const logIn = async (login: string, password: string) =>
+  axios.post("/api/login", { login, password }, { withCredentials: true })
 
-export const logOut = async (): Promise<void> => {
-  document.cookie = "forum-test-token=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;"
-  return Promise.resolve()
-}
+export const logOut = async (): Promise<void> =>
+  axios.post("/api/logout", {}, { withCredentials: true })
 
-export const SignUp = async (name: string, email: string, password: string): Promise<void> => {
-  return Promise.reject("Not connected to backend yet")
-}
+export const SignUp = async (name: string, email: string, password: string) =>
+  axios.post("/api/signup", { name, email, password }, { withCredentials: true })

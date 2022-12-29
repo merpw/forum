@@ -3,15 +3,15 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
-import { useUser } from "../api/auth"
-import { useUserPosts } from "../api/posts/fetch"
+import { useMe } from "../api/auth"
+import { useMyPosts } from "../api/posts/my_posts"
 import { PostList } from "../components/posts/list"
 
 /* TODO: add placeholders */
 
 const UserPage: NextPage = () => {
   const router = useRouter()
-  const { isLoading, isLoggedIn } = useUser()
+  const { isLoading, isLoggedIn } = useMe()
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
   useEffect(() => {
@@ -27,7 +27,7 @@ const UserPage: NextPage = () => {
         <title>{`Profile - Forum`}</title>
       </Head>
       <UserInfo />
-      <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1 w-fit"}>
+      <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1 max-w-fit"}>
         <span className={"my-auto"}>
           <svg
             xmlns={"http://www.w3.org/2000/svg"}
@@ -55,7 +55,7 @@ const UserPage: NextPage = () => {
 }
 
 const UserInfo = () => {
-  const { user } = useUser()
+  const { user } = useMe()
 
   return (
     <h1 className={"text-2xl font-thin mb-5"}>
@@ -66,14 +66,13 @@ const UserInfo = () => {
 }
 
 const UserPosts = () => {
-  const { user } = useUser()
-  const { posts } = useUserPosts(user?.id)
+  const { posts } = useMyPosts()
 
   if (posts == undefined) return null
 
   if (posts.length == 0) return <div>{"You haven't posted yet"}</div>
 
-  return <PostList posts={posts} />
+  return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
 }
 
 export default UserPage

@@ -1,20 +1,22 @@
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
 import { FC, useState } from "react"
-import { useUser } from "../../api/auth"
+import { useMe } from "../../api/auth"
 import { Post, Comment } from "../../custom"
 
 export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, comment }) => {
-  const { isLoggedIn } = useUser()
+  const { isLoggedIn } = useMe()
+  const user_reaction = 0 // TODO: add real user reaction
+
   const router = useRouter()
-  const [reaction, setReaction] = useState<number>(post.user_reaction || 0)
+  const [reaction, setReaction] = useState<number>(user_reaction || 0)
 
   return (
     <span className={"mx-2 my-auto flex"}>
       {comment ? (
         <span className={"mr-1"}>{comment.likes}</span>
       ) : (
-        <span className={"mr-1 text-xl"}>{post.likes}</span>
+        <span className={"mr-1 text-xl"}>{post.likes_count}</span>
       )}
       <motion.button
         whileTap={{ scale: 0.8 }}
