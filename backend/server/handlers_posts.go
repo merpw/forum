@@ -152,7 +152,8 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 
 // postsCreateHandler creates a new post in the database
 func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.getUserId(w, r) == -1 {
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
@@ -170,12 +171,21 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	requestBody.Title = strings.TrimSpace(requestBody.Title)
 	requestBody.Content = strings.TrimSpace(requestBody.Content)
 
-	if requestBody.Title == "" || requestBody.Content == "" {
-		http.Error(w, "Invalid post data", http.StatusBadRequest)
+	if len(requestBody.Title) < 3 {
+		http.Error(w, "Title is too short", http.StatusBadRequest)
+		return
+	}
+	if len(requestBody.Content) < 3 {
+		http.Error(w, "Content is too short", http.StatusBadRequest)
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, srv.getUserId(w, r))
+	if len(requestBody.Title) > 25 {
+		http.Error(w, "Title is too long, maximum length is 25", http.StatusBadRequest)
+		return
+	}
+
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId)
 	sendObject(w, id)
 }
 

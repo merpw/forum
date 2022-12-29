@@ -49,6 +49,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	type ResponsePost struct {
 		Id            int      `json:"id"`
 		Title         string   `json:"title"`
+		Content       string   `json:"content"`
 		Author        SafeUser `json:"author"` // TODO: maybe remove
 		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
@@ -61,6 +62,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 		response = append(response, ResponsePost{
 			Id:            post.Id,
 			Title:         post.Title,
+			Content:       post.Content,
 			Author:        SafeUser{Id: user.Id, Name: user.Name},
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,

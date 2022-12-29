@@ -30,7 +30,7 @@ func (db DB) GetUserById(id int) *User {
 //
 // returns nil if user not found
 func (db DB) GetUserByLogin(login string) *User {
-	query, err := db.Query("SELECT * FROM users WHERE email = ?", login)
+	query, err := db.Query("SELECT * FROM users WHERE email = ? OR name = ?", login, login)
 	if err != nil {
 		log.Panic(err)
 	}
