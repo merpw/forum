@@ -432,7 +432,7 @@ func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	id := srv.DB.AddComment(requestBody.Content, userId)
+	id := srv.DB.AddComment(requestBody.Content, postId, userId)
 	sendObject(w, id)
 }
 

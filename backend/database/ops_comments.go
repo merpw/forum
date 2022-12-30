@@ -6,9 +6,9 @@ import (
 )
 
 // AddComment adds comment to database, returns id of new comment
-func (db DB) AddComment(content string, authorId int) int {
-	result, err := db.Exec(`INSERT INTO comments (post_id, author_id, content, date, likes_count, dislikes_count) 
-								  VALUES (?, ?, ?, ?, ?)`, content, authorId, time.Now().Format(time.RFC3339), 0, 0)
+func (db DB) AddComment(content string, postId, authorId int) int {
+	result, err := db.Exec(`INSERT INTO comments (content, post_id, author_id, date, likes_count, dislikes_count) 
+								  VALUES (?, ?, ?, ?, ?, ?)`, content, postId, authorId, time.Now().Format(time.RFC3339), 0, 0)
 	if err != nil {
 		log.Panic(err)
 	}

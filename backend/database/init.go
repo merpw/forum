@@ -40,7 +40,7 @@ func (db DB) InitDatabase() error {
 						id INTEGER PRIMARY KEY,
 						post_id INTEGER,
 						author_id INTEGER,					
-						text TEXT,
+						content TEXT,
 						date TEXT,
 						likes_count INTEGER,
 						dislikes_count INTEGER,
