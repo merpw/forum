@@ -71,5 +71,16 @@ func (db DB) InitDatabase() error {
 		return err
 	}
 
+	_, err = db.Exec(`CREATE TABLE IF NOT EXISTS comment_reactions (
+		id INTEGER PRIMARY KEY,
+		comment_id INTEGER,
+		author_id INTEGER,
+		reaction INTEGER,
+		FOREIGN KEY(author_id) REFERENCES users(id),
+    	FOREIGN KEY(comment_id) REFERENCES comments(id))`)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

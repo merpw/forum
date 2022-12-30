@@ -56,3 +56,58 @@ func (db DB) GetPostReaction(postId, userId int) int {
 	}
 	return reaction
 }
+
+// GetCommentReaction returns user's reaction to comment
+//
+// returns 1 if user liked comment, -1 if disliked and 0 if not reacted
+func (db DB) GetCommentReaction(commentId, userId int) int {
+	query, err := db.Query("SELECT reaction FROM comment_reactions WHERE comment_id = ? AND author_id = ?", commentId, userId)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer query.Close()
+
+	if !query.Next() {
+		return 0
+	}
+	var reaction int
+	err = query.Scan(&reaction)
+	if err != nil {
+		log.Panic(err)
+	}
+	return reaction
+}
+
+// AddCommentReaction adds specified reaction to comment
+//
+// reaction=1 is like and reaction=-1 is dislike
+func (db DB) AddCommentReaction(commentId, userId, reaction int) {
+	_, err := db.Exec("INSERT INTO comment_reactions (comment_id, author_id, reaction) VALUES (?, ?, ?)", commentId, userId, reaction)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+// UpdateCommentLikesCount changes comment's likes_count value
+func (db DB) UpdateCommentLikesCount(commentId int, change int) {
+	_, err := db.Exec("UPDATE comments SET likes_count = likes_count + ? WHERE id = ?", change, commentId)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+// UpdateCommentDislikeCount changes comment's dislikes_count value
+func (db DB) UpdateCommentDislikeCount(commentId int, change int) {
+	_, err := db.Exec("UPDATE comments SET dislikes_count = comments.dislikes_count + ? WHERE id = ?", change, commentId)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+// RemoveCommentReaction removes user's comment reaction
+func (db DB) RemoveCommentReaction(commentId, userId int) {
+	_, err := db.Exec("DELETE FROM comment_reactions WHERE comment_id = ? AND author_id = ?", commentId, userId)
+	if err != nil {
+		log.Panic(err)
+	}
+}

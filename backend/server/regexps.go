@@ -30,7 +30,11 @@ var reApiPostsIdLike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/l
 var reApiPostsIdDislike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/dislike/?$`))
 var reApiPostsIdReaction = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/reaction/?$`))
 
+var reApiPostsIdCommentIdReaction = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/reaction/?$`))
+
 var reApiPostsIdComment = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/?$`))
+
+var reApiPostsIdComments = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comments/?$`))
 
 var reApiPostsIdCommentIdLike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`))
 var reApiPostsIdCommentIdDislike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/dislike/?$`))

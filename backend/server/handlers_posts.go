@@ -40,8 +40,14 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 	case reApiPostsIdReaction.MatchString(r.URL.Path):
 		srv.postsIdReactionHandler(w, r)
 
+	case reApiPostsIdCommentIdReaction.MatchString(r.URL.Path):
+		srv.postsIdCommentIdReactionHandler(w, r)
+
 	case reApiPostsIdComment.MatchString(r.URL.Path):
 		srv.postsIdCommentHandler(w, r)
+
+	case reApiPostsIdComments.MatchString(r.URL.Path):
+		srv.postsIdCommentsHandler(w, r)
 
 	case reApiPostsIdCommentIdLike.MatchString(r.URL.Path):
 		srv.postsIdCommentIdLikeHandler(w, r)
@@ -436,54 +442,184 @@ func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request)
 	sendObject(w, id)
 }
 
+func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request) {
+	// userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+	// userIdStr = strings.TrimSuffix(userIdStr, "/posts")
+	// /api/user/1/posts -> 1
+
+	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	post := srv.DB.GetPostById(postId)
+	if post == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	type ResponseComment struct {
+		Id            int      `json:"id"`
+		PostId        int      `json:"post_id"`
+		AuthorId      int      `json:"author_id"`
+		Content       string   `json:"content"`
+		Author        SafeUser `json:"author"` // TODO: maybe remove
+		Date          string   `json:"date"`
+		LikesCount    int      `json:"likes_count"`
+		DislikesCount int      `json:"dislikes_count"`
+	}
+
+	// posts := srv.DB.GetUserPosts(userId)
+	comments := srv.DB.GetPostComments(postId)
+
+	response := make([]ResponseComment, 0)
+	for _, comment := range comments {
+		user := srv.DB.GetUserById(comment.AuthorId)
+		response = append(response, ResponseComment{
+			Id:            comment.Id,
+			PostId:        postId,
+			AuthorId:      comment.AuthorId,
+			Content:       comment.Content,
+			Author:        SafeUser{user.Id, user.Name},
+			Date:          comment.Date,
+			LikesCount:    comment.LikesCount,
+			DislikesCount: comment.DislikesCount,
+		})
+	}
+
+	sendObject(w, response)
+}
+
 // postsIdCommentIdLikeHandler likes a comment on a post in the database
 func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Request) {
-	// requirement: the user needs to be logged in to do this.
-	// step1: check if the user is logged in
-	// step2: check if the post exists
-	// step3: check if the comment exists
-	//
-	// step4: check if the user has already his id in the list of user_reactions
-	// if user_id not in user_reactions{
-	// user_reaction[user_id]=1 // like
-	// like++ // for the post like number
-	// }else{ // user_id inside database
-	// switch user_reaction[user_id] { // old reaction from database
-	// case 1: //according to request, because it is "like" handler so like press happens here
-	// like-- // decrease like
-	// delete(user_reaction[user_id])
-	// case -1: // was dislike
-	// dislike--
-	// like++
-	// }
-	// }
-	// step 5: send the updated number of likes/dislikes on post to the frontend
-	// reaction = user_reaction[user_id] // 1 like -1 dislike 0- if no key inside map, then send it to the frontend
-	// todo database managing etc
-	sendObject(w, "postsIdCommentIdLikeHandler")
+
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+
+	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
+	// /api/posts/1/comment/2/like ->2
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+	}
+
+	comment := srv.DB.GetCommentById(commentId)
+	if comment == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	reaction := srv.DB.GetCommentReaction(commentId, userId)
+
+	switch reaction {
+	case 0: // if not reacted, add like
+		srv.DB.AddCommentReaction(commentId, userId, 1)
+		srv.DB.UpdateCommentLikesCount(commentId, +1)
+
+		sendObject(w, +1)
+
+	case 1: // if already liked, unlike
+		srv.DB.RemoveCommentReaction(commentId, userId)
+		srv.DB.UpdateCommentLikesCount(commentId, -1)
+
+		sendObject(w, 0)
+
+	case -1: // if disliked, remove dislike and add like
+		srv.DB.RemoveCommentReaction(commentId, userId)
+		srv.DB.UpdateCommentDislikeCount(commentId, -1)
+
+		srv.DB.AddCommentReaction(commentId, userId, 1)
+		srv.DB.UpdateCommentLikesCount(commentId, +1)
+
+		sendObject(w, 1)
+	}
 }
 
 // postsIdCommentIdDislikeHandler dislikes a comment on a post in the database
 func (srv *Server) postsIdCommentIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
-	// the user needs to be logged in to do this.
-	// todo step1: check if the user is logged in
-	// todo step2: check if the post exists
-	// check if the comment exists
-	//
-	// check if the user has already his id in the list of user_reactions
-	// if not, add the user id to the list of user_reactions
-	// if yes, check the reaction:value against the user_id from the list of user_reactions
-	// if the reaction:value is the same as the user_id from the list of user_reactions, make it 0,
-	// plus decrease the value of likes/dislikes on post depending upon whether user_reaction_value was 1 or -1, that we made into 0
-	// and remove the user_id from the list of user_reactions,
-	//
-	// else if the reaction:value is not the same as the user_id from the list of user_reactions, make it according
-	// to the reaction:value, plus increase the value of likes/dislikes on post depending upon whether user_reaction_value was 1 or -1
-	// and add the user_id to the list of user_reactions,
-	//
-	// send the updated number of likes/dislikes on post to the frontend
-	// send the updated user_reaction for the user_id to the frontend.
-	// if user_if is now not in the list of user_reactions, send 0 to the frontend
-	// todo
-	sendObject(w, "postsIdCommentIdDislikeHandler")
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+
+	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+	}
+
+	comment := srv.DB.GetCommentById(commentId)
+	if comment == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	reaction := srv.DB.GetCommentReaction(commentId, userId)
+
+	switch reaction {
+	case 0: // if not reacted, add dislike
+		srv.DB.AddCommentReaction(commentId, userId, -1)
+		srv.DB.UpdateCommentDislikeCount(commentId, +1)
+
+		sendObject(w, -1)
+
+	case -1: // if already disliked, remove dislike
+		srv.DB.RemoveCommentReaction(commentId, userId)
+		srv.DB.UpdateCommentDislikeCount(commentId, -1)
+
+		sendObject(w, 0)
+
+	case 1: // if liked, remove like and add dislike
+		srv.DB.RemoveCommentReaction(commentId, userId)
+		srv.DB.UpdateCommentLikesCount(commentId, -1)
+
+		srv.DB.AddCommentReaction(commentId, userId, -1)
+		srv.DB.UpdateCommentDislikeCount(commentId, +1)
+
+		sendObject(w, -1)
+	}
+}
+
+func (srv *Server) postsIdCommentIdReactionHandler(w http.ResponseWriter, r *http.Request) {
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+
+	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	comment := srv.DB.GetCommentById(commentId)
+	if comment == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	reaction := srv.DB.GetCommentReaction(commentId, userId)
+	if userId == comment.AuthorId {
+		sendObject(w, struct {
+			Reaction      int `json:"reaction"`
+			LikesCount    int `json:"likes_count"`
+			DislikesCount int `json:"dislikes_count"`
+		}{
+			Reaction:      reaction,
+			LikesCount:    comment.LikesCount,
+			DislikesCount: comment.DislikesCount,
+		})
+	} else {
+		sendObject(w, struct {
+			Reaction   int `json:"reaction"`
+			LikesCount int `json:"likes_count"`
+		}{
+			Reaction:   reaction,
+			LikesCount: comment.LikesCount,
+		})
+	}
 }

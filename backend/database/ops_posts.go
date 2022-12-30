@@ -100,3 +100,43 @@ func (db DB) GetCategoryPosts(category string) []Post {
 
 	return posts
 }
+
+// comments
+func (db DB) GetCommentById(id int) *Comment {
+	query, err := db.Query("SELECT * FROM comments WHERE id = ?", id)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if !query.Next() {
+		return nil
+	}
+	var comment Comment
+	err = query.Scan(&comment.Id, &comment.PostId, &comment.AuthorId, &comment.Content, &comment.Date, &comment.LikesCount, &comment.DislikesCount)
+	if err != nil {
+		log.Panic(err)
+	}
+	query.Close()
+
+	return &comment
+}
+
+func (db DB) GetPostComments(postId int) []Comment {
+	query, err := db.Query("SELECT * FROM comments WHERE post_id = ?", postId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var comments []Comment
+	for query.Next() {
+		var comment Comment
+		err = query.Scan(&comment.Id, &comment.PostId, &comment.AuthorId, &comment.Content, &comment.Date, &comment.LikesCount, &comment.DislikesCount)
+		if err != nil {
+			log.Panic(err)
+		}
+		comments = append(comments, comment)
+	}
+	query.Close()
+
+	return comments
+}
