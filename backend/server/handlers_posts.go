@@ -240,11 +240,11 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	requestBody.Title = strings.TrimSpace(requestBody.Title)
 	requestBody.Content = strings.TrimSpace(requestBody.Content)
 
-	if len(requestBody.Title) < 3 {
+	if len(requestBody.Title) < 1 {
 		http.Error(w, "Title is too short", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.Content) < 3 {
+	if len(requestBody.Content) < 1 {
 		http.Error(w, "Content is too short", http.StatusBadRequest)
 		return
 	}
@@ -360,10 +360,52 @@ func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// getPostId returns -1 if post was not found in database
+func (srv *Server) getPostId(w http.ResponseWriter, r *http.Request) int {
+	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
+	if err != nil {
+		return -1
+	}
+	// Get the post from the database
+	post := srv.DB.GetPostById(postId)
+	if post == nil {
+		return -1
+	}
+	return postId
+}
+
 // postsIdCommentHandler comments on a post in the database
 func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database managing etc
-	sendObject(w, "postsIdCommentHandler")
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+
+	postId := srv.getPostId(w, r)
+	if postId == -1 {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	requestBody := struct {
+		Content string `json:"content"`
+	}{}
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(w, "Body is not valid", http.StatusBadRequest)
+		return
+	}
+
+	requestBody.Content = strings.TrimSpace(requestBody.Content)
+
+	if len(requestBody.Content) < 1 {
+		http.Error(w, "Content is too short", http.StatusBadRequest)
+		return
+	}
+
+	id := srv.DB.AddComment(requestBody.Content, userId)
+	sendObject(w, id)
 }
 
 // postsIdCommentIdLikeHandler likes a comment on a post in the database

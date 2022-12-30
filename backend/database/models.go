@@ -20,13 +20,13 @@ type User struct {
 }
 
 type Comment struct {
-	Id       int
-	PostId   int
-	AuthorId int
-	Text     string
-	Date     string
-	Likes    int
-	Dislikes int
+	Id            int
+	PostId        int
+	AuthorId      int
+	Content       string
+	Date          string
+	LikesCount    int
+	DislikesCount int
 }
 
 type Session struct {
