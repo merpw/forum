@@ -61,7 +61,11 @@ const UserInfo = () => {
       </div>
       <button
         className={"cursor-pointer hover:opacity-50 m-auto"}
-        onClick={() => logOut().then(() => mutate())}
+        onClick={() =>
+          logOut()
+            .then(() => mutate())
+            .catch(null)
+        }
       >
         <svg
           xmlns={"http://www.w3.org/2000/svg"}

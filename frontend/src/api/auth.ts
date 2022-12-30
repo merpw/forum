@@ -3,7 +3,9 @@ import useSWR from "swr"
 import { User } from "../custom"
 
 export const useMe = () => {
-  const { data, mutate, error } = useSWR<{ user: User | undefined }>("/api/me", getMe)
+  const { data, mutate, error } = useSWR<{ user: User | undefined }>("/api/me", getMe, {
+    revalidateOnFocus: false,
+  })
   return {
     isError: error != undefined,
     isLoading: !error && !data,
@@ -16,7 +18,7 @@ export const useMe = () => {
 const getMe = async () =>
   document.cookie.includes("forum-token")
     ? axios
-        .get<User>("/api/me/", { withCredentials: true })
+        .get<User>("/api/me", { withCredentials: true })
         .then((res) => {
           return { user: res.data }
         })

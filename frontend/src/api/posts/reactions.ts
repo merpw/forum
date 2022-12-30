@@ -1,19 +1,44 @@
-export const LikePost = (postID: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
+import axios from "axios"
+import useSWR from "swr"
+
+export const useReactions = (postID: number) => {
+  const { data, mutate, error } = useSWR(`/api/posts/${postID}/reaction`, getPostReaction)
+  return {
+    isError: error != undefined,
+    isLoading: !error && !data,
+    mutate: mutate,
+    reaction: data?.reaction,
+    likes_count: data?.likes_count,
+    dislikes_count: data?.dislikes_count,
+  }
 }
 
-export const DislikePost = (postID: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
+type ReactionResponse = {
+  reaction: number
+  likes_count: number
+  dislikes_count: number | undefined
 }
 
-export const LikeComment = (postID: number, commentId: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
-}
+export const getPostReaction = (path: string) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .get<ReactionResponse>(path, {
+          withCredentials: true,
+        })
+        .then((res) => res.data)
+        .catch(() => undefined)
+    : undefined
 
-export const DislikeComment = (postID: number, commentId: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
-}
+export const dislikePost = (postID: number) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .post<number>(`/api/posts/${postID}/dislike`, null, { withCredentials: true })
+        .then((res) => res.data)
+    : Promise.resolve(0)
+
+export const likePost = (postID: number) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .post<number>(`/api/posts/${postID}/like`, null, { withCredentials: true })
+        .then((res) => res.data)
+    : Promise.resolve(0)

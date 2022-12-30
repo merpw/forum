@@ -1,23 +1,22 @@
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
-import { FC, useState } from "react"
+import { FC } from "react"
 import { useMe } from "../../api/auth"
+import { dislikePost, likePost, useReactions } from "../../api/posts/reactions"
 import { Post, Comment } from "../../custom"
+
+// TODO: add prefetching (useSWR fallback)
 
 export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, comment }) => {
   const { isLoggedIn } = useMe()
-  const user_reaction = 0 // TODO: add real user reaction
 
   const router = useRouter()
-  const [reaction, setReaction] = useState<number>(user_reaction || 0)
+
+  const { reaction, likes_count, dislikes_count, mutate: mutateReactions } = useReactions(post.id)
 
   return (
     <span className={"mx-2 my-auto flex"}>
-      {comment ? (
-        <span className={"mr-1"}>{comment.likes}</span>
-      ) : (
-        <span className={"mr-1 text-xl"}>{post.likes_count}</span>
-      )}
+      <span className={"mr-1 text-xl"}>{likes_count}</span>
       <motion.button
         whileTap={{ scale: 0.8 }}
         title={"Like"}
@@ -27,13 +26,7 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
             router.push("/login")
             return
           }
-          if (reaction == 1) {
-            setReaction(0)
-          } else {
-            setReaction(1)
-          }
-
-          // LikePost(post.id).then(() => {})
+          likePost(post.id).then(() => mutateReactions())
         }}
       >
         <svg
@@ -53,6 +46,8 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
           />
         </svg>
       </motion.button>
+      {dislikes_count != undefined && <span className={"mr-1 text-xl"}>{dislikes_count}</span>}
+
       <motion.button
         whileTap={{ scale: 0.5 }}
         title={"Dislike"}
@@ -62,14 +57,7 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
             router.push("/login")
             return
           }
-          if (reaction == -1) {
-            setReaction(0)
-          } else {
-            setReaction(-1)
-          }
-          // DislikePost(post.id).catch((error) => {
-          //   console.log(error)
-          // })
+          dislikePost(post.id).then(() => mutateReactions())
         }}
       >
         <svg

@@ -37,6 +37,9 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 	case reApiPostsIdDislike.MatchString(r.URL.Path):
 		srv.postsIdDislikeHandler(w, r)
 
+	case reApiPostsIdReaction.MatchString(r.URL.Path):
+		srv.postsIdReactionHandler(w, r)
+
 	case reApiPostsIdComment.MatchString(r.URL.Path):
 		srv.postsIdCommentHandler(w, r)
 
@@ -266,7 +269,7 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reaction := srv.DB.GetPostReaction(userId, postId)
+	reaction := srv.DB.GetPostReaction(postId, userId)
 
 	switch reaction {
 	case 0: // if not reacted, add like
@@ -292,6 +295,51 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (srv *Server) postsIdReactionHandler(w http.ResponseWriter, r *http.Request) {
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+
+	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+	postIdStr = strings.TrimSuffix(postIdStr, "/reaction")
+	// /api/posts/1/reaction -> 1
+
+	postId, err := strconv.Atoi(postIdStr)
+	if err != nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	post := srv.DB.GetPostById(postId)
+	if post == nil {
+		errorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	reaction := srv.DB.GetPostReaction(postId, userId)
+	if userId == post.AuthorId {
+		sendObject(w, struct {
+			Reaction      int `json:"reaction"`
+			LikesCount    int `json:"likes_count"`
+			DislikesCount int `json:"dislikes_count"`
+		}{
+			Reaction:      reaction,
+			LikesCount:    post.LikesCount,
+			DislikesCount: post.DislikesCount,
+		})
+	} else {
+		sendObject(w, struct {
+			Reaction   int `json:"reaction"`
+			LikesCount int `json:"likes_count"`
+		}{
+			Reaction:   reaction,
+			LikesCount: post.LikesCount,
+		})
+	}
+}
+
 // postsPostsIdDislikeHandler dislikes a post in the database
 func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
 	userId := srv.getUserId(w, r)
@@ -314,7 +362,7 @@ func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	reaction := srv.DB.GetPostReaction(userId, postId)
+	reaction := srv.DB.GetPostReaction(postId, userId)
 
 	switch reaction {
 	case 0: // if not reacted, add dislike
