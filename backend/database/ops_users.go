@@ -75,3 +75,15 @@ func (db DB) IsEmailTaken(email string) bool {
 }
 
 // TODO: maybe add IsNameTaken
+// IsUserTaken checks if name is already in use.
+// Added because authorization supports the name and the email as login
+func (db DB) IsNameTaken(name string) bool {
+	query, err := db.Query("SELECT 1 FROM users WHERE name = ?", name)
+	if err != nil {
+		log.Panic(err)
+	}
+	isTaken := query.Next()
+	query.Close()
+
+	return isTaken
+}
