@@ -16,6 +16,8 @@ const SignupPage: NextPage = () => {
   const [password, setPassword] = useState("")
   const [passwordConfirm, setPasswordConfirm] = useState("")
 
+  const [isSame, setIsSame] = useState(false)
+
   const [formError, setFormError] = useState<string | null>(null)
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
@@ -26,6 +28,10 @@ const SignupPage: NextPage = () => {
     }
   }, [router, isLoggedIn, isRedirecting, isLoading])
 
+  useEffect(() => {
+    setIsSame(false)
+  }, [name, email, password, passwordConfirm])
+
   return (
     <>
       <Head>
@@ -34,7 +40,11 @@ const SignupPage: NextPage = () => {
       <form
         onSubmit={async (e) => {
           e.preventDefault()
+
+          if (isSame) return
+
           if (formError != null) setFormError(null)
+          setIsSame(true)
 
           if (password != passwordConfirm) {
             setFormError("Passwords don't match")

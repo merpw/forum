@@ -2,14 +2,14 @@ import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { Post } from "../../custom"
 
 import Link from "next/link"
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import Head from "next/head"
 import moment from "moment"
 import { getPostLocal, getPostsLocal } from "../../api/posts/fetch"
 import { useMe } from "../../api/auth"
-import { motion } from "framer-motion"
 import { CreateComment } from "../../api/posts/comment"
 import { ReactionsButtons } from "../../components/posts/reactions"
+import { FormError } from "../../components/error"
 
 const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   return (
@@ -52,19 +52,31 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
   const [text, setText] = useState("")
   const [formError, setFormError] = useState<string | null>(null)
 
+  const [isSame, setIsSame] = useState(false)
+
+  useEffect(() => setIsSame(false), [text])
+
   if (!isLoggedIn) return null
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        setFormError(null)
+
+        if (isSame) return
+
+        if (formError != null) setFormError(null)
+
         CreateComment(post.id, text)
-          .then((comment) => {
-            console.log(comment)
+          .then((id) => {
+            console.log(id)
           })
           .catch((err) => {
-            setFormError(err)
+            if (err.code == "ERR_BAD_REQUEST") {
+              setFormError(err.response?.data as string)
+            } else {
+              // TODO: unexpected error
+            }
           })
       }}
       className={"mb-5"}
@@ -88,20 +100,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
         />
       </div>
 
-      {formError && (
-        <motion.div
-          className={
-            "transition ease-in-out -translate-y-1 p-4 mb-3 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-inherit dark:border-2 dark:border-red-900 dark:text-white"
-          }
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ ease: "easeOut", duration: 0.25 }}
-          exit={{ opacity: 0 }}
-          role={"alert"}
-        >
-          <span className={"font-medium"}>{formError}</span>
-        </motion.div>
-      )}
+      <FormError error={formError} />
 
       <button
         type={"submit"}

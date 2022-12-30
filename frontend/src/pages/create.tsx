@@ -1,4 +1,3 @@
-import { AxiosError } from "axios"
 import { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
@@ -36,17 +35,24 @@ const CreatePostForm = () => {
   const [formError, setFormError] = useState<string | null>(null)
   const router = useRouter()
 
+  const [isSame, setIsSame] = useState(false)
+
+  useEffect(() => {
+    setIsSame(false)
+  }, [title, content])
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
-        setFormError(null)
+
+        if (isSame) return
+
+        if (formError != null) setFormError(null)
+        setIsSame(true)
+
         CreatePost(title, content)
-          .then((response) => {
-            if (response.status == 200) {
-              router.push(`/post/${response.data}`)
-            }
-          })
+          .then((id) => router.push(`/post/${id}`))
           .catch((err) => {
             if (err.code == "ERR_BAD_REQUEST") {
               setFormError(err.response?.data as string)

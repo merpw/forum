@@ -16,6 +16,8 @@ const LoginPage: NextPage = () => {
   const [password, setPassword] = useState("")
   const [formError, setFormError] = useState<string | null>(null)
 
+  const [isSame, setIsSame] = useState(false)
+
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
   useEffect(() => {
     if (!isLoading && isLoggedIn && !isRedirecting) {
@@ -23,6 +25,10 @@ const LoginPage: NextPage = () => {
       router.replace("/me")
     }
   }, [router, isLoggedIn, isRedirecting, isLoading])
+
+  useEffect(() => {
+    setIsSame(false)
+  }, [login, password])
 
   return (
     <>
@@ -32,7 +38,11 @@ const LoginPage: NextPage = () => {
       <form
         onSubmit={async (e) => {
           e.preventDefault()
+
+          if (isSame) return
+
           if (formError != null) setFormError(null)
+          setIsSame(true)
 
           logIn(login, password)
             .then(() => mutate())
@@ -76,25 +86,7 @@ const LoginPage: NextPage = () => {
             required
           />
         </div>
-        {/* <div className={"flex items-start mb-6"}>
-          <div className={"flex items-center h-5"}>
-            <input
-              id={"remember"}
-              type={"checkbox"}
-              value={""}
-              className={
-                "w-4 h-4 bg-gray-50 rounded border border-gray-300 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800"
-              }
-              required
-            />
-          </div>
-          <label
-            htmlFor={"remember"}
-            className={"ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"}
-          >
-            Remember me
-          </label>
-        </div> */}
+
         <FormError error={formError} />
         <span className={"flex flex-wrap gap-2"}>
           <span>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
-import { FC, useState } from "react"
+import { FC } from "react"
 import { useMe } from "../../api/auth"
 import { dislikePost, likePost, useReactions } from "../../api/posts/reactions"
 import { Post, Comment } from "../../custom"

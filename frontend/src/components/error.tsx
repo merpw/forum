@@ -10,8 +10,6 @@ export const FormError: FC<{ error: string | null }> = ({ error }) => (
         }
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ type: "spring" }}
-        exit={{ opacity: 0 }}
         role={"alert"}
       >
         <span className={"font-medium"}>{error}</span>
