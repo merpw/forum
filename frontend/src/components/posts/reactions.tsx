@@ -1,23 +1,27 @@
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { useMe } from "../../api/auth"
+import { dislikePost, getPostReaction, likePost } from "../../api/posts/reactions"
 import { Post, Comment } from "../../custom"
 
 export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, comment }) => {
   const { isLoggedIn } = useMe()
-  const user_reaction = 0 // TODO: add real user reaction
 
   const router = useRouter()
-  const [reaction, setReaction] = useState<number>(user_reaction || 0)
+
+  const [reaction, setReaction] = useState(0)
+
+  const [likesCount, setLikesCount] = useState(post.likes_count)
+  const [dislikesCount, setDislikesCount] = useState(post.dislikes_count)
+
+  useEffect(() => {
+    getPostReaction(post.id).then(setReaction)
+  }, [post.id])
 
   return (
     <span className={"mx-2 my-auto flex"}>
-      {comment ? (
-        <span className={"mr-1"}>{comment.likes}</span>
-      ) : (
-        <span className={"mr-1 text-xl"}>{post.likes_count}</span>
-      )}
+      <span className={"mr-1 text-xl"}>{likesCount}</span>
       <motion.button
         whileTap={{ scale: 0.8 }}
         title={"Like"}
@@ -27,13 +31,22 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
             router.push("/login")
             return
           }
-          if (reaction == 1) {
-            setReaction(0)
-          } else {
-            setReaction(1)
-          }
-
-          // LikePost(post.id).then(() => {})
+          likePost(post.id).then((response) => {
+            setReaction(response)
+            if (reaction == 1 && response == 0) {
+              setLikesCount(likesCount - 1)
+              return
+            }
+            if (reaction == 0 && response == 1) {
+              setLikesCount(likesCount + 1)
+            }
+            if (reaction == -1 && response == 1) {
+              setLikesCount(likesCount + 1)
+              if (dislikesCount != undefined) {
+                setDislikesCount(dislikesCount - 1)
+              }
+            }
+          })
         }}
       >
         <svg
@@ -53,6 +66,8 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
           />
         </svg>
       </motion.button>
+      {dislikesCount != undefined && <span className={"mr-1 text-xl"}>{dislikesCount}</span>}
+
       <motion.button
         whileTap={{ scale: 0.5 }}
         title={"Dislike"}
@@ -62,14 +77,24 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
             router.push("/login")
             return
           }
-          if (reaction == -1) {
-            setReaction(0)
-          } else {
-            setReaction(-1)
-          }
-          // DislikePost(post.id).catch((error) => {
-          //   console.log(error)
-          // })
+          dislikePost(post.id).then((response) => {
+            setReaction(response)
+
+            if (reaction == 1 && response == -1) {
+              setLikesCount(likesCount - 1)
+              if (dislikesCount != undefined) {
+                setDislikesCount(dislikesCount + 1)
+              }
+            }
+
+            if (reaction == -1 && response == 0 && dislikesCount != undefined) {
+              setDislikesCount(dislikesCount - 1)
+              return
+            }
+            if (reaction == 0 && response == -1 && dislikesCount != undefined) {
+              setDislikesCount(dislikesCount + 1)
+            }
+          })
         }}
       >
         <svg

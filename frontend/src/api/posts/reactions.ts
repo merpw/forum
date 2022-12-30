@@ -1,19 +1,23 @@
-export const LikePost = (postID: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
-}
+import axios from "axios"
 
-export const DislikePost = (postID: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
-}
+export const getPostReaction = (postID: number) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .get<number>(`/api/posts/${postID}/reaction`, { withCredentials: true })
+        .then((res) => res.data)
+        .catch(() => 0)
+    : Promise.resolve(0)
 
-export const LikeComment = (postID: number, commentId: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
-}
+export const dislikePost = (postID: number) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .post<number>(`/api/posts/${postID}/dislike`, null, { withCredentials: true })
+        .then((res) => res.data)
+    : Promise.resolve(0)
 
-export const DislikeComment = (postID: number, commentId: number) => {
-  return Promise.reject("Not connected to backend yet")
-  return Promise.resolve(postID)
-}
+export const likePost = (postID: number) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .post<number>(`/api/posts/${postID}/like`, null, { withCredentials: true })
+        .then((res) => res.data)
+    : Promise.resolve(0)
