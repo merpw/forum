@@ -21,10 +21,10 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 		srv.postsCategoriesHandler(w, r)
 
 	case reApiPostsCategoriesFacts.MatchString(r.URL.Path):
-		srv.postsCategoriesFactsHandler(w, r)
+		srv.postsCategoriesHandler(w, r)
 
 	case reApiPostsCategoriesRumors.MatchString(r.URL.Path):
-		srv.postsCategoriesRumorsHandler(w, r)
+		srv.postsCategoriesHandler(w, r)
 
 	case reApiPostsId.MatchString(r.URL.Path):
 		srv.postsIdHandler(w, r)
@@ -53,8 +53,47 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 
 // postsCategoriesHandler returns a json list of all categories from the database
 func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database post fetching
-	sendObject(w, "posts categories list")
+	var category string
+	switch {
+	case reApiPostsCategoriesFacts.MatchString(r.URL.Path):
+		category = "facts"
+	case reApiPostsCategoriesRumors.MatchString(r.URL.Path):
+		category = "rumors"
+	}
+
+	if category == "" {
+		json := `{"facts","rumors"}`
+		sendObject(w, json)
+	} else {
+		posts := srv.DB.GetCategoryPosts(category)
+		type ResponsePost struct {
+			Id            int      `json:"id"`
+			Title         string   `json:"title"`
+			Content       string   `json:"content"`
+			Author        SafeUser `json:"author"`
+			Date          string   `json:"date"`
+			CommentsCount int      `json:"comments_count"`
+			LikesCount    int      `json:"likes_count"`
+			Category      string   `json:"category"`
+		}
+
+		response := make([]ResponsePost, 0)
+		for _, post := range posts {
+			postAuthor := srv.DB.GetUserById(post.AuthorId)
+			response = append(response, ResponsePost{
+				Id:            post.Id,
+				Title:         post.Title,
+				Content:       post.Content,
+				Date:          post.Date,
+				Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+				CommentsCount: post.CommentsCount,
+				LikesCount:    post.LikesCount,
+				Category:      post.Category,
+			})
+		}
+
+		sendObject(w, response)
+	}
 }
 
 // postsHandler returns a json list of all posts from the database
@@ -68,6 +107,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
 		LikesCount    int      `json:"likes_count"`
+		Category      string   `json:"category"`
 	}
 
 	response := make([]ResponsePost, 0)
@@ -81,23 +121,51 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
+			Category:      post.Category,
 		})
 	}
 
 	sendObject(w, response)
 }
 
-// postsCategoriesFactsHandler returns a json list of all posts from the database that match the category "facts"
-func (srv *Server) postsCategoriesFactsHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database managing etc
-	sendObject(w, "postsCategoriesFactsHandler")
-}
+// // postsCategoriesFactsHandler returns a json list of all posts from the database that match the category "facts"
+// func (srv *Server) postsCategoriesFactsHandler(w http.ResponseWriter, r *http.Request) {
+// 	// todo database managing etc
+// 	posts := srv.DB.GetCategoryPosts("facts")
+// 	type ResponsePost struct {
+// 		Id            int      `json:"id"`
+// 		Title         string   `json:"title"`
+// 		Content       string   `json:"content"`
+// 		Author        SafeUser `json:"author"`
+// 		Date          string   `json:"date"`
+// 		CommentsCount int      `json:"comments_count"`
+// 		LikesCount    int      `json:"likes_count"`
+// 		Category      string   `json:"category"`
+// 	}
 
-// postsCategoriesRumorsHandler returns a json list of all posts from the database that match the category "rumors"
-func (srv *Server) postsCategoriesRumorsHandler(w http.ResponseWriter, r *http.Request) {
-	// todo database managing etc
-	sendObject(w, "postsCategoriesRumorsHandler")
-}
+// 	response := make([]ResponsePost, 0)
+// 	for _, post := range posts {
+// 		postAuthor := srv.DB.GetUserById(post.AuthorId)
+// 		response = append(response, ResponsePost{
+// 			Id:            post.Id,
+// 			Title:         post.Title,
+// 			Content:       post.Content,
+// 			Date:          post.Date,
+// 			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+// 			CommentsCount: post.CommentsCount,
+// 			LikesCount:    post.LikesCount,
+// 			Category:      post.Category,
+// 		})
+// 	}
+
+// 	sendObject(w, response)
+// }
+
+// // postsCategoriesRumorsHandler returns a json list of all posts from the database that match the category "rumors"
+// func (srv *Server) postsCategoriesRumorsHandler(w http.ResponseWriter, r *http.Request) {
+// 	// todo database managing etc
+// 	sendObject(w, "postsCategoriesRumorsHandler")
+// }
 
 // postsIdHandler returns a single post from the database that matches the incoming id of the post in the url
 func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
@@ -159,8 +227,9 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody := struct {
-		Title   string `json:"title"`
-		Content string `json:"content"`
+		Title    string `json:"title"`
+		Content  string `json:"content"`
+		Category string `json:"category"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -185,7 +254,13 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId)
+	// TODO hardcoded check for two categories, at the moment
+	if requestBody.Category != "facts" && requestBody.Category != "rumors" {
+		http.Error(w, "No such category", http.StatusBadRequest)
+		return
+	}
+
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, requestBody.Category)
 	sendObject(w, id)
 }
 
