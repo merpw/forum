@@ -40,6 +40,12 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Name is not valid", http.StatusBadRequest)
 		return
 	}
+	// here is checking name is already in use,
+	// statement above checks the incoming name do not includes spaces before and after
+	if srv.DB.IsNameTaken(requestBody.Name) {
+		http.Error(w, "Name is already used", http.StatusBadRequest)
+		return
+	}
 	// check if email is a valid email
 	_, err = mail.ParseAddress(requestBody.Email)
 	if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) {
