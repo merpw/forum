@@ -16,10 +16,11 @@ var reApiMePosts = regexp.MustCompile(addSlashes(`^/api/me/posts/?$`))
 
 var reApiUserId = regexp.MustCompile(addSlashes(`^/api/user/[[:digit:]]+/?$`))
 var reApiUserIdPosts = regexp.MustCompile(addSlashes(`^/api/user/[[:digit:]]+/posts/?$`))
+
 var reApiPosts = regexp.MustCompile(addSlashes(`^/api/posts/?$`))
 var reApiPostsCategories = regexp.MustCompile(addSlashes(`^/api/posts/categories/?$`))
-var reApiPostsCategoriesFacts = regexp.MustCompile(addSlashes(`^/api/posts/categories/facts/?$`))
-var reApiPostsCategoriesRumors = regexp.MustCompile(addSlashes(`^/api/posts/categories/rumors/?$`))
+var reApiPostsCategoriesName = regexp.MustCompile(addSlashes(`^/api/posts/categories/[[:alnum:]]+/?$`))
+
 var reApiPostsId = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/?$`))
 
 // method POST endpoints
@@ -50,8 +51,7 @@ var getRegexps = []string{
 	reApiPostsIdReaction.String(),
 
 	reApiPostsCategories.String(),
-	reApiPostsCategoriesFacts.String(),
-	reApiPostsCategoriesRumors.String(),
+	reApiPostsCategoriesName.String(),
 }
 var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 
