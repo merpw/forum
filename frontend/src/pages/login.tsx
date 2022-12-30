@@ -35,10 +35,7 @@ const LoginPage: NextPage = () => {
           if (formError != null) setFormError(null)
 
           logIn(login, password)
-            .then(() => {
-              mutate()
-              router.replace("/me")
-            })
+            .then(() => mutate())
             .catch((err: AxiosError) => {
               setFormError(err.response?.data as string)
             })

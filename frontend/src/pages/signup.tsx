@@ -3,13 +3,13 @@ import { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { SignUp, useMe } from "../api/auth"
+import { logIn, SignUp, useMe } from "../api/auth"
 import { FormError } from "../components/error"
 
 const SignupPage: NextPage = () => {
   const router = useRouter()
 
-  const { isLoading, isLoggedIn } = useMe()
+  const { isLoading, isLoggedIn, mutate } = useMe()
 
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -44,7 +44,7 @@ const SignupPage: NextPage = () => {
           SignUp(name, email, password)
             .then((response) => {
               if (response.status == 200) {
-                router.replace("/login")
+                logIn(email, password).then(() => mutate())
               }
             })
             .catch((err: AxiosError) => {
