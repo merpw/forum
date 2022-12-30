@@ -1,12 +1,33 @@
 import axios from "axios"
+import useSWR from "swr"
 
-export const getPostReaction = (postID: number) =>
+export const useReactions = (postID: number) => {
+  const { data, mutate, error } = useSWR(`/api/posts/${postID}/reaction`, getPostReaction)
+  return {
+    isError: error != undefined,
+    isLoading: !error && !data,
+    mutate: mutate,
+    reaction: data?.reaction,
+    likes_count: data?.likes_count,
+    dislikes_count: data?.dislikes_count,
+  }
+}
+
+type ReactionResponse = {
+  reaction: number
+  likes_count: number
+  dislikes_count: number | undefined
+}
+
+export const getPostReaction = (path: string) =>
   document.cookie.includes("forum-token")
     ? axios
-        .get<number>(`/api/posts/${postID}/reaction`, { withCredentials: true })
+        .get<ReactionResponse>(path, {
+          withCredentials: true,
+        })
         .then((res) => res.data)
-        .catch(() => 0)
-    : Promise.resolve(0)
+        .catch(() => undefined)
+    : undefined
 
 export const dislikePost = (postID: number) =>
   document.cookie.includes("forum-token")

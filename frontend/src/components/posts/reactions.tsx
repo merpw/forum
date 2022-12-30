@@ -1,27 +1,22 @@
 import { motion } from "framer-motion"
 import { useRouter } from "next/router"
-import { FC, useEffect, useState } from "react"
+import { FC } from "react"
 import { useMe } from "../../api/auth"
-import { dislikePost, getPostReaction, likePost } from "../../api/posts/reactions"
+import { dislikePost, likePost, useReactions } from "../../api/posts/reactions"
 import { Post, Comment } from "../../custom"
+
+// TODO: add prefetching (useSWR fallback)
 
 export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, comment }) => {
   const { isLoggedIn } = useMe()
 
   const router = useRouter()
 
-  const [reaction, setReaction] = useState(0)
-
-  const [likesCount, setLikesCount] = useState(post.likes_count)
-  const [dislikesCount, setDislikesCount] = useState(post.dislikes_count)
-
-  useEffect(() => {
-    getPostReaction(post.id).then(setReaction)
-  }, [post.id])
+  const { reaction, likes_count, dislikes_count, mutate: mutateReactions } = useReactions(post.id)
 
   return (
     <span className={"mx-2 my-auto flex"}>
-      <span className={"mr-1 text-xl"}>{likesCount}</span>
+      <span className={"mr-1 text-xl"}>{likes_count}</span>
       <motion.button
         whileTap={{ scale: 0.8 }}
         title={"Like"}
@@ -31,22 +26,7 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
             router.push("/login")
             return
           }
-          likePost(post.id).then((response) => {
-            setReaction(response)
-            if (reaction == 1 && response == 0) {
-              setLikesCount(likesCount - 1)
-              return
-            }
-            if (reaction == 0 && response == 1) {
-              setLikesCount(likesCount + 1)
-            }
-            if (reaction == -1 && response == 1) {
-              setLikesCount(likesCount + 1)
-              if (dislikesCount != undefined) {
-                setDislikesCount(dislikesCount - 1)
-              }
-            }
-          })
+          likePost(post.id).then(() => mutateReactions())
         }}
       >
         <svg
@@ -66,7 +46,7 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
           />
         </svg>
       </motion.button>
-      {dislikesCount != undefined && <span className={"mr-1 text-xl"}>{dislikesCount}</span>}
+      {dislikes_count != undefined && <span className={"mr-1 text-xl"}>{dislikes_count}</span>}
 
       <motion.button
         whileTap={{ scale: 0.5 }}
@@ -77,24 +57,7 @@ export const ReactionsButtons: FC<{ post: Post; comment?: Comment }> = ({ post, 
             router.push("/login")
             return
           }
-          dislikePost(post.id).then((response) => {
-            setReaction(response)
-
-            if (reaction == 1 && response == -1) {
-              setLikesCount(likesCount - 1)
-              if (dislikesCount != undefined) {
-                setDislikesCount(dislikesCount + 1)
-              }
-            }
-
-            if (reaction == -1 && response == 0 && dislikesCount != undefined) {
-              setDislikesCount(dislikesCount - 1)
-              return
-            }
-            if (reaction == 0 && response == -1 && dislikesCount != undefined) {
-              setDislikesCount(dislikesCount + 1)
-            }
-          })
+          dislikePost(post.id).then(() => mutateReactions())
         }}
       >
         <svg
