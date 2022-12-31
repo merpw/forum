@@ -17,3 +17,17 @@ export const getUserPostsLocal = (user_id: number) =>
     .catch(() => {
       return { posts: [] as Post[] }
     })
+
+export const getCategoriesLocal = () =>
+  axios
+    .get<string[]>(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/posts/categories`)
+    .then((res) => res.data)
+
+export const getCategoryPostsLocal = (category: string) =>
+  axios<Post[]>(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/posts/categories/${category}`)
+    .then((res) => {
+      return { posts: res.data }
+    })
+    .catch(() => {
+      return { posts: undefined }
+    })
