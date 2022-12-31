@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"forum/server"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/rand"
 	"net/http"
@@ -19,22 +19,25 @@ import (
 )
 
 // TODO: move server init to separate func (to prevent `email is already taken` false test fail)
+// initServer initializes the server and database connection
+func initServer(db *sql.DB) *server.Server {
+	srv := server.Connect(db)
+	err := srv.DB.InitDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+	return srv
+}
 
 // TestAuth tests auth routes
 func TestAuth(t *testing.T) {
-	// delete the database file
+	// prepare database and server for testing
 	os.Remove("./test.db")
 	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv := server.Connect(db)
-	// Initialize database
-	err = srv.DB.InitDatabase()
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	srv := initServer(db)
 	router := srv.Start()
 	testServer := httptest.NewServer(router)
 	defer testServer.Close()
@@ -101,26 +104,17 @@ func TestAuth(t *testing.T) {
 			t.Fatal(err)
 		}
 		if resp.StatusCode != 200 {
-			body, _ := ioutil.ReadAll(resp.Body)
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				log.Println(err)
+			}
 			errorMessage := string(body)
 			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
 		}
 	})
 
 	t.Run("logout", func(t *testing.T) {
-		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/logout", nil)
-		if err != nil {
-			t.Fatal(err)
-		}
-		req.AddCookie(cookies[0])
-
-		resp, err := cli.Do(req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if resp.StatusCode != 200 {
-			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
-		}
+		testAuthLogout(t, cli, testServer, cookies)
 	})
 }
 
@@ -132,12 +126,7 @@ func BenchmarkAuth(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	srv := server.Connect(db)
-	// Initialize database
-	err = srv.DB.InitDatabase()
-	if err != nil {
-		log.Fatal(err)
-	}
+	srv := initServer(db)
 
 	router := srv.Start()
 	testServer := httptest.NewServer(router)
@@ -185,19 +174,7 @@ func BenchmarkAuth(b *testing.B) {
 				}
 
 				// logout
-				req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/logout", nil)
-				if err != nil {
-					b.Error(err)
-				}
-				req.AddCookie(cookies[0])
-
-				resp, err = cli.Do(req)
-				if err != nil {
-					b.Error(err)
-				}
-				if resp.StatusCode != 200 {
-					b.Errorf("expected %d, got %d", 200, resp.StatusCode)
-				}
+				logoutB(cli, testServer.URL, cookies[0], b)
 
 				wg.Done()
 			}()
@@ -244,4 +221,37 @@ func TestPost(t *testing.T) {
 		})
 	}
 	//	TODO: add POST tests with auth
+}
+
+func testAuthLogout(t *testing.T, cli *http.Client, testServer *httptest.Server, cookies []*http.Cookie) {
+	req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/logout", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.AddCookie(cookies[0])
+
+	resp, err := cli.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
+	}
+}
+
+func logoutB(cli *http.Client, url string, cookie *http.Cookie, b *testing.B) {
+	// logout
+	req, err := http.NewRequest(http.MethodPost, url+"/api/logout", nil)
+	if err != nil {
+		b.Error(err)
+	}
+	req.AddCookie(cookie)
+
+	resp, err := cli.Do(req)
+	if err != nil {
+		b.Error(err)
+	}
+	if resp.StatusCode != 200 {
+		b.Errorf("expected %d, got %d", 200, resp.StatusCode)
+	}
 }
