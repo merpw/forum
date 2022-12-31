@@ -16,8 +16,6 @@ var categories = []string{"facts", "rumors"}
 
 func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) {
 	switch {
-	case reApiPosts.MatchString(r.URL.Path):
-		srv.postsHandler(w, r)
 
 	case reApiPostsCategories.MatchString(r.URL.Path):
 		srv.postsCategoriesHandler(w, r)
@@ -160,7 +158,8 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 			Content string   `json:"content"`
 			Author  SafeUser `json:"author"`
 		} `json:"comments"`
-		LikesCount int `json:"likes_count"`
+		LikesCount int    `json:"likes_count"`
+		Category   string `json:"category"`
 	}
 
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
@@ -193,6 +192,7 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 			Author  SafeUser `json:"author"`
 		}{},
 		LikesCount: post.LikesCount,
+		Category:   post.Category,
 	},
 	)
 }

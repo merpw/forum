@@ -21,9 +21,12 @@ func (srv *Server) Start() http.Handler {
 	router := http.NewServeMux()
 
 	// Master-handler for:
-	// /api/posts, /api/posts/{id}, /api/posts/{id}/like, /api/posts/{id}/dislike
+	// /api/posts/{id}, /api/posts/{id}/like, /api/posts/{id}/dislike
 	// /api/posts/{id}/comment, /api/posts/{id}/comment/{id}/like, /api/posts/{id}/comment/{id}/dislike
 	router.HandleFunc("/api/posts/", srv.apiPostsMasterHandler)
+
+	// /api/posts handler
+	router.HandleFunc("/api/posts", srv.postsHandler)
 
 	// Master-handler for:
 	// /api/user/{id}, /api/user/{id}/posts, /api/user/{id}

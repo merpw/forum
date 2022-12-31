@@ -8,6 +8,7 @@ export type Post = {
   date: string
   author: User
   comments: Comment[]
+  category: string
 }
 
 export type User = {
