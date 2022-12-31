@@ -4,10 +4,13 @@ import (
 	"database/sql"
 	"fmt"
 	"forum/server"
+	"log"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 )
@@ -16,21 +19,28 @@ import (
 
 // TestAuth tests auth routes
 func TestAuth(t *testing.T) {
+	// delete the database file
+	os.Remove("./test.db")
 	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
 	if err != nil {
 		t.Fatal(err)
 	}
 	srv := server.Connect(db)
+	// Initialize database
+	err = srv.DB.InitDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	router := srv.Start()
 	testServer := httptest.NewServer(router)
 	defer testServer.Close()
 
 	cli := testServer.Client()
-
+	aUsr := fmt.Sprintf("%dtest%d", rand.Intn(100000), rand.Intn(100000))
+	anEmail := fmt.Sprintf("%s@test.com", aUsr)
 	t.Run("signup", func(t *testing.T) {
 		rand.Seed(time.Now().UnixNano())
-		aUsr := fmt.Sprintf("test%d", rand.Intn(100000))
-		anEmail := fmt.Sprintf("%s@test.com", aUsr)
 		body := fmt.Sprintf(`{ "name": "%s", "email": "%s", "password": "notapassword" }`, aUsr, anEmail)
 		resp, err := cli.Post(testServer.URL+"/api/signup", "application/json",
 			strings.NewReader(body))
@@ -46,8 +56,9 @@ func TestAuth(t *testing.T) {
 
 	var cookies []*http.Cookie
 	t.Run("login", func(t *testing.T) {
+		body := fmt.Sprintf(`{ "login": "%s", "password": "notapassword" }`, anEmail)
 		resp, err := cli.Post(testServer.URL+"/api/login", "application/json",
-			strings.NewReader(`{ "login": "test@test.com", "password": "notapassword" }`))
+			strings.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -74,6 +85,89 @@ func TestAuth(t *testing.T) {
 			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 		}
 	})
+}
+
+// BenchmarkAuth benchmarks auth routes, with i number of users in the for loop
+func BenchmarkAuth(b *testing.B) {
+	// delete the database file
+	os.Remove("./test.db")
+	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
+	if err != nil {
+		b.Fatal(err)
+	}
+	srv := server.Connect(db)
+	// Initialize database
+	err = srv.DB.InitDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	router := srv.Start()
+	testServer := httptest.NewServer(router)
+	defer testServer.Close()
+	cli := testServer.Client()
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		numUsers := 100
+		wg := sync.WaitGroup{}
+		wg.Add(numUsers)
+
+		counter := 0
+		mutex := &sync.Mutex{}
+		for i := 0; i < numUsers; i++ {
+			go func() {
+				mutex.Lock()
+				defer mutex.Unlock()
+
+				// signup
+				counter++
+				aUsr := fmt.Sprintf("user%d", counter)
+				anEmail := fmt.Sprintf("%s@test.com", aUsr)
+				body := fmt.Sprintf(`{ "name": "%s", "email": "%s", "password": "notapassword" }`, aUsr, anEmail)
+				resp, err := cli.Post(testServer.URL+"/api/signup", "application/json",
+					strings.NewReader(body))
+				if err != nil {
+					b.Error(err)
+				}
+
+				// bug found, if the user is already present, we give back 400 instead of 409
+				if resp.StatusCode != 200 {
+					b.Errorf("expected %d, got %d", 200, resp.StatusCode)
+				}
+
+				// login
+				resp, err = cli.Post(testServer.URL+"/api/login", "application/json",
+					strings.NewReader(fmt.Sprintf(`{ "login": "%s", "password": "notapassword" }`, anEmail)))
+				if err != nil {
+					b.Error(err)
+				}
+				cookies := resp.Cookies()
+				if resp.StatusCode != 200 {
+					b.Errorf("expected %d, got %d", 200, resp.StatusCode)
+				}
+
+				// logout
+				req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/logout", nil)
+				if err != nil {
+					b.Error(err)
+				}
+				req.AddCookie(cookies[0])
+
+				resp, err = cli.Do(req)
+				if err != nil {
+					b.Error(err)
+				}
+				if resp.StatusCode != 200 {
+					b.Errorf("expected %d, got %d", 200, resp.StatusCode)
+				}
+
+				wg.Done()
+			}()
+		}
+
+		wg.Wait()
+	}
 }
 
 // TestPost tests post routes
