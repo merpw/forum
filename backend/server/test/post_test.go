@@ -1,9 +1,12 @@
 package server
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"forum/server"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -67,6 +70,40 @@ func TestAuth(t *testing.T) {
 		// TODO: add request body
 		if resp.StatusCode != 200 {
 			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
+		}
+	})
+
+	// test create post
+	t.Run("createPost", func(t *testing.T) {
+		body := struct {
+			Title    string `json:"title"`
+			Content  string `json:"content"`
+			Category string `json:"category"`
+		}{
+			Title:    "Test Title",
+			Content:  "Test Content",
+			Category: "facts",
+		}
+		requestBodyBytes, err := json.Marshal(body)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/create/",
+			bytes.NewBuffer(requestBodyBytes))
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookies[0])
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 200 {
+			body, _ := ioutil.ReadAll(resp.Body)
+			errorMessage := string(body)
+			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
 		}
 	})
 
