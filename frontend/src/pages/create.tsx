@@ -3,6 +3,7 @@ import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { useMe } from "../api/auth"
+import { getCategories } from "../api/posts/categories"
 import { CreatePost } from "../api/posts/create"
 import { FormError } from "../components/error"
 
@@ -31,15 +32,21 @@ const CreatePostPage: NextPage = () => {
 const CreatePostForm = () => {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
-  // const [categories, setCategories] = useState([])
+  const [category, setCategory] = useState("")
+  const [categories, setCategories] = useState<string[]>([])
   const [formError, setFormError] = useState<string | null>(null)
+
   const router = useRouter()
 
   const [isSame, setIsSame] = useState(false)
 
   useEffect(() => {
     setIsSame(false)
-  }, [title, content])
+  }, [title, content, category])
+
+  useEffect(() => {
+    getCategories().then(setCategories)
+  }, [])
 
   return (
     <form
@@ -50,8 +57,12 @@ const CreatePostForm = () => {
 
         if (formError != null) setFormError(null)
         setIsSame(true)
+        if (category == "") {
+          setFormError("Category is not selected")
+          return
+        }
 
-        CreatePost(title, content)
+        CreatePost(title, content, category)
           .then((id) => router.push(`/post/${id}`))
           .catch((err) => {
             if (err.code == "ERR_BAD_REQUEST") {
@@ -86,7 +97,29 @@ const CreatePostForm = () => {
           required
         />
       </div>
+      <div className={"mb-6"}>
+        <label
+          htmlFor={"countries"}
+          className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
+        ></label>
+        <select
+          id={"countries"}
+          className={
+            "capitalize bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          }
+          onInput={(e) => setCategory(e.currentTarget.value)}
+          defaultValue={""}
+        >
+          <option disabled hidden value={""}>
+            category
+          </option>
+          {categories.map((cat, key) => (
+            <option key={key}>{cat}</option>
+          ))}
+        </select>
+      </div>
       <FormError error={formError} />
+
       <button
         type={"submit"}
         className={
