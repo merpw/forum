@@ -2,11 +2,14 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/server"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
 
 // TODO: move server init to separate func (to prevent `email is already taken` false test fail)
@@ -25,11 +28,17 @@ func TestAuth(t *testing.T) {
 	cli := testServer.Client()
 
 	t.Run("signup", func(t *testing.T) {
+		rand.Seed(time.Now().UnixNano())
+		aUsr := fmt.Sprintf("test%d", rand.Intn(100000))
+		anEmail := fmt.Sprintf("%s@test.com", aUsr)
+		body := fmt.Sprintf(`{ "name": "%s", "email": "%s", "password": "notapassword" }`, aUsr, anEmail)
 		resp, err := cli.Post(testServer.URL+"/api/signup", "application/json",
-			strings.NewReader(`{ "name": "test", "email": "test@test.com", "password": "notapassword" }`))
+			strings.NewReader(body))
 		if err != nil {
 			t.Fatal(err)
 		}
+
+		// bug found, if the user is already present, we give back 400 instead of 409
 		if resp.StatusCode != 200 {
 			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 		}
