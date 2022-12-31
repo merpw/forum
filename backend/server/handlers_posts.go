@@ -439,6 +439,8 @@ func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	id := srv.DB.AddComment(requestBody.Content, postId, userId)
+	srv.DB.UpdatePostsCommentsCount(postId, +1)
+
 	sendObject(w, id)
 }
 

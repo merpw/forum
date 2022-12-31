@@ -18,3 +18,10 @@ func (db DB) AddComment(content string, postId, authorId int) int {
 	}
 	return int(id)
 }
+
+func (db DB) UpdatePostsCommentsCount(postId int, change int) {
+	_, err := db.Exec("UPDATE posts SET comments_count = comments_count + ? WHERE id = ?", change, postId)
+	if err != nil {
+		log.Panic(err)
+	}
+}

@@ -16,8 +16,8 @@ const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
         <meta property={"og:title"} content={"FORUM"} key={"title"} />
         <meta name={"og:description"} content={"The friendliest forum"} />
       </Head>
-      <h1 className={"text-2xl font-light mb-5"}>
-        Category <span className={"font-normal"}>{category_name}</span>
+      <h1 className={"text-3xl font-light mb-5"}>
+        <span className={"font-normal"}>{category_name}</span> category
       </h1>
       <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
     </>
