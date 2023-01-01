@@ -42,7 +42,7 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 		srv.postsIdCommentIdReactionHandler(w, r)
 
 	case reApiPostsIdComment.MatchString(r.URL.Path):
-		srv.postsIdCommentHandler(w, r)
+		srv.postsIdCommentCreateHandler(w, r)
 
 	case reApiPostsIdComments.MatchString(r.URL.Path):
 		srv.postsIdCommentsHandler(w, r)
@@ -408,8 +408,8 @@ func (srv *Server) getPostId(w http.ResponseWriter, r *http.Request) int {
 	return postId
 }
 
-// postsIdCommentHandler comments on a post in the database
-func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request) {
+// postsIdCommentCreateHandler Add comments on a post in the database
+func (srv *Server) postsIdCommentCreateHandler(w http.ResponseWriter, r *http.Request) {
 	userId := srv.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
@@ -444,6 +444,7 @@ func (srv *Server) postsIdCommentHandler(w http.ResponseWriter, r *http.Request)
 	sendObject(w, id)
 }
 
+// postsIdCommentsHandler returns all comments on a post in the database
 func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	// userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
 	// userIdStr = strings.TrimSuffix(userIdStr, "/posts")

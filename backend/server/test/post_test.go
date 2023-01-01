@@ -238,6 +238,39 @@ func TestAuth(t *testing.T) {
 		}
 	})
 
+	// /api/posts/[[:digit:]]+/comment/
+	// test Adding comment to post
+	t.Run("createComment", func(t *testing.T) {
+		body := struct {
+			Content string `json:"content"`
+		}{
+			Content: "Test Comment Content",
+		}
+		requestBodyBytes, err := json.Marshal(body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req, err := http.NewRequest(http.MethodPost,
+			testServer.URL+"/api/posts/1/comment/",
+			bytes.NewBuffer(requestBodyBytes))
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookies[0])
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 200 {
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Fatal(err)
+			}
+			t.Fatalf("expected %d, got %d: %s", 200, resp.StatusCode, body)
+		}
+	})
+
 	t.Run("logout", func(t *testing.T) {
 		testAuthLogout(t, cli, testServer, cookies)
 	})
