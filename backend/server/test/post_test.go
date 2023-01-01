@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -112,6 +113,70 @@ func TestAuth(t *testing.T) {
 			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
 		}
 	})
+
+	// test like post, expected like value is 1
+	t.Run("likePost0to1", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/1/like",
+			nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookies[0])
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+		}
+		// get the like value
+		likeValue, err := strconv.Atoi(string(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 200 {
+			errorMessage := string(body)
+			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
+		}
+		if likeValue != 1 {
+			t.Fatalf("expected %s, got %d", "1", likeValue)
+		}
+	})
+
+	// test like post again, expected like value is 0
+	t.Run("likePost1to0", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/1/like",
+			nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookies[0])
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+		}
+		// get the like value
+		likeValue, err := strconv.Atoi(string(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 200 {
+			errorMessage := string(body)
+			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
+		}
+		if likeValue != 0 {
+			t.Fatalf("expected %s, got %d", "0", likeValue)
+		}
+	})
+
+	
 
 	t.Run("logout", func(t *testing.T) {
 		testAuthLogout(t, cli, testServer, cookies)
