@@ -336,6 +336,68 @@ func TestAuth(t *testing.T) {
 		}
 	})
 
+	// testPostsIdCommentIdDislikeHandler tests the dislike handler for comments
+	t.Run("dislikeComment0to-1", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/1/comment/1/dislike",
+			nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookies[0])
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+		}
+		// get the like value
+		dislikeValue, err := strconv.Atoi(string(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 200 {
+			errorMessage := string(body)
+			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
+		}
+		if dislikeValue != -1 {
+			t.Fatalf("expected %s, got %d", "-1", dislikeValue)
+		}
+	})
+
+	// dislike comment again, expected dislike value is 0
+	t.Run("dislikeComment-1to0", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/1/comment/1/dislike",
+			nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookies[0])
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+		}
+		// get the like value
+		dislikeValue, err := strconv.Atoi(string(body))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 200 {
+			errorMessage := string(body)
+			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
+		}
+		if dislikeValue != 0 {
+			t.Fatalf("expected %s, got %d", "0", dislikeValue)
+		}
+	})
+
 	t.Run("logout", func(t *testing.T) {
 		testAuthLogout(t, cli, testServer, cookies)
 	})
