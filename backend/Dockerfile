@@ -6,14 +6,20 @@ RUN apk add build-base
 WORKDIR /app/
 COPY . .
 
-RUN go build .
+RUN go build -o server -v .
 
 FROM alpine
 
+RUN apk add --no-cache bash
+
 # RUN apk add curl
-# todo audit question with high chance requires that container executable was executed like  "./server", but not an "app/bin/forum"
-COPY --from=builder /app/forum /app/bin/
-CMD /app/bin/forum
+COPY --from=builder /app/ /app/
+WORKDIR /app/
+# add permission to execute for all users
+RUN chmod 777 server
+# print permissions of server file, was required to test if permission error was from docker container or mac machine of gritlab. It was found to be error coming from bad docker config of mac machine
+# CMD ["/bin/ls", "-l"]
+CMD ./server
 
 # HEALTHCHECK --interval=3s CMD curl --fail http://localhost:8080/ || exit 1
 
