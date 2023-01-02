@@ -1,6 +1,6 @@
 FROM node:slim
 
-WORKDIR app
+WORKDIR /app
 
 COPY . .
 

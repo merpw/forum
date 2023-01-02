@@ -7,7 +7,24 @@ import (
 
 // AddSession adds session to database
 func (db DB) AddSession(token string, expire, userId int) {
-	_, err := db.Exec(`INSERT INTO sessions (token, expire, user_id) VALUES (?, ?, ?)`, token, expire, userId)
+
+	// check if session already exists
+	query, err := db.Query("SELECT * FROM sessions WHERE user_id = ?", userId)
+	if err != nil {
+		log.Panic(err)
+	}
+	// if session exists, delete it
+	if query.Next() {
+		var session Session
+		err = query.Scan(&session.Id, &session.Token, &session.Expire, &session.UserId)
+		if err != nil {
+			log.Panic(err)
+		}
+		query.Close()
+		db.RemoveSession(session.Token)
+	}
+
+	_, err = db.Exec(`INSERT INTO sessions (token, expire, user_id) VALUES (?, ?, ?)`, token, expire, userId)
 	if err != nil {
 		log.Panic(err)
 	}
