@@ -229,7 +229,10 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 			DislikesCount: comment.DislikesCount,
 		}
 	}
-
+	// reverse response.Comments
+	for i, j := 0, len(response.Comments)-1; i < j; i, j = i+1, j-1 {
+		response.Comments[i], response.Comments[j] = response.Comments[j], response.Comments[i]
+	}
 	fmt.Println(response.Comments) // TODO: Remove, for debugging
 
 	sendObject(w, response)
