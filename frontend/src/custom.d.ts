@@ -14,6 +14,7 @@ export type Post = {
 export type User = {
   name: string
   id: number
+  email: string
 }
 
 export type Comment = {
