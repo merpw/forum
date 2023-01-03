@@ -28,6 +28,7 @@ func (db DB) GetAllPosts() []Post {
 	return posts
 }
 
+// GetPostById reads post from database by post_id, does not require user to be logged in
 func (db DB) GetPostById(id int) *Post {
 	query, err := db.Query("SELECT * FROM posts WHERE id = ?", id)
 	if err != nil {
@@ -121,6 +122,11 @@ func (db DB) GetCommentById(id int) *Comment {
 	return &comment
 }
 
+// GetPostComments gets all comments for post using post_id
+//
+// Example:
+//
+//	comments := db.GetPostComments(1)
 func (db DB) GetPostComments(postId int) []Comment {
 	query, err := db.Query("SELECT * FROM comments WHERE post_id = ?", postId)
 	if err != nil {

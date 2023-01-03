@@ -127,7 +127,7 @@ const Comments: FC<{ post: Post }> = ({ post }) => {
           <Link href={`/user/${comment.author.id}`}>
             <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
           </Link>
-          <p>{comment.text}</p>
+          <p>{comment.content}</p>
           <hr className={"mt-4 mb-2"}></hr>
           <span className={"flex"}>
             <ReactionsButtons post={post} comment={comment} />

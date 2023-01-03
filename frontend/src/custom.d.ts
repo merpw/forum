@@ -19,7 +19,7 @@ export type User = {
 
 export type Comment = {
   author: User
-  text: string
+  content: string
   likes_count: number
   dislikes_count: number | undefined // defined only for comment's author
   date: string

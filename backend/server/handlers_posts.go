@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -145,7 +146,14 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // postsIdHandler returns a single post from the database that matches the incoming id of the post in the url
+//
+// Example: /api/posts/1
 func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
+	type SafeUser struct {
+		Id   int    `json:"id"`
+		Name string `json:"name"`
+	}
+
 	type Response struct {
 		Id            int      `json:"id"`
 		Title         string   `json:"title"`
@@ -179,22 +187,40 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 
 	postAuthor := srv.DB.GetUserById(post.AuthorId)
 
-	sendObject(w, Response{
+	response := Response{
 		Id:            post.Id,
 		Title:         post.Title,
 		Content:       post.Content,
 		Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
 		Date:          post.Date,
 		CommentsCount: post.CommentsCount,
-		Comments: []struct {
+		LikesCount:    post.LikesCount,
+		Category:      post.Category,
+	}
+
+	comments := srv.DB.GetPostComments(post.Id)
+
+	response.Comments = make([]struct {
+		Id      int      `json:"id"`
+		Content string   `json:"content"`
+		Author  SafeUser `json:"author"`
+	}, len(comments))
+	for i, comment := range comments {
+		commentAuthor := srv.DB.GetUserById(comment.AuthorId)
+		response.Comments[i] = struct {
 			Id      int      `json:"id"`
 			Content string   `json:"content"`
 			Author  SafeUser `json:"author"`
-		}{},
-		LikesCount: post.LikesCount,
-		Category:   post.Category,
-	},
-	)
+		}{
+			Id:      comment.Id,
+			Content: comment.Content,
+			Author:  SafeUser{Id: commentAuthor.Id, Name: commentAuthor.Name},
+		}
+	}
+
+	fmt.Println(response.Comments) // TODO: Remove, for debugging
+
+	sendObject(w, response)
 }
 
 // postsCreateHandler creates a new post in the database
