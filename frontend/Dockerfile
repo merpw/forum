@@ -1,21 +1,11 @@
-# Build stage
-FROM node:slim as builder
+FROM node:slim
 
 WORKDIR /app
 
 COPY . .
 
-RUN npm install
+RUN npm install --production
 
-RUN npm run build && docker system prune -f
-
-# Runtime stage
-FROM node:slim
-
-COPY --from=builder /app/build /app/build
-
-WORKDIR /app
-
-CMD npm run start
+CMD npm run build && npm run start && docker system prune -f
 
 EXPOSE 3000
