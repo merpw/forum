@@ -15,6 +15,9 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
+// apiMeHandler returns current user information (id, name, email) if the current user is logged in.
+//
+//	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 	userId := srv.getUserId(w, r)
 	if userId == -1 {
@@ -37,6 +40,9 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
+// apiMePostsHandler returns the current user's posts to the current user if he is logged in.
+//
+//	GET /api/me/posts
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	userId := srv.getUserId(w, r)
 	if userId == -1 {
@@ -74,6 +80,9 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
+// apiMePostsHandler Returns the info of the user with the given id. The requester does not need to be logged in.
+//
+//	GET /api/user/:id
 func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
 	// /api/user/1 -> 1
@@ -101,6 +110,9 @@ func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, userResponse)
 }
 
+// apiMePostsHandler Returns the posts of the user with the given id. The requester does not need to be logged in.
+//
+//	GET /api/user/:id/posts
 func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
 	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
