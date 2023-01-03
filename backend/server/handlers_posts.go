@@ -162,9 +162,12 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
 		Comments      []struct {
-			Id      int      `json:"id"`
-			Content string   `json:"content"`
-			Author  SafeUser `json:"author"`
+			Id            int      `json:"id"`
+			Content       string   `json:"content"`
+			Author        SafeUser `json:"author"`
+			Date          string   `json:"date"`
+			LikesCount    int      `json:"likes_count"`
+			DislikesCount int      `json:"dislikes_count"`
 		} `json:"comments"`
 		LikesCount int    `json:"likes_count"`
 		Category   string `json:"category"`
@@ -201,20 +204,29 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 	comments := srv.DB.GetPostComments(post.Id)
 
 	response.Comments = make([]struct {
-		Id      int      `json:"id"`
-		Content string   `json:"content"`
-		Author  SafeUser `json:"author"`
+		Id            int      `json:"id"`
+		Content       string   `json:"content"`
+		Author        SafeUser `json:"author"`
+		Date          string   `json:"date"`
+		LikesCount    int      `json:"likes_count"`
+		DislikesCount int      `json:"dislikes_count"`
 	}, len(comments))
 	for i, comment := range comments {
 		commentAuthor := srv.DB.GetUserById(comment.AuthorId)
 		response.Comments[i] = struct {
-			Id      int      `json:"id"`
-			Content string   `json:"content"`
-			Author  SafeUser `json:"author"`
+			Id            int      `json:"id"`
+			Content       string   `json:"content"`
+			Author        SafeUser `json:"author"`
+			Date          string   `json:"date"`
+			LikesCount    int      `json:"likes_count"`
+			DislikesCount int      `json:"dislikes_count"`
 		}{
-			Id:      comment.Id,
-			Content: comment.Content,
-			Author:  SafeUser{Id: commentAuthor.Id, Name: commentAuthor.Name},
+			Id:            comment.Id,
+			Content:       comment.Content,
+			Author:        SafeUser{Id: commentAuthor.Id, Name: commentAuthor.Name},
+			Date:          comment.Date,
+			LikesCount:    comment.LikesCount,
+			DislikesCount: comment.DislikesCount,
 		}
 	}
 
