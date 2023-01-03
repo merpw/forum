@@ -18,6 +18,7 @@ export type User = {
 }
 
 export type Comment = {
+  id : number
   author: User
   content: string
   likes_count: number
