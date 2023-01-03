@@ -10,38 +10,52 @@ func addSlashes(s string) string {
 	return strings.Replace(s, "/", "\\/", -1)
 }
 
+// pt function passes incoming pattern to regexp.MustCompile(addSlashes(pattern))
+// The purpose of this function is to make it easier to read long regexps.
+//
+// Example:
+//
+//	pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`)
+//
+// is equivalent to
+//
+//	regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`))
+func pt(pattern string) *regexp.Regexp {
+	return regexp.MustCompile(addSlashes(pattern))
+}
+
 // method get
-var reApiMe = regexp.MustCompile(addSlashes(`^/api/me/?$`))
-var reApiMePosts = regexp.MustCompile(addSlashes(`^/api/me/posts/?$`))
+var reApiMe = pt(`^/api/me/?$`)
+var reApiMePosts = pt(`^/api/me/posts/?$`)
 
-var reApiUserId = regexp.MustCompile(addSlashes(`^/api/user/[[:digit:]]+/?$`))
-var reApiUserIdPosts = regexp.MustCompile(addSlashes(`^/api/user/[[:digit:]]+/posts/?$`))
+var reApiUserId = pt(`^/api/user/[[:digit:]]+/?$`)
+var reApiUserIdPosts = pt(`^/api/user/[[:digit:]]+/posts/?$`)
 
-var reApiPosts = regexp.MustCompile(addSlashes(`^/api/posts/?$`))
-var reApiPostsCategories = regexp.MustCompile(addSlashes(`^/api/posts/categories/?$`))
-var reApiPostsCategoriesName = regexp.MustCompile(addSlashes(`^/api/posts/categories/[[:alnum:]]+/?$`))
+var reApiPosts = pt(`^/api/posts/?$`)
+var reApiPostsCategories = pt(`^/api/posts/categories/?$`)
+var reApiPostsCategoriesName = pt(`^/api/posts/categories/[[:alnum:]]+/?$`)
 
-var reApiPostsId = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/?$`))
+var reApiPostsId = pt(`^/api/posts/[[:digit:]]+/?$`)
 
 // method POST endpoints
-var reApiPostsCreate = regexp.MustCompile(addSlashes(`^/api/posts/create/?$`))
+var reApiPostsCreate = pt(`^/api/posts/create/?$`)
 
-var reApiPostsIdLike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/like/?$`))
-var reApiPostsIdDislike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/dislike/?$`))
-var reApiPostsIdReaction = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/reaction/?$`))
+var reApiPostsIdLike = pt(`^/api/posts/[[:digit:]]+/like/?$`)
+var reApiPostsIdDislike = pt(`^/api/posts/[[:digit:]]+/dislike/?$`)
+var reApiPostsIdReaction = pt(`^/api/posts/[[:digit:]]+/reaction/?$`)
 
-var reApiPostsIdCommentIdReaction = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/reaction/?$`))
+var reApiPostsIdCommentIdReaction = pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/reaction/?$`)
 
-var reApiPostsIdComment = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/?$`))
+var reApiPostsIdComment = pt(`^/api/posts/[[:digit:]]+/comment/?$`)
 
-var reApiPostsIdComments = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comments/?$`))
+var reApiPostsIdComments = pt(`^/api/posts/[[:digit:]]+/comments/?$`)
 
-var reApiPostsIdCommentIdLike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`))
-var reApiPostsIdCommentIdDislike = regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/dislike/?$`))
+var reApiPostsIdCommentIdLike = pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`)
+var reApiPostsIdCommentIdDislike = pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/dislike/?$`)
 
-var reApiSignup = regexp.MustCompile(addSlashes(`^/api/signup/?$`))
-var reApiLogin = regexp.MustCompile(addSlashes(`^/api/login/?$`))
-var reApiLogout = regexp.MustCompile(addSlashes(`^/api/logout/?$`))
+var reApiSignup = pt(`^/api/signup/?$`)
+var reApiLogin = pt(`^/api/login/?$`)
+var reApiLogout = pt(`^/api/logout/?$`)
 
 var getRegexps = []string{
 	reApiPosts.String(),
