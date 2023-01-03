@@ -63,6 +63,8 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
     <form
       onSubmit={(e) => {
         e.preventDefault()
+        // refresh the page in 0.3 seconds
+        setTimeout(() => window.location.reload(), 30)
 
         if (isSame) return
 
