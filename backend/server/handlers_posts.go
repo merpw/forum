@@ -22,7 +22,7 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 		srv.postsCategoriesHandler(w, r)
 
 	case reApiPostsCategoriesName.MatchString(r.URL.Path):
-		srv.apiPostsCategoriesNameHandler(w, r)
+		srv.postsCategoriesNameHandler(w, r)
 
 	case reApiPostsId.MatchString(r.URL.Path):
 		srv.postsIdHandler(w, r)
@@ -63,7 +63,7 @@ func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, r *http.Request
 	sendObject(w, categories)
 }
 
-func (srv *Server) apiPostsCategoriesNameHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Request) {
 	categoryName := strings.TrimPrefix(r.URL.Path, "/api/posts/categories/")
 	// /api/posts/categories/name -> name
 
