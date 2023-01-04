@@ -102,7 +102,7 @@ func (db DB) GetCategoryPosts(category string) []Post {
 	return posts
 }
 
-// comments
+// GetCommentById gets Comment Struct Pointer by comment_id from the database, does not require user to be logged in
 func (db DB) GetCommentById(id int) *Comment {
 	query, err := db.Query("SELECT * FROM comments WHERE id = ?", id)
 	if err != nil {

@@ -9,7 +9,7 @@ import { getPostLocal, getPostsLocal } from "../../api/posts/fetch"
 import { useMe } from "../../api/auth"
 import { CreateComment } from "../../api/posts/comment"
 import { FormError } from "../../components/error"
-import { Category, ReactionsButtons } from "../../components/posts/reactions"
+import { Category, ReactionsButtons, ReactionsCommentButtons } from "../../components/posts/reactions"
 
 const PostPage: NextPage<{ post: Post }> = ({ post }) => {
   return (
@@ -132,7 +132,7 @@ const Comments: FC<{ post: Post }> = ({ post }) => {
           <p>{comment.content}</p>
           <hr className={"mt-4 mb-2"}></hr>
           <span className={"flex"}>
-            <ReactionsButtons post={post} comment={comment} />
+            <ReactionsCommentButtons post={post} comment={comment} />
 
             <span
               className={"ml-auto"}

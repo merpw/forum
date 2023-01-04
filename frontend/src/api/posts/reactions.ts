@@ -13,6 +13,19 @@ export const useReactions = (postID: number) => {
   }
 }
 
+export const useCommentReactions = (postID:number, commentID: number | undefined) => {
+  console.log("Post Id is ", postID, "Comment Id is ", commentID) // ToDO: remove debug
+  const { data, mutate, error } = useSWR(`/api/posts/${postID}/comment/${commentID}/reaction`, getCommentReaction)
+  return {
+    isError: error != undefined,
+    isLoading: !error && !data,
+    cmutate: mutate,
+    creaction: data?.reaction,
+    clikes_count: data?.likes_count,
+    cdislikes_count: data?.dislikes_count,
+  }
+}
+
 type ReactionResponse = {
   reaction: number
   likes_count: number
@@ -20,6 +33,16 @@ type ReactionResponse = {
 }
 
 export const getPostReaction = (path: string) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .get<ReactionResponse>(path, {
+          withCredentials: true,
+        })
+        .then((res) => res.data)
+        .catch(() => undefined)
+    : undefined
+
+export const getCommentReaction = (path: string) =>
   document.cookie.includes("forum-token")
     ? axios
         .get<ReactionResponse>(path, {
@@ -40,5 +63,19 @@ export const likePost = (postID: number) =>
   document.cookie.includes("forum-token")
     ? axios
         .post<number>(`/api/posts/${postID}/like`, null, { withCredentials: true })
+        .then((res) => res.data)
+    : Promise.resolve(0)
+
+export const likeComment = (postID: number, commentID: number) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .post<number>(`/api/posts/${postID}/comment/${commentID}/like`, null, { withCredentials: true })
+        .then((res) => res.data)
+    : Promise.resolve(0)
+
+export const dislikeComment = (postID: number, commentID: number) =>
+  document.cookie.includes("forum-token")
+    ? axios
+        .post<number>(`/api/posts/${postID}/comment/${commentID}/dislike`, null, { withCredentials: true })
         .then((res) => res.data)
     : Promise.resolve(0)
