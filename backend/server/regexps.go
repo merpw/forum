@@ -24,7 +24,8 @@ func pt(pattern string) *regexp.Regexp {
 	return regexp.MustCompile(addSlashes(pattern))
 }
 
-// method get
+// method GET endpoints
+
 var reApiMe = pt(`^/api/me/?$`)
 var reApiMePosts = pt(`^/api/me/posts/?$`)
 
@@ -38,6 +39,7 @@ var reApiPostsCategoriesName = pt(`^/api/posts/categories/[[:alnum:]]+/?$`)
 var reApiPostsId = pt(`^/api/posts/[[:digit:]]+/?$`)
 
 // method POST endpoints
+
 var reApiPostsCreate = pt(`^/api/posts/create/?$`)
 
 var reApiPostsIdLike = pt(`^/api/posts/[[:digit:]]+/like/?$`)
@@ -70,6 +72,8 @@ var getRegexps = []string{
 
 	reApiPostsCategories.String(),
 	reApiPostsCategoriesName.String(),
+
+	reApiPostsIdCommentIdReaction.String(),
 }
 var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 
