@@ -56,7 +56,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 		Id            int      `json:"id"`
 		Title         string   `json:"title"`
 		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"` // TODO: maybe remove
+		Author        SafeUser `json:"author"`
 		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
 		LikesCount    int      `json:"likes_count"`
@@ -134,7 +134,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 		Id            int      `json:"id"`
 		Title         string   `json:"title"`
 		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"` // TODO: maybe remove
+		Author        SafeUser `json:"author"`
 		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
 		LikesCount    int      `json:"likes_count"`

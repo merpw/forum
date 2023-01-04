@@ -5,6 +5,7 @@ import (
 	"forum/database"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type Server struct {
@@ -47,7 +48,7 @@ func (srv *Server) Start() http.Handler {
 				errorResponse(w, http.StatusInternalServerError) // 500 ERROR
 			}
 		}()
-
+		r.URL.Path = strings.TrimSpace(r.URL.Path)
 		switch {
 		case GetRegexp.MatchString(r.URL.Path):
 			if r.Method != http.MethodGet {

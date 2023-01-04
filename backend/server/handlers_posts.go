@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,6 +15,7 @@ type SafeUser struct {
 var categories = []string{"facts", "rumors"}
 
 func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) {
+
 	switch {
 
 	case reApiPostsCategories.MatchString(r.URL.Path):
@@ -233,7 +233,6 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 	for i, j := 0, len(response.Comments)-1; i < j; i, j = i+1, j-1 {
 		response.Comments[i], response.Comments[j] = response.Comments[j], response.Comments[i]
 	}
-	fmt.Println(response.Comments) // TODO: Remove, for debugging
 
 	sendObject(w, response)
 }
@@ -296,6 +295,7 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 // postsIdLikeHandler likes a post in the database
 func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
+
 	userId := srv.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
@@ -508,7 +508,7 @@ func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request
 		PostId        int      `json:"post_id"`
 		AuthorId      int      `json:"author_id"`
 		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"` // TODO: maybe remove
+		Author        SafeUser `json:"author"`
 		Date          string   `json:"date"`
 		LikesCount    int      `json:"likes_count"`
 		DislikesCount int      `json:"dislikes_count"`
@@ -546,6 +546,7 @@ func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Re
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	// /api/posts/1/comment/2/like ->2
+
 	if err != nil {
 		errorResponse(w, http.StatusNotFound)
 	}

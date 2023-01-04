@@ -1,6 +1,8 @@
 package database
 
-import "log"
+import (
+	"log"
+)
 
 // AddPostReaction adds specified reaction to post
 //
