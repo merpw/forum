@@ -183,8 +183,9 @@ export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
   </span>
 )
 
+
 export const Category: FC<{ post: Post }> = ({ post }) => {
-  const categories = post.category.split(",");
+  const categories = post.category ? post.category.split(",") : [];
   return (
     <Fragment>
       {categories.map((category) => (
