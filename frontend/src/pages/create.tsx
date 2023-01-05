@@ -6,6 +6,7 @@ import { useMe } from "../api/auth"
 import { getCategories } from "../api/posts/categories"
 import { CreatePost } from "../api/posts/create"
 import { FormError } from "../components/error"
+import CategoryMultiselect from "../components/categoryMultiselect"
 
 const CreatePostPage: NextPage = () => {
   const { isLoading, isLoggedIn } = useMe()
@@ -119,6 +120,8 @@ const CreatePostForm = () => {
         </select>
       </div>
       <FormError error={formError} />
+
+      <CategoryMultiselect />
 
       <button
         type={"submit"}
