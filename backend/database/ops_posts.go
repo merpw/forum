@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"strings"
 	"time"
 )
 
@@ -49,9 +50,10 @@ func (db DB) GetPostById(id int) *Post {
 }
 
 // AddPost adds post to database, returns id of new post
-func (db DB) AddPost(title, content string, authorId int, category string) int {
+func (db DB) AddPost(title, content string, authorId int, categories []string) int {
+	categoryConcat := strings.Join(categories, ",")
 	result, err := db.Exec(`INSERT INTO posts (title, content, author, date, likes_count, dislikes_count, comments_count, category) 
-								  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, category)
+								  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categoryConcat)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -83,7 +85,8 @@ func (db DB) GetUserPosts(userId int) []Post {
 }
 
 func (db DB) GetCategoryPosts(category string) []Post {
-	query, err := db.Query("SELECT * FROM posts WHERE category = ?", category)
+	query, err := db.Query("SELECT * FROM posts WHERE category LIKE '%' || ? || '%'", category)
+	// query, err := db.Query("SELECT * FROM posts WHERE category = ?", category) // Old code just commented out as fallback
 	if err != nil {
 		log.Panic(err)
 	}

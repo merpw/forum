@@ -6,7 +6,6 @@ import { useMe } from "../api/auth"
 import { getCategories } from "../api/posts/categories"
 import { CreatePost } from "../api/posts/create"
 import { FormError } from "../components/error"
-import CategoryMultiselect from "../components/categoryMultiselect"
 
 const CreatePostPage: NextPage = () => {
   const { isLoading, isLoggedIn } = useMe()
@@ -33,7 +32,7 @@ const CreatePostPage: NextPage = () => {
 const CreatePostForm = () => {
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
-  const [category, setCategory] = useState("")
+  const [category, setCategory] = useState<string[]>([])
   const [categories, setCategories] = useState<string[]>([])
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -58,7 +57,7 @@ const CreatePostForm = () => {
 
         if (formError != null) setFormError(null)
         setIsSame(true)
-        if (category == "") {
+        if (category.length == 0) {
           setFormError("Category is not selected")
           return
         }
@@ -100,15 +99,16 @@ const CreatePostForm = () => {
       </div>
       <div className={"mb-6"}>
         <label
-          htmlFor={"countries"}
+          htmlFor={"cats"}
           className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
         ></label>
         <select
-          id={"countries"}
+          multiple
+          id={"cats"}
           className={
             "capitalize bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           }
-          onInput={(e) => setCategory(e.currentTarget.value)}
+          onChange={(e) => setCategory(Array.from(e.currentTarget.selectedOptions, (option) => option.value))}
           defaultValue={""}
         >
           <option disabled hidden value={""}>
@@ -120,8 +120,6 @@ const CreatePostForm = () => {
         </select>
       </div>
       <FormError error={formError} />
-
-      <CategoryMultiselect />
 
       <button
         type={"submit"}

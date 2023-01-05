@@ -246,9 +246,9 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody := struct {
-		Title    string `json:"title"`
-		Content  string `json:"content"`
-		Category string `json:"category"`
+		Title      string   `json:"title"`
+		Content    string   `json:"content"`
+		Categories []string `json:"category"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -273,13 +273,16 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestBody.Category = strings.TrimSpace(requestBody.Category)
-	requestBody.Category = strings.ToLower(requestBody.Category)
+	for i, cat := range requestBody.Categories {
+		cat = strings.TrimSpace(cat)
+		cat = strings.ToLower(cat)
+		requestBody.Categories[i] = cat
+	}
 
-	isValid := false
+	isValid := true
 	for _, cat := range categories {
-		if cat == requestBody.Category {
-			isValid = true
+		if !isPresent(requestBody.Categories, cat) {
+			isValid = false
 			break
 		}
 	}
@@ -289,8 +292,17 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, requestBody.Category)
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, requestBody.Categories)
 	sendObject(w, id)
+}
+
+func isPresent(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }
 
 // postsIdLikeHandler likes a post in the database

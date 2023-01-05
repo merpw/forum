@@ -27,7 +27,7 @@ func TestGet(t *testing.T) {
 	cli := testServer.Client()
 
 	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
-	srv.DB.AddPost("test", "test", userId, "facts")
+	srv.DB.AddPost("test", "test", userId, []string{"facts"})
 
 	tests := []struct {
 		url          string
