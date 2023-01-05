@@ -5,6 +5,7 @@ import { FC } from "react"
 import { useMe } from "../../api/auth"
 import { dislikeComment, likeComment, dislikePost, likePost, useReactions, useCommentReactions } from "../../api/posts/reactions"
 import { Post, Comment } from "../../custom"
+import { Fragment } from "react"
 
 // TODO: add prefetching (useSWR fallback)
 
@@ -182,27 +183,35 @@ export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
   </span>
 )
 
-export const Category: FC<{ post: Post }> = ({ post }) => (
-  <Link href={`/category/${post.category}`} className={"hover:opacity-50 flex"}>
-    <span className={"text-xl capitalize"}>{post.category}</span>
-    <span className={"pt-1 ml-1"}>
-      <svg
-        xmlns={"http://www.w3.org/2000/svg"}
-        fill={"none"}
-        viewBox={"0 0 24 24"}
-        strokeWidth={1.5}
-        stroke={"currentColor"}
-        className={"w-6 h-6"}
-      >
-        <path
-          strokeLinecap={"round"}
-          strokeLinejoin={"round"}
-          d={
-            "M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
-          }
-        />
-        <path strokeLinecap={"round"} strokeLinejoin={"round"} d={"M6 6h.008v.008H6V6z"} />
-      </svg>
-    </span>
-  </Link>
-)
+export const Category: FC<{ post: Post }> = ({ post }) => {
+  const categories = post.category.split(",");
+  return (
+    <Fragment>
+      {categories.map((category) => (
+        // eslint-disable-next-line react/jsx-key
+        <Link href={`/category/${category}`} className={"hover:opacity-50 flex"}>
+          <span className={"text-xl capitalize"}>{category}</span>
+          <span className={"pt-1 ml-1"}>
+            <svg
+              xmlns={"http://www.w3.org/2000/svg"}
+              fill={"none"}
+              viewBox={"0 0 24 24"}
+              strokeWidth={1.5}
+              stroke={"currentColor"}
+              className={"w-6 h-6"}
+            >
+              <path
+                strokeLinecap={"round"}
+                strokeLinejoin={"round"}
+                d={
+                  "M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
+                }
+              />
+              <path strokeLinecap={"round"} strokeLinejoin={"round"} d={"M6 6h.008v.008H6V6z"} />
+            </svg>
+          </span>
+        </Link>
+      ))}
+    </Fragment>
+  );
+};
