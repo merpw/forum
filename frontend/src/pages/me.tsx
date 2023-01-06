@@ -59,13 +59,14 @@ const UserInfo = () => {
 
   return (
     <>
-    <h1 className={"text-2xl font-thin mb-5"}>
-      {"Hello, "}
-      <span className={"text-3xl font-normal"}>{user?.name}</span>
-      
-    </h1>
-    <p>{"Your email is "} <span className={"text-2xl"}> {user?.email} </span></p>
-    <hr className={"my-5"} />
+      <h1 className={"text-2xl font-thin mb-5"}>
+        {"Hello, "}
+        <span className={"text-3xl font-normal"}>{user?.name}</span>
+      </h1>
+      <p>
+        {"Your email is "} <span className={"text-2xl"}> {user?.email} </span>
+      </p>
+      <hr className={"my-5"} />
     </>
   )
 }

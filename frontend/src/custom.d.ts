@@ -8,7 +8,7 @@ export type Post = {
   date: string
   author: User
   comments: Comment[]
-  category: string
+  categories: string
 }
 
 export type User = {
@@ -18,7 +18,7 @@ export type User = {
 }
 
 export type Comment = {
-  id : number
+  id: number
   author: User
   content: string
   likes_count: number

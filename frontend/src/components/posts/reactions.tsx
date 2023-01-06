@@ -1,7 +1,7 @@
 import { motion } from "framer-motion"
 import Link from "next/link"
 import { useRouter } from "next/router"
-import { FC } from "react"
+import { FC, useEffect } from "react"
 import { useMe } from "../../api/auth"
 import {
   dislikeComment,
@@ -21,6 +21,11 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
   const router = useRouter()
 
   const { reaction, likes_count, dislikes_count, mutate: mutateReactions } = useReactions(post.id)
+
+  useEffect(() => {
+    mutateReactions()
+    // mutate reactions if user logged out (to hide dislikes and reaction colors)
+  }, [mutateReactions, isLoggedIn])
 
   return (
     <span className={"mx-2 my-auto flex"}>
@@ -193,7 +198,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
 export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
   <span className={"my-auto flex mr-2"}>
     <Link href={`/post/${post.id}`} className={"hover:opacity-50 my-auto flex"}>
-      <span className={"mr-1 text-xl"}>{post.comments_count}</span>
+      <span className={"mr-1 text-xl"}>{post.comments_count > 0 && post.comments_count}</span>
       <span className={"pt-1"}>
         <svg
           xmlns={"http://www.w3.org/2000/svg"}
@@ -217,7 +222,7 @@ export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
 )
 
 export const Category: FC<{ post: Post }> = ({ post }) => {
-  const categories = post.category ? post.category.split(",") : []
+  const categories = post.categories.split(",")
   return (
     <>
       {categories.map((category, key) => (

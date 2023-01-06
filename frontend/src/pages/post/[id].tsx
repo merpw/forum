@@ -5,7 +5,7 @@ import Link from "next/link"
 import { FC, useEffect, useState } from "react"
 import Head from "next/head"
 import moment from "moment"
-import { getPostLocal, getPostsLocal } from "../../api/posts/fetch"
+import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "../../api/posts/fetch"
 import { useMe } from "../../api/auth"
 import { CreateComment, useComments } from "../../api/posts/comment"
 import { FormError } from "../../components/error"
@@ -73,6 +73,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
         if (isSame) return
 
+        setIsSame(true)
         if (formError != null) setFormError(null)
 
         CreateComment(post.id, text)
@@ -175,12 +176,14 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
     return { notFound: true }
   }
   const post = await getPostLocal(+params.id)
+  const comments = await getPostCommentsLocal(+params.id)
+
   return post
     ? {
         props: {
           post: post,
           fallback: {
-            [unstable_serialize(["api", "posts", post.id, "comments"])]: post.comments,
+            [unstable_serialize(["api", "posts", post.id, "comments"])]: comments,
           },
         },
         revalidate: 10,
