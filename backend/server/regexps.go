@@ -74,6 +74,7 @@ var getRegexps = []string{
 	reApiPostsCategoriesName.String(),
 
 	reApiPostsIdCommentIdReaction.String(),
+	reApiPostsIdComments.String(),
 }
 var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 
