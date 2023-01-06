@@ -18,7 +18,7 @@ func (db DB) GetAllPosts() []Post {
 	var posts []Post
 	for query.Next() {
 		var post Post
-		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Category)
+		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -40,7 +40,7 @@ func (db DB) GetPostById(id int) *Post {
 	if !query.Next() {
 		return nil
 	}
-	err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Category)
+	err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -73,7 +73,7 @@ func (db DB) GetUserPosts(userId int) []Post {
 	var posts []Post
 	for query.Next() {
 		var post Post
-		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Category)
+		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -94,7 +94,7 @@ func (db DB) GetCategoryPosts(category string) []Post {
 	var posts []Post
 	for query.Next() {
 		var post Post
-		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Category)
+		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
 		if err != nil {
 			log.Panic(err)
 		}

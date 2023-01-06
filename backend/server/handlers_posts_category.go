@@ -31,21 +31,11 @@ func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Req
 	}
 
 	posts := srv.DB.GetCategoryPosts(categoryName)
-	type ResponsePost struct {
-		Id            int      `json:"id"`
-		Title         string   `json:"title"`
-		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"`
-		Date          string   `json:"date"`
-		CommentsCount int      `json:"comments_count"`
-		LikesCount    int      `json:"likes_count"`
-		Category      string   `json:"category"`
-	}
 
-	response := make([]ResponsePost, 0)
+	response := make([]SafePost, 0)
 	for _, post := range posts {
 		postAuthor := srv.DB.GetUserById(post.AuthorId)
-		response = append(response, ResponsePost{
+		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,
 			Content:       post.Content,
@@ -53,7 +43,7 @@ func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Req
 			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
-			Category:      post.Category,
+			Categories:    post.Categories,
 		})
 	}
 

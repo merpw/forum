@@ -7,6 +7,35 @@ import (
 	"net/http"
 )
 
+type SafeUser struct {
+	Id   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type SafePost struct {
+	Id            int      `json:"id"`
+	Title         string   `json:"title"`
+	Content       string   `json:"content"`
+	Author        SafeUser `json:"author"`
+	Date          string   `json:"date"`
+	CommentsCount int      `json:"comments_count"`
+	LikesCount    int      `json:"likes_count"`
+	Categories    string   `json:"categories"`
+}
+
+type SafeComment struct {
+	Id         int      `json:"id"`
+	Content    string   `json:"content"`
+	Author     SafeUser `json:"author"`
+	Date       string   `json:"date"`
+	LikesCount int      `json:"likes_count"`
+}
+
+type SafeReaction struct {
+	Reaction   int `json:"reaction"`
+	LikesCount int `json:"likes_count"`
+}
+
 // errorResponse responses with specified error code in format "404 Not Found"
 func errorResponse(w http.ResponseWriter, code int) {
 	http.Error(w, fmt.Sprintf("%v %v", code, http.StatusText(code)), code)

@@ -10,31 +10,9 @@ import (
 //
 // Example: /api/posts/1
 func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
-	type SafeUser struct {
-		Id   int    `json:"id"`
-		Name string `json:"name"`
-	}
-
-	type Response struct {
-		Id            int      `json:"id"`
-		Title         string   `json:"title"`
-		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"`
-		Date          string   `json:"date"`
-		CommentsCount int      `json:"comments_count"`
-		Comments      []struct {
-			Id            int      `json:"id"`
-			Content       string   `json:"content"`
-			Author        SafeUser `json:"author"`
-			Date          string   `json:"date"`
-			LikesCount    int      `json:"likes_count"`
-			DislikesCount int      `json:"dislikes_count"`
-		} `json:"comments"`
-		LikesCount int    `json:"likes_count"`
-		Category   string `json:"category"`
-	}
-
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+	// /api/posts/1 -> 1
+
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		errorResponse(w, http.StatusNotFound)
@@ -43,15 +21,13 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get the post from the database
 	post := srv.DB.GetPostById(id)
-
 	if post == nil {
 		errorResponse(w, http.StatusNotFound)
 		return
 	}
 
 	postAuthor := srv.DB.GetUserById(post.AuthorId)
-
-	response := Response{
+	safePost := SafePost{
 		Id:            post.Id,
 		Title:         post.Title,
 		Content:       post.Content,
@@ -59,43 +35,10 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		Date:          post.Date,
 		CommentsCount: post.CommentsCount,
 		LikesCount:    post.LikesCount,
-		Category:      post.Category,
+		Categories:    post.Categories,
 	}
 
-	comments := srv.DB.GetPostComments(post.Id)
-
-	response.Comments = make([]struct {
-		Id            int      `json:"id"`
-		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"`
-		Date          string   `json:"date"`
-		LikesCount    int      `json:"likes_count"`
-		DislikesCount int      `json:"dislikes_count"`
-	}, len(comments))
-	for i, comment := range comments {
-		commentAuthor := srv.DB.GetUserById(comment.AuthorId)
-		response.Comments[i] = struct {
-			Id            int      `json:"id"`
-			Content       string   `json:"content"`
-			Author        SafeUser `json:"author"`
-			Date          string   `json:"date"`
-			LikesCount    int      `json:"likes_count"`
-			DislikesCount int      `json:"dislikes_count"`
-		}{
-			Id:            comment.Id,
-			Content:       comment.Content,
-			Author:        SafeUser{Id: commentAuthor.Id, Name: commentAuthor.Name},
-			Date:          comment.Date,
-			LikesCount:    comment.LikesCount,
-			DislikesCount: comment.DislikesCount,
-		}
-	}
-	// reverse response.Comments
-	for i, j := 0, len(response.Comments)-1; i < j; i, j = i+1, j-1 {
-		response.Comments[i], response.Comments[j] = response.Comments[j], response.Comments[i]
-	}
-
-	sendObject(w, response)
+	sendObject(w, safePost)
 }
 
 // postsIdLikeHandler likes a post in the database
@@ -106,6 +49,7 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
+
 	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	postIdStr = strings.TrimSuffix(postIdStr, "/like")
 	// /api/posts/1/like -> 1
@@ -219,23 +163,21 @@ func (srv *Server) postsIdReactionHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	reaction := srv.DB.GetPostReaction(postId, userId)
-	if userId == post.AuthorId {
-		sendObject(w, struct {
-			Reaction      int `json:"reaction"`
-			LikesCount    int `json:"likes_count"`
-			DislikesCount int `json:"dislikes_count"`
-		}{
-			Reaction:      reaction,
-			LikesCount:    post.LikesCount,
-			DislikesCount: post.DislikesCount,
-		})
-	} else {
-		sendObject(w, struct {
-			Reaction   int `json:"reaction"`
-			LikesCount int `json:"likes_count"`
-		}{
-			Reaction:   reaction,
-			LikesCount: post.LikesCount,
-		})
+	safeReaction := SafeReaction{
+		Reaction:   reaction,
+		LikesCount: post.LikesCount,
 	}
+
+	if userId != post.AuthorId {
+		sendObject(w, safeReaction)
+		return
+	}
+
+	sendObject(w, struct {
+		SafeReaction
+		DislikesCount int `json:"dislikes_count"`
+	}{
+		SafeReaction:  safeReaction,
+		DislikesCount: post.DislikesCount,
+	})
 }

@@ -4,11 +4,6 @@ import (
 	"net/http"
 )
 
-type SafeUser struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
-}
-
 var categories = []string{"facts", "rumors"}
 
 func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) {
@@ -60,21 +55,11 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 // postsHandler returns a json list of all posts from the database
 func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 	posts := srv.DB.GetAllPosts()
-	type ResponsePost struct {
-		Id            int      `json:"id"`
-		Title         string   `json:"title"`
-		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"`
-		Date          string   `json:"date"`
-		CommentsCount int      `json:"comments_count"`
-		LikesCount    int      `json:"likes_count"`
-		Category      string   `json:"category"`
-	}
 
-	response := make([]ResponsePost, 0)
+	response := make([]SafePost, 0)
 	for _, post := range posts {
 		postAuthor := srv.DB.GetUserById(post.AuthorId)
-		response = append(response, ResponsePost{
+		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,
 			Content:       post.Content,
@@ -82,7 +67,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
 			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
-			Category:      post.Category,
+			Categories:    post.Categories,
 		})
 	}
 
