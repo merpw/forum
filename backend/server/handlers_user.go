@@ -138,6 +138,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 		Date          string   `json:"date"`
 		CommentsCount int      `json:"comments_count"`
 		LikesCount    int      `json:"likes_count"`
+		Categories    string   `json:"categories"`
 	}
 
 	posts := srv.DB.GetUserPosts(userId)
@@ -152,6 +153,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
+			Categories:    post.Category,
 		})
 	}
 
