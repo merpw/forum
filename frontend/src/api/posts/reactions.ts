@@ -13,16 +13,18 @@ export const useReactions = (postID: number) => {
   }
 }
 
-export const useCommentReactions = (postID:number, commentID: number | undefined) => {
-  console.log("Post Id is ", postID, "Comment Id is ", commentID) // ToDO: remove debug
-  const { data, mutate, error } = useSWR(`/api/posts/${postID}/comment/${commentID}/reaction`, getCommentReaction)
+export const useCommentReactions = (postID: number, commentID: number | undefined) => {
+  const { data, mutate, error } = useSWR(
+    `/api/posts/${postID}/comment/${commentID}/reaction`,
+    getCommentReaction
+  )
   return {
     isError: error != undefined,
     isLoading: !error && !data,
-    cmutate: mutate,
-    creaction: data?.reaction,
-    clikes_count: data?.likes_count,
-    cdislikes_count: data?.dislikes_count,
+    mutate,
+    reaction: data?.reaction,
+    likes_count: data?.likes_count,
+    dislikes_count: data?.dislikes_count,
   }
 }
 
@@ -69,13 +71,17 @@ export const likePost = (postID: number) =>
 export const likeComment = (postID: number, commentID: number) =>
   document.cookie.includes("forum-token")
     ? axios
-        .post<number>(`/api/posts/${postID}/comment/${commentID}/like`, null, { withCredentials: true })
+        .post<number>(`/api/posts/${postID}/comment/${commentID}/like`, null, {
+          withCredentials: true,
+        })
         .then((res) => res.data)
     : Promise.resolve(0)
 
 export const dislikeComment = (postID: number, commentID: number) =>
   document.cookie.includes("forum-token")
     ? axios
-        .post<number>(`/api/posts/${postID}/comment/${commentID}/dislike`, null, { withCredentials: true })
+        .post<number>(`/api/posts/${postID}/comment/${commentID}/dislike`, null, {
+          withCredentials: true,
+        })
         .then((res) => res.data)
     : Promise.resolve(0)

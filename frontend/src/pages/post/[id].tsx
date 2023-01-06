@@ -7,13 +7,18 @@ import Head from "next/head"
 import moment from "moment"
 import { getPostLocal, getPostsLocal } from "../../api/posts/fetch"
 import { useMe } from "../../api/auth"
-import { CreateComment } from "../../api/posts/comment"
+import { CreateComment, useComments } from "../../api/posts/comment"
 import { FormError } from "../../components/error"
-import { Category, ReactionsButtons, ReactionsCommentButtons } from "../../components/posts/reactions"
+import {
+  Category,
+  ReactionsButtons,
+  ReactionsCommentButtons,
+} from "../../components/posts/reactions"
+import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
 
-const PostPage: NextPage<{ post: Post }> = ({ post }) => {
+const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   return (
-    <>
+    <SWRConfig value={fallback}>
       <Head>
         <title>{`${post.title} - Forum`}</title>
       </Head>
@@ -22,7 +27,7 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
           <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
           <hr />
         </div>
-        <p>{post.content}</p>
+        <p className={"whitespace-pre-line"}>{post.content}</p>
         <hr className={"mt-4"} />
         <div className={"border-t py-2 flex flex-wrap"}>
           <ReactionsButtons post={post} />
@@ -44,12 +49,14 @@ const PostPage: NextPage<{ post: Post }> = ({ post }) => {
           <Comments post={post} />
         </div>
       </div>
-    </>
+    </SWRConfig>
   )
 }
 
 const CommentForm: FC<{ post: Post }> = ({ post }) => {
   const { isLoggedIn } = useMe()
+  const { mutate: mutateComments } = useComments(post.id)
+
   const [text, setText] = useState("")
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -62,17 +69,16 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
   return (
     <form
       onSubmit={(e) => {
-        // e.preventDefault()
-        // refresh the page in 0.3 seconds
-        // setTimeout(() => window.location.reload(), 0)
+        e.preventDefault()
 
         if (isSame) return
 
         if (formError != null) setFormError(null)
 
         CreateComment(post.id, text)
-          .then((id) => {
-            console.log(id)
+          .then(() => {
+            setText("")
+            mutateComments()
           })
           .catch((err) => {
             if (err.code == "ERR_BAD_REQUEST") {
@@ -98,6 +104,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
             "w-full bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
           }
           rows={text.split("\n").length}
+          value={text}
           onInput={(e) => setText(e.currentTarget.value)}
           required
         />
@@ -118,31 +125,34 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 }
 
 const Comments: FC<{ post: Post }> = ({ post }) => {
-  if (post.comments.length == 0) {
+  const { comments } = useComments(post.id)
+  if (comments == undefined || comments.length == 0) {
     return <div>There are no comments yet, write one first!</div>
   }
 
   return (
     <div className={"flex flex-col gap-3"}>
-      {post.comments.map((comment, key) => (
-        <div className={"border rounded p-5"} key={key}>
-          <Link href={`/user/${comment.author.id}`}>
-            <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
-          </Link>
-          <p>{comment.content}</p>
-          <hr className={"mt-4 mb-2"}></hr>
-          <span className={"flex"}>
-            <ReactionsCommentButtons post={post} comment={comment} />
+      {comments
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .map((comment, key) => (
+          <div className={"border rounded p-5"} key={key}>
+            <Link href={`/user/${comment.author.id}`}>
+              <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
+            </Link>
+            <p className={"whitespace-pre-line"}>{comment.content}</p>
+            <hr className={"mt-4 mb-2"}></hr>
+            <span className={"flex"}>
+              <ReactionsCommentButtons post={post} comment={comment} />
 
-            <span
-              className={"ml-auto"}
-              title={moment(comment.date).local().format("DD.MM.YYYY HH:mm:ss")}
-            >
-              {moment(comment.date).fromNow()}
+              <span
+                className={"ml-auto"}
+                title={moment(comment.date).local().format("DD.MM.YYYY HH:mm:ss")}
+              >
+                {moment(comment.date).fromNow()}
+              </span>
             </span>
-          </span>
-        </div>
-      ))}
+          </div>
+        ))}
     </div>
   )
 }
@@ -165,6 +175,16 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
     return { notFound: true }
   }
   const post = await getPostLocal(+params.id)
-  return post ? { props: { post: post }, revalidate: 10 } : { notFound: true }
+  return post
+    ? {
+        props: {
+          post: post,
+          fallback: {
+            [unstable_serialize(["api", "posts", post.id, "comments"])]: post.comments,
+          },
+        },
+        revalidate: 10,
+      }
+    : { notFound: true }
 }
 export default PostPage

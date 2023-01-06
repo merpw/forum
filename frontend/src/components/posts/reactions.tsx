@@ -3,7 +3,14 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { FC } from "react"
 import { useMe } from "../../api/auth"
-import { dislikeComment, likeComment, dislikePost, likePost, useReactions, useCommentReactions } from "../../api/posts/reactions"
+import {
+  dislikeComment,
+  likeComment,
+  dislikePost,
+  likePost,
+  useReactions,
+  useCommentReactions,
+} from "../../api/posts/reactions"
 import { Post, Comment } from "../../custom"
 import { Fragment } from "react"
 
@@ -14,10 +21,17 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
   const router = useRouter()
 
   const { reaction, likes_count, dislikes_count, mutate: mutateReactions } = useReactions(post.id)
+
   return (
     <span className={"mx-2 my-auto flex"}>
       <span className={"mr-1 text-xl"}>
-        {likes_count != undefined ? likes_count : post.likes_count}
+        {likes_count != undefined
+          ? likes_count > 0
+            ? likes_count
+            : ""
+          : post.likes_count > 0
+          ? post.likes_count
+          : ""}
       </span>
       <button
         title={"Like"}
@@ -48,7 +62,9 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
           />
         </motion.svg>
       </button>
-      {dislikes_count != undefined && <span className={"mr-1 text-xl"}>{dislikes_count}</span>}
+      {dislikes_count != undefined && dislikes_count > 0 && (
+        <span className={"mr-1 text-xl"}>{dislikes_count}</span>
+      )}
 
       <button
         title={"Dislike"}
@@ -83,19 +99,34 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
   )
 }
 
-export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({ post, comment }) => {
+export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
+  post,
+  comment,
+}) => {
   const { isLoggedIn } = useMe()
   const router = useRouter()
 
-  const { creaction, clikes_count, cdislikes_count, cmutate: mutateCommentReactions } = useCommentReactions(post.id, comment.id)
+  const {
+    reaction,
+    likes_count,
+    dislikes_count,
+    mutate: mutateCommentReactions,
+  } = useCommentReactions(post.id, comment.id)
+
   return (
     <span className={"mx-2 my-auto flex"}>
       <span className={"mr-1 text-xl"}>
-        {clikes_count != undefined ? clikes_count : comment.likes_count}
+        {likes_count != undefined
+          ? likes_count > 0
+            ? likes_count
+            : ""
+          : comment.likes_count > 0
+          ? comment.likes_count
+          : ""}
       </span>
       <button
         title={"Like"}
-        className={"mr-1 " + (creaction == 1 ? "text-blue-500" : "")}
+        className={"mr-1 " + (reaction == 1 ? "text-blue-500" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -122,11 +153,13 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({ 
           />
         </motion.svg>
       </button>
-      {cdislikes_count != undefined && <span className={"mr-1 text-xl"}>{cdislikes_count}</span>}
+      {dislikes_count != undefined && dislikes_count > 0 && (
+        <span className={"mr-1 text-xl"}>{dislikes_count}</span>
+      )}
 
       <button
         title={"Dislike"}
-        className={"mr-1 " + (creaction == -1 ? "text-blue-500" : "")}
+        className={"mr-1 " + (reaction == -1 ? "text-blue-500" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -183,16 +216,15 @@ export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
   </span>
 )
 
-
 export const Category: FC<{ post: Post }> = ({ post }) => {
-  const categories = post.category ? post.category.split(",") : [];
+  const categories = post.category ? post.category.split(",") : []
   return (
-    <Fragment>
-      {categories.map((category) => (
+    <>
+      {categories.map((category, key) => (
         // eslint-disable-next-line react/jsx-key
-        <Link href={`/category/${category}`} className={"hover:opacity-50 flex"}>
+        <Link key={key} href={`/category/${category}`} className={"hover:opacity-50 flex"}>
           <span className={"text-xl capitalize"}>{category}</span>
-          <span className={"pt-1 ml-1"}>
+          <span className={"pt-1 mx-1"}>
             <svg
               xmlns={"http://www.w3.org/2000/svg"}
               fill={"none"}
@@ -213,6 +245,6 @@ export const Category: FC<{ post: Post }> = ({ post }) => {
           </span>
         </Link>
       ))}
-    </Fragment>
-  );
-};
+    </>
+  )
+}
