@@ -6,24 +6,16 @@ RUN apk add build-base
 WORKDIR /app/
 COPY . .
 
-RUN go build -o server -v .
+RUN go build -o /bin/server .
 
 FROM alpine
 
 FROM alpine
 
-RUN apk add --no-cache bash && apk add --no-cache curl && apk add --no-cache ca-certificates
+COPY --from=builder /bin/ /bin/
 
-COPY --from=builder /app/ /app/
+WORKDIR /bin/
 
-WORKDIR /app/
-# add permission to execute for all users
-RUN chmod 777 server
-
-# print permissions of server file, was required to test if permission error was from docker container or mac machine of gritlab. It was found to be error coming from bad docker config of mac machine
-# CMD ["/bin/ls", "-l"]
 CMD ./server
-
-# HEALTHCHECK --interval=3s CMD curl --fail http://localhost:8080/ || exit 1
 
 EXPOSE 8080

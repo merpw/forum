@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN npm install --production
+RUN npm install
 
 CMD npm run build && npm run start && docker system prune -f
 
