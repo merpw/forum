@@ -1,6 +1,6 @@
 import axios from "axios"
 
-export const CreatePost = (title: string, content: string, category: string[]) =>
+export const CreatePost = (title: string, content: string, categories: string[]) =>
   axios
-    .post<number>("/api/posts/create", { title, content, category }, { withCredentials: true })
+    .post<number>("/api/posts/create", { title, content, categories }, { withCredentials: true })
     .then((res) => res.data)

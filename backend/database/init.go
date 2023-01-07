@@ -30,7 +30,7 @@ func (db DB) InitDatabase() error {
 						likes_count INTEGER,
 						dislikes_count INTEGER,
 						comments_count INTEGER,
-						category TEXT,
+						categories TEXT,
 						FOREIGN KEY(author) REFERENCES users(id))`)
 	if err != nil {
 		return err

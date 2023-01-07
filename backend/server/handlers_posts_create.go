@@ -17,7 +17,7 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	requestBody := struct {
 		Title      string   `json:"title"`
 		Content    string   `json:"content"`
-		Categories []string `json:"category"`
+		Categories []string `json:"categories"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -62,7 +62,7 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, requestBody.Categories)
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, strings.Join(requestBody.Categories, ","))
 	sendObject(w, id)
 }
 
