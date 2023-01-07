@@ -5,7 +5,7 @@ RESTful API server to manage data about users, posts
 ---
 
 Authors: [@maximihajlov](https://github.com/maximihajlov), [@healingdrawing](https://github.com/healingdrawing)
-, [@nattikim](https://github.com/nattikim)
+, [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere)
 
 Solved during studying in Gritlab coding school on Åland, December 2022
 
@@ -19,6 +19,7 @@ Solved during studying in Gritlab coding school on Åland, December 2022
 
 #### Example: `go run .` to run on default port 8080
 
+### Testing: `go test forum/server/test -cover -coverpkg=./...`
 ## Endpoints
 
 - GET `/api/me` - get current user info
