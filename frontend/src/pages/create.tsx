@@ -112,7 +112,6 @@ const CreatePostForm = () => {
           onChange={(e) =>
             setCategory(Array.from(e.currentTarget.selectedOptions, (option) => option.value))
           }
-          defaultValue={[]}
         >
           {categories.map((cat, key) => (
             <option key={key}>{cat}</option>

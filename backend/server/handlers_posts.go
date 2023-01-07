@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-var categories = []string{"facts", "rumors"}
+var categories = []string{"facts", "rumors", "other"}
 
 func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) {
 
