@@ -20,6 +20,7 @@ type SafePost struct {
 	Date          string   `json:"date"`
 	CommentsCount int      `json:"comments_count"`
 	LikesCount    int      `json:"likes_count"`
+	DislikesCount int      `json:"dislikes_count"`
 	Categories    string   `json:"categories"`
 }
 

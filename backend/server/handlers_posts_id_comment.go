@@ -189,11 +189,9 @@ func (srv *Server) postsIdCommentCreateHandler(w http.ResponseWriter, r *http.Re
 
 // postsIdCommentsHandler returns all comments on a post in the database
 func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request) {
-	// userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
-	// userIdStr = strings.TrimSuffix(userIdStr, "/posts")
-	// /api/user/1/posts -> 1
-
 	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
+	// /api/posts/1/comments -> 1
+	
 	if err != nil {
 		errorResponse(w, http.StatusNotFound)
 		return

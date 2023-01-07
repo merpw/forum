@@ -3,7 +3,7 @@ export type Post = {
   title: string
   content: string
   likes_count: number
-  dislikes_count: number | undefined // defined only for post's author
+  dislikes_count: number
   comments_count: number
   date: string
   author: User
@@ -22,6 +22,6 @@ export type Comment = {
   author: User
   content: string
   likes_count: number
-  dislikes_count: number | undefined // defined only for comment's author
+  dislikes_count: number
   date: string
 }

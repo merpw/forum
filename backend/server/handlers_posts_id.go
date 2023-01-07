@@ -35,6 +35,7 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		Date:          post.Date,
 		CommentsCount: post.CommentsCount,
 		LikesCount:    post.LikesCount,
+		DislikesCount: post.DislikesCount,
 		Categories:    post.Categories,
 	}
 

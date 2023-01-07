@@ -12,7 +12,6 @@ import {
   useCommentReactions,
 } from "../../api/posts/reactions"
 import { Post, Comment } from "../../custom"
-import { Fragment } from "react"
 
 // TODO: add prefetching (useSWR fallback)
 
@@ -67,9 +66,16 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
           />
         </motion.svg>
       </button>
-      {dislikes_count != undefined && dislikes_count > 0 && (
-        <span className={"mr-1 text-xl"}>{dislikes_count}</span>
-      )}
+
+      <span className={"mr-1 text-xl"}>
+        {dislikes_count != undefined
+          ? dislikes_count > 0
+            ? dislikes_count
+            : ""
+          : post.dislikes_count > 0
+          ? post.dislikes_count
+          : ""}
+      </span>
 
       <button
         title={"Dislike"}
@@ -158,9 +164,16 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
           />
         </motion.svg>
       </button>
-      {dislikes_count != undefined && dislikes_count > 0 && (
-        <span className={"mr-1"}>{dislikes_count}</span>
-      )}
+
+      <span className={"mr-1"}>
+        {dislikes_count != undefined
+          ? dislikes_count > 0
+            ? dislikes_count
+            : ""
+          : comment.dislikes_count > 0
+          ? comment.dislikes_count
+          : ""}
+      </span>
 
       <button
         title={"Dislike"}

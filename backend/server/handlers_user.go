@@ -52,7 +52,6 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	type Response struct {
 		SafePost
-		DislikesCount int `json:"dislikesCount"`
 	}
 
 	response := make([]Response, 0)
@@ -66,9 +65,9 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
 				LikesCount:    post.LikesCount,
+				DislikesCount: post.DislikesCount,
 				Categories:    post.Categories,
 			},
-			DislikesCount: post.DislikesCount,
 		})
 	}
 
@@ -103,9 +102,9 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
 				LikesCount:    post.LikesCount,
+				DislikesCount: post.DislikesCount,
 				Categories:    post.Categories,
 			},
-			DislikesCount: post.DislikesCount,
 		})
 	}
 
@@ -166,6 +165,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
+			DislikesCount: post.DislikesCount,
 			Categories:    post.Categories,
 		})
 	}
