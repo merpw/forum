@@ -36,7 +36,10 @@ const PostCard = (post: Post, key: number) => {
         <Category post={post} />
 
         <span className={"ml-auto"}>
-          <span title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}>
+          <span
+            suppressHydrationWarning
+            title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}
+          >
             {moment(post.date).fromNow()}
           </span>
           {" by "}

@@ -34,7 +34,10 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
           <Category post={post} />
 
           <span className={"ml-auto"}>
-            <span title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}>
+            <span
+              suppressHydrationWarning
+              title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}
+            >
               {moment(post.date).fromNow()}
             </span>
             {" by "}
@@ -146,6 +149,7 @@ const Comments: FC<{ post: Post }> = ({ post }) => {
               <ReactionsCommentButtons post={post} comment={comment} />
 
               <span
+                suppressHydrationWarning
                 className={"ml-auto"}
                 title={moment(comment.date).local().format("DD.MM.YYYY HH:mm:ss")}
               >
