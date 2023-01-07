@@ -5,6 +5,7 @@ import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
 import { useMe } from "../api/auth"
 import { useMyPosts } from "../api/posts/my_posts"
+import { useMyPostsLiked } from "../api/posts/my_posts_liked"
 import { PostList } from "../components/posts/list"
 
 /* TODO: add placeholders */
@@ -14,6 +15,13 @@ const UserPage: NextPage = () => {
   const { isLoading, isLoggedIn } = useMe()
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
+
+  const tabs = [
+    { title: "Your posts", component: <UserPosts /> },
+    { title: "Your liked posts", component: <UserLikedPosts /> },
+  ]
+  const [activeTab, setActiveTab] = useState(0)
+
   useEffect(() => {
     if (!isLoading && !isLoggedIn && !isRedirecting) {
       setIsRedirecting(true)
@@ -48,8 +56,22 @@ const UserPage: NextPage = () => {
         </span>
         <span>Create a new post</span>
       </Link>
-      <h2 className={"text-xl mb-3"}>Your recent posts:</h2>
-      <UserPosts />
+
+      <ul className={"flex flex-wrap gap-2 text-2xl mb-3"}>
+        {tabs.map(({ title }, key) => (
+          <li
+            key={key}
+            className={
+              "cursor-pointer hover:opacity-60 p-1 " +
+              (activeTab == key ? "border-b-2 border-b-blue-500" : "")
+            }
+            onClick={() => setActiveTab(key)}
+          >
+            {title}
+          </li>
+        ))}
+      </ul>
+      {tabs[activeTab].component}
     </>
   )
 }
@@ -67,12 +89,6 @@ const UserInfo = () => {
         {"Your email is "} <span className={"text-2xl"}> {user?.email} </span>
       </p>
       <hr className={"my-5"} />
-      <span className={"text-xl px-5 py-2 capitalize"}>
-            <Link href={`/liked`} className={"hover:opacity-50"}>
-              {"Your favorite posts"}
-            </Link>
-          </span>
-      <hr className={"my-5"} />
     </>
   )
 }
@@ -83,6 +99,16 @@ const UserPosts = () => {
   if (posts == undefined) return null
 
   if (posts.length == 0) return <div>{"You haven't posted yet"}</div>
+
+  return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
+}
+
+const UserLikedPosts = () => {
+  const { posts } = useMyPostsLiked()
+
+  if (posts == undefined) return null
+
+  if (posts.length == 0) return <div>{"You haven't liked any posts yet"}</div>
 
   return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
 }
