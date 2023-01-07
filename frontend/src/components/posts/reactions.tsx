@@ -120,7 +120,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
 
   return (
     <span className={"mx-2 my-auto flex"}>
-      <span className={"mr-1 text-xl"}>
+      <span className={"mr-1"}>
         {likes_count != undefined
           ? likes_count > 0
             ? likes_count
@@ -159,7 +159,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
         </motion.svg>
       </button>
       {dislikes_count != undefined && dislikes_count > 0 && (
-        <span className={"mr-1 text-xl"}>{dislikes_count}</span>
+        <span className={"mr-1"}>{dislikes_count}</span>
       )}
 
       <button
