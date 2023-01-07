@@ -165,8 +165,9 @@ func (srv *Server) postsIdReactionHandler(w http.ResponseWriter, r *http.Request
 
 	reaction := srv.DB.GetPostReaction(postId, userId)
 	safeReaction := SafeReaction{
-		Reaction:   reaction,
-		LikesCount: post.LikesCount,
+		Reaction:      reaction,
+		LikesCount:    post.LikesCount,
+		DislikesCount: post.DislikesCount,
 	}
 
 	if userId != post.AuthorId {

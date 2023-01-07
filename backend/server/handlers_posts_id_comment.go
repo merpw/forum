@@ -120,25 +120,12 @@ func (srv *Server) postsIdCommentIdReactionHandler(w http.ResponseWriter, r *htt
 	}
 
 	reaction := srv.DB.GetCommentReaction(commentId, userId)
-	if userId == comment.AuthorId {
-		sendObject(w, struct {
-			Reaction      int `json:"reaction"`
-			LikesCount    int `json:"likes_count"`
-			DislikesCount int `json:"dislikes_count"`
-		}{
+	sendObject(w,
+		SafeReaction{
 			Reaction:      reaction,
 			LikesCount:    comment.LikesCount,
 			DislikesCount: comment.DislikesCount,
 		})
-	} else {
-		sendObject(w, struct {
-			Reaction   int `json:"reaction"`
-			LikesCount int `json:"likes_count"`
-		}{
-			Reaction:   reaction,
-			LikesCount: comment.LikesCount,
-		})
-	}
 }
 
 // postsIdCommentCreateHandler Add comments on a post in the database
@@ -191,7 +178,7 @@ func (srv *Server) postsIdCommentCreateHandler(w http.ResponseWriter, r *http.Re
 func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request) {
 	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
 	// /api/posts/1/comments -> 1
-	
+
 	if err != nil {
 		errorResponse(w, http.StatusNotFound)
 		return
@@ -217,13 +204,11 @@ func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request
 	// posts := srv.DB.GetUserPosts(userId)
 	comments := srv.DB.GetPostComments(postId)
 
-	response := make([]ResponseComment, 0)
+	response := make([]SafeComment, 0)
 	for _, comment := range comments {
 		user := srv.DB.GetUserById(comment.AuthorId)
-		response = append(response, ResponseComment{
+		response = append(response, SafeComment{
 			Id:            comment.Id,
-			PostId:        postId,
-			AuthorId:      comment.AuthorId,
 			Content:       comment.Content,
 			Author:        SafeUser{user.Id, user.Name},
 			Date:          comment.Date,

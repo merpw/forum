@@ -25,16 +25,18 @@ type SafePost struct {
 }
 
 type SafeComment struct {
-	Id         int      `json:"id"`
-	Content    string   `json:"content"`
-	Author     SafeUser `json:"author"`
-	Date       string   `json:"date"`
-	LikesCount int      `json:"likes_count"`
+	Id            int      `json:"id"`
+	Content       string   `json:"content"`
+	Author        SafeUser `json:"author"`
+	Date          string   `json:"date"`
+	LikesCount    int      `json:"likes_count"`
+	DislikesCount int      `json:"dislikes_count"`
 }
 
 type SafeReaction struct {
-	Reaction   int `json:"reaction"`
-	LikesCount int `json:"likes_count"`
+	Reaction      int `json:"reaction"`
+	LikesCount    int `json:"likes_count"`
+	DislikesCount int `json:"dislikes_count"`
 }
 
 // errorResponse responses with specified error code in format "404 Not Found"
