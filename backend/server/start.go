@@ -35,6 +35,7 @@ func (srv *Server) Start() http.Handler {
 
 	router.HandleFunc("/api/me", srv.apiMeHandler)
 	router.HandleFunc("/api/me/posts", srv.apiMePostsHandler)
+	router.HandleFunc("/api/me/posts/liked", srv.apiMePostsLikedHandler)
 
 	router.HandleFunc("/api/login", srv.loginHandler)
 	router.HandleFunc("/api/signup", srv.signupHandler)

@@ -28,6 +28,7 @@ func pt(pattern string) *regexp.Regexp {
 
 var reApiMe = pt(`^/api/me/?$`)
 var reApiMePosts = pt(`^/api/me/posts/?$`)
+var reApiMePostsLiked = pt(`^/api/me/posts/liked/?$`)
 
 var reApiUserId = pt(`^/api/user/[[:digit:]]+/?$`)
 var reApiUserIdPosts = pt(`^/api/user/[[:digit:]]+/posts/?$`)
@@ -68,6 +69,7 @@ var getRegexps = []string{
 
 	reApiMe.String(),
 	reApiMePosts.String(),
+	reApiMePostsLiked.String(),
 	reApiPostsIdReaction.String(),
 
 	reApiPostsCategories.String(),

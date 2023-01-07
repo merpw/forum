@@ -23,6 +23,7 @@ Solved during studying in Gritlab coding school on Åland, December 2022
 
 - GET `/api/me` - get current user info
 - GET `/api/me/posts` - get current user posts
+- GET `/api/me/posts/liked` - get current user liked posts
 - GET `/api/user/{id}/` - get user info by id
 - GET `/api/user/{id}/posts/` - get user posts by id
 - GET `/api/posts/` - get all posts

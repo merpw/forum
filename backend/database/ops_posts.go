@@ -84,6 +84,26 @@ func (db DB) GetUserPosts(userId int) []Post {
 	return posts
 }
 
+func (db DB) GetUserPostsLiked(userId int) []Post {
+	query, err := db.Query("SELECT * FROM posts WHERE id IN (SELECT post_id FROM post_reactions WHERE author_id = ? AND reaction = 1)", userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var posts []Post
+	for query.Next() {
+		var post Post
+		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date, &post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
+		if err != nil {
+			log.Panic(err)
+		}
+		posts = append(posts, post)
+	}
+	query.Close()
+
+	return posts
+}
+
 func (db DB) GetCategoryPosts(category string) []Post {
 	query, err := db.Query("SELECT * FROM posts WHERE category LIKE '%' || ? || '%'", category)
 	// query, err := db.Query("SELECT * FROM posts WHERE category = ?", category) // Old code just commented out as fallback

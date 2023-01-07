@@ -75,6 +75,43 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
+// apiMePostsLikedHandler returns the current user's liked posts to the current user if he is logged in.
+//
+//	GET /api/me/posts/liked
+func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) {
+	userId := srv.getUserId(w, r)
+	if userId == -1 {
+		errorResponse(w, http.StatusUnauthorized)
+		return
+	}
+	user := srv.DB.GetUserById(userId)
+	posts := srv.DB.GetUserPostsLiked(userId)
+
+	type Response struct {
+		SafePost
+		DislikesCount int `json:"dislikesCount"`
+	}
+
+	response := make([]Response, 0)
+	for _, post := range posts {
+		response = append(response, Response{
+			SafePost: SafePost{
+				Id:            post.Id,
+				Title:         post.Title,
+				Content:       post.Content,
+				Author:        SafeUser{Id: user.Id, Name: user.Name},
+				Date:          post.Date,
+				CommentsCount: post.CommentsCount,
+				LikesCount:    post.LikesCount,
+				Categories:    post.Categories,
+			},
+			DislikesCount: post.DislikesCount,
+		})
+	}
+
+	sendObject(w, response)
+}
+
 // apiMePostsHandler Returns the info of the user with the given id. The requester does not need to be logged in.
 //
 //	GET /api/user/:id

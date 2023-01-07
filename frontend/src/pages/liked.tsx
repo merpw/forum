@@ -4,7 +4,7 @@ import { useRouter } from "next/router"
 import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
 import { useMe } from "../api/auth"
-import { useMyPosts } from "../api/posts/my_posts"
+import { useMyPostsLiked } from "../api/posts/my_posts_liked"
 import { PostList } from "../components/posts/list"
 
 /* TODO: add placeholders */
@@ -48,8 +48,8 @@ const UserPage: NextPage = () => {
         </span>
         <span>Create a new post</span>
       </Link>
-      <h2 className={"text-xl mb-3"}>Your recent posts:</h2>
-      <UserPosts />
+      <h2 className={"text-xl mb-3"}>Your favorite posts:</h2>
+      <UserPostsLiked />
     </>
   )
 }
@@ -68,8 +68,8 @@ const UserInfo = () => {
       </p>
       <hr className={"my-5"} />
       <span className={"text-xl px-5 py-2 capitalize"}>
-            <Link href={`/liked`} className={"hover:opacity-50"}>
-              {"Your favorite posts"}
+            <Link href={`/me`} className={"hover:opacity-50"}>
+              {"Your recent posts"}
             </Link>
           </span>
       <hr className={"my-5"} />
@@ -77,12 +77,12 @@ const UserInfo = () => {
   )
 }
 
-const UserPosts = () => {
-  const { posts } = useMyPosts()
+const UserPostsLiked = () => {
+  const { posts } = useMyPostsLiked()
 
   if (posts == undefined) return null
 
-  if (posts.length == 0) return <div>{"You haven't posted yet"}</div>
+  if (posts.length == 0) return <div>{"You haven't liked posts yet"}</div>
 
   return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
 }
