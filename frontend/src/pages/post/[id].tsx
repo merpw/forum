@@ -15,12 +15,18 @@ import {
   ReactionsCommentButtons,
 } from "../../components/posts/reactions"
 import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
+import ReactTextareaAutosize from "react-textarea-autosize"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   return (
     <SWRConfig value={fallback}>
       <Head>
         <title>{`${post.title} - Forum`}</title>
+        <meta property={"og:title"} content={`${post.title} - Forum`} />
+
+        {/* TODO: change to description */}
+        <meta name={"description"} content={post.content.slice(0, 200)} />
+        <meta property={"og:description"} content={post.content.slice(0, 200)} />
       </Head>
       <div className={"m-5"}>
         <div className={"mb-3"}>
@@ -102,12 +108,11 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
           Write a comment:
         </label>
 
-        <textarea
+        <ReactTextareaAutosize
           id={"comment-text"}
           className={
             "w-full bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
           }
-          rows={text.split("\n").length}
           value={text}
           onInput={(e) => setText(e.currentTarget.value)}
           required

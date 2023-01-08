@@ -9,6 +9,8 @@ export default function App({ Component, pageProps }: AppProps) {
     <Layout>
       <Head>
         <meta property={"og:site_name"} content={"FORUM"} />
+        <meta property={"og:type"} content={"website"} />
+        <meta property={"og:url"} content={"https://forum.mer.pw"} />
       </Head>
       <Component {...pageProps} />
     </Layout>

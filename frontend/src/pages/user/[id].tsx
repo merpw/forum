@@ -26,6 +26,12 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
     <>
       <Head>
         <title>{`${user.name} - Forum`}</title>
+        <meta name={"og:title"} content={`${user.name} - Forum`} />
+
+        <meta name={"description"} content={`Posts created by ${user.name}`} />
+        <meta name={"og:description"} content={`Posts created by ${user.name}`} />
+
+        <meta name={"author"} content={user.name} />
       </Head>
       <div>
         <h1 className={"text-2xl mb-5"}>{user.name}</h1>
@@ -56,7 +62,7 @@ export const getStaticProps: GetStaticProps<
   if (user == undefined) {
     return { notFound: true }
   }
-  const { posts } = await getUserPostsLocal(user.id)
+  const posts = await getUserPostsLocal(user.id)
 
   return { props: { user: user, posts: posts } }
 }

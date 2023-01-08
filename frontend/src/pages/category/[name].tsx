@@ -12,9 +12,9 @@ const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
     <>
       <Head>
         <title>{`${category_name} - Forum`}</title>
-        <meta name={"description"} content={"The friendliest forum"} />
-        <meta property={"og:title"} content={"FORUM"} key={"title"} />
-        <meta name={"og:description"} content={"The friendliest forum"} />
+        <meta name={"og:title"} content={`${category_name} - Forum`} />
+        <meta name={"description"} content={`Posts in ${category_name} category`} />
+        <meta name={"og:description"} content={`Posts in ${category_name} category`} />
       </Head>
       <h1 className={"text-3xl font-light mb-5"}>
         <span className={"font-normal"}>{category_name}</span> category
@@ -42,7 +42,7 @@ export const getStaticProps: GetStaticProps<{ posts: Post[] }, { name: string }>
 
   let category_name = params.name.toLowerCase()
 
-  const { posts } = await getCategoryPostsLocal(category_name)
+  const posts = await getCategoryPostsLocal(category_name)
   if (posts == undefined) return { notFound: true }
 
   // capitalize

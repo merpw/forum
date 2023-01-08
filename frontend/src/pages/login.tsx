@@ -34,6 +34,8 @@ const LoginPage: NextPage = () => {
     <>
       <Head>
         <title>Login - Forum</title>
+        <meta name={"title"} content={"Login - Forum"} />
+        <meta name={"og:title"} content={"Login - Forum"} />
       </Head>
       <form
         onSubmit={async (e) => {

@@ -210,7 +210,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
 
 export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
   <span className={"my-auto flex mr-2"}>
-    <Link href={`/post/${post.id}`} className={"hover:opacity-50 my-auto flex"}>
+    <Link title={"Comments"} href={`/post/${post.id}`} className={"hover:opacity-50 my-auto flex"}>
       <span className={"mr-1 text-xl"}>{post.comments_count > 0 && post.comments_count}</span>
       <span className={"pt-1"}>
         <svg
@@ -240,7 +240,12 @@ export const Category: FC<{ post: Post }> = ({ post }) => {
     <>
       {categories.map((category, key) => (
         // eslint-disable-next-line react/jsx-key
-        <Link key={key} href={`/category/${category}`} className={"hover:opacity-50 flex"}>
+        <Link
+          title={`Category ${category}`}
+          key={key}
+          href={`/category/${category}`}
+          className={"hover:opacity-50 flex"}
+        >
           <span className={"text-xl capitalize"}>{category}</span>
           <span className={"pt-1 mx-1"}>
             <svg

@@ -16,12 +16,8 @@ export const getPostCommentsLocal = (id: number) =>
 
 export const getUserPostsLocal = (user_id: number) =>
   axios<Post[]>(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/user/${user_id}/posts`)
-    .then((res) => {
-      return { posts: res.data }
-    })
-    .catch(() => {
-      return { posts: [] as Post[] }
-    })
+    .then((res) => res.data)
+    .catch(() => [])
 
 export const getCategoriesLocal = () =>
   axios
@@ -30,9 +26,5 @@ export const getCategoriesLocal = () =>
 
 export const getCategoryPostsLocal = (category: string) =>
   axios<Post[]>(`http://${process.env.FORUM_BACKEND_LOCALHOST}/api/posts/categories/${category}`)
-    .then((res) => {
-      return { posts: res.data }
-    })
-    .catch(() => {
-      return { posts: undefined }
-    })
+    .then((res) => res.data)
+    .catch(() => undefined)

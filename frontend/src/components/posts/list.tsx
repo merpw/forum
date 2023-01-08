@@ -27,6 +27,7 @@ const PostCard = (post: Post, key: number) => {
           <hr className={"mt-2"} />
         </div>
 
+        {/* TODO: change to description */}
         <p>{post.content}</p>
       </div>
 

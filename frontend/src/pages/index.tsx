@@ -11,8 +11,9 @@ const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, catego
     <>
       <Head>
         <title>Recent Posts - Forum</title>
+        <meta property={"og:title"} content={"Recent Posts - FORUM"} />
+
         <meta name={"description"} content={"The friendliest forum"} />
-        <meta property={"og:title"} content={"FORUM"} key={"title"} />
         <meta name={"og:description"} content={"The friendliest forum"} />
       </Head>
       <div className={"flex gap-2 flex-wrap justify-center mb-5"}>

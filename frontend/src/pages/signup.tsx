@@ -36,6 +36,8 @@ const SignupPage: NextPage = () => {
     <>
       <Head>
         <title>Sign Up - Forum</title>
+        <meta name={"title"} content={"Sign Up - Forum"} />
+        <meta name={"og:title"} content={"Sign Up - Forum"} />
       </Head>
       <form
         onSubmit={async (e) => {
