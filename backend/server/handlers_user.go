@@ -84,7 +84,6 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
-	user := srv.DB.GetUserById(userId)
 	posts := srv.DB.GetUserPostsLiked(userId)
 
 	type Response struct {
@@ -95,12 +94,13 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 	response := make([]Response, 0)
 	for _, post := range posts {
 		cutPostContentForLists(&post)
+		author := srv.DB.GetUserById(post.AuthorId)
 		response = append(response, Response{
 			SafePost: SafePost{
 				Id:            post.Id,
 				Title:         post.Title,
 				Content:       post.Content,
-				Author:        SafeUser{Id: user.Id, Name: user.Name},
+				Author:        SafeUser{Id: author.Id, Name: author.Name},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
 				LikesCount:    post.LikesCount,
