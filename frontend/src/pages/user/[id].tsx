@@ -60,7 +60,7 @@ export const getStaticProps: GetStaticProps<
   }
   const user = await getUserLocal(+params.id)
   if (user == undefined) {
-    return { notFound: true }
+    return { notFound: true, revalidate: 1 }
   }
   const posts = await getUserPostsLocal(user.id)
 

@@ -43,7 +43,7 @@ export const getStaticProps: GetStaticProps<{ posts: Post[] }, { name: string }>
   let category_name = params.name.toLowerCase()
 
   const posts = await getCategoryPostsLocal(category_name)
-  if (posts == undefined) return { notFound: true }
+  if (posts == undefined) return { notFound: true, revalidate: 1 }
 
   // capitalize
   category_name = category_name.charAt(0).toUpperCase() + category_name.slice(1)

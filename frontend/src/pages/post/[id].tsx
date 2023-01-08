@@ -197,6 +197,6 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
         },
         revalidate: 1,
       }
-    : { notFound: true }
+    : { notFound: true, revalidate: 1 }
 }
 export default PostPage
