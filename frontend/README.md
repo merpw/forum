@@ -4,9 +4,10 @@ Next.js based frontend for [FORUM](https://github.com/01-edu/public/tree/master/
 
 ---
 
-Authors: [@maximihajlov](https://github.com/maximihajlov), [@nattikim](https://github.com/nattikim)
+Authors: [@maximihajlov](https://github.com/maximihajlov), [@healingdrawing](https://github.com/healingdrawing)
+, [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere)
 
-Solved during studying in Gritlab coding school on Åland, November 2022
+Solved during studying in Gritlab coding school on Åland, January 2023
 
 ---
 
@@ -36,4 +37,4 @@ To start Next.js server
 
 You can customize API by changing following environment variables:
 
-- `GROUPIE_FORUM_LOCALHOST` - local host for server-side initial data fetching
+- `FORUM_BACKEND_LOCALHOST` - local host for server-side data fetching

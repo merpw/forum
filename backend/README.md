@@ -7,7 +7,7 @@ RESTful API server to manage data about users, posts
 Authors: [@maximihajlov](https://github.com/maximihajlov), [@healingdrawing](https://github.com/healingdrawing)
 , [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere)
 
-Solved during studying in Gritlab coding school on Åland, December 2022
+Solved during studying in Gritlab coding school on Åland, January 2023
 
 ---
 
