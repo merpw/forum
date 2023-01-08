@@ -35,6 +35,7 @@ func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Req
 	response := make([]SafePost, 0)
 	for _, post := range posts {
 		postAuthor := srv.DB.GetUserById(post.AuthorId)
+		cutPostContentForLists(&post)
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,

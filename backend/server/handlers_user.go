@@ -56,6 +56,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := make([]Response, 0)
 	for _, post := range posts {
+		cutPostContentForLists(&post)
 		response = append(response, Response{
 			SafePost: SafePost{
 				Id:            post.Id,
@@ -93,6 +94,7 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 
 	response := make([]Response, 0)
 	for _, post := range posts {
+		cutPostContentForLists(&post)
 		response = append(response, Response{
 			SafePost: SafePost{
 				Id:            post.Id,
@@ -157,6 +159,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {
+		cutPostContentForLists(&post)
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,

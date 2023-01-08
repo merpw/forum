@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"forum/database"
 	"log"
 	"net/http"
 )
@@ -60,5 +61,11 @@ func sendObject(w http.ResponseWriter, object any) {
 		log.Println(err)
 		errorResponse(w, 500)
 		return
+	}
+}
+
+func cutPostContentForLists(post *database.Post) {
+	if len(post.Content) > 200 {
+		post.Content = post.Content[:200] + "..."
 	}
 }
