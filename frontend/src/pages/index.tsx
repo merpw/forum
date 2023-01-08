@@ -37,7 +37,7 @@ export const getStaticProps: GetStaticProps<{ posts: Post[]; categories: string[
 
   return {
     props: { posts, categories },
-    revalidate: 10,
+    revalidate: 1,
   }
 }
 

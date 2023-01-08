@@ -64,6 +64,6 @@ export const getStaticProps: GetStaticProps<
   }
   const posts = await getUserPostsLocal(user.id)
 
-  return { props: { user: user, posts: posts } }
+  return { props: { user: user, posts: posts }, revalidate: 1 }
 }
 export default UserPage

@@ -195,7 +195,7 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
             [unstable_serialize(["api", "posts", post.id, "comments"])]: comments,
           },
         },
-        revalidate: 10,
+        revalidate: 1,
       }
     : { notFound: true }
 }

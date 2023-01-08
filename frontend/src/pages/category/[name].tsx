@@ -50,7 +50,7 @@ export const getStaticProps: GetStaticProps<{ posts: Post[] }, { name: string }>
 
   return {
     props: { posts: posts, category_name: category_name },
-    revalidate: 10,
+    revalidate: 1,
   }
 }
 
