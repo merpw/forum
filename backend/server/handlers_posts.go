@@ -53,7 +53,7 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 }
 
 // postsHandler returns a json list of all posts from the database
-func (srv *Server) postsHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) postsHandler(w http.ResponseWriter, _ *http.Request) {
 	posts := srv.DB.GetAllPosts()
 
 	response := make([]SafePost, 0)
