@@ -19,12 +19,10 @@ RUN --mount=type=cache,target=/root/.cache/go-build go build -o /bin/server .
 
 FROM alpine
 
-FROM alpine
-
 COPY --from=builder /bin/ /bin/
 
-WORKDIR /bin/
+WORKDIR /app/
 
-CMD ./server
+CMD /bin/server
 
 EXPOSE 8080
