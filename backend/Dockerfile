@@ -4,13 +4,18 @@ FROM golang:alpine AS builder
 RUN apk add build-base
 
 WORKDIR /app/
+
+# Download dependencies first to leverage Docker cache
+COPY go.mod .
+RUN go mod download
+
 COPY . .
 
 # Test with cache
-RUN go test ./...
+RUN --mount=type=cache,target=/root/.cache/go-build go test ./...
 
 # Build with cache
-RUN go build -o /bin/server .
+RUN --mount=type=cache,target=/root/.cache/go-build go build -o /bin/server .
 
 FROM alpine
 

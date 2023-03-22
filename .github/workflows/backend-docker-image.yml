@@ -14,5 +14,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Build the Docker image
-        run: docker build backend --tag forum-backend:$(date +%s)
+        uses: docker/build-push-action@v4
+        with:
+          context: backend
+          push: false # TODO: add pushing to container registry
+          tags: "forum-backend:latest"
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
