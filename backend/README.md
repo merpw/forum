@@ -20,6 +20,7 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 #### Example: `go run .` to run on default port 8080
 
 ### Testing: `go test forum/server/test -cover -coverpkg=./...`
+
 ## Endpoints
 
 - GET `/api/me` - get current user info

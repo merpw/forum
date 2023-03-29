@@ -12,7 +12,7 @@ RUN go mod download
 COPY . .
 
 # Test with cache
-RUN --mount=type=cache,target=/root/.cache/go-build go test ./...
+RUN --mount=type=cache,target=/root/.cache/go-build go test forum/server/test -cover -coverpkg=./... -coverprofile=./profile.txt
 
 # Build with cache
 RUN --mount=type=cache,target=/root/.cache/go-build go build -o /bin/server .
