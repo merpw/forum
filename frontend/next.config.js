@@ -19,6 +19,7 @@ const nextConfig = {
     }
     return []
   },
+  output: "standalone",
 }
 if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
   console.warn("WARNING: FORUM_BACKEND_PRIVATE_URL is not defined.")
