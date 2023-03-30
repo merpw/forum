@@ -15,11 +15,17 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ## Usage
 
-### Run `go run . --port=[PORT]` to start API server on specified port
+### Run `go run . [PARAMS]` to start API server
 
 #### Example: `go run .` to run on default port 8080
 
+### Params:
+
+- `--port` - port to run API server on (default: 8080)
+- `--db` - database file path (default: `./database.db`)
+
 ### Testing: `go test forum/server/test -cover -coverpkg=./...`
+
 ## Endpoints
 
 - GET `/api/me` - get current user info
