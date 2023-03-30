@@ -10,4 +10,14 @@ go test "forum/server/test" -cover -coverpkg="../../..." -coverprofile="./cover_
 go tool cover -html="./cover_reports/profile.txt" -o "./cover_reports/coverage.html"
 
 # Open the coverage report in a browser window
-open ./cover_reports/coverage.html
+if [[ $(uname) == "Darwin" ]]; then
+    open ./cover_reports/coverage.html
+fi
+
+if [[ $(uname) == "Linux" ]]; then
+    xdg-open ./cover_reports/coverage.html
+fi
+
+if [[ $(uname -r) == *microsoft* ]]; then
+    start msedge ./cover_reports/coverage.html
+fi
