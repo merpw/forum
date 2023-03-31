@@ -192,12 +192,21 @@ func TestWithAuth(t *testing.T) {
 		// test disliking post 1 and then undisliking it by clicking again on the dislike button
 		{"/api/posts/1/dislike return -1", "/api/posts/1/dislike", nil, "-1"},
 		{"/api/posts/1/dislike return 0", "/api/posts/1/dislike", nil, "0"},
+		// dislike a psot then like it, so that it returns like count as 1
+		{"/api/posts/3/dislike return -1", "/api/posts/3/dislike", nil, "-1"},
+		{"/api/posts/3/like return 1", "/api/posts/3/like", nil, "1"},
+		// like a psot then like it, so that it returns like count as 1
+		{"/api/posts/3/dislike return -1", "/api/posts/3/dislike", nil, "-1"},
 
 		{"/api/posts/1/comment return 1", "/api/posts/1/comment", []byte(`{"content": "test"}`), "1"},
 		{"/api/posts/1/comment/1/like return 1", "/api/posts/1/comment/1/like", nil, "1"},
 		{"/api/posts/1/comment/1/like return 0", "/api/posts/1/comment/1/like", nil, "0"},
 		{"/api/posts/1/comment/1/dislike return -1", "/api/posts/1/comment/1/dislike", nil, "-1"},
 		{"/api/posts/1/comment/1/dislike return 0", "/api/posts/1/comment/1/dislike", nil, "0"},
+		// dislike a comment then like it, so that it returns like count as 1
+		{"/api/posts/1/comment/1/dislike return -1", "/api/posts/1/comment/1/dislike", nil, "-1"},
+		{"/api/posts/1/comment/1/like return 1", "/api/posts/1/comment/1/like", nil, "1"},
+		{"/api/posts/1/comment/1/dislike return -1", "/api/posts/1/comment/1/dislike", nil, "-1"},
 		{"/api/logout return empty string", "/api/logout", nil, ""},
 	}
 

@@ -27,7 +27,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
-	
+
 	requestBody.Email = strings.ToLower(requestBody.Email)
 
 	if len(requestBody.Name) < 3 {
