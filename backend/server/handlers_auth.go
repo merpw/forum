@@ -27,15 +27,19 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
+	
 	requestBody.Email = strings.ToLower(requestBody.Email)
+
 	if len(requestBody.Name) < 3 {
 		http.Error(w, "Name is too short", http.StatusBadRequest)
 		return
 	}
+
 	if len(requestBody.Name) > 15 {
 		http.Error(w, "Name is too long", http.StatusBadRequest)
 		return
 	}
+
 	if requestBody.Name != strings.TrimSpace(requestBody.Name) {
 		http.Error(w, "Name is not valid", http.StatusBadRequest)
 		return

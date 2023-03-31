@@ -17,25 +17,53 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type User4t struct {
+// TestUser to be used in all Post tests.
+type TestUser struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
+// cookie to simulate logged in user.
+var cookie *http.Cookie
+
 // TestWithAuth tests all routes that require authentication
 func TestWithAuth(t *testing.T) {
 	cli := testServer.Client()
 
-	testUser := User4t{
+	validUser := TestUser{
 		Name:     "test",
 		Email:    "test@test.com",
 		Password: "SuperAmazingPassword()!@*#)(!@#",
 	}
 
+	// Slice of invalid users. It will cover most nonDB test cases.
+	invalidUsers := []TestUser{
+		{
+			Name:     "",
+			Email:    "",
+			Password: "",
+		},
+		{
+			Name:     "userNameTooLongToHandle1337",
+			Email:    "invalidEmail1337",
+			Password: "invalidPassword1337",
+		},
+		{
+			Name:     "😂😂😂😂😂😂😂😂",
+			Email:    "😂😂😂😂😂😂😂😂😂😂😂",
+			Password: "1111111111111111111111111111111111111111111111111111111111111111111111111",
+		},
+		{
+			Name:     "😂😂😂😂😂😂😂😂",
+			Email:    "😂😂😂😂😂😂😂😂😂😂😂",
+			Password: "1234",
+		}, {},
+	}
+
 	t.Run("signup", func(t *testing.T) {
-		body, err := json.Marshal(testUser)
-		if err != nil {
+		body, err := json.Marshal(validUser)
+		if err != nil || body == nil {
 			t.Fatal(err)
 		}
 
@@ -44,16 +72,39 @@ func TestWithAuth(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		// bug found, if the user is already present, we give back 400 instead of 409
+		// bug found, if thee user is already present, we give back 400 instead of 409
 		if resp.StatusCode != 200 {
 			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 		}
+
+		for _, user := range invalidUsers {
+			body, err := json.Marshal(user)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			resp, err := cli.Post(testServer.URL+"/api/signup", "application/json", bytes.NewReader(body))
+			if err != nil {
+				t.Fatal(err)
+			}
+			// print the resp
+			buf := new(bytes.Buffer)
+			buf.ReadFrom(resp.Body)
+			newStr := buf.String()
+			fmt.Println(newStr)
+
+			// bug found, if the user is already present, we give back 400 instead of 409
+			if resp.StatusCode != 400 {
+				t.Fatalf("expected %d, got %d", http.StatusBadRequest, http.StatusOK)
+			}
+		}
 	})
 
-	var cookie *http.Cookie
-
 	t.Run("login", func(t *testing.T) {
-		cookie = login4t(t, cli, testServer, testUser)
+		cookie = dummyLogin(t, cli, testServer, validUser)
+		// for _, user := range invalidUsers {
+		// 	cookie = dummyLogin(t, cli, testServer, user)
+		// }
 	})
 
 	// test create 5 posts
@@ -133,7 +184,7 @@ func TestWithAuth(t *testing.T) {
 	}
 
 	for _, test := range validTests {
-		t.Run(test.url, func(t *testing.T) {
+		t.Run(test.name, func(t *testing.T) {
 			req, err := http.NewRequest(http.MethodPost, testServer.URL+test.url, bytes.NewReader(test.body))
 			if err != nil {
 				t.Fatal(err)
@@ -222,7 +273,7 @@ func BenchmarkWithAuth(b *testing.B) {
 	}
 }
 
-func login4t(t *testing.T, cli *http.Client, testServer *httptest.Server, testUser User4t) *http.Cookie {
+func dummyLogin(t *testing.T, cli *http.Client, testServer *httptest.Server, testUser TestUser) *http.Cookie {
 	body := fmt.Sprintf(`{ "login": "%v", "password": "%v" }`, testUser.Email, testUser.Password)
 	resp, err := cli.Post(testServer.URL+"/api/login", "application/json",
 		strings.NewReader(body))
