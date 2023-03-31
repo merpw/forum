@@ -190,16 +190,16 @@ func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	type ResponseComment struct {
-		Id            int      `json:"id"`
-		PostId        int      `json:"post_id"`
-		AuthorId      int      `json:"author_id"`
-		Content       string   `json:"content"`
-		Author        SafeUser `json:"author"`
-		Date          string   `json:"date"`
-		LikesCount    int      `json:"likes_count"`
-		DislikesCount int      `json:"dislikes_count"`
-	}
+	// type ResponseComment struct {
+	// 	Id            int      `json:"id"`
+	// 	PostId        int      `json:"post_id"`
+	// 	AuthorId      int      `json:"author_id"`
+	// 	Content       string   `json:"content"`
+	// 	Author        SafeUser `json:"author"`
+	// 	Date          string   `json:"date"`
+	// 	LikesCount    int      `json:"likes_count"`
+	// 	DislikesCount int      `json:"dislikes_count"`
+	// }
 
 	// posts := srv.DB.GetUserPosts(userId)
 	comments := srv.DB.GetPostComments(postId)

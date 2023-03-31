@@ -125,6 +125,23 @@ func TestWithAuth(t *testing.T) {
 		// }
 	})
 
+	// create a test for a post not found (404) error
+	t.Run("postNotFound", func(t *testing.T) {
+		req, err := http.NewRequest(http.MethodGet, testServer.URL+"/api/posts/1234", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
+		req.AddCookie(cookie)
+
+		resp, err := cli.Do(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if resp.StatusCode != 404 {
+			t.Fatalf("expected %d, got %d", 404, resp.StatusCode)
+		}
+	})
+
 	// test create 5 posts
 	t.Run("createPost", func(t *testing.T) {
 		for i := 1; i <= 5; i++ {
