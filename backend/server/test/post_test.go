@@ -4,24 +4,30 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gofrs/uuid"
 	"io"
 	"log"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	// from package database import Post
+
+	"github.com/gofrs/uuid"
 )
+
+type User4t struct {
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
 
 // TestWithAuth tests all routes that require authentication
 func TestWithAuth(t *testing.T) {
 	cli := testServer.Client()
 
-	testUser := struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}{
+	testUser := User4t{
 		Name:     "test",
 		Email:    "test@test.com",
 		Password: "SuperAmazingPassword()!@*#)(!@#",
@@ -45,77 +51,85 @@ func TestWithAuth(t *testing.T) {
 	})
 
 	var cookie *http.Cookie
-	t.Run("login", func(t *testing.T) {
-		body := fmt.Sprintf(`{ "login": "%v", "password": "%v" }`, testUser.Email, testUser.Password)
-		resp, err := cli.Post(testServer.URL+"/api/login", "application/json",
-			strings.NewReader(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-		if len(resp.Cookies()) == 0 {
-			t.Fatal("no cookies after login")
-		}
-		cookie = resp.Cookies()[0]
 
-		if resp.StatusCode != 200 {
-			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
-		}
+	t.Run("login", func(t *testing.T) {
+		cookie = login4t(t, cli, testServer, testUser)
 	})
 
-	// test create post
+	// test create 5 posts
 	t.Run("createPost", func(t *testing.T) {
-		body := struct {
-			Title      string   `json:"title"`
-			Content    string   `json:"content"`
-			Categories []string `json:"categories"`
-		}{
-			Title:      "Test Title",
-			Content:    "Test Content",
-			Categories: []string{"facts"},
-		}
-		requestBodyBytes, err := json.Marshal(body)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/create/",
-			bytes.NewReader(requestBodyBytes))
-		if err != nil {
-			t.Fatal(err)
-		}
-		req.AddCookie(cookie)
-
-		resp, err := cli.Do(req)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if resp.StatusCode != 200 {
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				log.Println(err)
+		for i := 1; i <= 5; i++ {
+			body := struct {
+				Title      string   `json:"title"`
+				Content    string   `json:"content"`
+				Categories []string `json:"categories"`
+			}{
+				Title:      fmt.Sprintf("Test Title %d", i),
+				Content:    fmt.Sprintf("Test Content %d", i),
+				Categories: []string{"facts"},
 			}
-			errorMessage := string(body)
-			t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
+			requestBodyBytes, err := json.Marshal(body)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/create/",
+				bytes.NewReader(requestBodyBytes))
+			if err != nil {
+				t.Fatal(err)
+			}
+			req.AddCookie(cookie)
+
+			resp, err := cli.Do(req)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if resp.StatusCode != 200 {
+				body, err := io.ReadAll(resp.Body)
+				if err != nil {
+					log.Println(err)
+				}
+				errorMessage := string(body)
+				t.Fatalf("expected %d, got %d, ErrBody: %v", 200, resp.StatusCode, errorMessage)
+			}
 		}
 	})
 
 	validTests := []struct {
+		name             string
 		url              string
 		body             []byte
 		expectedResponse string
 	}{
-		{"/api/posts/1/like", nil, "1"},
-		{"/api/posts/1/like", nil, "0"},
+		// before starting, we have already created 5 posts
+		// test getting all posts [this is a GET request]
+		// {"/api/posts return 5", "/api/posts", nil, "5"},
+		// TODO DISCUSS WITH TEAM: should we return all posts on Post request also or only on GET request?
+		// in the current implementation, we return all posts on GET request only
+		// when we make a POST request currently to fetch allPosts, we get a method not allowed error,
 
-		{"/api/posts/1/dislike", nil, "-1"},
-		{"/api/posts/1/dislike", nil, "0"},
+		// test liking post 1 and then unliking it by clicking again on the like button
+		{"/api/posts/1/like return 1", "/api/posts/1/like", nil, "1"},
+		{"/api/posts/1/like return 0", "/api/posts/1/like", nil, "0"},
 
-		{"/api/posts/1/comment", []byte(`{"content": "test"}`), "1"},
-		{"/api/posts/1/comment/1/like", nil, "1"},
-		{"/api/posts/1/comment/1/like", nil, "0"},
-		{"/api/posts/1/comment/1/dislike", nil, "-1"},
-		{"/api/posts/1/comment/1/dislike", nil, "0"},
-		{"/api/logout", nil, ""},
+		// TODO Need to discuss with team, how to test this, as post Date becomes an issue, right now returning empty array
+		// test liking posts 2 and 3
+		// {"/api/posts/2/like return 1", "/api/posts/2/like", nil, "1"},
+		// {"/api/posts/3/like return 1", "/api/posts/3/like", nil, "1"},
+
+		// test getting the posts liked by the user
+		{"/api/me/posts/liked return 0 POSTS", "/api/me/posts/liked", nil, "[]"},
+
+		// test disliking post 1 and then undisliking it by clicking again on the dislike button
+		{"/api/posts/1/dislike return -1", "/api/posts/1/dislike", nil, "-1"},
+		{"/api/posts/1/dislike return 0", "/api/posts/1/dislike", nil, "0"},
+
+		{"/api/posts/1/comment return 1", "/api/posts/1/comment", []byte(`{"content": "test"}`), "1"},
+		{"/api/posts/1/comment/1/like return 1", "/api/posts/1/comment/1/like", nil, "1"},
+		{"/api/posts/1/comment/1/like return 0", "/api/posts/1/comment/1/like", nil, "0"},
+		{"/api/posts/1/comment/1/dislike return -1", "/api/posts/1/comment/1/dislike", nil, "-1"},
+		{"/api/posts/1/comment/1/dislike return 0", "/api/posts/1/comment/1/dislike", nil, "0"},
+		{"/api/logout return empty string", "/api/logout", nil, ""},
 	}
 
 	for _, test := range validTests {
@@ -131,6 +145,9 @@ func TestWithAuth(t *testing.T) {
 				t.Fatal(err)
 			}
 			if resp.StatusCode != 200 {
+				// print the full response
+				body, _ := io.ReadAll(resp.Body)
+				fmt.Println(string(body))
 				t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 			}
 
@@ -203,4 +220,22 @@ func BenchmarkWithAuth(b *testing.B) {
 			b.Errorf("cookie should be expired")
 		}
 	}
+}
+
+func login4t(t *testing.T, cli *http.Client, testServer *httptest.Server, testUser User4t) *http.Cookie {
+	body := fmt.Sprintf(`{ "login": "%v", "password": "%v" }`, testUser.Email, testUser.Password)
+	resp, err := cli.Post(testServer.URL+"/api/login", "application/json",
+		strings.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(resp.Cookies()) == 0 {
+		t.Fatal("no cookies after login")
+	}
+	cookie := resp.Cookies()[0]
+
+	if resp.StatusCode != 200 {
+		t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
+	}
+	return cookie
 }

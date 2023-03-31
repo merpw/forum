@@ -20,3 +20,10 @@ Inside the backend directory, run the following command in the terminal:
 cd ./server/test
 bash get_cover_report.sh
 ```
+
+This will generate a `coverage.html` file in the `cover_reports` directory.
+
+In case of OS type MacOS, Linux and Windows, the `coverage.html` file will be automatically opened in the browser.
+
+<span style="color:red">Note:</span>
+If you are using WSL on windows, you will need to manually open the `coverage.html` file in the browser.

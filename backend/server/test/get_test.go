@@ -62,6 +62,7 @@ func TestGet(t *testing.T) {
 		{"/api/me", http.StatusUnauthorized},
 		{"/api/me/posts", http.StatusUnauthorized},
 
+		{"/api/me/posts/liked", http.StatusMethodNotAllowed},
 		{"/api/posts/create", http.StatusMethodNotAllowed},
 		{"/api/posts/1/like", http.StatusMethodNotAllowed},
 		{"/api/posts/1/dislike", http.StatusMethodNotAllowed},
