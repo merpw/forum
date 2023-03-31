@@ -59,6 +59,7 @@ func TestWithAuth(t *testing.T) {
 			Email:    "valid@test.com",
 			Password: "1234", // invalid password: too short
 		},
+		{}, // empty user
 	}
 
 	t.Run("signup", func(t *testing.T) {
@@ -80,6 +81,19 @@ func TestWithAuth(t *testing.T) {
 	})
 
 	t.Run("invalidSignup", func(t *testing.T) {
+		invalidBody, err := json.Marshal("")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		invalidResp, err := cli.Post(testServer.URL+"/api/signup", "application/json", bytes.NewReader(invalidBody))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if invalidResp.StatusCode != 400 {
+			t.Fatalf("expected %d, got %d", 400, invalidResp.StatusCode)
+		}
 
 		for _, user := range invalidUsers {
 			body, err := json.Marshal(user)
