@@ -1,0 +1,23 @@
+name: Check formatting of backend code
+
+on:
+  push:
+    paths:
+      - "backend/**"
+
+jobs:
+  check-formatting:
+    name: Check formatting of backend code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v2
+
+      - name: Run gofmt
+        working-directory: backend
+        run: |
+          gofmt -l -s -w .
+          git diff --exit-code
