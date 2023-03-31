@@ -45,25 +45,25 @@ func TestWithAuth(t *testing.T) {
 			Password: "",
 		},
 		{
-			Name:     "userNameTooLongToHandle1337",
-			Email:    "invalidEmail1337",
-			Password: "invalidPassword1337",
+			Name:     "ThisUserNameIsWayTooLong",
+			Email:    "valid@test.com",
+			Password: "ValidPassword123",
 		},
 		{
-			Name:     "😂😂😂😂😂😂😂😂",
-			Email:    "😂😂😂😂😂😂😂😂😂😂😂",
-			Password: "1111111111111111111111111111111111111111111111111111111111111111111111111",
+			Name:     "ValidName",
+			Email:    "😂😂😂😂😂😂😂😂😂😂😂", // invalid email
+			Password: "ValidPassword123",
 		},
 		{
-			Name:     "😂😂😂😂😂😂😂😂",
-			Email:    "😂😂😂😂😂😂😂😂😂😂😂",
-			Password: "1234",
-		}, {},
+			Name:     "ValidName",
+			Email:    "valid@test.com",
+			Password: "1234", // invalid password: too short
+		},
 	}
 
 	t.Run("signup", func(t *testing.T) {
 		body, err := json.Marshal(validUser)
-		if err != nil || body == nil {
+		if err != nil {
 			t.Fatal(err)
 		}
 
@@ -77,6 +77,10 @@ func TestWithAuth(t *testing.T) {
 			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 		}
 
+	})
+
+	t.Run("invalidSignup", func(t *testing.T) {
+
 		for _, user := range invalidUsers {
 			body, err := json.Marshal(user)
 			if err != nil {
@@ -87,17 +91,12 @@ func TestWithAuth(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			// print the resp
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(resp.Body)
-			newStr := buf.String()
-			fmt.Println(newStr)
-
 			// bug found, if the user is already present, we give back 400 instead of 409
 			if resp.StatusCode != 400 {
-				t.Fatalf("expected %d, got %d", http.StatusBadRequest, http.StatusOK)
+				t.Fatalf("expected %d, got %d", http.StatusBadRequest, resp.StatusCode)
 			}
 		}
+
 	})
 
 	t.Run("login", func(t *testing.T) {
@@ -184,7 +183,7 @@ func TestWithAuth(t *testing.T) {
 	}
 
 	for _, test := range validTests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.url, func(t *testing.T) {
 			req, err := http.NewRequest(http.MethodPost, testServer.URL+test.url, bytes.NewReader(test.body))
 			if err != nil {
 				t.Fatal(err)
