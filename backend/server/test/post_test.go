@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"forum/server"
 	"io"
@@ -455,6 +456,48 @@ func BenchmarkWithAuth(b *testing.B) {
 			b.Errorf("cookie should be expired")
 		}
 	}
+}
+
+type invalidResponseWriter struct {
+	Code int
+}
+
+func TestSendObject(t *testing.T) {
+	t.Run("invalidJson", func(t *testing.T) {
+		// create a mock http.ResponseWriter
+		w := httptest.NewRecorder()
+
+		// create an object that cannot be serialized to JSON
+		object := make(chan int)
+
+		// call sendObject with the mock response writer and the invalid object
+		server.SendObject(w, object)
+
+		// check that the response code is 500
+		if w.Code != http.StatusInternalServerError {
+			t.Errorf("Expected response code 500, got %d", w.Code)
+		}
+	})
+
+	t.Run("writerError", func(t *testing.T) {
+		w := invalidResponseWriter{}
+		// call sendObject with the invalid writer and the valid object
+		server.SendObject(w, map[string]string{"message": "hello"})
+	})
+
+}
+
+// Used to implement the ResponseWriter interface.
+func (w invalidResponseWriter) Header() http.Header {
+	return make(http.Header)
+}
+
+func (w invalidResponseWriter) Write(bytes []byte) (int, error) {
+	return 0, errors.New("write error")
+}
+
+func (w invalidResponseWriter) WriteHeader(statusCode int) {
+
 }
 
 func dummyLogin(t *testing.T, cli *http.Client, testServer *httptest.Server, testUser TestUser) *http.Cookie {

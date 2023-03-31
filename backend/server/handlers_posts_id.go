@@ -39,7 +39,7 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		Categories:    post.Categories,
 	}
 
-	sendObject(w, safePost)
+	SendObject(w, safePost)
 }
 
 // postsIdLikeHandler likes a post in the database
@@ -73,13 +73,13 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 		srv.DB.AddPostReaction(postId, userId, 1)
 		srv.DB.UpdatePostLikesCount(postId, +1)
 
-		sendObject(w, +1)
+		SendObject(w, +1)
 
 	case 1: // if already liked, unlike
 		srv.DB.RemovePostReaction(postId, userId)
 		srv.DB.UpdatePostLikesCount(postId, -1)
 
-		sendObject(w, 0)
+		SendObject(w, 0)
 
 	case -1: // if disliked, remove dislike and add like
 		srv.DB.RemovePostReaction(postId, userId)
@@ -88,7 +88,7 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 		srv.DB.AddPostReaction(postId, userId, 1)
 		srv.DB.UpdatePostLikesCount(postId, +1)
 
-		sendObject(w, 1)
+		SendObject(w, 1)
 	}
 }
 
@@ -121,13 +121,13 @@ func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request)
 		srv.DB.AddPostReaction(postId, userId, -1)
 		srv.DB.UpdatePostDislikeCount(postId, +1)
 
-		sendObject(w, -1)
+		SendObject(w, -1)
 
 	case -1: // if already disliked, remove dislike
 		srv.DB.RemovePostReaction(postId, userId)
 		srv.DB.UpdatePostDislikeCount(postId, -1)
 
-		sendObject(w, 0)
+		SendObject(w, 0)
 
 	case 1: // if liked, remove like and add dislike
 		srv.DB.RemovePostReaction(postId, userId)
@@ -136,7 +136,7 @@ func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request)
 		srv.DB.AddPostReaction(postId, userId, -1)
 		srv.DB.UpdatePostDislikeCount(postId, +1)
 
-		sendObject(w, -1)
+		SendObject(w, -1)
 	}
 }
 

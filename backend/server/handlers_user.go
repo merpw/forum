@@ -35,7 +35,7 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 		Email:    user.Email,
 	}
 
-	sendObject(w, response)
+	SendObject(w, response)
 }
 
 // apiMePostsHandler returns the current user's posts to the current user if he is logged in.
@@ -72,7 +72,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	sendObject(w, response)
+	SendObject(w, response)
 }
 
 // # api Me(logged in user) Posts Liked Handler
@@ -113,7 +113,7 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 		})
 	}
 
-	sendObject(w, response)
+	SendObject(w, response)
 }
 
 // apiMePostsHandler Returns the info of the user with the given id. The requester does not need to be logged in.
@@ -135,7 +135,7 @@ func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sendObject(w, SafeUser{Id: user.Id, Name: user.Name})
+	SendObject(w, SafeUser{Id: user.Id, Name: user.Name})
 }
 
 // apiMePostsHandler Returns the posts of the user with the given id. The requester does not need to be logged in.
@@ -176,5 +176,5 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 		})
 	}
 
-	sendObject(w, response)
+	SendObject(w, response)
 }

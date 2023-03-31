@@ -63,7 +63,7 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, strings.Join(requestBody.Categories, ","))
-	sendObject(w, id)
+	SendObject(w, id)
 }
 
 func isPresent(slice []string, item string) bool {
