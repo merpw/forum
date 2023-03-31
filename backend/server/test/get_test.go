@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 )
 
 // TestGet tests all GET routes for valid status codes
@@ -64,6 +65,9 @@ func TestGet(t *testing.T) {
 		{"/api/cat/", 404},
 		{"/api/", 404},
 		{"/", 404},
+
+		{"/api/posts/0/comments", http.StatusNotFound},
+		{"/api/posts/1/comment/1/reaction", http.StatusUnauthorized},
 
 		{"/api/me", http.StatusUnauthorized},
 		{"/api/me/posts", http.StatusUnauthorized},
@@ -189,5 +193,34 @@ func TestQueries(t *testing.T) {
 		if comments[i] != expectedComments[i] {
 			t.Errorf("Expected comment %+v, but got %+v", expectedComments[i], comments[i])
 		}
+	}
+}
+
+func TestRemoveExpiredSessions(t *testing.T) {
+	// Open a test database
+	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create some expired sessions
+	expireTime := time.Now().Add(-time.Hour).Unix()
+	_, err = db.Exec("INSERT INTO sessions (token, expire, user_id) VALUES (?, ?, ?)", "expired_token_1", expireTime, 1)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a database instance and call the RemoveExpiredSessions function
+	testDB := server.Connect(db)
+	testDB.DB.RemoveExpiredSessions()
+
+	// Check that the expired sessions have been removed from the database
+	var count int
+	err = db.QueryRow("SELECT COUNT(*) FROM sessions WHERE token IN (?)", "expired_token_1").Scan(&count)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Errorf("Expected 0 sessions with expired tokens, but found %d", count)
 	}
 }

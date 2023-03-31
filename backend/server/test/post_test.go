@@ -266,6 +266,7 @@ func TestWithAuth(t *testing.T) {
 		}
 	})
 
+	// TODO: DOCUMENTATION
 	t.Run("createInvalidPost", func(t *testing.T) {
 		// Tests invalid body
 		requestBodyBytes, err := json.Marshal("")
@@ -496,9 +497,7 @@ func (w invalidResponseWriter) Write(bytes []byte) (int, error) {
 	return 0, errors.New("write error")
 }
 
-func (w invalidResponseWriter) WriteHeader(statusCode int) {
-
-}
+func (w invalidResponseWriter) WriteHeader(statusCode int) {}
 
 func dummyLogin(t *testing.T, cli *http.Client, testServer *httptest.Server, testUser TestUser) *http.Cookie {
 	body := fmt.Sprintf(`{ "login": "%v", "password": "%v" }`, testUser.Email, testUser.Password)
