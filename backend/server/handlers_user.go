@@ -19,7 +19,7 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 //
 //	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -42,7 +42,7 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 //
 //	GET /api/me/posts
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -83,7 +83,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 //
 // Route: /api/me/posts/liked
 func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return

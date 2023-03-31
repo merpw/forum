@@ -8,7 +8,7 @@ import (
 
 // postsCreateHandler creates a new post in the database
 func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return

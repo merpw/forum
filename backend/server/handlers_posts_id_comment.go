@@ -10,7 +10,7 @@ import (
 // postsIdCommentIdLikeHandler likes a comment on a post in the database
 func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -57,7 +57,7 @@ func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Re
 
 // postsIdCommentIdDislikeHandler dislikes a comment on a post in the database
 func (srv *Server) postsIdCommentIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -101,7 +101,7 @@ func (srv *Server) postsIdCommentIdDislikeHandler(w http.ResponseWriter, r *http
 }
 
 func (srv *Server) postsIdCommentIdReactionHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -130,7 +130,7 @@ func (srv *Server) postsIdCommentIdReactionHandler(w http.ResponseWriter, r *htt
 
 // postsIdCommentCreateHandler Add comments on a post in the database
 func (srv *Server) postsIdCommentCreateHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return

@@ -45,7 +45,7 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 // postsIdLikeHandler likes a post in the database
 func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -94,7 +94,7 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 
 // postsPostsIdDislikeHandler dislikes a post in the database
 func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+	userId := srv.GetUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
