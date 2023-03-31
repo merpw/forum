@@ -40,6 +40,11 @@ func TestWithAuth(t *testing.T) {
 	// Slice of invalid users. It will cover most nonDB test cases.
 	invalidUsers := []TestUser{
 		{
+			Name:     "test1",
+			Email:    "test@test.com", // email already in use
+			Password: "SuperAmazingPassword()!@*#)(!@#",
+		},
+		{
 			Name:     "",
 			Email:    "",
 			Password: "",
