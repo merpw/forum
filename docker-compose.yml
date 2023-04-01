@@ -3,11 +3,15 @@ services:
   backend:
     build:
       context: backend
+    volumes:
+      - db:/app/db
   frontend:
-    environment:
-      - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
     build:
       context: frontend
+    volumes:
+      - pages:/app/.next/server/pages
+    environment:
+      - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
     depends_on:
       - backend
   nginx:
@@ -19,3 +23,6 @@ services:
     depends_on:
       - backend
       - frontend
+volumes:
+  db:
+  pages:

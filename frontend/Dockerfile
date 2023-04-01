@@ -41,4 +41,6 @@ EXPOSE 3000
 
 ENV PORT 3000
 
+VOLUME /app/.next/server/pages
+
 CMD node server.js

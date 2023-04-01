@@ -23,6 +23,8 @@ COPY --from=builder /bin/ /bin/
 
 WORKDIR /app/
 
-CMD /bin/server
+VOLUME /app/db
+
+CMD server --db /app/db/database.db
 
 EXPOSE 8080
