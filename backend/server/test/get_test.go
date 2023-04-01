@@ -1,7 +1,9 @@
 package server
 
 import (
+	"bytes"
 	"database/sql"
+	"encoding/json"
 	"forum/database"
 	"forum/server"
 	"net/http"
@@ -140,6 +142,20 @@ func TestGet(t *testing.T) {
 
 	})
 
+	// t.Run("LastInsertId", func(t *testing.T) {
+	// 	// Execute an INSERT statement that fails due to a unique key violation
+	// 	result, err := db.Exec("INSERT INTO users (id, name) VALUES (?, ?)", 1, "Alice")
+	// 	if err != nil {
+	// 		log.Fatal(err)
+	// 	}
+
+	// 	// Try to get the last inserted ID, which will fail due to the error in the previous statement
+	// 	_, err = result.LastInsertId()
+	// 	if err != nil {
+	// 		log.Println("Error in LastInsertId:", err)
+	// 	}
+	// })
+
 }
 
 func TestQueries(t *testing.T) {
@@ -150,7 +166,8 @@ func TestQueries(t *testing.T) {
 	}
 	defer db.Close()
 
-	_, err = db.Exec(`
+	t.Run("GetPostComments", func(t *testing.T) {
+		_, err = db.Exec(`
         CREATE TABLE posts (
             id INTEGER PRIMARY KEY,
             title TEXT,
@@ -172,28 +189,30 @@ func TestQueries(t *testing.T) {
             (2, 1, 2, 'Thanks for sharing!', '2023-03-31', 5, 2),
             (3, 1, 3, 'I have a question...', '2023-04-01', 2, 3);
     `)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Call GetPostComments() with the ID of the test post
-	dbInstance := database.DB{DB: db}
-	comments := dbInstance.GetPostComments(1)
-
-	// Verify that the returned comments match the expected values
-	expectedComments := []database.Comment{
-		{Id: 1, PostId: 1, AuthorId: 1, Content: "Nice post!", Date: "2023-03-30", LikesCount: 10, DislikesCount: 0},
-		{Id: 2, PostId: 1, AuthorId: 2, Content: "Thanks for sharing!", Date: "2023-03-31", LikesCount: 5, DislikesCount: 2},
-		{Id: 3, PostId: 1, AuthorId: 3, Content: "I have a question...", Date: "2023-04-01", LikesCount: 2, DislikesCount: 3},
-	}
-	if len(comments) != len(expectedComments) {
-		t.Fatalf("Expected %d comments, but got %d", len(expectedComments), len(comments))
-	}
-	for i := range expectedComments {
-		if comments[i] != expectedComments[i] {
-			t.Errorf("Expected comment %+v, but got %+v", expectedComments[i], comments[i])
+		if err != nil {
+			t.Fatal(err)
 		}
-	}
+
+		// Call GetPostComments() with the ID of the test post
+		dbInstance := database.DB{DB: db}
+		comments := dbInstance.GetPostComments(1)
+
+		// Verify that the returned comments match the expected values
+		expectedComments := []database.Comment{
+			{Id: 1, PostId: 1, AuthorId: 1, Content: "Nice post!", Date: "2023-03-30", LikesCount: 10, DislikesCount: 0},
+			{Id: 2, PostId: 1, AuthorId: 2, Content: "Thanks for sharing!", Date: "2023-03-31", LikesCount: 5, DislikesCount: 2},
+			{Id: 3, PostId: 1, AuthorId: 3, Content: "I have a question...", Date: "2023-04-01", LikesCount: 2, DislikesCount: 3},
+		}
+		if len(comments) != len(expectedComments) {
+			t.Fatalf("Expected %d comments, but got %d", len(expectedComments), len(comments))
+		}
+		for i := range expectedComments {
+			if comments[i] != expectedComments[i] {
+				t.Errorf("Expected comment %+v, but got %+v", expectedComments[i], comments[i])
+			}
+		}
+	})
+
 }
 
 func TestRemoveExpiredSessions(t *testing.T) {
@@ -222,5 +241,49 @@ func TestRemoveExpiredSessions(t *testing.T) {
 	}
 	if count != 0 {
 		t.Errorf("Expected 0 sessions with expired tokens, but found %d", count)
+	}
+}
+
+func TestLoginHandler_InvalidLogin(t *testing.T) {
+	// Create a new server instance and open the database connection
+	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
+	if err != nil {
+		t.Fatal(err)
+	}
+	srv := server.Connect(db)
+	err = srv.DB.InitDatabase()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a request body with a non-existing login
+	requestBody := map[string]string{
+		"login":    "non_existing_user",
+		"password": "some_password",
+	}
+	jsonBody, err := json.Marshal(requestBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new HTTP request with the JSON payload
+	req, err := http.NewRequest("POST", "/login", bytes.NewBuffer(jsonBody))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create an HTTP recorder to record the response
+	recorder := httptest.NewRecorder()
+
+	// Call the LoginHandler with the request and recorder
+	srv.LoginHandler(recorder, req)
+
+	// Check the response status code and body
+	if recorder.Code != http.StatusBadRequest {
+		t.Errorf("LoginHandler returned wrong status code: got %v, want %v", recorder.Code, http.StatusBadRequest)
+	}
+	expectedResponse := "Invalid login or password\n"
+	if recorder.Body.String() != expectedResponse {
+		t.Errorf("LoginHandler returned wrong response body: got %v, want %v", recorder.Body.String(), expectedResponse)
 	}
 }
