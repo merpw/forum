@@ -3,8 +3,9 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/mattn/go-sqlite3"
 	"log"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type DB struct {
@@ -128,7 +129,7 @@ func (db DB) InitTable(table string, columns []Column, additional ...string) err
 
 	if len(oldColumns) == 0 {
 		var q string
-		for _, column := range append(columns) {
+		for _, column := range columns {
 			q += column.Name + " " + column.Type
 			if column.PrimaryKey {
 				q += " PRIMARY KEY"
@@ -155,22 +156,27 @@ func (db DB) InitTable(table string, columns []Column, additional ...string) err
 	}
 
 	if len(oldColumns) > len(columns) {
-		return fmt.Errorf("old database has more columns than expected in table '%s', got %d, expected %d", table, len(oldColumns), len(columns))
+		return fmt.Errorf("old database has more columns than expected in table '%s', got %d, expected %d",
+			table, len(oldColumns), len(columns))
 	}
 
 	// check existing columns
 	for i, column := range oldColumns {
 		if column.Name != columns[i].Name {
-			return fmt.Errorf("old column #%d in %s has name %s, but should be %s", i, table, column.Name, columns[i].Name)
+			return fmt.Errorf("old column #%d in %s has name %s, but should be %s",
+				i, table, column.Name, columns[i].Name)
 		}
 		if column.Type != columns[i].Type {
-			return fmt.Errorf("old column %s in %s has type %s, but should be %s", column.Name, table, column.Type, columns[i].Type)
+			return fmt.Errorf("old column %s in %s has type %s, but should be %s",
+				column.Name, table, column.Type, columns[i].Type)
 		}
 		if column.PrimaryKey != columns[i].PrimaryKey {
-			return fmt.Errorf("old column %s in %s has PrimaryKey %v, but should be %v", column.Name, table, column.PrimaryKey, columns[i].PrimaryKey)
+			return fmt.Errorf("old column %s in %s has PrimaryKey %v, but should be %v",
+				column.Name, table, column.PrimaryKey, columns[i].PrimaryKey)
 		}
 		if column.NotNull != columns[i].NotNull {
-			return fmt.Errorf("old column %s in %s has NotNull %v, but should be %v", column.Name, table, column.NotNull, columns[i].NotNull)
+			return fmt.Errorf("old column %s in %s has NotNull %v, but should be %v",
+				column.Name, table, column.NotNull, columns[i].NotNull)
 		}
 	}
 

@@ -1,4 +1,4 @@
-package server
+package server_test
 
 import (
 	"database/sql"
@@ -14,8 +14,6 @@ var testServer *httptest.Server
 // TestMain is the entry point for all tests
 func TestMain(m *testing.M) {
 	testServer = startServer()
-	defer testServer.Close()
-
 	os.Exit(m.Run())
 }
 

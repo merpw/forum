@@ -1,0 +1,22 @@
+# https://golangci-lint.run/usage/configuration/
+
+linters:
+  enable:
+    - gofmt
+    - lll # line length
+    - dupl # tool for code clone detection
+    - cyclop # checks that functions do not have too many statements
+    - gosec # checks for security issues
+    - goimports # checks that imports are organized
+    - gocritic # checks for code style
+    - goconst # finds repeated strings that could be replaced by a constant
+    - testpackage # checks that tests are in a separate package
+    - predeclared # checks that predeclared identifiers are not shadowed
+    - usestdlibvars # checks that standard library functions are used instead of redeclared ones
+
+linters-settings:
+  cyclop:
+    # The maximal code complexity to report.
+    # Default: 10
+    max-complexity: 30
+    package-average: 10.0

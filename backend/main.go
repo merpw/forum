@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -35,7 +36,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = http.Serve(listen, srv.Start())
+	httpServer := http.Server{
+		Handler:           srv.Start(),
+		ReadHeaderTimeout: 3 * time.Second,
+	}
+
+	err = httpServer.Serve(listen)
 	if err != nil {
 		log.Fatal(err)
 	}
