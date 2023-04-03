@@ -56,12 +56,11 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := make([]Response, 0)
 	for _, post := range posts {
-		cutPostContentForLists(&post)
 		response = append(response, Response{
 			SafePost: SafePost{
 				Id:            post.Id,
 				Title:         post.Title,
-				Content:       post.Content,
+				Content:       shortenContent(post.Content),
 				Author:        SafeUser{Id: user.Id, Name: user.Name},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
@@ -93,13 +92,12 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 
 	response := make([]Response, 0)
 	for _, post := range posts {
-		cutPostContentForLists(&post)
 		author := srv.DB.GetUserById(post.AuthorId)
 		response = append(response, Response{
 			SafePost: SafePost{
 				Id:            post.Id,
 				Title:         post.Title,
-				Content:       post.Content,
+				Content:       shortenContent(post.Content),
 				Author:        SafeUser{Id: author.Id, Name: author.Name},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
@@ -159,11 +157,10 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {
-		cutPostContentForLists(&post)
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,
-			Content:       post.Content,
+			Content:       shortenContent(post.Content),
 			Author:        SafeUser{user.Id, user.Name},
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,
