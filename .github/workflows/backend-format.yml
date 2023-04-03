@@ -16,8 +16,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v2
 
-      - name: Run gofmt
-        working-directory: backend
-        run: |
-          gofmt -l -s -w .
-          git diff --exit-code
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          working-directory: backend

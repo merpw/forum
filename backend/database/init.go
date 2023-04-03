@@ -128,7 +128,7 @@ func (db DB) InitTable(table string, columns []Column, additional ...string) err
 
 	if len(oldColumns) == 0 {
 		var q string
-		for _, column := range append(columns) {
+		for _, column := range columns {
 			q += column.Name + " " + column.Type
 			if column.PrimaryKey {
 				q += " PRIMARY KEY"
