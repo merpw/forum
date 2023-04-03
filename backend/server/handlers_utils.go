@@ -46,19 +46,17 @@ func errorResponse(w http.ResponseWriter, code int) {
 
 // sendObject sends object to http.ResponseWriter
 //
-// calls errorResponse(500) if error happened
+// panics if error occurs
 func sendObject(w http.ResponseWriter, object any) {
 	w.Header().Set("Content-Type", "application/json")
 	objJson, err := json.Marshal(object)
 	if err != nil {
-		log.Println(err)
-		errorResponse(w, 500)
+		log.Panic(err)
 		return
 	}
 	_, err = w.Write(objJson)
 	if err != nil {
-		log.Println(err)
-		errorResponse(w, 500)
+		log.Panic(err)
 		return
 	}
 }

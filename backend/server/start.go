@@ -43,7 +43,6 @@ func (srv *Server) Start() http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
-			// TODO uncomment in production
 			if err := recover(); err != nil {
 				log.Printf("ERROR %d. %v\n", http.StatusInternalServerError, err)
 				errorResponse(w, http.StatusInternalServerError) // 500 ERROR
