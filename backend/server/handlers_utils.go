@@ -45,10 +45,10 @@ func errorResponse(w http.ResponseWriter, code int) {
 	http.Error(w, fmt.Sprintf("%v %v", code, http.StatusText(code)), code)
 }
 
-// SendObject sends object to http.ResponseWriter
+// sendObject sends object to http.ResponseWriter
 //
 // calls errorResponse(500) if error happened
-func SendObject(w http.ResponseWriter, object any) {
+func sendObject(w http.ResponseWriter, object any) {
 	w.Header().Set("Content-Type", "application/json")
 	objJson, err := json.Marshal(object)
 	if err != nil {

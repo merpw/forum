@@ -8,7 +8,7 @@ import (
 
 // postsCreateHandler creates a new post in the database
 func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.GetUserId(w, r)
+	userId := srv.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -63,7 +63,7 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, strings.Join(requestBody.Categories, ","))
-	SendObject(w, id)
+	sendObject(w, id)
 }
 
 func isPresent(slice []string, item string) bool {

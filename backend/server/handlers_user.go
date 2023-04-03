@@ -19,7 +19,7 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 //
 //	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.GetUserId(w, r)
+	userId := srv.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -35,14 +35,14 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 		Email:    user.Email,
 	}
 
-	SendObject(w, response)
+	sendObject(w, response)
 }
 
 // apiMePostsHandler returns the current user's posts to the current user if he is logged in.
 //
 //	GET /api/me/posts
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.GetUserId(w, r)
+	userId := srv.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -72,7 +72,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	SendObject(w, response)
+	sendObject(w, response)
 }
 
 // # api Me(logged in user) Posts Liked Handler
@@ -83,7 +83,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 //
 // Route: /api/me/posts/liked
 func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.GetUserId(w, r)
+	userId := srv.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -113,7 +113,7 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 		})
 	}
 
-	SendObject(w, response)
+	sendObject(w, response)
 }
 
 // apiMePostsHandler Returns the info of the user with the given id. The requester does not need to be logged in.
@@ -135,7 +135,7 @@ func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	SendObject(w, SafeUser{Id: user.Id, Name: user.Name})
+	sendObject(w, SafeUser{Id: user.Id, Name: user.Name})
 }
 
 // apiMePostsHandler Returns the posts of the user with the given id. The requester does not need to be logged in.
@@ -176,5 +176,5 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 		})
 	}
 
-	SendObject(w, response)
+	sendObject(w, response)
 }

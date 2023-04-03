@@ -11,8 +11,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (srv *Server) SignupHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.GetUserId(w, r) != -1 {
+func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
+	if srv.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -75,8 +75,8 @@ func (srv *Server) SignupHandler(w http.ResponseWriter, r *http.Request) {
 	srv.DB.AddUser(requestBody.Name, requestBody.Email, string(encryptedPassword))
 }
 
-func (srv *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.GetUserId(w, r) != -1 {
+func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
+	if srv.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -119,7 +119,7 @@ func (srv *Server) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (srv *Server) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
 		errorResponse(w, http.StatusUnauthorized)
@@ -135,7 +135,7 @@ func (srv *Server) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (srv *Server) GetUserId(w http.ResponseWriter, r *http.Request) int {
+func (srv *Server) getUserId(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
 		return -1

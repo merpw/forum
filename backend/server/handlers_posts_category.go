@@ -7,7 +7,7 @@ import (
 
 // postsCategoriesHandler returns a json list of all categories from the database
 func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, _ *http.Request) {
-	SendObject(w, categories)
+	sendObject(w, categories)
 }
 
 func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Request) {
@@ -49,5 +49,5 @@ func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Req
 		})
 	}
 
-	SendObject(w, response)
+	sendObject(w, response)
 }

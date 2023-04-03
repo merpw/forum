@@ -37,9 +37,9 @@ func (srv *Server) Start() http.Handler {
 	router.HandleFunc("/api/me/posts", srv.apiMePostsHandler)
 	router.HandleFunc("/api/me/posts/liked", srv.apiMePostsLikedHandler)
 
-	router.HandleFunc("/api/login", srv.LoginHandler)
-	router.HandleFunc("/api/signup", srv.SignupHandler)
-	router.HandleFunc("/api/logout", srv.LogoutHandler)
+	router.HandleFunc("/api/login", srv.loginHandler)
+	router.HandleFunc("/api/signup", srv.signupHandler)
+	router.HandleFunc("/api/logout", srv.logoutHandler)
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {

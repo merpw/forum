@@ -74,5 +74,5 @@ func (srv *Server) postsHandler(w http.ResponseWriter, _ *http.Request) {
 		})
 	}
 
-	SendObject(w, response)
+	sendObject(w, response)
 }
