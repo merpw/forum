@@ -1,5 +1,5 @@
 import axios from "axios"
-import { User } from "../../custom"
+import { User } from "@/custom"
 
 export const getUserLocal = (id: number) =>
   process.env.FORUM_BACKEND_PRIVATE_URL

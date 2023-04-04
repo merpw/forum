@@ -1,19 +1,15 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import { Post } from "../../custom"
+import { Post } from "@/custom"
 
 import Link from "next/link"
 import { FC, useEffect, useState } from "react"
 import Head from "next/head"
 import moment from "moment"
-import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "../../api/posts/fetch"
-import { useMe } from "../../api/auth"
-import { CreateComment, useComments } from "../../api/posts/comment"
-import { FormError } from "../../components/error"
-import {
-  Category,
-  ReactionsButtons,
-  ReactionsCommentButtons,
-} from "../../components/posts/reactions"
+import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
+import { useMe } from "@/api/auth"
+import { CreateComment, useComments } from "@/api/posts/comment"
+import { FormError } from "@/components/error"
+import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
 import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
 

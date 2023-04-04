@@ -3,8 +3,8 @@ import { NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { logIn, SignUp, useMe } from "../api/auth"
-import { FormError } from "../components/error"
+import { SignUp, logIn, useMe } from "@/api/auth"
+import { FormError } from "@/components/error"
 
 const SignupPage: NextPage = () => {
   const router = useRouter()

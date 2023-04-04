@@ -1,7 +1,6 @@
-import moment from "moment"
 import Link from "next/link"
 import { FC } from "react"
-import { Post } from "../../custom"
+import { Post } from "@/custom"
 import { Category, CommentsCount, ReactionsButtons } from "./reactions"
 
 export const PostList: FC<{ posts: Post[] }> = ({ posts }) => {

@@ -1,4 +1,4 @@
-import { Comment, Post } from "../../custom"
+import { Comment, Post } from "@/custom"
 import axios from "axios"
 
 export const getPostsLocal = (): Promise<Post[]> =>

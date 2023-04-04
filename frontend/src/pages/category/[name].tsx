@@ -1,8 +1,8 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import Head from "next/head"
-import { getCategoriesLocal, getCategoryPostsLocal } from "../../api/posts/fetch"
-import { PostList } from "../../components/posts/list"
-import { Post } from "../../custom"
+import { getCategoriesLocal, getCategoryPostsLocal } from "@/api/posts/fetch"
+import { PostList } from "@/components/posts/list"
+import { Post } from "@/custom"
 
 const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
   category_name,

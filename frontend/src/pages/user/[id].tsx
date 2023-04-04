@@ -2,12 +2,12 @@ import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { Post, User } from "../../custom"
+import { Post, User } from "@/custom"
 
-import { getUserLocal } from "../../api/users/fetch"
-import { useMe } from "../../api/auth"
-import { getUserPostsLocal } from "../../api/posts/fetch"
-import { PostList } from "../../components/posts/list"
+import { getUserLocal } from "@/api/users/fetch"
+import { useMe } from "@/api/auth"
+import { getUserPostsLocal } from "@/api/posts/fetch"
+import { PostList } from "@/components/posts/list"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   const router = useRouter()
