@@ -86,7 +86,18 @@ const UserInfo = () => {
         <span className={"text-3xl font-normal"}>{user?.name}</span>
       </h1>
       <p>
-        {"Your email is "} <span className={"text-2xl"}> {user?.email} </span>
+        {"Full name: "} 
+        <span className={"text-2xl"}> {user?.first_name + " "} </span>
+        <span className={"text-2xl"}> {user?.last_name} </span>
+      </p>
+      <p>
+        {"Age: "} <span className={"text-2xl"}> {user?.age} </span>
+      </p>
+      <p>
+        {"Gender: "} <span className={"text-2xl"}> {user?.gender} </span>
+      </p>
+      <p>
+        {"Email: "} <span className={"text-2xl"}> {user?.email} </span>
       </p>
       <hr className={"my-5"} />
     </>
