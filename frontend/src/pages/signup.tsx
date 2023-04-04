@@ -15,6 +15,10 @@ const SignupPage: NextPage = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [passwordConfirm, setPasswordConfirm] = useState("")
+  const [first_name, setFirstName] = useState("")
+  const [last_name, setLastName] = useState("")
+  const [age, setAge] = useState("")
+  const [gender, setGender] = useState("")
 
   const [isSame, setIsSame] = useState(false)
 
@@ -30,7 +34,7 @@ const SignupPage: NextPage = () => {
 
   useEffect(() => {
     setIsSame(false)
-  }, [name, email, password, passwordConfirm])
+  }, [name, email, password, passwordConfirm, first_name, last_name, age, gender])
 
   return (
     <>
@@ -53,7 +57,7 @@ const SignupPage: NextPage = () => {
             return
           }
 
-          SignUp(name, email, password)
+          SignUp(name, email, password, first_name, last_name, age, gender)
             .then((response) => {
               if (response.status == 200) {
                 logIn(email, password).then(() => mutate())
@@ -86,6 +90,81 @@ const SignupPage: NextPage = () => {
             required
           />
         </div>
+
+        <div className={"mb-6"}>
+          <label
+            htmlFor={"first_name"}
+            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
+          >
+            First Name
+          </label>
+          <input
+            type={"text"}
+            id={"first_name"}
+            className={
+              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            }
+            onInput={(e) => setFirstName(e.currentTarget.value)}
+            placeholder={"First Name"}
+            
+          />
+        </div>
+        <div className={"mb-6"}>
+          <label
+            htmlFor={"last_name"}
+            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
+          >
+            Last Name
+          </label>
+          <input
+            type={"text"}
+            id={"last_name"}
+            className={
+              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            }
+            onInput={(e) => setLastName(e.currentTarget.value)}
+            placeholder={"Last Name"}
+            
+          />
+        </div>
+        <div className={"mb-6"}>
+          <label
+            htmlFor={"age"}
+            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
+          >
+            Age
+          </label>
+          <input
+            type={"number"}
+            min={0}
+            id={"age"}
+            className={
+              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            }
+            onInput={(e) => setAge(e.currentTarget.value)}
+            placeholder={"Age"}
+            
+          />
+        </div>
+        <div className={"mb-6"}>
+          <label
+            htmlFor={"gender"}
+            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
+          >
+            Gender
+          </label>
+          <input
+            type={"text"}
+            id={"gender"}
+            className={
+              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            }
+            onInput={(e) => setGender(e.currentTarget.value)}
+            placeholder={"Gender"}
+            
+          />
+        </div>
+
         <div className={"mb-6"}>
           <label
             htmlFor={"email"}
