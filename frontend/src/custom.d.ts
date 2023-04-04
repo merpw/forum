@@ -15,6 +15,10 @@ export type User = {
   name: string
   id: number
   email: string
+  first_name: string
+  last_name: string
+  age: string
+  gender: string
 }
 
 export type Comment = {
