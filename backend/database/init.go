@@ -23,6 +23,10 @@ func (db DB) InitDatabase() error {
 		{Name: "name", Type: "TEXT"},
 		{Name: "email", Type: "TEXT"},
 		{Name: "password", Type: "TEXT"},
+		{Name: "first_name", Type: "TEXT"},
+		{Name: "last_name", Type: "TEXT"},
+		{Name: "age", Type: "TEXT"},
+		{Name: "gender", Type: "TEXT"},
 	})
 	if err != nil {
 		return err

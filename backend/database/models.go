@@ -13,10 +13,14 @@ type Post struct {
 }
 
 type User struct {
-	Id       int
-	Name     string
-	Email    string
-	Password string
+	Id        int
+	Name      string
+	Email     string
+	Password  string
+	FirstName string
+	LastName  string
+	Age       string
+	Gender    string
 }
 
 type Comment struct {

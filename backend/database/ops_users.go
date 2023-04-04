@@ -17,7 +17,7 @@ func (db DB) GetUserById(id int) *User {
 	if !query.Next() {
 		return nil
 	}
-	err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+	err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.FirstName, &user.LastName, &user.Age, &user.Gender)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -39,7 +39,7 @@ func (db DB) GetUserByLogin(login string) *User {
 		return nil
 	}
 	var user User
-	err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password)
+	err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password, &user.FirstName, &user.LastName, &user.Age, &user.Gender)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -49,8 +49,8 @@ func (db DB) GetUserByLogin(login string) *User {
 }
 
 // AddUser adds user to database, returns id of new user
-func (db DB) AddUser(name, email, password string) int {
-	result, err := db.Exec(`INSERT INTO users (name, email, password) VALUES (?, ?, ?)`, name, email, password)
+func (db DB) AddUser(name, email, password, first_name, last_name, age, gender string) int {
+	result, err := db.Exec(`INSERT INTO users (name, email, password, first_name, last_name, age, gender) VALUES (?, ?, ?, ?, ?, ?, ?)`, name, email, password, first_name, last_name, age, gender)
 	if err != nil {
 		log.Panic(err)
 	}
