@@ -11,6 +11,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@next/bundle-analyzer": "^13.2.4",
     "axios": "^1.2.2",
     "framer-motion": "^8.0.1",
     "moment": "^2.29.4",

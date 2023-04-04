@@ -24,4 +24,8 @@ const nextConfig = {
 if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
   console.warn("WARNING: FORUM_BACKEND_PRIVATE_URL is not defined.")
 }
-module.exports = nextConfig
+
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+})
+module.exports = withBundleAnalyzer(nextConfig)
