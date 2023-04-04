@@ -1,10 +1,10 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import { Post } from "@/custom"
+import { Comment, Post } from "@/custom"
 
 import Link from "next/link"
 import { FC, useEffect, useState } from "react"
 import Head from "next/head"
-import moment from "moment"
+
 import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
 import { useMe } from "@/api/auth"
 import { CreateComment, useComments } from "@/api/posts/comment"
@@ -12,8 +12,11 @@ import { FormError } from "@/components/error"
 import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
 import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
+import useDates from "@/helpers/dates"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
+  const { localDate, relativeDate } = useDates(post.date)
+
   return (
     <SWRConfig value={fallback}>
       <Head>
@@ -36,12 +39,7 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
           <Category post={post} />
 
           <span className={"ml-auto"}>
-            <span
-              suppressHydrationWarning
-              title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}
-            >
-              {moment(post.date).fromNow()}
-            </span>
+            <span title={localDate}>{relativeDate}</span>
             {" by "}
             <span className={"text-xl hover:opacity-50"}>
               <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
@@ -131,34 +129,34 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
 const Comments: FC<{ post: Post }> = ({ post }) => {
   const { comments } = useComments(post.id)
-  if (comments == undefined || comments.length == 0) {
-    return <div>There are no comments yet, write one first!</div>
-  }
 
   return (
     <div className={"flex flex-col gap-3"}>
       {comments
-        .sort((a, b) => b.date.localeCompare(a.date))
+        ?.sort((a, b) => b.date.localeCompare(a.date))
         .map((comment, key) => (
-          <div className={"border rounded p-5"} key={key}>
-            <Link href={`/user/${comment.author.id}`}>
-              <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
-            </Link>
-            <p className={"whitespace-pre-line"}>{comment.content}</p>
-            <hr className={"mt-4 mb-2"}></hr>
-            <span className={"flex"}>
-              <ReactionsCommentButtons post={post} comment={comment} />
-
-              <span
-                suppressHydrationWarning
-                className={"ml-auto"}
-                title={moment(comment.date).local().format("DD.MM.YYYY HH:mm:ss")}
-              >
-                {moment(comment.date).fromNow()}
-              </span>
-            </span>
-          </div>
+          <CommentCard comment={comment} post={post} key={key} />
         ))}
+    </div>
+  )
+}
+
+const CommentCard: FC<{ comment: Comment; post: Post }> = ({ comment, post }) => {
+  const { localDate, relativeDate } = useDates(comment.date)
+  return (
+    <div className={"border rounded p-5"}>
+      <Link href={`/user/${comment.author.id}`}>
+        <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
+      </Link>
+      <p className={"whitespace-pre-line"}>{comment.content}</p>
+      <hr className={"mt-4 mb-2"}></hr>
+      <span className={"flex"}>
+        <ReactionsCommentButtons post={post} comment={comment} />
+
+        <span suppressHydrationWarning className={"ml-auto"} title={localDate}>
+          {relativeDate}
+        </span>
+      </span>
     </div>
   )
 }

@@ -1,19 +1,28 @@
 import Link from "next/link"
 import { FC } from "react"
+
 import { Post } from "@/custom"
 import { Category, CommentsCount, ReactionsButtons } from "./reactions"
+import useDates from "@/helpers/dates"
 
 export const PostList: FC<{ posts: Post[] }> = ({ posts }) => {
   if (posts.length == 0) {
     return <div>There are no posts yet...</div>
   }
-  return <div>{posts.map(PostCard)}</div>
+  return (
+    <div>
+      {posts.map((post, key) => (
+        <PostCard post={post} key={key} />
+      ))}
+    </div>
+  )
 }
 
-const PostCard = (post: Post, key: number) => {
+const PostCard: FC<{ post: Post }> = ({ post }) => {
+  const { localDate, relativeDate } = useDates(post.date)
+
   return (
     <div
-      key={key}
       className={
         "rounded-lg border opacity-90 hover:opacity-100 hover:shadow dark:shadow-white mb-4"
       }
@@ -34,13 +43,9 @@ const PostCard = (post: Post, key: number) => {
         <ReactionsButtons post={post} />
         <CommentsCount post={post} />
         <Category post={post} />
-
         <span className={"ml-auto"}>
-          <span
-            suppressHydrationWarning
-            title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}
-          >
-            {moment(post.date).fromNow()}
+          <span suppressHydrationWarning title={localDate}>
+            {relativeDate}
           </span>
           {" by "}
           <span className={"text-xl hover:opacity-50"}>
