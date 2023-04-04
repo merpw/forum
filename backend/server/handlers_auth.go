@@ -18,9 +18,13 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody := struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Name      string `json:"name"`
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Age       string `json:"age"`
+		Gender    string `json:"gender"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -68,7 +72,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Password is not valid", http.StatusBadRequest)
 		return
 	}
-	srv.DB.AddUser(requestBody.Name, requestBody.Email, string(encryptedPassword))
+	srv.DB.AddUser(requestBody.Name, requestBody.Email, string(encryptedPassword), requestBody.FirstName, requestBody.LastName, requestBody.Age, requestBody.Gender)
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {

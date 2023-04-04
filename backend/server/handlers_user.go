@@ -15,7 +15,7 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// apiMeHandler returns current user information (id, name, email) if the current user is logged in.
+// apiMeHandler returns current user information (id, name, email, first name, last name, age, gender) if the current user is logged in.
 //
 //	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,10 +29,18 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := struct {
 		SafeUser
-		Email string `json:"email"`
+		Email     string `json:"email"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Age       string `json:"age"`
+		Gender    string `json:"gender"`
 	}{
-		SafeUser: SafeUser{Id: user.Id, Name: user.Name},
-		Email:    user.Email,
+		SafeUser:  SafeUser{Id: user.Id, Name: user.Name},
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Age:       user.Age,
+		Gender:    user.Gender,
 	}
 
 	sendObject(w, response)
