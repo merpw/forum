@@ -17,7 +17,7 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 
 // apiMeHandler returns the currently logged in user's information.
 //
-// (id, name, email, first name, last name, day of birth, gender)
+// (id, name, email, first name, last name, date of birth, gender)
 //
 //	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
