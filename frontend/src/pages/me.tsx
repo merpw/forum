@@ -59,15 +59,17 @@ const UserPage: NextPage = () => {
 
       <ul className={"flex flex-wrap gap-2 text-2xl mb-3"}>
         {tabs.map(({ title }, key) => (
-          <li
-            key={key}
-            className={
-              "cursor-pointer hover:opacity-60 p-1 " +
-              (activeTab == key ? "border-b-2 border-b-blue-500" : "")
-            }
-            onClick={() => setActiveTab(key)}
-          >
-            {title}
+          <li key={key}>
+            <button
+              key={key}
+              className={
+                "cursor-pointer hover:opacity-60 p-1 " +
+                (activeTab == key ? "border-b-2 border-b-blue-500" : "")
+              }
+              onClick={() => setActiveTab(key)}
+            >
+              {title}
+            </button>
           </li>
         ))}
       </ul>
