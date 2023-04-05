@@ -86,7 +86,7 @@ const UserInfo = () => {
         <span className={"text-3xl font-normal"}>{user?.name}</span>
       </h1>
       <p>
-        {"Full name: "} 
+        {"Full name: "}
         <span className={"text-2xl"}> {user?.first_name + " "} </span>
         <span className={"text-2xl"}> {user?.last_name} </span>
       </p>

@@ -106,7 +106,6 @@ const SignupPage: NextPage = () => {
             }
             onInput={(e) => setFirstName(e.currentTarget.value)}
             placeholder={"First Name"}
-            
           />
         </div>
         <div className={"mb-6"}>
@@ -124,7 +123,6 @@ const SignupPage: NextPage = () => {
             }
             onInput={(e) => setLastName(e.currentTarget.value)}
             placeholder={"Last Name"}
-            
           />
         </div>
         <div className={"mb-6"}>
@@ -143,7 +141,6 @@ const SignupPage: NextPage = () => {
             }
             onInput={(e) => setAge(e.currentTarget.value)}
             placeholder={"Age"}
-            
           />
         </div>
         <div className={"mb-6"}>
@@ -161,7 +158,6 @@ const SignupPage: NextPage = () => {
             }
             onInput={(e) => setGender(e.currentTarget.value)}
             placeholder={"Gender"}
-            
           />
         </div>
 
