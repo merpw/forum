@@ -72,7 +72,14 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Password is not valid", http.StatusBadRequest)
 		return
 	}
-	srv.DB.AddUser(requestBody.Name, requestBody.Email, string(encryptedPassword), requestBody.FirstName, requestBody.LastName, requestBody.Age, requestBody.Gender)
+	srv.DB.AddUser(
+		requestBody.Name,
+		requestBody.Email,
+		string(encryptedPassword),
+		requestBody.FirstName,
+		requestBody.LastName,
+		requestBody.Age,
+		requestBody.Gender)
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {

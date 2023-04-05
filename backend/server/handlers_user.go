@@ -15,7 +15,9 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// apiMeHandler returns current user information (id, name, email, first name, last name, age, gender) if the current user is logged in.
+// apiMeHandler returns the currently logged in user's information.
+//
+// (id, name, email, first name, last name, age, gender)
 //
 //	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
@@ -46,7 +48,7 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
-// apiMePostsHandler returns the current user's posts to the current user if he is logged in.
+// apiMePostsHandler returns the posts of the currently logged in user.
 //
 //	GET /api/me/posts
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +84,8 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
-// apiMePostsLikedHandler returns the current user's liked posts to the current user if he is logged in.
+// apiMePostsLikedHandler
+// returns liked posts of the currently logged in user.
 //
 //	GET /api/me/posts/liked
 func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +144,8 @@ func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, SafeUser{Id: user.Id, Name: user.Name})
 }
 
-// apiMePostsHandler Returns the posts of the user with the given id. The requester does not need to be logged in.
+// apiMePostsHandler Returns the posts of the user with the given id.
+// The requester does not need to be logged in.
 //
 //	GET /api/user/:id/posts
 func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request) {
