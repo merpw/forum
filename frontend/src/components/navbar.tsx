@@ -1,5 +1,6 @@
 import { NextComponentType } from "next"
 import Link from "next/link"
+
 import { logOut, useMe } from "@/api/auth"
 
 // TODO: fix hydration error

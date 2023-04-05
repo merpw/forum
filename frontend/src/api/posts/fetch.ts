@@ -1,5 +1,6 @@
-import { Comment, Post } from "@/custom"
 import axios from "axios"
+
+import { Comment, Post } from "@/custom"
 
 export const getPostsLocal = (): Promise<Post[]> =>
   process.env.FORUM_BACKEND_PRIVATE_URL

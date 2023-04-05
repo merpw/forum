@@ -2,11 +2,12 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
+import { NextSeo } from "next-seo"
+
 import { useMe } from "@/api/auth"
 import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
-import { NextSeo } from "next-seo"
 
 /* TODO: add placeholders */
 

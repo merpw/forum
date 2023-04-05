@@ -1,8 +1,9 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
+import { NextSeo } from "next-seo"
+
 import { getCategoriesLocal, getCategoryPostsLocal } from "@/api/posts/fetch"
 import { PostList } from "@/components/posts/list"
 import { Post } from "@/custom"
-import { NextSeo } from "next-seo"
 
 const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
   category_name,

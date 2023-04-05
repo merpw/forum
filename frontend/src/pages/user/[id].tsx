@@ -1,13 +1,13 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { Post, User } from "@/custom"
+import { NextSeo } from "next-seo"
 
+import { Post, User } from "@/custom"
 import { getUserLocal } from "@/api/users/fetch"
 import { useMe } from "@/api/auth"
 import { getUserPostsLocal } from "@/api/posts/fetch"
 import { PostList } from "@/components/posts/list"
-import { NextSeo } from "next-seo"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   const router = useRouter()

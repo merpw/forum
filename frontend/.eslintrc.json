@@ -4,20 +4,35 @@
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
     "prettier",
-    "plugin:react/recommended"
+    "plugin:react/recommended",
+    "plugin:import/recommended"
   ],
   "ignorePatterns": ["*.js"],
   "rules": {
-    "react/react-in-jsx-scope": 0,
-    "react/prop-types": 0,
-    // TODO: Maybe remove
-    "no-unused-vars": 0,
+    "react/react-in-jsx-scope": "off",
+    // Next.js handles this
+
+    "react/prop-types": "off",
+    // TODO: props validation
+
+    "no-unused-vars": "warn",
     "react/jsx-curly-brace-presence": [
-      1,
+      "warn",
       {
         "props": "always",
         "children": "ignore"
       }
+    ],
+    "import/order": [
+      "error",
+      {
+        "newlines-between": "always"
+      }
     ]
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
   }
 }

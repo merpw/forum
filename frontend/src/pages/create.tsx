@@ -1,13 +1,13 @@
 import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
+import ReactTextAreaAutosize from "react-textarea-autosize"
+import { NextSeo } from "next-seo"
+
 import { useMe } from "@/api/auth"
 import { getCategories } from "@/api/posts/categories"
 import { CreatePost } from "@/api/posts/create"
 import { FormError } from "@/components/error"
-
-import ReactTextAreaAutosize from "react-textarea-autosize"
-import { NextSeo } from "next-seo"
 
 const CreatePostPage: NextPage = () => {
   const { isLoading, isLoggedIn } = useMe()

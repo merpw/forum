@@ -1,9 +1,10 @@
 import { GetStaticProps, NextPage } from "next"
+import Link from "next/link"
+import { NextSeo } from "next-seo"
+
 import { Post } from "@/custom"
 import { PostList } from "@/components/posts/list"
 import { getCategoriesLocal, getPostsLocal } from "@/api/posts/fetch"
-import Link from "next/link"
-import { NextSeo } from "next-seo"
 
 const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, categories }) => {
   return (

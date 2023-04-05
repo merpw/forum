@@ -1,5 +1,6 @@
 import axios from "axios"
 import useSWR from "swr"
+
 import { Comment } from "@/custom"
 export const CreateComment = (post_id: number, text: string) =>
   axios

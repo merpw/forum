@@ -1,8 +1,9 @@
 import Link from "next/link"
 import { FC } from "react"
 
-import { Post } from "@/custom"
 import { Category, CommentsCount, ReactionsButtons } from "./reactions"
+
+import { Post } from "@/custom"
 import useDates from "@/helpers/dates"
 
 export const PostList: FC<{ posts: Post[] }> = ({ posts }) => {

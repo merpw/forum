@@ -1,4 +1,5 @@
 import axios from "axios"
+
 import { User } from "@/custom"
 
 export const getUserLocal = (id: number) =>

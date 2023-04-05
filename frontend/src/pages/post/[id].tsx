@@ -1,18 +1,17 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import { Comment, Post } from "@/custom"
-
 import Link from "next/link"
 import { FC, useEffect, useState } from "react"
+import { SWRConfig, SWRConfiguration } from "swr"
+import ReactTextareaAutosize from "react-textarea-autosize"
+import { NextSeo } from "next-seo"
 
+import { Comment, Post } from "@/custom"
 import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
 import { useMe } from "@/api/auth"
 import { CreateComment, useComments } from "@/api/posts/comment"
 import { FormError } from "@/components/error"
 import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
-import { SWRConfig, SWRConfiguration } from "swr"
-import ReactTextareaAutosize from "react-textarea-autosize"
 import useDates from "@/helpers/dates"
-import { NextSeo } from "next-seo"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   const { localDate, relativeDate } = useDates(post.date)

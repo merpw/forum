@@ -1,5 +1,6 @@
 import axios from "axios"
 import useSWR from "swr"
+
 import { Post } from "@/custom"
 
 const getMyPosts = async () =>

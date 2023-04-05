@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default-member */ // https://github.com/iamkun/dayjs/issues/1242
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import relativeTime from "dayjs/plugin/relativeTime"

@@ -2,9 +2,10 @@ import { AxiosError } from "axios"
 import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
+import { NextSeo } from "next-seo"
+
 import { logIn, SignUp, useMe } from "@/api/auth"
 import { FormError } from "@/components/error"
-import { NextSeo } from "next-seo"
 
 const SignupPage: NextPage = () => {
   const router = useRouter()
