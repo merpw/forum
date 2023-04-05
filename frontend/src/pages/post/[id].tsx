@@ -9,15 +9,16 @@ import { useMe } from "@/api/auth"
 import { CreateComment, useComments } from "@/api/posts/comment"
 import { FormError } from "@/components/error"
 import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
-import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
+import { SWRConfig, SWRConfiguration } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
 import useDates from "@/helpers/dates"
 import { NextSeo } from "next-seo"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   const { localDate, relativeDate } = useDates(post.date)
+
   return (
-    <SWRConfig value={fallback}>
+    <SWRConfig value={{ fallback }}>
       <NextSeo title={post.title} description={post.content.slice(0, 200)} />
 
       <div className={"m-5"}>
@@ -50,7 +51,7 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
 }
 
 const CommentForm: FC<{ post: Post }> = ({ post }) => {
-  const { isLoggedIn } = useMe()
+  const { isLoggedIn, isLoading } = useMe()
   const { mutate: mutateComments } = useComments(post.id)
 
   const [text, setText] = useState("")
@@ -60,7 +61,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
   useEffect(() => setIsSame(false), [text])
 
-  if (!isLoggedIn) return null
+  if (!isLoggedIn && !isLoading) return null
 
   return (
     <form
@@ -101,6 +102,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
             "w-full bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
           }
           value={text}
+          rows={1}
           onInput={(e) => setText(e.currentTarget.value)}
           required
         />
@@ -125,11 +127,13 @@ const Comments: FC<{ post: Post }> = ({ post }) => {
 
   return (
     <div className={"flex flex-col gap-3"}>
-      {comments
-        ?.sort((a, b) => b.date.localeCompare(a.date))
-        .map((comment, key) => (
-          <CommentCard comment={comment} post={post} key={key} />
-        ))}
+      {comments && comments.length > 0 ? (
+        comments
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .map((comment, key) => <CommentCard comment={comment} post={post} key={key} />)
+      ) : (
+        <div>There are no comments yet...</div>
+      )}
     </div>
   )
 }
@@ -179,7 +183,7 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
         props: {
           post: post,
           fallback: {
-            [unstable_serialize(["api", "posts", post.id, "comments"])]: comments,
+            [`/api/posts/${post.id}/comments`]: comments,
           },
         },
         revalidate: 1,
