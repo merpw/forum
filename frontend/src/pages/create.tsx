@@ -1,5 +1,4 @@
 import { NextPage } from "next"
-import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { useMe } from "@/api/auth"
@@ -8,6 +7,7 @@ import { CreatePost } from "@/api/posts/create"
 import { FormError } from "@/components/error"
 
 import ReactTextAreaAutosize from "react-textarea-autosize"
+import { NextSeo } from "next-seo"
 
 const CreatePostPage: NextPage = () => {
   const { isLoading, isLoggedIn } = useMe()
@@ -23,9 +23,8 @@ const CreatePostPage: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Create new post - Forum</title>
-      </Head>
+      <NextSeo title={"Create new post"} />
+
       <CreatePostForm />
     </>
   )

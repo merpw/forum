@@ -16,6 +16,7 @@
     "dayjs": "^1.11.7",
     "framer-motion": "^8.0.1",
     "next": "13.0.3",
+    "next-seo": "^6.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-select": "^5.7.0",

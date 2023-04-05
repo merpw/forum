@@ -1,4 +1,3 @@
-import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
@@ -7,6 +6,7 @@ import { useMe } from "@/api/auth"
 import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
+import { NextSeo } from "next-seo"
 
 /* TODO: add placeholders */
 
@@ -31,9 +31,8 @@ const UserPage: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>{`Profile - Forum`}</title>
-      </Head>
+      <NextSeo title={"Profile"} />
+
       <UserInfo />
       <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1 max-w-fit"}>
         <span className={"my-auto"}>

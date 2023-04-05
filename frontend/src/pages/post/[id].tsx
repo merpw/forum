@@ -3,7 +3,6 @@ import { Comment, Post } from "@/custom"
 
 import Link from "next/link"
 import { FC, useEffect, useState } from "react"
-import Head from "next/head"
 
 import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
 import { useMe } from "@/api/auth"
@@ -13,20 +12,14 @@ import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/component
 import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
 import useDates from "@/helpers/dates"
+import { NextSeo } from "next-seo"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   const { localDate, relativeDate } = useDates(post.date)
-
   return (
     <SWRConfig value={fallback}>
-      <Head>
-        <title>{`${post.title} - Forum`}</title>
-        <meta property={"og:title"} content={`${post.title} - Forum`} />
+      <NextSeo title={post.title} description={post.content.slice(0, 200)} />
 
-        {/* TODO: change to description */}
-        <meta name={"description"} content={post.content.slice(0, 200)} />
-        <meta property={"og:description"} content={post.content.slice(0, 200)} />
-      </Head>
       <div className={"m-5"}>
         <div className={"mb-3"}>
           <h1 className={"text-3xl mb-2 "}>{post.title}</h1>

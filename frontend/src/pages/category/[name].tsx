@@ -1,8 +1,8 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import Head from "next/head"
 import { getCategoriesLocal, getCategoryPostsLocal } from "@/api/posts/fetch"
 import { PostList } from "@/components/posts/list"
 import { Post } from "@/custom"
+import { NextSeo } from "next-seo"
 
 const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
   category_name,
@@ -10,12 +10,7 @@ const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
 }) => {
   return (
     <>
-      <Head>
-        <title>{`${category_name} - Forum`}</title>
-        <meta name={"og:title"} content={`${category_name} - Forum`} />
-        <meta name={"description"} content={`Posts in ${category_name} category`} />
-        <meta name={"og:description"} content={`Posts in ${category_name} category`} />
-      </Head>
+      <NextSeo title={category_name} description={`Posts in ${category_name} category`} />
       <h1 className={"text-3xl font-light mb-5"}>
         <span className={"font-normal"}>{category_name}</span> category
       </h1>
