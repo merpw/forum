@@ -5,6 +5,7 @@ import { Post } from "../custom"
 import { PostList } from "../components/posts/list"
 import { getCategoriesLocal, getPostsLocal } from "../api/posts/fetch"
 import Link from "next/link"
+import { AxiosError } from "axios"
 
 const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, categories }) => {
   return (
@@ -35,12 +36,19 @@ export const getStaticProps: GetStaticProps<{ posts: Post[]; categories: string[
   if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
     return { notFound: true }
   }
-  const posts: Post[] = await getPostsLocal()
-  const categories = await getCategoriesLocal()
 
-  return {
-    props: { posts, categories },
-    revalidate: 1,
+  try {
+    const posts: Post[] = await getPostsLocal()
+    const categories = await getCategoriesLocal()
+    return {
+      props: { posts, categories },
+      revalidate: 1,
+    }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
+    return { notFound: true, revalidate: 1 }
   }
 }
 

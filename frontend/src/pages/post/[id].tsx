@@ -16,6 +16,7 @@ import {
 } from "../../components/posts/reactions"
 import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
+import { AxiosError } from "axios"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   return (
@@ -186,19 +187,24 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
   if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
     return { notFound: true }
   }
-  const post = await getPostLocal(+params.id)
-  const comments = await getPostCommentsLocal(+params.id)
+  try {
+    const post = await getPostLocal(+params.id)
+    const comments = await getPostCommentsLocal(+params.id)
 
-  return post
-    ? {
-        props: {
-          post: post,
-          fallback: {
-            [unstable_serialize(["api", "posts", post.id, "comments"])]: comments,
-          },
+    return {
+      props: {
+        post: post,
+        fallback: {
+          [unstable_serialize(["api", "posts", post.id, "comments"])]: comments,
         },
-        revalidate: 1,
-      }
-    : { notFound: true, revalidate: 1 }
+      },
+      revalidate: 1,
+    }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
+    return { notFound: true, revalidate: 1 }
+  }
 }
 export default PostPage

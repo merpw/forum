@@ -8,6 +8,7 @@ import { getUserLocal } from "../../api/users/fetch"
 import { useMe } from "../../api/auth"
 import { getUserPostsLocal } from "../../api/posts/fetch"
 import { PostList } from "../../components/posts/list"
+import { AxiosError } from "axios"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   const router = useRouter()
@@ -58,12 +59,16 @@ export const getStaticProps: GetStaticProps<
   if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
     return { notFound: true }
   }
-  const user = await getUserLocal(+params.id)
-  if (user == undefined) {
+  try {
+    const user = await getUserLocal(+params.id)
+    const posts = await getUserPostsLocal(user.id)
+
+    return { props: { user: user, posts: posts }, revalidate: 1 }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
     return { notFound: true, revalidate: 1 }
   }
-  const posts = await getUserPostsLocal(user.id)
-
-  return { props: { user: user, posts: posts }, revalidate: 1 }
 }
 export default UserPage

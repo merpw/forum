@@ -5,9 +5,7 @@ export const getPostsLocal = (): Promise<Post[]> =>
   axios(`${process.env.FORUM_BACKEND_PRIVATE_URL}/api/posts`).then((res) => res.data)
 
 export const getPostLocal = (id: number) =>
-  axios<Post | undefined>(`${process.env.FORUM_BACKEND_PRIVATE_URL}/api/posts/${id}`).then(
-    (res) => res.data
-  )
+  axios<Post>(`${process.env.FORUM_BACKEND_PRIVATE_URL}/api/posts/${id}`).then((res) => res.data)
 
 export const getPostCommentsLocal = (id: number) =>
   axios<Comment[]>(`${process.env.FORUM_BACKEND_PRIVATE_URL}/api/posts/${id}/comments`).then(
