@@ -8,8 +8,6 @@ services:
   frontend:
     build:
       context: frontend
-    volumes:
-      - pages:/app/.next/server/pages
     environment:
       - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
     depends_on:
