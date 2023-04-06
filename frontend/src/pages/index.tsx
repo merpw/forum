@@ -32,6 +32,9 @@ const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, catego
 }
 
 export const getStaticProps: GetStaticProps<{ posts: Post[]; categories: string[] }> = async () => {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
+    return { notFound: true }
+  }
   const posts: Post[] = await getPostsLocal()
   const categories = await getCategoriesLocal()
 

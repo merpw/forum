@@ -168,20 +168,22 @@ const Comments: FC<{ post: Post }> = ({ post }) => {
 }
 
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
+    return { paths: [], fallback: "blocking" }
+  }
   const posts = await getPostsLocal()
   return {
     paths: posts.map((post) => {
       return { params: { id: post.id.toString() } }
     }),
-    // TODO: maybe remove
-    fallback: "blocking", // fallback tries to regenerate ArtistPage if Artist did not exist during building
+    fallback: "blocking",
   }
 }
 
 export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = async ({
   params,
 }) => {
-  if (params == undefined) {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
     return { notFound: true }
   }
   const post = await getPostLocal(+params.id)

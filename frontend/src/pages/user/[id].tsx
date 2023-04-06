@@ -55,7 +55,7 @@ export const getStaticProps: GetStaticProps<
   { user: User; posts: Post[] },
   { id: string }
 > = async ({ params }) => {
-  if (params == undefined) {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
     return { notFound: true }
   }
   const user = await getUserLocal(+params.id)
