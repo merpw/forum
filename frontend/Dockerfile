@@ -19,13 +19,6 @@ ARG FORUM_BACKEND_PRIVATE_URL
 
 RUN npm run build
 
-RUN if [[ -z "$FORUM_BACKEND_PRIVATE_URL" ]] ; then \
-    find /app/.next/standalone/.next/server/pages  \
-    -name "*.json" -o -name "*.html" -not -name "404.html" -not -name "500.html" -delete;  \
-    fi
-
-# If backend was not specified, remove all pages that require it
-
 FROM base AS runner
 
 WORKDIR /app/
