@@ -1,14 +1,14 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { Post, User } from "../../custom"
-
-import { getUserLocal } from "../../api/users/fetch"
-import { useMe } from "../../api/auth"
-import { getUserPostsLocal } from "../../api/posts/fetch"
-import { PostList } from "../../components/posts/list"
+import { NextSeo } from "next-seo"
 import { AxiosError } from "axios"
+
+import { Post, User } from "@/custom"
+import { getUserLocal } from "@/api/users/fetch"
+import { useMe } from "@/api/auth"
+import { getUserPostsLocal } from "@/api/posts/fetch"
+import { PostList } from "@/components/posts/list"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   const router = useRouter()
@@ -25,15 +25,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
 
   return (
     <>
-      <Head>
-        <title>{`${user.name} - Forum`}</title>
-        <meta name={"og:title"} content={`${user.name} - Forum`} />
-
-        <meta name={"description"} content={`Posts created by ${user.name}`} />
-        <meta name={"og:description"} content={`Posts created by ${user.name}`} />
-
-        <meta name={"author"} content={user.name} />
-      </Head>
+      <NextSeo title={user.name} description={`Posts created by ${user.name}`} />
       <div>
         <h1 className={"text-2xl mb-5"}>{user.name}</h1>
         <div>

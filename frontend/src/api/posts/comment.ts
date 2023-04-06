@@ -1,6 +1,7 @@
 import axios from "axios"
 import useSWR from "swr"
-import { Comment } from "../../custom"
+
+import { Comment } from "@/custom"
 export const CreateComment = (post_id: number, text: string) =>
   axios
     .post<number>(`/api/posts/${post_id}/comment`, { content: text }, { withCredentials: true })

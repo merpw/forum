@@ -1,12 +1,13 @@
-import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
-import { useMe } from "../api/auth"
-import { useMyPosts } from "../api/posts/my_posts"
-import { useMyPostsLiked } from "../api/posts/my_posts_liked"
-import { PostList } from "../components/posts/list"
+import { NextSeo } from "next-seo"
+
+import { useMe } from "@/api/auth"
+import { useMyPosts } from "@/api/posts/my_posts"
+import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
+import { PostList } from "@/components/posts/list"
 
 /* TODO: add placeholders */
 
@@ -31,9 +32,8 @@ const UserPage: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>{`Profile - Forum`}</title>
-      </Head>
+      <NextSeo title={"Profile"} />
+
       <UserInfo />
       <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1 max-w-fit"}>
         <span className={"my-auto"}>
@@ -59,15 +59,17 @@ const UserPage: NextPage = () => {
 
       <ul className={"flex flex-wrap gap-2 text-2xl mb-3"}>
         {tabs.map(({ title }, key) => (
-          <li
-            key={key}
-            className={
-              "cursor-pointer hover:opacity-60 p-1 " +
-              (activeTab == key ? "border-b-2 border-b-blue-500" : "")
-            }
-            onClick={() => setActiveTab(key)}
-          >
-            {title}
+          <li key={key}>
+            <button
+              key={key}
+              className={
+                "cursor-pointer hover:opacity-60 p-1 " +
+                (activeTab == key ? "border-b-2 border-b-blue-500" : "")
+              }
+              onClick={() => setActiveTab(key)}
+            >
+              {title}
+            </button>
           </li>
         ))}
       </ul>
