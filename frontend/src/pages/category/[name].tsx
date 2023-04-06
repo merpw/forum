@@ -1,5 +1,6 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { NextSeo } from "next-seo"
+import { AxiosError } from "axios"
 
 import { getCategoriesLocal, getCategoryPostsLocal } from "@/api/posts/fetch"
 import { PostList } from "@/components/posts/list"
@@ -21,6 +22,9 @@ const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
 }
 
 export const getStaticPaths: GetStaticPaths<{ name: string }> = async () => {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
+    return { paths: [], fallback: "blocking" }
+  }
   const categories = await getCategoriesLocal()
   return {
     paths: categories.map((category) => {
@@ -34,19 +38,27 @@ export const getStaticPaths: GetStaticPaths<{ name: string }> = async () => {
 export const getStaticProps: GetStaticProps<{ posts: Post[] }, { name: string }> = async ({
   params,
 }) => {
-  if (params == undefined) return { notFound: true }
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || !params) {
+    return { notFound: true }
+  }
 
-  let category_name = params.name.toLowerCase()
+  try {
+    let category_name = params.name.toLowerCase()
 
-  const posts = await getCategoryPostsLocal(category_name)
-  if (posts == undefined) return { notFound: true, revalidate: 1 }
+    const posts = await getCategoryPostsLocal(category_name)
 
-  // capitalize
-  category_name = category_name.charAt(0).toUpperCase() + category_name.slice(1)
+    // capitalize
+    category_name = category_name.charAt(0).toUpperCase() + category_name.slice(1)
 
-  return {
-    props: { posts: posts, category_name: category_name },
-    revalidate: 1,
+    return {
+      props: { posts: posts, category_name: category_name },
+      revalidate: 1,
+    }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
+    return { notFound: true, revalidate: 1 }
   }
 }
 

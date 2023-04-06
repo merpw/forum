@@ -2,6 +2,7 @@ import { GetStaticPaths, GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { NextSeo } from "next-seo"
+import { AxiosError } from "axios"
 
 import { Post, User } from "@/custom"
 import { getUserLocal } from "@/api/users/fetch"
@@ -47,15 +48,19 @@ export const getStaticProps: GetStaticProps<
   { user: User; posts: Post[] },
   { id: string }
 > = async ({ params }) => {
-  if (params == undefined) {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
     return { notFound: true }
   }
-  const user = await getUserLocal(+params.id)
-  if (user == undefined) {
+  try {
+    const user = await getUserLocal(+params.id)
+    const posts = await getUserPostsLocal(user.id)
+
+    return { props: { user: user, posts: posts }, revalidate: 1 }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
     return { notFound: true, revalidate: 1 }
   }
-  const posts = await getUserPostsLocal(user.id)
-
-  return { props: { user: user, posts: posts }, revalidate: 1 }
 }
 export default UserPage

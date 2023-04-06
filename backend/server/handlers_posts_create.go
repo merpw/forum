@@ -56,6 +56,9 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+	if len(requestBody.Categories) == 0 {
+		isValid = false
+	}
 
 	if !isValid {
 		http.Error(w, "Categories are not valid", http.StatusBadRequest)

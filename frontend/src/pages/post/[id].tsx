@@ -4,6 +4,7 @@ import { FC, useEffect, useState } from "react"
 import { SWRConfig, SWRConfiguration } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
+import { AxiosError } from "axios"
 
 import { Comment, Post } from "@/custom"
 import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
@@ -101,7 +102,6 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
             "w-full bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
           }
           value={text}
-          rows={1}
           onInput={(e) => setText(e.currentTarget.value)}
           required
         />
@@ -123,16 +123,17 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
 const Comments: FC<{ post: Post }> = ({ post }) => {
   const { comments } = useComments(post.id)
+  if (comments == undefined || comments.length == 0) {
+    return <div>There are no comments yet, write one first!</div>
+  }
 
   return (
     <div className={"flex flex-col gap-3"}>
-      {comments && comments.length > 0 ? (
-        comments
-          .sort((a, b) => b.date.localeCompare(a.date))
-          .map((comment, key) => <CommentCard comment={comment} post={post} key={key} />)
-      ) : (
-        <div>There are no comments yet...</div>
-      )}
+      {comments
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .map((comment, key) => (
+          <CommentCard comment={comment} post={post} key={key} />
+        ))}
     </div>
   )
 }
@@ -158,35 +159,42 @@ const CommentCard: FC<{ comment: Comment; post: Post }> = ({ comment, post }) =>
 }
 
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
+    return { paths: [], fallback: "blocking" }
+  }
   const posts = await getPostsLocal()
   return {
     paths: posts.map((post) => {
       return { params: { id: post.id.toString() } }
     }),
-    // TODO: maybe remove
-    fallback: "blocking", // fallback tries to regenerate ArtistPage if Artist did not exist during building
+    fallback: "blocking",
   }
 }
 
 export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = async ({
   params,
 }) => {
-  if (params == undefined) {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
     return { notFound: true }
   }
-  const post = await getPostLocal(+params.id)
-  const comments = await getPostCommentsLocal(+params.id)
+  try {
+    const post = await getPostLocal(+params.id)
+    const comments = await getPostCommentsLocal(+params.id)
 
-  return post
-    ? {
-        props: {
-          post: post,
-          fallback: {
-            [`/api/posts/${post.id}/comments`]: comments,
-          },
+    return {
+      props: {
+        post: post,
+        fallback: {
+          [`/api/posts/${post.id}/comments`]: comments,
         },
-        revalidate: 1,
-      }
-    : { notFound: true, revalidate: 1 }
+      },
+      revalidate: 1,
+    }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
+    return { notFound: true, revalidate: 1 }
+  }
 }
 export default PostPage
