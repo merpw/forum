@@ -1,5 +1,5 @@
 {
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": ["@typescript-eslint", "react", "import"],
   "extends": [
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
