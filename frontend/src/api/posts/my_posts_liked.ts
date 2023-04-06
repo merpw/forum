@@ -1,6 +1,7 @@
 import axios from "axios"
 import useSWR from "swr"
-import { Post } from "../../custom"
+
+import { Post } from "@/custom"
 
 const getMyPostsLiked = async () =>
   document.cookie.includes("forum-token")

@@ -1,6 +1,7 @@
 import axios from "axios"
 import useSWR from "swr"
-import { User } from "../custom"
+
+import { User } from "@/custom"
 
 export const useMe = () => {
   const { data, mutate, error } = useSWR<{ user: User | undefined }>("/api/me", getMe, {

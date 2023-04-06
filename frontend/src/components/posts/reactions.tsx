@@ -2,16 +2,17 @@ import { motion } from "framer-motion"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { FC, useEffect } from "react"
-import { useMe } from "../../api/auth"
+
+import { useMe } from "@/api/auth"
 import {
   dislikeComment,
-  likeComment,
   dislikePost,
+  likeComment,
   likePost,
-  useReactions,
   useCommentReactions,
-} from "../../api/posts/reactions"
-import { Post, Comment } from "../../custom"
+  useReactions,
+} from "@/api/posts/reactions"
+import { Comment, Post } from "@/custom"
 
 // TODO: add prefetching (useSWR fallback)
 
