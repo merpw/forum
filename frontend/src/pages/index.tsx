@@ -1,7 +1,6 @@
 import { GetStaticProps, NextPage } from "next"
 import Link from "next/link"
 import { NextSeo } from "next-seo"
-import { AxiosError } from "axios"
 
 import { Post } from "@/custom"
 import { PostList } from "@/components/posts/list"
@@ -29,21 +28,14 @@ const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, catego
 
 export const getStaticProps: GetStaticProps<{ posts: Post[]; categories: string[] }> = async () => {
   if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
-    return { notFound: true }
+    return { notFound: true, revalidate: 60 }
   }
 
-  try {
-    const posts: Post[] = await getPostsLocal()
-    const categories = await getCategoriesLocal()
-    return {
-      props: { posts, categories },
-      revalidate: 1,
-    }
-  } catch (e) {
-    if ((e as AxiosError).response?.status !== 404) {
-      throw e
-    }
-    return { notFound: true, revalidate: 1 }
+  const posts: Post[] = await getPostsLocal()
+  const categories = await getCategoriesLocal()
+  return {
+    props: { posts, categories },
+    revalidate: 60,
   }
 }
 
