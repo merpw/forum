@@ -3,6 +3,8 @@ services:
   backend:
     build:
       context: backend
+    environment:
+      - FRONTEND_REVALIDATE_URL=http://frontend:3000/api/revalidate
     volumes:
       - db:/app/db
   frontend:
