@@ -24,6 +24,12 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 - `--port` - port to run API server on (default: 8080)
 - `--db` - database file path (default: `./database.db`)
 
+### Environment variables:
+
+- `FRONTEND_REVALIDATE_URL` - optional, url to revalidate Next.js pages in ISR mode. For
+  example, `http://localhost:3000/api/revalidate`
+- `FRONTEND_REVALIDATE_TOKEN` - optional, token to revalidate Next.js pages in ISR mode if frontend `/api/` is public
+
 ### Testing: `go test forum/server/test -cover -coverpkg=./...`
 
 ## Endpoints
@@ -51,4 +57,4 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 - POST `/api/posts/{id}/comment/{id}/like` - like comment by id
 - POST `/api/posts/{id}}/comment/{id}/dislike` - dislike comment by id
 
-[//]: # (TODO: add request body examples)
+[//]: # "TODO: add request body examples"

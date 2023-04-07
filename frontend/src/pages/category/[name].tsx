@@ -38,27 +38,26 @@ export const getStaticPaths: GetStaticPaths<{ name: string }> = async () => {
 export const getStaticProps: GetStaticProps<{ posts: Post[] }, { name: string }> = async ({
   params,
 }) => {
-  if (!process.env.FORUM_BACKEND_PRIVATE_URL || !params) {
-    return { notFound: true }
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
+    return { notFound: true, revalidate: 60 }
   }
 
   try {
-    let category_name = params.name.toLowerCase()
-
+    const category_name = params.name.toLowerCase()
     const posts = await getCategoryPostsLocal(category_name)
 
-    // capitalize
-    category_name = category_name.charAt(0).toUpperCase() + category_name.slice(1)
-
     return {
-      props: { posts: posts, category_name: category_name },
-      revalidate: 1,
+      props: {
+        posts: posts,
+        category_name: category_name.charAt(0).toUpperCase() + category_name.slice(1), // Capitalize first letter
+      },
+      revalidate: 60,
     }
   } catch (e) {
     if ((e as AxiosError).response?.status !== 404) {
       throw e
     }
-    return { notFound: true, revalidate: 1 }
+    return { notFound: true, revalidate: 60 }
   }
 }
 

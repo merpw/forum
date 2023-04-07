@@ -49,18 +49,24 @@ export const getStaticProps: GetStaticProps<
   { id: string }
 > = async ({ params }) => {
   if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
-    return { notFound: true }
+    return { notFound: true, revalidate: 60 }
   }
   try {
     const user = await getUserLocal(+params.id)
     const posts = await getUserPostsLocal(user.id)
 
-    return { props: { user: user, posts: posts }, revalidate: 1 }
+    return {
+      props: {
+        user,
+        posts,
+      },
+      revalidate: 60,
+    }
   } catch (e) {
     if ((e as AxiosError).response?.status !== 404) {
       throw e
     }
-    return { notFound: true, revalidate: 1 }
+    return { notFound: true, revalidate: 60 }
   }
 }
 export default UserPage

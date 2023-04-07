@@ -175,7 +175,7 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
   params,
 }) => {
   if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
-    return { notFound: true }
+    return { notFound: true, revalidate: 60 }
   }
   try {
     const post = await getPostLocal(+params.id)
@@ -188,13 +188,13 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
           [`/api/posts/${post.id}/comments`]: comments,
         },
       },
-      revalidate: 1,
+      revalidate: 60,
     }
   } catch (e) {
     if ((e as AxiosError).response?.status !== 404) {
       throw e
     }
-    return { notFound: true, revalidate: 1 }
+    return { notFound: true, revalidate: 60 }
   }
 }
 export default PostPage
