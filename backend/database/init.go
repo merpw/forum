@@ -91,6 +91,21 @@ func (db DB) InitDatabase() error {
 		return err
 	}
 
+	// TODO: remove this later. Chat functionality section
+
+	/*
+		Add TABLE `chats` with columns:
+		- `id` (int, primary key) of chat
+		- `date` (text) of chat creation timestamp
+	*/
+	err = db.InitTable("chats", []Column{
+		{Name: "id", Type: "INTEGER", PrimaryKey: true},
+		{Name: "date", Type: "TEXT"},
+	})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
