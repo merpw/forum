@@ -96,11 +96,13 @@ func (db DB) InitDatabase() error {
 	/*
 		Add TABLE `chats` with columns:
 		- `id` (int, primary key) of chat
-		- `date` (text) of chat creation timestamp
+		- `last_message_date` (text) timestamp of chat last message ( // TODO: NOT APPROVED YET)
+			... used for sorting chats by last message date:
+			get user chats by user id, from `memberships` table, and sort by `last_message_date` column
 	*/
 	err = db.InitTable("chats", []Column{
 		{Name: "id", Type: "INTEGER", PrimaryKey: true},
-		{Name: "date", Type: "TEXT"},
+		{Name: "last_message_date", Type: "TEXT"},
 	})
 	if err != nil {
 		return err
