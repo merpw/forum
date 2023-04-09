@@ -132,7 +132,7 @@ func (db DB) InitDatabase() error {
 		- `chat_id` (int), foreign key to `chats` table
 		- `sender_id` (int), foreign key to `users` table
 		- `body` (text) message body (at least it can be f.e. text + markup // TODO: NOT APPROVED YET)
-		- `date` (text) timestamp of message creation(last modification too // TODO: NOT APPROVED YET)
+		- `date` (text) timestamp of message creation
 	*/
 	err = db.InitTable("messages", []Column{
 		{Name: "id", Type: "INTEGER", PrimaryKey: true},
