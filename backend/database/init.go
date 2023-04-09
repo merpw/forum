@@ -108,6 +108,24 @@ func (db DB) InitDatabase() error {
 		return err
 	}
 
+	/*
+		Add TABLE `memberships` with columns:
+		- `id` (int, primary key) of membership
+		- `chat_id` (int), foreign key to `chats` table
+		- `user_id` (int), foreign key to `users` table
+		- `date` (text) timestamp of membership creation
+	*/
+	err = db.InitTable("memberships", []Column{
+		{Name: "id", Type: "INTEGER", PrimaryKey: true},
+		{Name: "chat_id", Type: "INTEGER"},
+		{Name: "user_id", Type: "INTEGER"},
+		{Name: "date", Type: "TEXT"},
+	}, "FOREIGN KEY(chat_id) REFERENCES chats(id)",
+		"FOREIGN KEY(user_id) REFERENCES users(id)")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
