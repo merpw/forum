@@ -10,6 +10,7 @@ type Post struct {
 	DislikesCount int
 	CommentsCount int
 	Categories    string
+	Description   string
 }
 
 type User struct {

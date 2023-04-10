@@ -17,9 +17,10 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody := struct {
-		Title      string   `json:"title"`
-		Content    string   `json:"content"`
-		Categories []string `json:"categories"`
+		Title       string   `json:"title"`
+		Content     string   `json:"content"`
+		Description string   `json:"description"`
+		Categories  []string `json:"categories"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -38,6 +39,9 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if len(requestBody.Content) < 1 {
 		http.Error(w, "Content is too short", http.StatusBadRequest)
 		return
+	}
+	if requestBody.Description == "" {
+		requestBody.Description = shortenContent(requestBody.Content)
 	}
 
 	if len(requestBody.Title) > 25 {
@@ -67,7 +71,8 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, strings.Join(requestBody.Categories, ","))
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
+		userId, strings.Join(requestBody.Categories, ","))
 	sendObject(w, id)
 
 	err = revalidateURL(fmt.Sprintf("/post/%v", id))

@@ -31,6 +31,7 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 		Id:            post.Id,
 		Title:         post.Title,
 		Content:       post.Content,
+		Description:   post.Description,
 		Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
 		Date:          post.Date,
 		CommentsCount: post.CommentsCount,
