@@ -105,6 +105,7 @@ const CreatePostForm = () => {
           className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
         ></label>
         <select
+          title={"category"}
           multiple
           required
           id={"cats"}
