@@ -110,6 +110,30 @@ func (db DB) GetPrivateChatOponentsByUserId(userId int) []PrivateChatOponent {
 	return oponents
 }
 
+/*
+*
+GetChatsIdsByUserId reads chats ids from database by user_id, does not require user to be logged in
+*/
+func (db DB) GetChatsIdsByUserId(userId int) []int {
+	query, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var chatIds []int
+	for query.Next() {
+		var chatId int
+		err = query.Scan(&chatId)
+		if err != nil {
+			log.Panic(err)
+		}
+		chatIds = append(chatIds, chatId)
+	}
+	query.Close()
+
+	return chatIds
+}
+
 // AddMembership adds membership to database, returns id of new membership
 func (db DB) AddMembership(chatId, userId int) int {
 	result, err := db.Exec(
