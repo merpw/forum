@@ -13,12 +13,18 @@ type Migration struct {
 
 var Migrations = []Migration{
 	v001,
+	v002,
 }
 
 // Migrate migrates the database to the specified revision
 //
 // If the database is empty, it will create the initial schema
 func Migrate(db *sql.DB, toRevision int) error {
+	err := Check(db)
+	if err != nil {
+		return fmt.Errorf("database precheck failed: %w", err)
+	}
+
 	dbRevision, err := GetVersion(db)
 	if err != nil {
 		return err
@@ -60,6 +66,11 @@ func Migrate(db *sql.DB, toRevision int) error {
 				return err
 			}
 		}
+	}
+
+	err = Check(db)
+	if err != nil {
+		return fmt.Errorf("database postcheck failed: %w", err)
 	}
 
 	return nil
