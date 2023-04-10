@@ -19,7 +19,7 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
 
   return (
     <SWRConfig value={{ fallback }}>
-      <NextSeo title={post.title} description={post.content.slice(0, 200)} />
+      <NextSeo title={post.title} description={post.description} />
 
       <div className={"m-5"}>
         <div className={"mb-3"}>

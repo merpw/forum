@@ -1,7 +1,8 @@
 export type Post = {
   id: number
   title: string
-  content: string
+  content?: string
+  description: string
   likes_count: number
   dislikes_count: number
   comments_count: number
