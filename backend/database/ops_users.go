@@ -58,7 +58,7 @@ func (db DB) AddUser(name, email, password string, first_name, last_name, dob, g
 	result, err := db.Exec(
 		`INSERT INTO users (name, email, password, first_name, last_name, dob, gender)
 		VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		name, email, password, first_name.String, last_name.String, dob.String , gender.String)
+		name, email, password, first_name.String, last_name.String, dob.String, gender.String)
 	if err != nil {
 		log.Panic(err)
 	}
