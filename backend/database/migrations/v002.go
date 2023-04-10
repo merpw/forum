@@ -29,7 +29,10 @@ var v002 = Migration{
 		if err != nil {
 			return err
 		}
-
+		_, err = db.Exec("VACUUM")
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 
@@ -50,7 +53,10 @@ var v002 = Migration{
 		if err != nil {
 			return err
 		}
-
+		_, err = db.Exec("VACUUM")
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 }
