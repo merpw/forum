@@ -17,7 +17,7 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 
 // apiMeHandler returns the currently logged in user's information.
 //
-// (id, name, email, first name, last name, age, gender)
+// (id, name, email, first name, last name, day of birth, gender)
 //
 //	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
@@ -34,15 +34,15 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 		Email     string `json:"email"`
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
-		Age       string `json:"age"`
+		DoB       string `json:"dob"`
 		Gender    string `json:"gender"`
 	}{
 		SafeUser:  SafeUser{Id: user.Id, Name: user.Name},
 		Email:     user.Email,
-		FirstName: user.FirstName,
-		LastName:  user.LastName,
-		Age:       user.Age,
-		Gender:    user.Gender,
+		FirstName: user.FirstName.String,
+		LastName:  user.LastName.String,
+		DoB:       user.DoB.String,
+		Gender:    user.Gender.String,
 	}
 
 	sendObject(w, response)

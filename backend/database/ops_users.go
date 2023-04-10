@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -19,7 +20,7 @@ func (db DB) GetUserById(id int) *User {
 	}
 	err = query.Scan(
 		&user.Id, &user.Name, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.Age, &user.Gender)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -43,7 +44,7 @@ func (db DB) GetUserByLogin(login string) *User {
 	var user User
 	err = query.Scan(
 		&user.Id, &user.Name, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.Age, &user.Gender)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -53,11 +54,11 @@ func (db DB) GetUserByLogin(login string) *User {
 }
 
 // AddUser adds user to database, returns id of new user
-func (db DB) AddUser(name, email, password, first_name, last_name, age, gender string) int {
+func (db DB) AddUser(name, email, password string, first_name, last_name, dob, gender sql.NullString) int {
 	result, err := db.Exec(
-		`INSERT INTO users (name, email, password, first_name, last_name, age, gender)
+		`INSERT INTO users (name, email, password, first_name, last_name, dob, gender)
 		VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		name, email, password, first_name, last_name, age, gender)
+		name, email, password, first_name.String, last_name.String, dob.String , gender.String)
 	if err != nil {
 		log.Panic(err)
 	}

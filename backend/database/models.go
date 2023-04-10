@@ -1,5 +1,7 @@
 package database
 
+import "database/sql"
+
 type Post struct {
 	Id            int
 	Title         string
@@ -17,10 +19,10 @@ type User struct {
 	Name      string
 	Email     string
 	Password  string
-	FirstName string
-	LastName  string
-	Age       string
-	Gender    string
+	FirstName sql.NullString
+	LastName  sql.NullString
+	DoB       sql.NullString
+	Gender    sql.NullString
 }
 
 type Comment struct {

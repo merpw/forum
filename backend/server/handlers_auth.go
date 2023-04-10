@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/mail"
@@ -23,7 +24,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		Password  string `json:"password"`
 		FirstName string `json:"first_name"`
 		LastName  string `json:"last_name"`
-		Age       string `json:"age"`
+		DoB       string `json:"dob"`
 		Gender    string `json:"gender"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -72,14 +73,16 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Password is not valid", http.StatusBadRequest)
 		return
 	}
+
 	srv.DB.AddUser(
 		requestBody.Name,
 		requestBody.Email,
 		string(encryptedPassword),
-		requestBody.FirstName,
-		requestBody.LastName,
-		requestBody.Age,
-		requestBody.Gender)
+		sql.NullString{String: requestBody.FirstName, Valid: true},
+		sql.NullString{String: requestBody.LastName, Valid: true},
+		sql.NullString{String: requestBody.DoB, Valid: true},
+		sql.NullString{String: requestBody.Gender, Valid: true},
+	)
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {

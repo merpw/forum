@@ -39,11 +39,11 @@ export const SignUp = async (
   password: string,
   first_name: string,
   last_name: string,
-  age: string,
+  dob: string,
   gender: string
 ) =>
   axios.post(
     "/api/signup",
-    { name, email, password, first_name, last_name, age, gender },
+    { name, email, password, first_name, last_name, dob, gender },
     { withCredentials: true }
   )
