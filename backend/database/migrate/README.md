@@ -15,10 +15,10 @@ You can use this package as a CLI or as a function.
    - to run `go run forum/database/migrate/cli`
    - to build `go build forum/database/migrate/cli`
 
-2. Run `cli -h` to see the available commands
+2. Run `./cli -h` to see the available commands
 
-   - For example, `cli -db database.db stat` will show you the current revision of the `database.db` schema
-   - `cli -db database.db migrate latest` will migrate database to the latest available version.
+   - For example, `./cli -db database.db stat` will show you the current revision of the `database.db` schema
+   - `./cli -db database.db migrate latest` will migrate database to the latest available version.
 
 ### Function
 
