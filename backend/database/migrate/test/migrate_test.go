@@ -3,7 +3,6 @@ package migrate_test
 import (
 	"database/sql"
 	"forum/database/migrate"
-	"forum/database/migrate/migrations"
 	"log"
 	"os"
 	"testing"
@@ -27,8 +26,8 @@ func TestMigrate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	for revision := 0; revision < len(migrations.Migrations); revision++ {
-		err = migrate.Migrate(db, revision+1)
+	for revision := 1; revision <= migrate.LATEST; revision++ {
+		err = migrate.Migrate(db, revision)
 		if err != nil {
 			t.Fatal(err)
 		}

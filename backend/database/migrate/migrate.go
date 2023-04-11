@@ -12,6 +12,9 @@ import (
 	"strings"
 )
 
+// LATEST is latest available revision
+var LATEST = len(Migrations)
+
 // Migrate migrates the database to the specified revision
 //
 // If the database is empty, it will create the initial schema
@@ -30,13 +33,13 @@ func Migrate(db *sql.DB, toRevision int) error {
 		return nil
 	}
 
-	if toRevision > len(Migrations) || toRevision < 1 {
-		return fmt.Errorf("invalid revision %d, availible revisions 1..%d", toRevision, len(Migrations))
+	if toRevision > LATEST || toRevision < 1 {
+		return fmt.Errorf("invalid revision %d, availible revisions 1..%d", toRevision, LATEST)
 	}
 
-	if dbRevision > len(Migrations) {
+	if dbRevision > LATEST {
 		log.Fatalf("Migration failed, found database revision %d which is higher than the latest availible revision %d",
-			dbRevision, len(Migrations))
+			dbRevision, LATEST)
 	}
 
 	if dbRevision == 0 {

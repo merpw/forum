@@ -11,8 +11,6 @@ type DB struct {
 	*sql.DB
 }
 
-const REVISION = 2
-
 func (db DB) InitDatabase() error {
-	return migrate.Migrate(db.DB, REVISION)
+	return migrate.Migrate(db.DB, migrate.LATEST)
 }

@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"flag"
 	"forum/database/migrate"
-	"forum/database/migrate/migrations"
 	"log"
 	"strconv"
 )
@@ -27,7 +26,7 @@ var actions = []struct {
 				log.Fatal(err)
 			}
 			log.Printf("Integrity check passed successfully, current revision is %d, latest is %d\n",
-				version, len(migrations.Migrations))
+				version, migrate.LATEST)
 		},
 	},
 	{
@@ -40,7 +39,7 @@ var actions = []struct {
 			}
 			var toRevision int
 			if toRevisionStr == "latest" {
-				toRevision = len(migrations.Migrations)
+				toRevision = migrate.LATEST
 			} else {
 				toRevision, _ = strconv.Atoi(toRevisionStr)
 				if toRevision <= 0 {
@@ -59,7 +58,7 @@ var actions = []struct {
 		"create",
 		"- create new database file and migrate it to the latest revision",
 		func(db *sql.DB) {
-			err := migrate.Migrate(db, len(migrations.Migrations))
+			err := migrate.Migrate(db, migrate.LATEST)
 			if err != nil {
 				log.Fatal(err)
 			}
