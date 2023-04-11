@@ -1,9 +1,14 @@
 package migrations
 
 import (
+	"bufio"
 	"database/sql"
+	"errors"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"strings"
 )
 
 type Migration struct {
@@ -38,12 +43,28 @@ func Migrate(db *sql.DB, toRevision int) error {
 		return fmt.Errorf("invalid revision %d, availible revisions 1..%d", toRevision, len(Migrations))
 	}
 
+	if dbRevision > len(Migrations) {
+		log.Fatalf("Migration failed, found database revision %d which is higher than the latest availible revision %d",
+			dbRevision, len(Migrations))
+	}
+
 	if dbRevision == 0 {
 		log.Printf("Empty/unknown database, initial schema will be created")
 	}
 
 	if dbRevision > toRevision {
-		log.Printf("Migrating database down from revision %d to %d", dbRevision, toRevision)
+		log.Printf(`WARNING: migrating database DOWN from %d to %d
+Down migrations may remove columns and tables, so some data can be lost. Make sure you have a backup.
+If you still want to continue, type YES, otherwise press Ctrl+C to abort.
+`, dbRevision, toRevision)
+		reader := bufio.NewReader(os.Stdin)
+		text, err := reader.ReadString('\n')
+		if err != nil && !errors.Is(err, io.EOF) {
+			return err
+		}
+		if strings.TrimSpace(text) != "YES" {
+			log.Fatal("Aborted by user")
+		}
 		for i := dbRevision; i > toRevision; i-- {
 			err := Migrations[i-1].Down(db)
 			if err != nil {
