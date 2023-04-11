@@ -14,7 +14,7 @@ import (
 func init() {
 	log.SetFlags(0)
 	flag.Usage = func() {
-		fmt.Printf(`Forum database CLI
+		fmt.Printf(`Forum database migrations CLI
 
 Usage: cli [PARAMETERS] [ACTION]
 
@@ -30,13 +30,13 @@ Availible parameters:
 
 		fmt.Println("\nAvailable actions:")
 		for _, action := range actions {
-			fmt.Printf("\t%s - %s\n", action.command, action.description)
+			fmt.Printf("\t%s %s\n", action.command, action.description)
 		}
 	}
 }
 
 func main() {
-	dbFile := flag.String("db", "", "specify database to migrate")
+	dbFile := flag.String("db", "", "specify database file to work with")
 	flag.Parse()
 
 	if *dbFile == "" {
@@ -61,7 +61,17 @@ func main() {
 
 	_, err := os.Stat(*dbFile)
 	if err != nil {
-		log.Fatalf("ERROR: Database file %s does not exist", *dbFile)
+		if os.IsNotExist(err) {
+			if action != "create" {
+				log.Fatalf("ERROR: Database file %s does not exist. Run `create` action to create database", *dbFile)
+			}
+		} else {
+			log.Fatal(err)
+		}
+	} else {
+		if action == "create" {
+			log.Fatalf("ERROR: %s already exists", *dbFile)
+		}
 	}
 
 	db, err := sql.Open("sqlite3", *dbFile+"?_foreign_keys=true") // enable foreign keys

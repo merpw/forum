@@ -16,7 +16,7 @@ var actions = []struct {
 }{
 	{
 		"stat",
-		"show information about database",
+		"- check database integrity and show current revision",
 		func(db *sql.DB) {
 			err := migrate.Check(db)
 			if err != nil {
@@ -32,7 +32,7 @@ var actions = []struct {
 	},
 	{
 		"migrate",
-		"[REVISION], migrate to the specific revision",
+		"[REVISION] - migrate to the specific revision or `latest`",
 		func(db *sql.DB) {
 			toRevisionStr := flag.Arg(1)
 			if toRevisionStr == "" {
@@ -53,6 +53,17 @@ var actions = []struct {
 				log.Fatalf("migration failed, %s\n", err)
 			}
 			log.Println("Migration finished.")
+		},
+	},
+	{
+		"create",
+		"- create new database file and migrate it to the latest revision",
+		func(db *sql.DB) {
+			err := migrate.Migrate(db, len(migrations.Migrations))
+			if err != nil {
+				log.Fatal(err)
+			}
+			log.Println("Database created successfully")
 		},
 	},
 }
