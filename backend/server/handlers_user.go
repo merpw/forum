@@ -32,10 +32,10 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 	response := struct {
 		SafeUser
 		Email     string `json:"email"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-		DoB       string `json:"dob"`
-		Gender    string `json:"gender"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+		DoB       string `json:"dob,omitempty"`
+		Gender    string `json:"gender,omitempty"`
 	}{
 		SafeUser:  SafeUser{Id: user.Id, Name: user.Name},
 		Email:     user.Email,
