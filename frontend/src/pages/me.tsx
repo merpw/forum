@@ -3,6 +3,7 @@ import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
 import { useEffect, useState } from "react"
+import dayjs from "dayjs"
 import { useMe } from "../api/auth"
 import { useMyPosts } from "../api/posts/my_posts"
 import { useMyPostsLiked } from "../api/posts/my_posts_liked"
@@ -79,23 +80,49 @@ const UserPage: NextPage = () => {
 const UserInfo = () => {
   const { user } = useMe()
 
+  const calculateAge = (dob: string | undefined): string | null => {
+    if (!dob) return null
+    const dobDate = dayjs(dob, "YYYY-MM-DD")
+    if (!dobDate.isValid()) return null
+    const ageInYears = dayjs().diff(dobDate, "year")
+    if (ageInYears < 1) {
+      const ageInMonths = dayjs().diff(dobDate, "month")
+      if (ageInMonths < 1) {
+        const ageInDays = dayjs().diff(dobDate, "day")
+        if (ageInDays < 1) {
+          return `newborn ☺︎`
+        }
+        return `${ageInDays} day${ageInDays > 1 ? "s" + " old" : ""}`
+      }
+      return `${ageInMonths} month${ageInMonths > 1 ? "s" + " old" : ""}`
+    }
+    return `${ageInYears} y.o.`
+  }
+
+  const age = calculateAge(user?.dob ?? undefined)
+
   return (
     <>
       <h1 className={"text-2xl font-thin mb-5"}>
         {"Hello, "}
         <span className={"text-3xl font-normal"}>{user?.name}</span>
       </h1>
-      <p>
-        {"Full name: "}
-        <span className={"text-2xl"}> {user?.first_name + " "} </span>
-        <span className={"text-2xl"}> {user?.last_name} </span>
-      </p>
-      <p>
-        {"Age: "} <span className={"text-2xl"}> {user?.age} </span>
-      </p>
-      <p>
-        {"Gender: "} <span className={"text-2xl"}> {user?.gender} </span>
-      </p>
+      {user?.first_name && user?.last_name && user?.dob && user.gender ? (
+        <div>
+          <p>
+            {"Full name: "}
+            <span className={"text-2xl"}> {user?.first_name + " "} </span>
+            <span className={"text-2xl"}> {user?.last_name} </span>
+          </p>
+          <p>
+            {"Age: "}
+            <span className={"text-2xl"}> {age} </span>
+          </p>
+          <p>
+            {"Gender: "} <span className={"text-2xl"}> {user?.gender} </span>
+          </p>
+        </div>
+      ) : null}
       <p>
         {"Email: "} <span className={"text-2xl"}> {user?.email} </span>
       </p>
