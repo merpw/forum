@@ -2,7 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"forum/database/migrations"
+	"forum/database/migrate"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -14,5 +14,5 @@ type DB struct {
 const REVISION = 2
 
 func (db DB) InitDatabase() error {
-	return migrations.Migrate(db.DB, REVISION)
+	return migrate.Migrate(db.DB, REVISION)
 }

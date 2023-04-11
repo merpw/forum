@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-// v001 is the initial revision. It creates the tables users, posts, comments, sessions and reactions.
+// V001 is the initial revision. It creates the tables users, posts, comments, sessions and reactions.
 var v001 = Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`

@@ -1,25 +1,16 @@
-package migrations
+package migrate
 
 import (
 	"bufio"
 	"database/sql"
 	"errors"
 	"fmt"
+	. "forum/database/migrate/migrations"
 	"io"
 	"log"
 	"os"
 	"strings"
 )
-
-type Migration struct {
-	Up   func(db *sql.DB) error
-	Down func(db *sql.DB) error
-}
-
-var Migrations = []Migration{
-	v001,
-	v002,
-}
 
 // Migrate migrates the database to the specified revision
 //
