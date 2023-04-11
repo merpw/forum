@@ -79,6 +79,10 @@ const UserPage: NextPage = () => {
   )
 }
 
+
+const UserInfo = () => {
+  const { user } = useMe()
+
 const calculateAge = (dob: string | undefined): string | null => {
   if (!dob) return null
   const dobDate = dayjs(dob, "YYYY-MM-DD")
@@ -97,9 +101,6 @@ const calculateAge = (dob: string | undefined): string | null => {
   }
   return `${ageInYears} y.o.`
 }
-
-const UserInfo = () => {
-  const { user } = useMe()
 
   const age = calculateAge(user?.dob ?? undefined)
 
