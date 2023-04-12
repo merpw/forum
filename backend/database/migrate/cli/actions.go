@@ -49,7 +49,7 @@ var actions = []struct {
 
 			err := migrate.Migrate(db, toRevision)
 			if err != nil {
-				log.Fatalf("migration failed, %s\n", err)
+				log.Fatalf("ERROR: migration failed, %s\n", err)
 			}
 			log.Println("Migration finished.")
 		},

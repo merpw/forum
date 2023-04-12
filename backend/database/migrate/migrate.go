@@ -37,8 +37,8 @@ func Migrate(db *sql.DB, toRevision int) error {
 		return fmt.Errorf("invalid revision %d, availible revisions 1..%d", toRevision, LATEST)
 	}
 
-	if dbRevision > LATEST {
-		log.Fatalf("Migration failed, found database revision %d which is higher than the latest availible revision %d",
+	if dbRevision > LATEST || dbRevision < 0 {
+		return fmt.Errorf("database revision %d is not supported, supported revisions 1..%d",
 			dbRevision, LATEST)
 	}
 
@@ -57,7 +57,7 @@ If you still want to continue, type YES, otherwise press Ctrl+C to abort.
 			return err
 		}
 		if strings.TrimSpace(text) != "YES" {
-			log.Fatal("Aborted by user")
+			return fmt.Errorf("aborted by user")
 		}
 		for i := dbRevision; i > toRevision; i-- {
 			err := Migrations[i-1].Down(db)
