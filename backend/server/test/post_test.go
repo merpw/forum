@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -23,49 +24,36 @@ type TestUser struct {
 	Password string `json:"password"`
 }
 
-// TestBody to be used in all Post tests.
-type TestBody struct {
-	Title      string   `json:"title"`
-	Content    string   `json:"content"`
-	Categories []string `json:"categories"`
-}
-
 // cookie to simulate logged in user.
 var cookie *http.Cookie
 
-// TestWithAuth tests all routes that require authentication
-func TestWithAuth(t *testing.T) {
-	// Opens sqlite3
-	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
-	if err != nil {
-		t.Fatal(err)
+func getInvalidPosts() []Post {
+	return []Post{
+		{
+			Title:      "",
+			Content:    "Valid Content",
+			Categories: []string{"facts"},
+		},
+		{
+			Title:      "invalidTitleTooLongItWillExceed25length",
+			Content:    "Valid Content",
+			Categories: []string{"facts"},
+		},
+		{
+			Title:      "Valid Title",
+			Content:    "",
+			Categories: []string{"facts"},
+		},
+		{
+			Title:      "Valid Title",
+			Content:    "Valid title",
+			Categories: []string{"Invalid category"},
+		},
 	}
-	// connects server to DB, and initiates the DB
-	srv := server.Connect(db)
-	err = srv.DB.InitDatabase()
-	if err != nil {
-		t.Fatal(err)
-	}
+}
 
-	// Opens the available routes
-	router := srv.Start()
-	testServer := httptest.NewServer(router)
-	defer testServer.Close()
-
-	cli := testServer.Client()
-
-	// Adds an user and a post to the database
-	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
-	srv.DB.AddPost("test", "test", userId, "facts")
-
-	validUser := TestUser{
-		Name:     "test",
-		Email:    "test@test.com",
-		Password: "SuperAmazingPassword()!@*#)(!@#",
-	}
-
-	// Slice of invalid users. It will cover most nonDB test cases.
-	invalidUsers := []TestUser{
+func getInvalidUsers() []TestUser {
+	return []TestUser{
 		{
 			Name:     "test1",
 			Email:    "test@test.com", // email already in use
@@ -107,18 +95,91 @@ func TestWithAuth(t *testing.T) {
 			Password: "ValidPassword123",
 		},
 	}
+}
+
+func setupServer() (*sql.DB, *server.Server, *httptest.Server, *http.Client, error) {
+	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	srv := server.Connect(db)
+	err = srv.DB.InitDatabase()
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	router := srv.Start()
+	testServer := httptest.NewServer(router)
+	cli := testServer.Client()
+
+	return db, srv, testServer, cli, nil
+}
+
+func signup(cli *http.Client, testServer *httptest.Server, user TestUser) (*http.Response, error) {
+	body, err := json.Marshal(user)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := cli.Post(testServer.URL+"/api/signup", "application/json", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
+}
+
+type Post struct {
+	Title      string
+	Content    string
+	Categories []string
+}
+
+// err := createPost(cli, testServer, cookie, title, content, []string{"facts"})
+func createPost(cli *http.Client, sURL string, ck *http.Cookie, p Post) (*http.Response, error) {
+	requestBodyBytes, err := json.Marshal(p)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, sURL+"/api/posts/create/", bytes.NewReader(requestBodyBytes))
+	if err != nil {
+		return nil, err
+	}
+	req.AddCookie(ck)
+
+	return cli.Do(req)
+}
+
+// TestWithAuth tests all routes that require authentication
+func TestWithAuth(t *testing.T) {
+	db, srv, testServer, cli, err := setupServer()
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+	defer testServer.Close()
+
+	// Adds an user and a post to the database
+	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
+	srv.DB.AddPost("test", "test", userId, "facts")
+
+	validUser := TestUser{
+		Name:     "test",
+		Email:    "test@test.com",
+		Password: "SuperAmazingPassword()!@*#)(!@#",
+	}
+
+	// Slice of invalid users. It will cover most nonDB test cases.
+	invalidUsers := getInvalidUsers()
 
 	t.Run("signup", func(t *testing.T) {
-		body, err := json.Marshal(validUser)
+		resp, err := signup(cli, testServer, validUser)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		resp, err := cli.Post(testServer.URL+"/api/signup", "application/json", bytes.NewReader(body))
-		if err != nil {
-			t.Fatal(err)
-		}
-    
 		// bug found, if the user is already present, we give back 400 instead of 409
 		if resp.StatusCode != http.StatusOK {
 			t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
@@ -126,34 +187,25 @@ func TestWithAuth(t *testing.T) {
 	})
 
 	t.Run("invalidSignup", func(t *testing.T) {
-		invalidBody, err := json.Marshal("")
+		// signup with an invalid user (empry string)
+		invalidResp, err := signup(cli, testServer, TestUser{})
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		invalidResp, err := cli.Post(testServer.URL+"/api/signup", "application/json", bytes.NewReader(invalidBody))
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if invalidResp.StatusCode != 400 {
+		if invalidResp.StatusCode != http.StatusBadRequest {
 			t.Fatalf("expected %d, got %d", 400, invalidResp.StatusCode)
 		}
 
 		// Loop through all the invalid users to test all the nonDB errors.
 		for _, user := range invalidUsers {
-			body, err := json.Marshal(user)
+			invalidResp, err := signup(cli, testServer, user)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			resp, err := cli.Post(testServer.URL+"/api/signup", "application/json", bytes.NewReader(body))
-			if err != nil {
-				t.Fatal(err)
-			}
-			// bug found, if the user is already present, we give back 400 instead of 409
-			if resp.StatusCode != 400 {
-				t.Fatalf("expected %d, got %d", http.StatusBadRequest, resp.StatusCode)
+			if invalidResp.StatusCode != http.StatusBadRequest {
+				t.Fatalf("expected %d, got %d", http.StatusBadRequest, invalidResp.StatusCode)
 			}
 
 		}
@@ -161,28 +213,10 @@ func TestWithAuth(t *testing.T) {
 
 	t.Run("login", func(t *testing.T) {
 		cookie = dummyLogin(t, cli, testServer, validUser)
-		// for _, user := range invalidUsers {
-		// 	cookie = dummyLogin(t, cli, testServer, user)
-		// }
 		// TODO: Improve this test.
 	})
 
 	// TODO: Make this test not use unauthorized global exports.
-	// t.Run("invalidLogin", func(t *testing.T) {
-
-	// 	// fakeUser := srv.DB.AddUser("testuser", "test@testing.com", "@@@l1sa@@@")
-	// 	fakeCookie := &http.Cookie{Name: "forum-token", Value: "fake-token"}
-	// 	fakeRequest := httptest.NewRequest(http.MethodPost, "/login", nil)
-	// 	fakeRequest.AddCookie(fakeCookie)
-
-	// 	// call the login handler and check the response
-	// 	fakeRecorder := httptest.NewRecorder()
-	// 	srv.loginHandler(fakeRecorder, fakeRequest)
-	// 	if fakeRecorder.Result().StatusCode != http.StatusBadRequest {
-	// 		t.Errorf("Expected status code %d but got %d", http.StatusBadRequest, fakeRecorder.Result().StatusCode)
-	// 	}
-
-	// })
 
 	// create a test for a post not found (404) error
 	t.Run("postNotFound", func(t *testing.T) {
@@ -196,64 +230,27 @@ func TestWithAuth(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if resp.StatusCode != 404 {
+		if resp.StatusCode != http.StatusNotFound {
 			t.Fatalf("expected %d, got %d", 404, resp.StatusCode)
 		}
 	})
 
 	// Invalid posts to be used in the "invalid posts" test
-	invalidPosts := []TestBody{
-		{
-			Title:      "",
-			Content:    "Valid Content",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "invalidTitleTooLongItWillExceed25length",
-			Content:    "Valid Content",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "Valid Title",
-			Content:    "",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "Valid Title",
-			Content:    "Valid title",
-			Categories: []string{"Invalid category"},
-		},
-	}
+	invalidPosts := getInvalidPosts()
 
 	// test create 5 posts
 	t.Run("createPost", func(t *testing.T) {
 		for i := 1; i <= 5; i++ {
-			body := struct {
-				Title      string   `json:"title"`
-				Content    string   `json:"content"`
-				Categories []string `json:"categories"`
-			}{
+			p := Post{
 				Title:      fmt.Sprintf("Test Title %d", i),
 				Content:    fmt.Sprintf("Test Content %d", i),
-				Categories: []string{"facts"},
+				Categories: []string{"facts"}, // Categories
 			}
-			requestBodyBytes, err := json.Marshal(body)
+			resp, err := createPost(cli, testServer.URL, cookie, p)
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/create/",
-				bytes.NewReader(requestBodyBytes))
-			if err != nil {
-				t.Fatal(err)
-			}
-			req.AddCookie(cookie)
-
-			resp, err := cli.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if resp.StatusCode != 200 {
+			if resp.StatusCode != http.StatusOK {
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
 					log.Println(err)
@@ -266,25 +263,12 @@ func TestWithAuth(t *testing.T) {
 
 	// TODO: DOCUMENTATION
 	t.Run("createInvalidPost", func(t *testing.T) {
-		// Tests invalid body
-		requestBodyBytes, err := json.Marshal("")
+		resp, err := createPost(cli, testServer.URL, cookie, Post{"", "", []string{""}})
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/create/",
-			bytes.NewReader(requestBodyBytes))
-		if err != nil {
-			t.Fatal(err)
-		}
-		req.AddCookie(cookie)
-
-		resp, err := cli.Do(req)
-		if err != nil {
-			t.Fatal(err)
-		}
-
-		if resp.StatusCode != 400 {
+		if resp.StatusCode != http.StatusBadRequest {
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				log.Println(err)
@@ -295,23 +279,11 @@ func TestWithAuth(t *testing.T) {
 
 		// Tests the invalid posts
 		for _, post := range invalidPosts {
-			requestBodyBytes, err := json.Marshal(post)
+			resp, err := createPost(cli, testServer.URL, cookie, post)
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			req, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/posts/create/",
-				bytes.NewReader(requestBodyBytes))
-			if err != nil {
-				t.Fatal(err)
-			}
-			req.AddCookie(cookie)
-
-			resp, err := cli.Do(req)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if resp.StatusCode != 400 {
+			if resp.StatusCode != http.StatusBadRequest {
 				body, err := io.ReadAll(resp.Body)
 				if err != nil {
 					log.Println(err)
@@ -456,49 +428,6 @@ func BenchmarkWithAuth(b *testing.B) {
 	}
 }
 
-// *****BELOW IS TEST FOR sendObject FUNCTION.*****
-// It has been noted that it contains illegal exports. Move to correct directory? Delete?
-// type invalidResponseWriter struct {
-// 	Code int
-// }
-
-// func TestSendObject(t *testing.T) {
-// 	t.Run("invalidJson", func(t *testing.T) {
-// 		// create a mock http.ResponseWriter
-// 		w := httptest.NewRecorder()
-
-// 		// create an object that cannot be serialized to JSON
-// 		object := make(chan int)
-
-// 		// call sendObject with the mock response writer and the invalid object
-// 		server.SendObject(w, object)
-
-// 		// check that the response code is 500
-// 		if w.Code != http.StatusInternalServerError {
-// 			t.Errorf("Expected response code 500, got %d", w.Code)
-// 		}
-// 	})
-
-// 	t.Run("writerError", func(t *testing.T) {
-// 		w := invalidResponseWriter{}
-// 		// call sendObject with the invalid writer and the valid object
-// 		server.SendObject(w, map[string]string{"message": "hello"})
-// 	})
-
-// }
-
-// Used to implement the ResponseWriter interface.
-// func (w invalidResponseWriter) Header() http.Header {
-// 	return make(http.Header)
-// }
-
-// func (w invalidResponseWriter) Write(bytes []byte) (int, error) {
-// 	return 0, errors.New("write error")
-// }
-
-// func (w invalidResponseWriter) WriteHeader(statusCode int) {}
-// *****ABOVE IS CODE FOR SENDOBJECT FUNCTION*****
-
 func dummyLogin(t *testing.T, cli *http.Client, testServer *httptest.Server, testUser TestUser) *http.Cookie {
 	body := fmt.Sprintf(`{ "login": "%v", "password": "%v" }`, testUser.Email, testUser.Password)
 	resp, err := cli.Post(testServer.URL+"/api/login", "application/json",
@@ -511,7 +440,7 @@ func dummyLogin(t *testing.T, cli *http.Client, testServer *httptest.Server, tes
 	}
 	cookie := resp.Cookies()[0]
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode != http.StatusOK {
 		t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
 	}
 	return cookie

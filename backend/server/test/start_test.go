@@ -38,5 +38,3 @@ func startServer() *httptest.Server {
 	}
 	return httptest.NewServer(srv.Start())
 }
-
-
