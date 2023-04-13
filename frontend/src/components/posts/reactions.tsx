@@ -39,7 +39,7 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
       </span>
       <button
         title={"Like"}
-        className={"mr-1 " + (reaction == 1 ? "text-blue-500" : "")}
+        className={"clickable mr-1 " + (reaction == 1 ? "text-blue-500" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -79,7 +79,7 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
 
       <button
         title={"Dislike"}
-        className={"mr-1 " + (reaction == -1 ? "text-blue-500" : "")}
+        className={"clickable mr-1 " + (reaction == -1 ? "text-blue-500" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -210,7 +210,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
 
 export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
   <span className={"my-auto flex mr-2"}>
-    <Link title={"Comments"} href={`/post/${post.id}`} className={"hover:opacity-50 my-auto flex"}>
+    <Link title={"Comments"} href={`/post/${post.id}`} className={"clickable my-auto flex"}>
       <span className={"mr-1 text-xl"}>{post.comments_count > 0 && post.comments_count}</span>
       <span className={"pt-1"}>
         <svg
@@ -244,7 +244,7 @@ export const Category: FC<{ post: Post }> = ({ post }) => {
           title={`Category ${category}`}
           key={key}
           href={`/category/${category}`}
-          className={"hover:opacity-50 flex"}
+          className={"clickable flex"}
         >
           <span className={"text-xl capitalize"}>{category}</span>
           <span className={"pt-1 mx-1"}>

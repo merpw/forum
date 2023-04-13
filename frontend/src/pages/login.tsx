@@ -53,57 +53,42 @@ const LoginPage: NextPage = () => {
             })
         }}
       >
-        <div className={"mb-6"}>
-          <label
-            htmlFor={"login"}
-            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-          >
-            Your email or username
+        <div className={"field"}>
+          <label htmlFor={"login"} className={"label"}>
+            <p className={"field-title"}>Your email or username</p>
             <input
               type={login.match("@") ? "email" : "text"}
-              className={
-                "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              }
+              className={"input"}
               onInput={(e) => setLogin(e.currentTarget.value)}
               placeholder={"Email or username"}
               required
             />
           </label>
         </div>
-        <div className={"mb-6"}>
-          <label
-            htmlFor={"password"}
-            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-          >
-            Your password
+        <div className={"field"}>
+          <label htmlFor={"password"} className={"label"}>
+            <p className={"field-title"}>Your password</p>
+            <input
+              onInput={(e) => setPassword(e.currentTarget.value)}
+              type={"password"}
+              id={"password"}
+              className={"input"}
+              required
+            />
           </label>
-          <input
-            onInput={(e) => setPassword(e.currentTarget.value)}
-            type={"password"}
-            id={"password"}
-            className={
-              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            }
-            required
-          />
         </div>
 
         <FormError error={formError} />
         <span className={"flex flex-wrap gap-2"}>
           <span>
-            <button
-              type={"submit"}
-              className={
-                "mb-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              }
-            >
+            <button type={"submit"} className={"button mb-2"}>
               Submit
             </button>
           </span>
 
           <span className={"ml-auto text-right"}>
             <div className={"font-light"}>{"Don't have an account yet?"}</div>
-            <Link className={"text-2xl hover:opacity-50 "} href={"/signup"}>
+            <Link className={"clickable text-2xl"} href={"/signup"}>
               Sign Up!
             </Link>
           </span>

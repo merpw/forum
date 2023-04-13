@@ -17,10 +17,10 @@ const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, catego
         <meta name={"og:description"} content={"The friendliest forum"} />
       </Head>
       <div className={"flex gap-2 flex-wrap justify-center mb-5"}>
-        <span className={"text-3xl rounded-lg px-5 py-2 w-full text-center"}>Categories:</span>
+        <span className={"title w-full text-center"}>Categories:</span>
         {categories.map((category, key) => (
           <span key={key} className={"text-3xl border rounded-lg px-5 py-2 capitalize"}>
-            <Link href={`/category/${category}`} className={"hover:opacity-50"}>
+            <Link href={`/category/${category}`} className={"clickable"}>
               {category}
             </Link>
           </span>

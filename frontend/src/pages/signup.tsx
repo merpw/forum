@@ -72,35 +72,24 @@ const SignupPage: NextPage = () => {
             })
         }}
       >
-        <div className={"mb-6"}>
-          <label
-            htmlFor={"username"}
-            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-          >
-            Username
-            <input
-              type={"text"}
-              className={
-                "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              }
-              onInput={(e) => setName(e.currentTarget.value)}
-              placeholder={"Username"}
-              required
-            />
-          </label>
-        </div>
-        <div className={"flex flex-raw mb-3 gap-3"}>
+        <label htmlFor={"username"} className={"field label"}>
+          <p className={"field-title"}>Username</p>
+          <input
+            type={"text"}
+            className={"input"}
+            onInput={(e) => setName(e.currentTarget.value)}
+            placeholder={"Username"}
+            required
+          />
+        </label>
+
+        <div className={"field flex flex-raw gap-3"}>
           <div className={"w-full"}>
-            <label
-              htmlFor={"first_name"}
-              className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-            >
-              First Name
+            <label htmlFor={"first_name"} className={"label"}>
+              <p className={"field-title"}>First Name </p>
               <input
                 type={"text"}
-                className={
-                  "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                }
+                className={"input"}
                 onInput={(e) => setFirstName(e.currentTarget.value)}
                 placeholder={"First Name"}
                 required
@@ -108,16 +97,11 @@ const SignupPage: NextPage = () => {
             </label>
           </div>
           <div className={"w-full"}>
-            <label
-              htmlFor={"last_name"}
-              className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-            >
-              Last Name
+            <label htmlFor={"last_name"} className={"label"}>
+              <p className={"field-title"}>Last Name </p>
               <input
                 type={"text"}
-                className={
-                  "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                }
+                className={"input"}
                 onInput={(e) => setLastName(e.currentTarget.value)}
                 placeholder={"Last Name"}
                 required
@@ -125,19 +109,14 @@ const SignupPage: NextPage = () => {
             </label>
           </div>
         </div>
-        <div className={"flex flex-raw mb-6 gap-3"}>
+        <div className={"field flex flex-raw gap-3"}>
           <div className={"w-full flex-1 overflow-x-hidden"}>
-            <label
-              htmlFor={"dob"}
-              className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-            >
-              Date of Birth
+            <label htmlFor={"dob"} className={"label"}>
+              <p className={"field-title"}>Date of Birth </p>
               <input
                 type={"date"}
                 max={new Date().toISOString().split("T")[0]}
-                className={
-                  "h-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                }
+                className={"input"}
                 onInput={(e) => setDoB(e.currentTarget.value)}
                 placeholder={"Date of Birth"}
                 required
@@ -145,15 +124,10 @@ const SignupPage: NextPage = () => {
             </label>
           </div>
           <div className={"w-full flex-1"}>
-            <label
-              htmlFor={"gender"}
-              className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-            >
-              Gender
+            <label htmlFor={"gender"} className={"label"}>
+              <p className={"field-title"}>Gender </p>
               <select
-                className={
-                  "h-10 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                }
+                className={"input"}
                 onInput={(e) => setGender(e.currentTarget.value)}
                 placeholder={"Gender"}
                 required
@@ -166,63 +140,41 @@ const SignupPage: NextPage = () => {
             </label>
           </div>
         </div>
-        <div className={"mb-6"}>
-          <label
-            htmlFor={"email"}
-            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-          >
-            Your email
-            <input
-              type={"email"}
-              className={
-                "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              }
-              onInput={(e) => setEmail(e.currentTarget.value)}
-              placeholder={"Email"}
-              required
-            />
-          </label>
-        </div>
-        <div className={"mb-3"}>
-          <label
-            htmlFor={"password"}
-            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-          >
-            Create password
-            <input
-              onInput={(e) => setPassword(e.currentTarget.value)}
-              type={"password"}
-              className={
-                "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              }
-              required
-            />
-          </label>
-        </div>
-        <div className={"mb-6"}>
-          <label
-            htmlFor={"repeat-password"}
-            className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-          >
-            Repeat password
-          </label>
+
+        <label htmlFor={"email"} className={"field label"}>
+          <p className={"field-title"}>Your email</p>
+          <input
+            type={"email"}
+            className={"input"}
+            onInput={(e) => setEmail(e.currentTarget.value)}
+            placeholder={"Email"}
+            required
+          />
+        </label>
+
+        <label htmlFor={"password"} className={"field label"}>
+          <p className={"field-title"}>Create password </p>
+          <input
+            onInput={(e) => setPassword(e.currentTarget.value)}
+            type={"password"}
+            className={"input"}
+            required
+          />
+        </label>
+
+        <label htmlFor={"repeat-password"} className={"field label"}>
+          <p className={"field-title"}>Repeat password </p>
           <input
             onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
             type={"password"}
             id={"repeat-password"}
-            className={
-              "bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            }
+            className={"input"}
             required
           />
-        </div>
+        </label>
+
         <FormError error={formError} />
-        <button
-          type={"submit"}
-          className={
-            "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          }
-        >
+        <button type={"submit"} className={"button"}>
           Submit
         </button>
       </form>

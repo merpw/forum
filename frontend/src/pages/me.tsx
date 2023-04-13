@@ -36,7 +36,7 @@ const UserPage: NextPage = () => {
         <title>{`Profile - Forum`}</title>
       </Head>
       <UserInfo />
-      <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1 max-w-fit"}>
+      <Link href={"/create"} className={"clickable text-2xl mb-5 flex gap-1 max-w-fit"}>
         <span className={"my-auto"}>
           <svg
             xmlns={"http://www.w3.org/2000/svg"}
@@ -58,12 +58,12 @@ const UserPage: NextPage = () => {
         <span>Create a new post</span>
       </Link>
 
-      <ul className={"flex flex-wrap gap-2 text-2xl mb-3"}>
+      <ul className={"title flex flex-wrap gap-5"}>
         {tabs.map(({ title }, key) => (
           <li
             key={key}
             className={
-              "cursor-pointer hover:opacity-60 p-1 " +
+              "clickable cursor-pointer p-1 " +
               (activeTab == key ? "border-b-2 border-b-blue-500" : "")
             }
             onClick={() => setActiveTab(key)}

@@ -47,7 +47,7 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
               {moment(post.date).fromNow()}
             </span>
             {" by "}
-            <span className={"text-xl hover:opacity-50"}>
+            <span className={"clickable text-xl"}>
               <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
             </span>
           </span>
@@ -121,12 +121,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
       <FormError error={formError} />
 
-      <button
-        type={"submit"}
-        className={
-          "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        }
-      >
+      <button type={"submit"} className={"button"}>
         Submit
       </button>
     </form>
@@ -146,7 +141,7 @@ const Comments: FC<{ post: Post }> = ({ post }) => {
         .map((comment, key) => (
           <div className={"border rounded p-5"} key={key}>
             <Link href={`/user/${comment.author.id}`}>
-              <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
+              <h3 className={"clickable text-lg"}>{comment.author.name}</h3>
             </Link>
             <p className={"whitespace-pre-line"}>{comment.content}</p>
             <hr className={"mt-4 mb-2"}></hr>
