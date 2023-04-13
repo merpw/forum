@@ -77,10 +77,16 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = revalidateURL(fmt.Sprintf("/post/%v", id))
 	if err != nil {
-		log.Printf("Error while revalidating URL: %v", err)
+		log.Printf("Error while revalidating `/post/%v`: %v", id, err)
 	}
 	err = revalidateURL("/")
 	if err != nil {
-		log.Printf("Error while revalidating URL: %v", err)
+		log.Printf("Error while revalidating '/': %v", err)
+	}
+	for _, category := range categories {
+		err = revalidateURL(fmt.Sprintf("/category/%v", category))
+		if err != nil {
+			log.Printf("Error while revalidating `/category/%v`: %v", category, err)
+		}
 	}
 }
