@@ -2,7 +2,9 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"forum/database/migrate"
+	"log"
 
 	_ "github.com/mattn/go-sqlite3"
 )
