@@ -2,8 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
-	"log"
+	"forum/database/migrate"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -12,11 +11,6 @@ type DB struct {
 	*sql.DB
 }
 
-// TODO: add column changing support
-
-// InitDatabase creates all the necessary tables and columns in sql.DB
-//
-// If the table already exists, it will be checked for the columns. If the columns are missing, they will be added.
 func (db DB) InitDatabase() error {
 	err := db.InitTable("users", []Column{
 		{Name: "id", Type: "INTEGER", PrimaryKey: true},
@@ -249,6 +243,5 @@ func (db DB) InitTable(table string, columns []Column, additional ...string) err
 			}
 		}
 	}
-
-	return nil
+	return migrate.Migrate(db.DB, migrate.LATEST)
 }
