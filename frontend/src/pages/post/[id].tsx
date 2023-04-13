@@ -110,9 +110,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
         <ReactTextareaAutosize
           id={"comment-text"}
-          className={
-            "w-full bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
-          }
+          className={"create w-full"}
           value={text}
           onInput={(e) => setText(e.currentTarget.value)}
           required

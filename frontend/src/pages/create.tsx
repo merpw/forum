@@ -79,9 +79,7 @@ const CreatePostForm = () => {
         <input
           type={"text"}
           title={"title"}
-          className={
-            "bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
-          }
+          className={"create"}
           onInput={(e) => setTitle(e.currentTarget.value)}
           placeholder={"Title"}
           required
@@ -90,9 +88,7 @@ const CreatePostForm = () => {
       <div className={"mb-3"}>
         <ReactTextAreaAutosize
           title={"content"}
-          className={
-            "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          }
+          className={"create w-full"}
           onInput={(e) => setContent(e.currentTarget.value)}
           minRows={5}
           placeholder={"Content"}
@@ -109,9 +105,7 @@ const CreatePostForm = () => {
           multiple
           required
           id={"cats"}
-          className={
-            "text-xl capitalize bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          }
+          className={"create text-xl capitalize w-full"}
           onChange={(e) =>
             setCategory(Array.from(e.currentTarget.selectedOptions, (option) => option.value))
           }
