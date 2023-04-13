@@ -5,6 +5,7 @@ import { AxiosError } from "axios"
 import { getCategoriesLocal, getCategoryPostsLocal } from "@/api/posts/fetch"
 import { PostList } from "@/components/posts/list"
 import { Post } from "@/custom"
+import { Capitalize } from "@/helpers/text"
 
 const CategoryPage: NextPage<{ category_name: string; posts: Post[] }> = ({
   category_name,
@@ -49,7 +50,7 @@ export const getStaticProps: GetStaticProps<{ posts: Post[] }, { name: string }>
     return {
       props: {
         posts: posts,
-        category_name: category_name.charAt(0).toUpperCase() + category_name.slice(1), // Capitalize first letter
+        category_name: Capitalize(category_name),
       },
       revalidate: 60,
     }

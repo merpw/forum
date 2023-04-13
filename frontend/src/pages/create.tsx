@@ -1,15 +1,17 @@
-import { NextPage } from "next"
+import { GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
+import Select from "react-select"
 
 import { useMe } from "@/api/auth"
-import { getCategories } from "@/api/posts/categories"
 import { CreatePost } from "@/api/posts/create"
 import { FormError } from "@/components/error"
+import { getCategoriesLocal } from "@/api/posts/fetch"
+import { Capitalize } from "@/helpers/text"
 
-const CreatePostPage: NextPage = () => {
+const CreatePostPage: NextPage<{ categories: string[] }> = ({ categories }) => {
   const { isLoading, isLoggedIn } = useMe()
   const router = useRouter()
 
@@ -25,16 +27,18 @@ const CreatePostPage: NextPage = () => {
     <>
       <NextSeo title={"Create new post"} />
 
-      <CreatePostForm />
+      <CreatePostForm categories={categories} />
     </>
   )
 }
 
-const CreatePostForm = () => {
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [category, setCategory] = useState<string[]>([])
-  const [categories, setCategories] = useState<string[]>([])
+const CreatePostForm: FC<{ categories: string[] }> = ({ categories }) => {
+  const [formFields, setFormFields] = useState<{
+    title: string
+    content: string
+    categories: string[]
+  }>({ title: "", content: "", categories: [] })
+
   const [formError, setFormError] = useState<string | null>(null)
 
   const router = useRouter()
@@ -43,14 +47,14 @@ const CreatePostForm = () => {
 
   useEffect(() => {
     setIsSame(false)
-  }, [title, content, category])
-
-  useEffect(() => {
-    getCategories().then(setCategories)
-  }, [])
+  }, [formFields])
 
   return (
     <form
+      onChange={(e) => {
+        const { name, value } = e.target as HTMLInputElement
+        setFormFields({ ...formFields, [name]: value })
+      }}
       onSubmit={(e) => {
         e.preventDefault()
 
@@ -58,12 +62,12 @@ const CreatePostForm = () => {
 
         if (formError != null) setFormError(null)
         setIsSame(true)
-        if (category.length == 0) {
+        if (formFields.categories.length == 0) {
           setFormError("Category is not selected")
           return
         }
 
-        CreatePost(title, content, category)
+        CreatePost(formFields)
           .then((id) => router.push(`/post/${id}`))
           .catch((err) => {
             if (err.code == "ERR_BAD_REQUEST") {
@@ -77,47 +81,37 @@ const CreatePostForm = () => {
       <div className={"mb-3"}>
         <input
           type={"text"}
-          title={"title"}
+          name={"title"}
           className={
             "bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
           }
-          onInput={(e) => setTitle(e.currentTarget.value)}
           placeholder={"Title"}
           required
         />
       </div>
       <div className={"mb-3"}>
         <ReactTextAreaAutosize
-          title={"content"}
+          name={"content"}
           className={
             "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
           }
-          onInput={(e) => setContent(e.currentTarget.value)}
+          rows={5}
           minRows={5}
           placeholder={"Content"}
           required
         />
       </div>
       <div className={"mb-6"}>
-        <label
-          htmlFor={"cats"}
-          className={"block mb-2 text-sm font-medium text-gray-900 dark:text-white"}
-        ></label>
-        <select
-          multiple
-          required
-          id={"cats"}
-          className={
-            "text-xl capitalize bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        <Select
+          isMulti={true}
+          name={"categories"}
+          className={"react-select-container"}
+          classNamePrefix={"react-select"}
+          onChange={(newValue) =>
+            setFormFields({ ...formFields, categories: newValue.map((v) => v.value) })
           }
-          onChange={(e) =>
-            setCategory(Array.from(e.currentTarget.selectedOptions, (option) => option.value))
-          }
-        >
-          {categories.map((cat, key) => (
-            <option key={key}>{cat}</option>
-          ))}
-        </select>
+          options={categories.map((name) => ({ label: Capitalize(name), value: name }))}
+        />
       </div>
       <FormError error={formError} />
 
@@ -131,6 +125,19 @@ const CreatePostForm = () => {
       </button>
     </form>
   )
+}
+
+export const getStaticProps: GetStaticProps = async () => {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
+    return { notFound: true, revalidate: 60 }
+  }
+  const categories = await getCategoriesLocal()
+  return {
+    props: {
+      categories,
+    },
+    revalidate: 60,
+  }
 }
 
 export default CreatePostPage
