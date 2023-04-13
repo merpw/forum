@@ -7,7 +7,7 @@ import (
 
 // addSlashes escapes all slashes in a string ( / -> \/ )
 func addSlashes(s string) string {
-	return strings.Replace(s, "/", "\\/", -1)
+	return strings.ReplaceAll(s, "/", "\\/")
 }
 
 // # Pattern Translator

@@ -6,7 +6,7 @@ RUN apk add build-base
 WORKDIR /app/
 
 # Download dependencies first to leverage Docker cache
-COPY go.mod .
+COPY go.* .
 RUN go mod download
 
 COPY . .
@@ -19,12 +19,12 @@ RUN --mount=type=cache,target=/root/.cache/go-build go build -o /bin/server .
 
 FROM alpine
 
-FROM alpine
-
 COPY --from=builder /bin/ /bin/
 
-WORKDIR /bin/
+WORKDIR /app/
 
-CMD ./server
+VOLUME /app/db
+
+CMD server --db /app/db/database.db
 
 EXPOSE 8080

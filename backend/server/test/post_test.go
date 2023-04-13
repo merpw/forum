@@ -1,4 +1,4 @@
-package server
+package server_test
 
 import (
 	"bytes"
@@ -13,9 +13,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-
-	// from package database import Post
-
 	"github.com/gofrs/uuid"
 )
 
@@ -121,10 +118,10 @@ func TestWithAuth(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-
-		// bug found, if thee user is already present, we give back 400 instead of 409
-		if resp.StatusCode != 200 {
-			t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
+    
+		// bug found, if the user is already present, we give back 400 instead of 409
+		if resp.StatusCode != http.StatusOK {
+			t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
 		}
 	})
 
@@ -158,8 +155,8 @@ func TestWithAuth(t *testing.T) {
 			if resp.StatusCode != 400 {
 				t.Fatalf("expected %d, got %d", http.StatusBadRequest, resp.StatusCode)
 			}
-		}
 
+		}
 	})
 
 	t.Run("login", func(t *testing.T) {
@@ -286,6 +283,7 @@ func TestWithAuth(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
+
 		if resp.StatusCode != 400 {
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
@@ -382,11 +380,9 @@ func TestWithAuth(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if resp.StatusCode != 200 {
-				// print the full response
-				body, _ := io.ReadAll(resp.Body)
-				fmt.Println(string(body))
-				t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
+
+			if resp.StatusCode != http.StatusOK {
+				t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
 			}
 
 			respBody, err := io.ReadAll(resp.Body)
@@ -420,12 +416,12 @@ func BenchmarkWithAuth(b *testing.B) {
 			b.Error(err)
 		}
 
-		if resp.StatusCode != 200 {
+		if resp.StatusCode != http.StatusOK {
 			body, err := io.ReadAll(resp.Body)
 			if err != nil {
 				b.Error(err)
 			}
-			b.Errorf("expected %d, got %d, %s", 200, resp.StatusCode, body)
+			b.Errorf("expected %d, got %d, %s", http.StatusOK, resp.StatusCode, body)
 		}
 
 		resp, err = cli.Post(testServer.URL+"/api/login", "application/json",
@@ -437,8 +433,8 @@ func BenchmarkWithAuth(b *testing.B) {
 			b.Errorf("invalid cookies, expected 1, got %d", len(resp.Cookies()))
 		}
 		cookie := resp.Cookies()[0]
-		if resp.StatusCode != 200 {
-			b.Errorf("expected %d, got %d", 200, resp.StatusCode)
+		if resp.StatusCode != http.StatusOK {
+			b.Errorf("expected %d, got %d", http.StatusOK, resp.StatusCode)
 		}
 
 		request, err := http.NewRequest(http.MethodPost, testServer.URL+"/api/logout", nil)
@@ -451,8 +447,8 @@ func BenchmarkWithAuth(b *testing.B) {
 		if err != nil {
 			b.Errorf("error while logging out: %v", err)
 		}
-		if resp.StatusCode != 200 {
-			b.Errorf("expected %d, got %d", 200, resp.StatusCode)
+		if resp.StatusCode != http.StatusOK {
+			b.Errorf("expected %d, got %d", http.StatusOK, resp.StatusCode)
 		}
 		if resp.Cookies()[0].Expires.After(time.Now()) {
 			b.Errorf("cookie should be expired")

@@ -8,7 +8,9 @@ import (
 //
 // reaction=1 is like and reaction=-1 is dislike
 func (db DB) AddPostReaction(postId, userId, reaction int) {
-	_, err := db.Exec("INSERT INTO post_reactions (post_id, author_id, reaction) VALUES (?, ?, ?)", postId, userId, reaction)
+	_, err := db.Exec(`INSERT INTO post_reactions 
+    	(post_id, author_id, reaction) VALUES (?, ?, ?)`,
+		postId, userId, reaction)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -63,7 +65,8 @@ func (db DB) GetPostReaction(postId, userId int) int {
 //
 // returns 1 if user liked comment, -1 if disliked and 0 if not reacted
 func (db DB) GetCommentReaction(commentId, userId int) int {
-	query, err := db.Query("SELECT reaction FROM comment_reactions WHERE comment_id = ? AND author_id = ?", commentId, userId)
+	query, err := db.Query(`SELECT reaction FROM comment_reactions 
+                WHERE comment_id = ? AND author_id = ?`, commentId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -84,7 +87,9 @@ func (db DB) GetCommentReaction(commentId, userId int) int {
 //
 // reaction=1 is like and reaction=-1 is dislike
 func (db DB) AddCommentReaction(commentId, userId, reaction int) {
-	_, err := db.Exec("INSERT INTO comment_reactions (comment_id, author_id, reaction) VALUES (?, ?, ?)", commentId, userId, reaction)
+	_, err := db.Exec(`INSERT INTO comment_reactions 
+    	(comment_id, author_id, reaction) VALUES (?, ?, ?)`,
+		commentId, userId, reaction)
 	if err != nil {
 		log.Panic(err)
 	}

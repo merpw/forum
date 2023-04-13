@@ -1,20 +1,20 @@
-name: Backend Docker Image CI
+name: Frontend Docker Image CI
 
 on:
   push:
     branches: ["main"]
-    paths: ["backend/**"]
+    paths: ["frontend/**"]
   pull_request:
     branches: ["main"]
-    paths: ["backend/**"]
+    paths: ["frontend/**"]
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/backend
+  IMAGE_NAME: ${{ github.repository }}/frontend
 
 jobs:
   build:
-    name: Build the backend Docker image
+    name: Build the frontend Docker image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -39,7 +39,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v4
         with:
-          context: backend
+          context: frontend
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

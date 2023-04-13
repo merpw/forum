@@ -1,21 +1,16 @@
 import { GetStaticProps, NextPage } from "next"
-
-import Head from "next/head"
-import { Post } from "../custom"
-import { PostList } from "../components/posts/list"
-import { getCategoriesLocal, getPostsLocal } from "../api/posts/fetch"
 import Link from "next/link"
+import { NextSeo } from "next-seo"
+
+import { Post } from "@/custom"
+import { PostList } from "@/components/posts/list"
+import { getCategoriesLocal, getPostsLocal } from "@/api/posts/fetch"
 
 const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, categories }) => {
   return (
     <>
-      <Head>
-        <title>Recent Posts - Forum</title>
-        <meta property={"og:title"} content={"Recent Posts - FORUM"} />
+      <NextSeo title={"Recent Posts"} />
 
-        <meta name={"description"} content={"The friendliest forum"} />
-        <meta name={"og:description"} content={"The friendliest forum"} />
-      </Head>
       <div className={"flex gap-2 flex-wrap justify-center mb-5"}>
         <span className={"text-3xl rounded-lg px-5 py-2 w-full text-center"}>Categories:</span>
         {categories.map((category, key) => (
@@ -32,12 +27,15 @@ const Home: NextPage<{ posts: Post[]; categories: string[] }> = ({ posts, catego
 }
 
 export const getStaticProps: GetStaticProps<{ posts: Post[]; categories: string[] }> = async () => {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
+    return { notFound: true, revalidate: 60 }
+  }
+
   const posts: Post[] = await getPostsLocal()
   const categories = await getCategoriesLocal()
-
   return {
     props: { posts, categories },
-    revalidate: 1,
+    revalidate: 60,
   }
 }
 

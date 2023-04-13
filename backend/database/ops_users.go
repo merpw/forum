@@ -30,7 +30,7 @@ func (db DB) GetUserById(id int) *User {
 //
 // returns nil if user not found
 func (db DB) GetUserByLogin(login string) *User {
-	query, err := db.Query("SELECT * FROM users WHERE email = ? OR name = ?", login, login)
+	query, err := db.Query("SELECT * FROM users WHERE email = ? OR name = ? COLLATE NOCASE", login, login)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -77,7 +77,7 @@ func (db DB) IsEmailTaken(email string) bool {
 // IsNameTaken checks if name is already in use.
 // Added because authorization supports the name and the email as login
 func (db DB) IsNameTaken(name string) bool {
-	query, err := db.Query("SELECT 1 FROM users WHERE name = ?", name)
+	query, err := db.Query("SELECT 1 FROM users WHERE name = ? COLLATE NOCASE", name)
 	if err != nil {
 		log.Panic(err)
 	}

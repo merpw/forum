@@ -2,6 +2,8 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -72,7 +74,12 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Password is not valid", http.StatusBadRequest)
 		return
 	}
-	srv.DB.AddUser(requestBody.Name, requestBody.Email, string(encryptedPassword))
+	id := srv.DB.AddUser(requestBody.Name, requestBody.Email, string(encryptedPassword))
+
+	err = revalidateURL(fmt.Sprintf("/user/%d", id))
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {

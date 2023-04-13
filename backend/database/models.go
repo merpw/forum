@@ -35,3 +35,26 @@ type Session struct {
 	Expire int
 	UserId int
 }
+
+// TODO: remove this later
+
+// chat section
+type Chat struct {
+	Id              int
+	LastMessageDate string
+}
+
+type Membership struct {
+	Id     int
+	ChatId int
+	UserId int
+	Date   string
+}
+
+type Message struct {
+	Id       int
+	ChatId   int
+	SenderId int
+	Body     string
+	Date     string
+}

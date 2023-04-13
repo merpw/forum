@@ -2,6 +2,8 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -56,6 +58,9 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 	}
+	if len(requestBody.Categories) == 0 {
+		isValid = false
+	}
 
 	if !isValid {
 		http.Error(w, "Categories are not valid", http.StatusBadRequest)
@@ -64,13 +69,13 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, strings.Join(requestBody.Categories, ","))
 	sendObject(w, id)
-}
 
-func isPresent(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
+	err = revalidateURL(fmt.Sprintf("/post/%v", id))
+	if err != nil {
+		log.Printf("Error while revalidating URL: %v", err)
 	}
-	return false
+	err = revalidateURL("/")
+	if err != nil {
+		log.Printf("Error while revalidating URL: %v", err)
+	}
 }

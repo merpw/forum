@@ -3,9 +3,10 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"forum/database"
+	"io"
 	"log"
 	"net/http"
+	"os"
 )
 
 type SafeUser struct {
@@ -47,25 +48,69 @@ func errorResponse(w http.ResponseWriter, code int) {
 
 // sendObject sends object to http.ResponseWriter
 //
-// calls errorResponse(500) if error happened
+// panics if error occurs
 func sendObject(w http.ResponseWriter, object any) {
 	w.Header().Set("Content-Type", "application/json")
 	objJson, err := json.Marshal(object)
 	if err != nil {
-		log.Println(err)
-		errorResponse(w, 500)
+		log.Panic(err)
 		return
 	}
 	_, err = w.Write(objJson)
 	if err != nil {
-		log.Println(err)
-		errorResponse(w, 500)
+		log.Panic(err)
 		return
 	}
 }
 
-func cutPostContentForLists(post *database.Post) {
-	if len(post.Content) > 200 {
-		post.Content = post.Content[:200] + "..."
+// shortenContent shortens content to 200 characters, adds "..." at the end
+func shortenContent(content string) string {
+	if len(content) > 200 {
+		return content[:200] + "..."
 	}
+	return content
+}
+
+func isPresent(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
+
+// revalidateURL creates POST request to frontend to revalidate url
+//
+// Uses environment variables FRONTEND_REVALIDATE_URL and optional FRONTEND_REVALIDATE_TOKEN
+//
+// Does nothing if FRONTEND_REVALIDATE_URL is not set
+func revalidateURL(url string) error {
+	apiURL := os.Getenv("FRONTEND_REVALIDATE_URL")
+	if apiURL == "" {
+		return nil
+	}
+	req, err := http.NewRequest(http.MethodPost, apiURL, nil)
+	if err != nil {
+		return err
+	}
+
+	q := req.URL.Query()
+	q.Add("url", url)
+	q.Add("token", os.Getenv("FRONTEND_REVALIDATE_TOKEN"))
+	req.URL.RawQuery = q.Encode()
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	if res.StatusCode != http.StatusOK {
+		bodyBytes, err := io.ReadAll(res.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("revalidation failed: %s, %s", res.Status, bodyBytes)
+	}
+
+	return nil
 }
