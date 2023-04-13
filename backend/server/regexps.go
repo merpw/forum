@@ -10,6 +10,8 @@ func addSlashes(s string) string {
 	return strings.ReplaceAll(s, "/", "\\/")
 }
 
+// # Pattern Translator
+//
 // pt function passes incoming pattern to regexp.MustCompile(addSlashes(pattern))
 // The purpose of this function is to make it easier to read long regexps.
 //
@@ -24,7 +26,9 @@ func pt(pattern string) *regexp.Regexp {
 	return regexp.MustCompile(addSlashes(pattern))
 }
 
-// method GET endpoints
+// ****************************************************
+// *********** method GET endpoints *******************
+// ****************************************************
 
 var reApiMe = pt(`^/api/me/?$`)
 var reApiMePosts = pt(`^/api/me/posts/?$`)
@@ -33,13 +37,20 @@ var reApiMePostsLiked = pt(`^/api/me/posts/liked/?$`)
 var reApiUserId = pt(`^/api/user/[[:digit:]]+/?$`)
 var reApiUserIdPosts = pt(`^/api/user/[[:digit:]]+/posts/?$`)
 
+// macthes /api/posts/ and /api/posts
 var reApiPosts = pt(`^/api/posts/?$`)
+
+// macthes /api/posts/categories/ and /api/posts/categories
 var reApiPostsCategories = pt(`^/api/posts/categories/?$`)
+
+// macthes /api/posts/categories/[catName]/ and /api/posts/categories/[catName]
 var reApiPostsCategoriesName = pt(`^/api/posts/categories/[[:alnum:]]+/?$`)
 
 var reApiPostsId = pt(`^/api/posts/[[:digit:]]+/?$`)
 
-// method POST endpoints
+// ****************************************************
+// *********** method POST endpoints ******************
+// ****************************************************
 
 var reApiPostsCreate = pt(`^/api/posts/create/?$`)
 
@@ -69,7 +80,6 @@ var getRegexps = []string{
 
 	reApiMe.String(),
 	reApiMePosts.String(),
-	reApiMePostsLiked.String(),
 	reApiPostsIdReaction.String(),
 
 	reApiPostsCategories.String(),
@@ -82,6 +92,8 @@ var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 
 var postRegexps = []string{
 	reApiPostsCreate.String(),
+
+	reApiMePostsLiked.String(),
 
 	reApiPostsIdLike.String(),
 	reApiPostsIdDislike.String(),

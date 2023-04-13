@@ -5,9 +5,13 @@ import (
 	"time"
 )
 
-// GetAllPosts reads all posts from database (reads only userId, not user object)
+// # GetAllPosts reads all posts from database (reads only userId, not user object)
 //
 // panics if error occurs
+//
+// METHOD: GET
+//
+// URL: /api/posts
 func (db DB) GetAllPosts() []Post {
 	query, err := db.Query("SELECT * FROM posts")
 	if err != nil {
@@ -50,7 +54,11 @@ func (db DB) GetPostById(id int) *Post {
 	return &post
 }
 
-// AddPost adds post to database, returns id of new post
+// # AddPost adds post to database, returns id of new post
+//
+// METHOD: POST
+//
+// URL: /api/posts/create/
 func (db DB) AddPost(title, content string, authorId int, categories string) int {
 	result, err := db.Exec(`INSERT INTO posts 
     	(title, content, author, date, likes_count, dislikes_count, comments_count, categories)
@@ -87,6 +95,14 @@ func (db DB) GetUserPosts(userId int) []Post {
 	return posts
 }
 
+// # GetUserPostsLiked: retrieves all posts liked by user with specified userId.
+//
+// GetUserPostsLiked is a method of the DB object. It takes userId (int) and returns a slice of Post objects.
+// This function retrieves all the posts that have been liked by the user with the specified userId.
+//
+// Method: POST
+//
+// Route: /api/me/posts/liked
 func (db DB) GetUserPostsLiked(userId int) []Post {
 	query, err := db.Query(`SELECT * FROM posts WHERE id IN 
 	(SELECT post_id FROM post_reactions WHERE author_id = ? AND reaction = 1)`, userId)
@@ -152,11 +168,11 @@ func (db DB) GetCommentById(id int) *Comment {
 	return &comment
 }
 
-// GetPostComments gets all comments for post using post_id
+// # GetPostComments gets all comments for post using post_id
 //
 // Example:
 //
-//	comments := db.GetPostComments(1)
+// comments := db.GetPostComments(1)
 func (db DB) GetPostComments(postId int) []Comment {
 	query, err := db.Query("SELECT * FROM comments WHERE post_id = ?", postId)
 	if err != nil {

@@ -74,9 +74,13 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
-// apiMePostsLikedHandler returns the current user's liked posts to the current user if he is logged in.
+// # api Me(logged in user) Posts Liked Handler
 //
-//	GET /api/me/posts/liked
+// returns the current user's liked posts to the current user if he is logged in.
+//
+// Method: POST
+//
+// Route: /api/me/posts/liked
 func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) {
 	userId := srv.getUserId(w, r)
 	if userId == -1 {
@@ -87,7 +91,6 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 
 	type Response struct {
 		SafePost
-		DislikesCount int `json:"dislikesCount"`
 	}
 
 	response := make([]Response, 0)
