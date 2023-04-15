@@ -11,14 +11,25 @@ const SignupPage: NextPage = () => {
 
   const { isLoading, isLoggedIn, mutate } = useMe()
 
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [passwordConfirm, setPasswordConfirm] = useState("")
-  const [first_name, setFirstName] = useState("")
-  const [last_name, setLastName] = useState("")
-  const [dob, setDoB] = useState("")
-  const [gender, setGender] = useState("")
+  const [formFields, setFormFields] = useState<{
+    name: string
+    email: string
+    password: string
+    passwordConfirm: string
+    first_name: string
+    last_name: string
+    dob: string
+    gender: string
+  }>({
+    name: "",
+    email: "",
+    password: "",
+    passwordConfirm: "",
+    first_name: "",
+    last_name: "",
+    dob: "",
+    gender: "",
+  })
 
   const [isSame, setIsSame] = useState(false)
 
@@ -34,7 +45,7 @@ const SignupPage: NextPage = () => {
 
   useEffect(() => {
     setIsSame(false)
-  }, [name, email, password, passwordConfirm, first_name, last_name, dob, gender])
+  }, [formFields])
 
   return (
     <>
@@ -44,6 +55,10 @@ const SignupPage: NextPage = () => {
         <meta name={"og:title"} content={"Sign Up - Forum"} />
       </Head>
       <form
+        onChange={(e) => {
+          const target = e.target as HTMLInputElement
+          setFormFields({ ...formFields, [target.name]: target.value })
+        }}
         onSubmit={async (e) => {
           e.preventDefault()
 
@@ -52,15 +67,23 @@ const SignupPage: NextPage = () => {
           if (formError != null) setFormError(null)
           setIsSame(true)
 
-          if (password != passwordConfirm) {
+          if (formFields.password != formFields.passwordConfirm) {
             setFormError("Passwords don't match")
             return
           }
 
-          SignUp(name, email, password, first_name, last_name, dob, gender)
+          SignUp(
+            formFields.name,
+            formFields.email,
+            formFields.password,
+            formFields.first_name,
+            formFields.last_name,
+            formFields.dob,
+            formFields.gender
+          )
             .then((response) => {
               if (response.status == 200) {
-                logIn(email, password).then(() => mutate())
+                logIn(formFields.email, formFields.password).then(() => mutate())
               }
             })
             .catch((err: AxiosError) => {
@@ -77,7 +100,7 @@ const SignupPage: NextPage = () => {
           <input
             type={"text"}
             className={"input"}
-            onInput={(e) => setName(e.currentTarget.value)}
+            name={"name"}
             placeholder={"Username"}
             required
           />
@@ -90,7 +113,7 @@ const SignupPage: NextPage = () => {
               <input
                 type={"text"}
                 className={"input"}
-                onInput={(e) => setFirstName(e.currentTarget.value)}
+                name={"first_name"}
                 placeholder={"First Name"}
                 required
               />
@@ -102,7 +125,7 @@ const SignupPage: NextPage = () => {
               <input
                 type={"text"}
                 className={"input"}
-                onInput={(e) => setLastName(e.currentTarget.value)}
+                name={"last_name"}
                 placeholder={"Last Name"}
                 required
               />
@@ -117,7 +140,7 @@ const SignupPage: NextPage = () => {
                 type={"date"}
                 max={new Date().toISOString().split("T")[0]}
                 className={"input"}
-                onInput={(e) => setDoB(e.currentTarget.value)}
+                name={"dob"}
                 placeholder={"Date of Birth"}
                 required
               />
@@ -126,12 +149,7 @@ const SignupPage: NextPage = () => {
           <div className={"w-full flex-1"}>
             <label htmlFor={"gender"} className={"label"}>
               <p className={"field-title"}>Gender </p>
-              <select
-                className={"input"}
-                onInput={(e) => setGender(e.currentTarget.value)}
-                placeholder={"Gender"}
-                required
-              >
+              <select className={"input"} name={"gender"} placeholder={"Gender"} required>
                 <option value={""}>Select</option>
                 <option value={"male"}>Male</option>
                 <option value={"female"}>Female</option>
@@ -143,32 +161,21 @@ const SignupPage: NextPage = () => {
 
         <label htmlFor={"email"} className={"field label"}>
           <p className={"field-title"}>Your email</p>
-          <input
-            type={"email"}
-            className={"input"}
-            onInput={(e) => setEmail(e.currentTarget.value)}
-            placeholder={"Email"}
-            required
-          />
+          <input type={"email"} className={"input"} name={"email"} placeholder={"Email"} required />
         </label>
 
         <label htmlFor={"password"} className={"field label"}>
           <p className={"field-title"}>Create password </p>
-          <input
-            onInput={(e) => setPassword(e.currentTarget.value)}
-            type={"password"}
-            className={"input"}
-            required
-          />
+          <input type={"password"} className={"input"} name={"password"} required />
         </label>
 
         <label htmlFor={"repeat-password"} className={"field label"}>
           <p className={"field-title"}>Repeat password </p>
           <input
-            onInput={(e) => setPasswordConfirm(e.currentTarget.value)}
             type={"password"}
             id={"repeat-password"}
             className={"input"}
+            name={"passwordConfirm"}
             required
           />
         </label>
