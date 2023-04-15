@@ -108,7 +108,6 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           type={"text"}
           name={"title"}
           className={"inputbox-singlerow"}
-          onInput={(e) => setTitle(e.currentTarget.value)}
           placeholder={"Title"}
           value={formFields.title}
           onChange={() => void 0}
@@ -179,10 +178,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
               .finally(() => setFormFields((prev) => ({ ...prev, isDescriptionLoading: false })))
           }}
           type={"button"}
-          className={
-            "mb-3 flex flex-row row justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-2.5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-
-          }
+          className={"inputbox text-xl capitalize"}
         >
           {formFields.isDescriptionLoading ? (
             <svg
