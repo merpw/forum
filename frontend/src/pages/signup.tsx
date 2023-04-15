@@ -95,24 +95,24 @@ const SignupPage: NextPage = () => {
             })
         }}
       >
-        <label htmlFor={"username"} className={"field label"}>
-          <p className={"field-title"}>Username</p>
+        <label htmlFor={"username"} className={"mb-6 label"}>
+          <p className={"inputbox-title"}>Username</p>
           <input
             type={"text"}
-            className={"input"}
+            className={"inputbox"}
             name={"name"}
             placeholder={"Username"}
             required
           />
         </label>
 
-        <div className={"field flex flex-raw gap-3"}>
+        <div className={"mb-6 flex flex-raw gap-3"}>
           <div className={"w-full"}>
             <label htmlFor={"first_name"} className={"label"}>
-              <p className={"field-title"}>First Name </p>
+              <p className={"inputbox-title"}>First Name </p>
               <input
                 type={"text"}
-                className={"input"}
+                className={"inputbox"}
                 name={"first_name"}
                 placeholder={"First Name"}
                 required
@@ -121,10 +121,10 @@ const SignupPage: NextPage = () => {
           </div>
           <div className={"w-full"}>
             <label htmlFor={"last_name"} className={"label"}>
-              <p className={"field-title"}>Last Name </p>
+              <p className={"inputbox-title"}>Last Name </p>
               <input
                 type={"text"}
-                className={"input"}
+                className={"inputbox"}
                 name={"last_name"}
                 placeholder={"Last Name"}
                 required
@@ -132,14 +132,14 @@ const SignupPage: NextPage = () => {
             </label>
           </div>
         </div>
-        <div className={"field flex flex-raw gap-3"}>
+        <div className={"mb-6 flex flex-raw gap-3"}>
           <div className={"w-full flex-1 overflow-x-hidden"}>
             <label htmlFor={"dob"} className={"label"}>
-              <p className={"field-title"}>Date of Birth </p>
+              <p className={"inputbox-title"}>Date of Birth </p>
               <input
                 type={"date"}
                 max={new Date().toISOString().split("T")[0]}
-                className={"input"}
+                className={"inputbox"}
                 name={"dob"}
                 placeholder={"Date of Birth"}
                 required
@@ -148,8 +148,8 @@ const SignupPage: NextPage = () => {
           </div>
           <div className={"w-full flex-1"}>
             <label htmlFor={"gender"} className={"label"}>
-              <p className={"field-title"}>Gender </p>
-              <select className={"input"} name={"gender"} placeholder={"Gender"} required>
+              <p className={"inputbox-title"}>Gender </p>
+              <select className={"inputbox"} name={"gender"} placeholder={"Gender"} required>
                 <option value={""}>Select</option>
                 <option value={"male"}>Male</option>
                 <option value={"female"}>Female</option>
@@ -159,22 +159,28 @@ const SignupPage: NextPage = () => {
           </div>
         </div>
 
-        <label htmlFor={"email"} className={"field label"}>
-          <p className={"field-title"}>Your email</p>
-          <input type={"email"} className={"input"} name={"email"} placeholder={"Email"} required />
+        <label htmlFor={"email"} className={"mb-6 label"}>
+          <p className={"inputbox-title"}>Your email</p>
+          <input
+            type={"email"}
+            className={"inputbox"}
+            name={"email"}
+            placeholder={"Email"}
+            required
+          />
         </label>
 
-        <label htmlFor={"password"} className={"field label"}>
-          <p className={"field-title"}>Create password </p>
-          <input type={"password"} className={"input"} name={"password"} required />
+        <label htmlFor={"password"} className={"mb-6 label"}>
+          <p className={"inputbox-title"}>Create password </p>
+          <input type={"password"} className={"inputbox"} name={"password"} required />
         </label>
 
-        <label htmlFor={"repeat-password"} className={"field label"}>
-          <p className={"field-title"}>Repeat password </p>
+        <label htmlFor={"repeat-password"} className={"mb-6 label"}>
+          <p className={"inputbox-title"}>Repeat password </p>
           <input
             type={"password"}
             id={"repeat-password"}
-            className={"input"}
+            className={"inputbox"}
             name={"passwordConfirm"}
             required
           />

@@ -58,7 +58,7 @@ const UserPage: NextPage = () => {
         <span>Create a new post</span>
       </Link>
 
-      <ul className={"title flex flex-wrap gap-5"}>
+      <ul className={"text-2xl my-3 flex flex-wrap gap-5"}>
         {tabs.map(({ title }, key) => (
           <li
             key={key}

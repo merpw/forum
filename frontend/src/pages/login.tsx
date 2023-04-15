@@ -53,26 +53,26 @@ const LoginPage: NextPage = () => {
             })
         }}
       >
-        <div className={"field"}>
+        <div className={"mb-6"}>
           <label htmlFor={"login"} className={"label"}>
-            <p className={"field-title"}>Your email or username</p>
+            <p className={"inputbox-title"}>Your email or username</p>
             <input
               type={login.match("@") ? "email" : "text"}
-              className={"input"}
+              className={"inputbox"}
               onInput={(e) => setLogin(e.currentTarget.value)}
               placeholder={"Email or username"}
               required
             />
           </label>
         </div>
-        <div className={"field"}>
+        <div className={"mb-6"}>
           <label htmlFor={"password"} className={"label"}>
-            <p className={"field-title"}>Your password</p>
+            <p className={"inputbox-title"}>Your password</p>
             <input
               onInput={(e) => setPassword(e.currentTarget.value)}
               type={"password"}
               id={"password"}
-              className={"input"}
+              className={"inputbox"}
               required
             />
           </label>

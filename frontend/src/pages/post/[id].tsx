@@ -110,7 +110,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
         <ReactTextareaAutosize
           id={"comment-text"}
-          className={"create w-full"}
+          className={"inputbox"}
           value={text}
           onInput={(e) => setText(e.currentTarget.value)}
           required

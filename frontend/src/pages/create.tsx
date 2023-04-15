@@ -79,7 +79,7 @@ const CreatePostForm = () => {
         <input
           type={"text"}
           title={"title"}
-          className={"create"}
+          className={"inputbox"}
           onInput={(e) => setTitle(e.currentTarget.value)}
           placeholder={"Title"}
           required
@@ -88,7 +88,7 @@ const CreatePostForm = () => {
       <div className={"mb-3"}>
         <ReactTextAreaAutosize
           title={"content"}
-          className={"create w-full"}
+          className={"inputbox"}
           onInput={(e) => setContent(e.currentTarget.value)}
           minRows={5}
           placeholder={"Content"}
@@ -105,7 +105,7 @@ const CreatePostForm = () => {
           multiple
           required
           id={"cats"}
-          className={"create text-xl capitalize w-full"}
+          className={"inputbox text-xl capitalize"}
           onChange={(e) =>
             setCategory(Array.from(e.currentTarget.selectedOptions, (option) => option.value))
           }
