@@ -5,9 +5,17 @@ import (
 	"time"
 )
 
-// AddChat adds chat to database, returns id of new chat
-func (db DB) AddChat() int {
-	result, err := db.Exec("INSERT INTO chats (last_message_date) VALUES (?)", time.Now().Format(time.RFC3339))
+/*
+AddChat adds chat to database, returns id of new chat
+
+	chatType:
+	  2 (private 1vs1) or
+	  1 (group chat) or
+	  0 (the channel owner is posting to subscribers)
+*/
+func (db DB) AddChat(chatType int) int {
+	result, err := db.Exec("INSERT INTO chats (type, date) VALUES (?, ?)", chatType,
+		time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -28,7 +36,7 @@ func (db DB) GetChatsByUserId(userId int) []Chat {
 	var chats []Chat
 	for query.Next() {
 		var chat Chat
-		err = query.Scan(&chat.Id, &chat.LastMessageDate)
+		err = query.Scan(&chat.Id, &chat.Type, &chat.Date)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -44,8 +52,9 @@ func (db DB) GetChatsByUserId(userId int) []Chat {
  */
 func (db DB) GetPrivateChatsByUserId(userId int) []Chat {
 	query, err := db.Query(
-		"SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?) AND "+
-			"id IN (SELECT chat_id FROM memberships GROUP BY chat_id HAVING COUNT(*) = 2)", userId)
+		"SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?) AND type = 2",
+		userId,
+	)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -53,7 +62,7 @@ func (db DB) GetPrivateChatsByUserId(userId int) []Chat {
 	var chats []Chat
 	for query.Next() {
 		var chat Chat
-		err = query.Scan(&chat.Id, &chat.LastMessageDate)
+		err = query.Scan(&chat.Id, &chat.Type, &chat.Date)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -64,15 +73,15 @@ func (db DB) GetPrivateChatsByUserId(userId int) []Chat {
 	return chats
 }
 
-// TODO: perhaps move it later to models.go. Not approved yet.
-type PrivateChatOponent struct {
-	Id                  int    // opoent id
-	Name                string // oponent name
-	ChatId              int    // chat id
-	ChatLastMessageDate string // last message date, to sort chats by last message date
-}
+// TODO: perhaps move it later to models.go. Not approved yet. Structure was changed. Full refactoring is needed.
+// type PrivateChatOponent struct {
+// 	Id                  int    // opoent id
+// 	Name                string // oponent name
+// 	ChatId              int    // chat id
+// 	ChatLastMessageDate string // last message date, to sort chats by last message date
+// }
 
-// TODO: remove it later. Not approved yet.
+// TODO: remove it later. Not approved yet. Structure was changed. Full refactoring is needed, include comments.
 /*
 * GetPrivateChatOponentsByUserId reads private chat oponents from database by user_id,
 does not require user to be logged in.
@@ -85,30 +94,30 @@ The oponent has Name and Id.
 The ChatId is the id of the private chat. Only two users can be in a private chat.
 Returns nil if no such chats exist.
 */
-func (db DB) GetPrivateChatOponentsByUserId(userId int) []PrivateChatOponent {
-	query, err := db.Query(
-		"SELECT users.id, users.name, chats.id, chats.last_message_date FROM users "+
-			"JOIN memberships ON memberships.user_id = users.id "+
-			"JOIN chats ON chats.id = memberships.chat_id "+
-			"WHERE users.id != ? AND chats.id IN (SELECT chat_id FROM memberships GROUP BY chat_id HAVING COUNT(*) = 2)",
-		userId)
-	if err != nil {
-		log.Panic(err)
-	}
+// func (db DB) GetPrivateChatOponentsByUserId(userId int) []PrivateChatOponent {
+// 	query, err := db.Query(
+// 		"SELECT users.id, users.name, chats.id, chats.last_message_date FROM users "+
+// 			"JOIN memberships ON memberships.user_id = users.id "+
+// 			"JOIN chats ON chats.id = memberships.chat_id "+
+// 			"WHERE users.id != ? AND chats.id IN (SELECT chat_id FROM memberships GROUP BY chat_id HAVING COUNT(*) = 2)",
+// 		userId)
+// 	if err != nil {
+// 		log.Panic(err)
+// 	}
 
-	var oponents []PrivateChatOponent
-	for query.Next() {
-		var oponent PrivateChatOponent
-		err = query.Scan(&oponent.Id, &oponent.Name, &oponent.ChatId, &oponent.ChatLastMessageDate)
-		if err != nil {
-			log.Panic(err)
-		}
-		oponents = append(oponents, oponent)
-	}
-	query.Close()
+// 	var oponents []PrivateChatOponent
+// 	for query.Next() {
+// 		var oponent PrivateChatOponent
+// 		err = query.Scan(&oponent.Id, &oponent.Name, &oponent.ChatId, &oponent.ChatLastMessageDate)
+// 		if err != nil {
+// 			log.Panic(err)
+// 		}
+// 		oponents = append(oponents, oponent)
+// 	}
+// 	query.Close()
 
-	return oponents
-}
+// 	return oponents
+// }
 
 /*
 *
@@ -135,10 +144,10 @@ func (db DB) GetChatsIdsByUserId(userId int) []int {
 }
 
 // AddMembership adds membership to database, returns id of new membership
-func (db DB) AddMembership(chatId, userId int) int {
+func (db DB) AddMembership(userId, chatId int) int {
 	result, err := db.Exec(
-		"INSERT INTO memberships (chat_id, user_id, date) VALUES (?, ?, ?)",
-		chatId, userId, time.Now().Format(time.RFC3339))
+		"INSERT INTO memberships (user_id, chat_id, date) VALUES (?, ?, ?)",
+		userId, chatId, time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -150,19 +159,14 @@ func (db DB) AddMembership(chatId, userId int) int {
 }
 
 // AddMessage adds message to database, returns id of new message, plus updates last_message_date in chats table
-func (db DB) AddMessage(chatId, userId int, content string) int {
-	timeNow := time.Now().Format(time.RFC3339)
+func (db DB) AddMessage(userId, chatId int, content string) int {
 	result, err := db.Exec(
-		"INSERT INTO messages (chat_id, user_id, content, date) VALUES (?, ?, ?, ?)",
-		chatId, userId, content, timeNow)
+		"INSERT INTO messages (user_id, chat_id, content, date) VALUES (?, ?, ?, ?)",
+		userId, chatId, content, time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
 	}
 	id, err := result.LastInsertId()
-	if err != nil {
-		log.Panic(err)
-	}
-	_, err = db.Exec("UPDATE chats SET last_message_date = ? WHERE id = ?", timeNow, chatId)
 	if err != nil {
 		log.Panic(err)
 	}
