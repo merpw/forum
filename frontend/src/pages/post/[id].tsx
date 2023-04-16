@@ -1,33 +1,26 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import { Post } from "../../custom"
-
 import Link from "next/link"
 import { FC, useEffect, useState } from "react"
-import Head from "next/head"
-import moment from "moment"
-import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "../../api/posts/fetch"
-import { useMe } from "../../api/auth"
-import { CreateComment, useComments } from "../../api/posts/comment"
-import { FormError } from "../../components/error"
-import {
-  Category,
-  ReactionsButtons,
-  ReactionsCommentButtons,
-} from "../../components/posts/reactions"
-import { SWRConfig, SWRConfiguration, unstable_serialize } from "swr"
+import { SWRConfig, SWRConfiguration } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
+import { NextSeo } from "next-seo"
+import { AxiosError } from "axios"
+
+import { Comment, Post } from "@/custom"
+import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
+import { useMe } from "@/api/auth"
+import { CreateComment, useComments } from "@/api/posts/comment"
+import { FormError } from "@/components/error"
+import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
+import useDates from "@/helpers/dates"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
-  return (
-    <SWRConfig value={fallback}>
-      <Head>
-        <title>{`${post.title} - Forum`}</title>
-        <meta property={"og:title"} content={`${post.title} - Forum`} />
+  const { localDate, relativeDate } = useDates(post.date)
 
-        {/* TODO: change to description */}
-        <meta name={"description"} content={post.content.slice(0, 200)} />
-        <meta property={"og:description"} content={post.content.slice(0, 200)} />
-      </Head>
+  return (
+    <SWRConfig value={{ fallback }}>
+      <NextSeo title={post.title} description={post.content.slice(0, 200)} />
+
       <div className={"m-5"}>
         <div className={"mb-3"}>
           <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
@@ -40,12 +33,7 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
           <Category post={post} />
 
           <span className={"ml-auto"}>
-            <span
-              suppressHydrationWarning
-              title={moment(post.date).local().format("DD.MM.YYYY HH:mm:ss")}
-            >
-              {moment(post.date).fromNow()}
-            </span>
+            <span title={localDate}>{relativeDate}</span>
             {" by "}
             <span className={"clickable text-xl"}>
               <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
@@ -63,7 +51,7 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
 }
 
 const CommentForm: FC<{ post: Post }> = ({ post }) => {
-  const { isLoggedIn } = useMe()
+  const { isLoggedIn, isLoading } = useMe()
   const { mutate: mutateComments } = useComments(post.id)
 
   const [text, setText] = useState("")
@@ -73,7 +61,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
   useEffect(() => setIsSame(false), [text])
 
-  if (!isLoggedIn) return null
+  if (!isLoggedIn && !isLoading) return null
 
   return (
     <form
@@ -137,59 +125,69 @@ const Comments: FC<{ post: Post }> = ({ post }) => {
       {comments
         .sort((a, b) => b.date.localeCompare(a.date))
         .map((comment, key) => (
-          <div className={"border rounded p-5"} key={key}>
-            <Link href={`/user/${comment.author.id}`}>
-              <h3 className={"clickable text-lg"}>{comment.author.name}</h3>
-            </Link>
-            <p className={"whitespace-pre-line"}>{comment.content}</p>
-            <hr className={"mt-4 mb-2"}></hr>
-            <span className={"flex"}>
-              <ReactionsCommentButtons post={post} comment={comment} />
-
-              <span
-                suppressHydrationWarning
-                className={"ml-auto"}
-                title={moment(comment.date).local().format("DD.MM.YYYY HH:mm:ss")}
-              >
-                {moment(comment.date).fromNow()}
-              </span>
-            </span>
-          </div>
+          <CommentCard comment={comment} post={post} key={key} />
         ))}
     </div>
   )
 }
 
+const CommentCard: FC<{ comment: Comment; post: Post }> = ({ comment, post }) => {
+  const { localDate, relativeDate } = useDates(comment.date)
+  return (
+    <div className={"border rounded p-5"}>
+      <Link href={`/user/${comment.author.id}`}>
+        <h3 className={"clickable text-lg"}>{comment.author.name}</h3>
+      </Link>
+      <p className={"whitespace-pre-line"}>{comment.content}</p>
+      <hr className={"mt-4 mb-2"}></hr>
+      <span className={"flex"}>
+        <ReactionsCommentButtons post={post} comment={comment} />
+
+        <span suppressHydrationWarning className={"ml-auto"} title={localDate}>
+          {relativeDate}
+        </span>
+      </span>
+    </div>
+  )
+}
+
 export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
+    return { paths: [], fallback: "blocking" }
+  }
   const posts = await getPostsLocal()
   return {
     paths: posts.map((post) => {
       return { params: { id: post.id.toString() } }
     }),
-    // TODO: maybe remove
-    fallback: "blocking", // fallback tries to regenerate ArtistPage if Artist did not exist during building
+    fallback: "blocking",
   }
 }
 
 export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = async ({
   params,
 }) => {
-  if (params == undefined) {
-    return { notFound: true }
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
+    return { notFound: true, revalidate: 60 }
   }
-  const post = await getPostLocal(+params.id)
-  const comments = await getPostCommentsLocal(+params.id)
+  try {
+    const post = await getPostLocal(+params.id)
+    const comments = await getPostCommentsLocal(+params.id)
 
-  return post
-    ? {
-        props: {
-          post: post,
-          fallback: {
-            [unstable_serialize(["api", "posts", post.id, "comments"])]: comments,
-          },
+    return {
+      props: {
+        post: post,
+        fallback: {
+          [`/api/posts/${post.id}/comments`]: comments,
         },
-        revalidate: 1,
-      }
-    : { notFound: true, revalidate: 1 }
+      },
+      revalidate: 60,
+    }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
+    return { notFound: true, revalidate: 60 }
+  }
 }
 export default PostPage

@@ -1,13 +1,14 @@
 import { GetStaticPaths, GetStaticProps, NextPage } from "next"
-import Head from "next/head"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { Post, User } from "../../custom"
+import { NextSeo } from "next-seo"
+import { AxiosError } from "axios"
 
-import { getUserLocal } from "../../api/users/fetch"
-import { useMe } from "../../api/auth"
-import { getUserPostsLocal } from "../../api/posts/fetch"
-import { PostList } from "../../components/posts/list"
+import { Post, User } from "@/custom"
+import { getUserLocal } from "@/api/users/fetch"
+import { useMe } from "@/api/auth"
+import { getUserPostsLocal } from "@/api/posts/fetch"
+import { PostList } from "@/components/posts/list"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   const router = useRouter()
@@ -24,15 +25,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
 
   return (
     <>
-      <Head>
-        <title>{`${user.name} - Forum`}</title>
-        <meta name={"og:title"} content={`${user.name} - Forum`} />
-
-        <meta name={"description"} content={`Posts created by ${user.name}`} />
-        <meta name={"og:description"} content={`Posts created by ${user.name}`} />
-
-        <meta name={"author"} content={user.name} />
-      </Head>
+      <NextSeo title={user.name} description={`Posts created by ${user.name}`} />
       <div>
         <h1 className={"text-2xl mb-5"}>{user.name}</h1>
         <div>
@@ -55,15 +48,25 @@ export const getStaticProps: GetStaticProps<
   { user: User; posts: Post[] },
   { id: string }
 > = async ({ params }) => {
-  if (params == undefined) {
-    return { notFound: true }
+  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
+    return { notFound: true, revalidate: 60 }
   }
-  const user = await getUserLocal(+params.id)
-  if (user == undefined) {
-    return { notFound: true, revalidate: 1 }
-  }
-  const posts = await getUserPostsLocal(user.id)
+  try {
+    const user = await getUserLocal(+params.id)
+    const posts = await getUserPostsLocal(user.id)
 
-  return { props: { user: user, posts: posts }, revalidate: 1 }
+    return {
+      props: {
+        user,
+        posts,
+      },
+      revalidate: 60,
+    }
+  } catch (e) {
+    if ((e as AxiosError).response?.status !== 404) {
+      throw e
+    }
+    return { notFound: true, revalidate: 60 }
+  }
 }
 export default UserPage

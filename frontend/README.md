@@ -19,6 +19,8 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 - `DEV_FORUM_BACKEND_REWRITE_URL` - optional, default for `dev`: `FORUM_BACKEND_PRIVATE_URL`.
   URL to rewrite all `/api/` requests to backend using Next.js. It should not be used in production, use reverse proxy
   instead.
+- `FRONTEND_REVALIDATE_TOKEN` - optional, should be set if `/api/revalidate` endpoint is going to be public. By default,
+  it is not public and available only in private network.
 
 ## Usage
 

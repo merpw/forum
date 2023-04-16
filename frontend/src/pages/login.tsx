@@ -1,11 +1,12 @@
 import { AxiosError } from "axios"
 import { NextPage } from "next"
-import Head from "next/head"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
-import { logIn, useMe } from "../api/auth"
-import { FormError } from "../components/error"
+import { NextSeo } from "next-seo"
+
+import { logIn, useMe } from "@/api/auth"
+import { FormError } from "@/components/error"
 
 const LoginPage: NextPage = () => {
   const router = useRouter()
@@ -32,11 +33,7 @@ const LoginPage: NextPage = () => {
 
   return (
     <>
-      <Head>
-        <title>Login - Forum</title>
-        <meta name={"title"} content={"Login - Forum"} />
-        <meta name={"og:title"} content={"Login - Forum"} />
-      </Head>
+      <NextSeo title={"Login"} />
       <form
         onSubmit={async (e) => {
           e.preventDefault()

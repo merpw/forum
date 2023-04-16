@@ -3,6 +3,8 @@ package server
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 	"net/mail"
 	"strings"
@@ -74,7 +76,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	srv.DB.AddUser(
+	id := srv.DB.AddUser(
 		requestBody.Name,
 		requestBody.Email,
 		string(encryptedPassword),
@@ -83,6 +85,11 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		sql.NullString{String: requestBody.DoB, Valid: true},
 		sql.NullString{String: requestBody.Gender, Valid: true},
 	)
+
+	err = revalidateURL(fmt.Sprintf("/user/%d", id))
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
