@@ -222,7 +222,7 @@ func (db DB) GetPrivateChatOponentsByUserId(userId int) []OnlineUser {
 			"JOIN memberships AS um ON um.chat_id = c.id "+
 			"JOIN users AS u ON u.id = um.user_id "+
 			"WHERE c.type = 2 AND o.id != ? AND u.id = ?",
-		userId)
+		userId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
