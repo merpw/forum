@@ -84,8 +84,8 @@ func TestMigrate(t *testing.T) {
 	})
 
 	t.Run("Down, call for each revision", func(t *testing.T) {
-		inputYES()
 		for i := migrate.LATEST; i > 0; i-- {
+			inputYES()
 			err := migrate.Migrate(db, i)
 			if err != nil {
 				t.Fatal(err)
