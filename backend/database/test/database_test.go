@@ -127,7 +127,7 @@ func TestOps(t *testing.T) {
 		}
 	})
 
-	// get private chat opoents by user id
+	// get private chat oponents by user id
 
 	t.Run("GetPrivateChatOponentsByUserId", func(t *testing.T) {
 		oponents := srv.DB.GetPrivateChatOponentsByUserId(userId)
