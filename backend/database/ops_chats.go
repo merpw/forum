@@ -195,7 +195,7 @@ func (db DB) GetChatsIdsByUserId(userId int) []int {
 	return chatsIds
 }
 
-// TODO: add function to get all messages from chat
+// TODO: implement tests, later, after approving the logic
 /*
 GetAllMessagesByChatId reads messages from database by chat_id, does not require user to be logged in.
 */
