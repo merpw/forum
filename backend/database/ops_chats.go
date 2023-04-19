@@ -171,6 +171,28 @@ func (db DB) GetPrivateChatOponentsByUserId(userId int) []OnlineUser {
 	return oponents
 }
 
-// TODO: add function to get all chats ids where user has membership
+// TODO: implement tests, later, after approving the logic
+/*
+GetChatsIdsByUserId reads chats ids from database by user_id, does not require user to be logged in.
+*/
+func (db DB) GetChatsIdsByUserId(userId int) []int {
+	query, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var chatsIds []int
+	for query.Next() {
+		var chatId int
+		err = query.Scan(&chatId)
+		if err != nil {
+			log.Panic(err)
+		}
+		chatsIds = append(chatsIds, chatId)
+	}
+	query.Close()
+
+	return chatsIds
+}
 
 // TODO: add function to get all messages from chat
