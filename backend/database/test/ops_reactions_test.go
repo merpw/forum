@@ -44,7 +44,7 @@ func TestOpsReactions(t *testing.T) {
 	t.Run("GetPostReactionsToTestOpsReactions", func(t *testing.T) {
 		reaction := srv.DB.GetPostReaction(postId, userId)
 		if reaction != 1 {
-			t.Errorf("Expected reaction 1, got %d", reaction)
+			t.Fatalf("Expected reaction 1, got %d", reaction)
 		}
 	})
 
@@ -76,7 +76,7 @@ func TestOpsReactions(t *testing.T) {
 	t.Run("GetCommentReactionsToTestOpsReactions", func(t *testing.T) {
 		reaction := srv.DB.GetCommentReaction(commentId, userId)
 		if reaction != -1 {
-			t.Errorf("Expected reaction -1, got %d", reaction)
+			t.Fatalf("Expected reaction -1, got %d", reaction)
 		}
 	})
 

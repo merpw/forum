@@ -30,7 +30,7 @@ func TestOpsSessions(t *testing.T) {
 	t.Run("CheckLongSessionIsStillValid", func(t *testing.T) {
 		userId := srv.DB.CheckSession("longToken")
 		if userId != 1 {
-			t.Errorf("Expected userId 1, got %d", userId)
+			t.Fatalf("Expected userId 1, got %d", userId)
 		}
 	})
 
@@ -43,7 +43,7 @@ func TestOpsSessions(t *testing.T) {
 	t.Run("CheckShortSessionIsExpired", func(t *testing.T) {
 		userId := srv.DB.CheckSession("shortToken")
 		if userId != -1 {
-			t.Errorf("Expected userId -1, got %d", userId)
+			t.Fatalf("Expected userId -1, got %d", userId)
 		}
 	})
 }
