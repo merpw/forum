@@ -170,3 +170,7 @@ func (db DB) GetPrivateChatOponentsByUserId(userId int) []OnlineUser {
 
 	return oponents
 }
+
+// TODO: add function to get all chats ids where user has membership
+
+// TODO: add function to get all messages from chat
