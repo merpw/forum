@@ -196,3 +196,25 @@ func (db DB) GetChatsIdsByUserId(userId int) []int {
 }
 
 // TODO: add function to get all messages from chat
+/*
+GetAllMessagesByChatId reads messages from database by chat_id, does not require user to be logged in.
+*/
+func (db DB) GetAllMessagesByChatId(chatId int) []Message {
+	query, err := db.Query("SELECT * FROM messages WHERE chat_id = ?", chatId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var messages []Message
+	for query.Next() {
+		var message Message
+		err = query.Scan(&message.Id, &message.UserId, &message.ChatId, &message.Content, &message.Date)
+		if err != nil {
+			log.Panic(err)
+		}
+		messages = append(messages, message)
+	}
+	query.Close()
+
+	return messages
+}
