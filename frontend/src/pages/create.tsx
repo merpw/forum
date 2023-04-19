@@ -1,6 +1,6 @@
 import { GetStaticProps, NextPage } from "next"
 import { useRouter } from "next/router"
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useId, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
 import Select from "react-select"
@@ -36,8 +36,9 @@ const CreatePostForm: FC<{ categories: string[] }> = ({ categories }) => {
   const [formFields, setFormFields] = useState<{
     title: string
     content: string
+    description: string
     categories: string[]
-  }>({ title: "", content: "", categories: [] })
+  }>({ title: "", content: "", description: "", categories: [] })
 
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -101,8 +102,20 @@ const CreatePostForm: FC<{ categories: string[] }> = ({ categories }) => {
           required
         />
       </div>
-      <div className={"mb-6"}>
+      <ReactTextAreaAutosize
+        name={"description"}
+        className={
+          "mb-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        }
+        rows={2}
+        minRows={2}
+        placeholder={"Description"}
+        value={formFields.description}
+      />
+      <div className={"mb-3"}>
         <Select
+          placeholder={"Categories"}
+          instanceId={useId()}
           isMulti={true}
           name={"categories"}
           className={"react-select-container"}
