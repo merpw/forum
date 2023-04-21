@@ -4,6 +4,9 @@ import { FC, useEffect, useId, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
 import Select from "react-select"
+import remarkHtml from "remark-html"
+import { remark } from "remark"
+import stripMarkdown from "strip-markdown"
 
 import { useMe } from "@/api/auth"
 import { CreatePost, generateDescription } from "@/api/posts/create"
@@ -35,6 +38,25 @@ const CreatePostPage: NextPage<{ categories: string[]; isAIEnabled: boolean }> =
   )
 }
 
+const MarkdownPreview: FC<{ content: string }> = ({ content }) => {
+  const [html, setHtml] = useState("")
+  useEffect(() => {
+    remark()
+      .use(remarkHtml)
+      .process(content, (err, file) => {
+        if (err) throw err
+        setHtml(String(file))
+      })
+  }, [content])
+  return (
+    <div
+      className={"prose dark:prose-invert"}
+      id={"preview"}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
+}
+
 const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
   categories,
   isAIEnabled,
@@ -63,7 +85,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         const { name, value } = e.target as HTMLInputElement
         setFormFields({ ...formFields, [name]: value })
       }}
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault()
 
         if (isSame) return
@@ -74,6 +96,18 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           setFormError("Category is not selected")
           return
         }
+        if (formFields.description == "") {
+          const description = await remark().use(stripMarkdown).process(formFields.content)
+          formFields.description = description.toString().replace(/\n+/g, " ").trim()
+        }
+
+        if (document.querySelector("#preview h1")) {
+          return setFormError(
+            "The biggest headings are not allowed, please use title field instead"
+          )
+        }
+
+        setFormFields({ ...formFields }) // to show generated description in the input field
 
         CreatePost(formFields)
           .then((id) => router.push(`/post/${id}`))
@@ -99,6 +133,28 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
       </div>
       <div className={"mb-3"}>
         <ReactTextAreaAutosize
+          title={"Content input field. Press ESC and then TAB to move the focus to the next field"}
+          onFocus={(e) => e.currentTarget.setAttribute("data-escaped", "false")}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              return e.currentTarget.setAttribute("data-escaped", "true")
+            }
+
+            if (
+              e.currentTarget.getAttribute("data-escaped") === "false" &&
+              !e.shiftKey &&
+              e.key === "Tab"
+            ) {
+              e.preventDefault()
+              const textarea = e.target as HTMLTextAreaElement
+              const start = textarea.selectionStart
+              const end = textarea.selectionEnd
+              const value = textarea.value
+              textarea.value = value.substring(0, start) + "\t" + value.substring(end)
+              textarea.selectionStart = textarea.selectionEnd = start + 1
+              setFormFields({ ...formFields, content: textarea.value })
+            }
+          }}
           name={"content"}
           className={
             "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -109,6 +165,11 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           required
         />
       </div>
+
+      <div className={"mb-3"}>
+        <MarkdownPreview content={formFields.content} />
+      </div>
+
       <ReactTextAreaAutosize
         name={"description"}
         className={
@@ -138,10 +199,10 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
             "mb-3 flex flex-row row justify-center text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-2.5 py-2 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           }
         >
-          {formFields.isDescriptionLoading && (
+          {formFields.isDescriptionLoading ? (
             <svg
               aria-hidden={"true"}
-              className={"w-5 h-5 mr-2 text-gray-200 animate-spin fill-blue-600"}
+              className={"w-5 h-5 mr-1 text-gray-200 animate-spin fill-blue-600"}
               viewBox={"0 0 100 101"}
               fill={"none"}
               xmlns={"http://www.w3.org/2000/svg"}
@@ -157,6 +218,23 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
                   "M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
                 }
                 fill={"currentFill"}
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns={"http://www.w3.org/2000/svg"}
+              fill={"none"}
+              viewBox={"0 0 24 24"}
+              strokeWidth={1.5}
+              stroke={"currentColor"}
+              className={"w-5 h-5 mr-1"}
+            >
+              <path
+                strokeLinecap={"round"}
+                strokeLinejoin={"round"}
+                d={
+                  "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+                }
               />
             </svg>
           )}
