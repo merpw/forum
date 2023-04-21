@@ -34,17 +34,12 @@ export const logIn = async (login: string, password: string) =>
 export const logOut = async (): Promise<void> =>
   axios.post("/api/logout", {}, { withCredentials: true })
 
-export const SignUp = async (
-  name: string,
-  email: string,
-  password: string,
-  first_name: string,
-  last_name: string,
-  dob: string,
+export const SignUp = async (data: {
+  name: string
+  email: string
+  password: string
+  first_name: string
+  last_name: string
+  dob: string
   gender: string
-) =>
-  axios.post(
-    "/api/signup",
-    { name, email, password, first_name, last_name, dob, gender },
-    { withCredentials: true }
-  )
+}) => axios.post("/api/signup", data, { withCredentials: true })

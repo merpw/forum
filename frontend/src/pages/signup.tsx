@@ -70,15 +70,7 @@ const SignupPage: NextPage = () => {
             return
           }
 
-          SignUp(
-            formFields.name,
-            formFields.email,
-            formFields.password,
-            formFields.first_name,
-            formFields.last_name,
-            formFields.dob,
-            formFields.gender
-          )
+          SignUp(formFields)
             .then((response) => {
               if (response.status == 200) {
                 logIn(formFields.email, formFields.password).then(() => mutate())
