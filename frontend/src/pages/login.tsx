@@ -55,7 +55,7 @@ const LoginPage: NextPage = () => {
             <p className={"inputbox-title"}>Your email or username</p>
             <input
               type={login.match("@") ? "email" : "text"}
-              className={"inputbox"}
+              className={"inputbox-singlerow"}
               onInput={(e) => setLogin(e.currentTarget.value)}
               placeholder={"Email or username"}
               required
@@ -69,7 +69,7 @@ const LoginPage: NextPage = () => {
               onInput={(e) => setPassword(e.currentTarget.value)}
               type={"password"}
               id={"password"}
-              className={"inputbox"}
+              className={"inputbox-singlerow"}
               required
             />
           </label>

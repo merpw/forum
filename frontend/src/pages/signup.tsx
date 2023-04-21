@@ -89,7 +89,7 @@ const SignupPage: NextPage = () => {
           <p className={"inputbox-title"}>Username</p>
           <input
             type={"text"}
-            className={"inputbox"}
+            className={"inputbox-singlerow"}
             name={"name"}
             placeholder={"Username"}
             required
@@ -102,7 +102,7 @@ const SignupPage: NextPage = () => {
               <p className={"inputbox-title"}>First Name </p>
               <input
                 type={"text"}
-                className={"inputbox"}
+                className={"inputbox-singlerow"}
                 name={"first_name"}
                 placeholder={"First Name"}
                 required
@@ -114,7 +114,7 @@ const SignupPage: NextPage = () => {
               <p className={"inputbox-title"}>Last Name </p>
               <input
                 type={"text"}
-                className={"inputbox"}
+                className={"inputbox-singlerow"}
                 name={"last_name"}
                 placeholder={"Last Name"}
                 required
@@ -130,7 +130,7 @@ const SignupPage: NextPage = () => {
                 type={"date"}
                 min={"1900-01-01"}
                 max={new Date().toISOString().split("T")[0]}
-                className={"inputbox"}
+                className={"inputbox-singlerow"}
                 name={"dob"}
                 placeholder={"Date of Birth"}
                 required
@@ -140,7 +140,12 @@ const SignupPage: NextPage = () => {
           <div className={"w-full flex-1"}>
             <label className={"label"}>
               <p className={"inputbox-title"}>Gender </p>
-              <select className={"inputbox"} name={"gender"} placeholder={"Gender"} required>
+              <select
+                className={"inputbox-singlerow"}
+                name={"gender"}
+                placeholder={"Gender"}
+                required
+              >
                 <option value={""}>Select</option>
                 <option value={"male"}>Male</option>
                 <option value={"female"}>Female</option>
@@ -154,7 +159,7 @@ const SignupPage: NextPage = () => {
           <p className={"inputbox-title"}>Your email</p>
           <input
             type={"email"}
-            className={"inputbox"}
+            className={"inputbox-singlerow"}
             name={"email"}
             placeholder={"Email"}
             required
@@ -163,7 +168,7 @@ const SignupPage: NextPage = () => {
 
         <label className={"mb-6 label"}>
           <p className={"inputbox-title"}>Create password </p>
-          <input type={"password"} className={"inputbox"} name={"password"} required />
+          <input type={"password"} className={"inputbox-singlerow"} name={"password"} required />
         </label>
 
         <label className={"mb-6 label"}>
@@ -171,7 +176,7 @@ const SignupPage: NextPage = () => {
           <input
             type={"password"}
             id={"repeat-password"}
-            className={"inputbox"}
+            className={"inputbox-singlerow"}
             name={"passwordConfirm"}
             required
           />

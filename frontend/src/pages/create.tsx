@@ -78,7 +78,7 @@ const CreatePostForm = () => {
         <input
           type={"text"}
           title={"title"}
-          className={"inputbox"}
+          className={"inputbox-singlerow"}
           onInput={(e) => setTitle(e.currentTarget.value)}
           placeholder={"Title"}
           required
