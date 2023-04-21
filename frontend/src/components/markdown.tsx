@@ -4,12 +4,14 @@ import remarkRehype from "remark-rehype"
 import { unified } from "unified"
 import remarkParse from "remark-parse"
 import rehypeStringify from "rehype-stringify"
+import remarkGfm from "remark-gfm"
 
 import "highlight.js/styles/github-dark.css"
 
 export const RenderMarkdown = async (content: string) => {
   const html = await unified()
     .use(remarkParse)
+    .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypeHighlight, { ignoreMissing: true })
     .use(rehypeStringify)
