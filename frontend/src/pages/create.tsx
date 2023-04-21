@@ -1,4 +1,4 @@
-import { GetStaticProps, NextPage } from "next"
+import { GetServerSideProps, NextPage } from "next"
 import { useRouter } from "next/router"
 import { FC, useEffect, useId, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
@@ -191,18 +191,13 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  if (!process.env.FORUM_BACKEND_PRIVATE_URL) {
-    return { notFound: true, revalidate: 1 }
-  }
-  // TODO: change revalidate to 60 and fix bug with 404 after build
+export const getServerSideProps: GetServerSideProps = async () => {
   const categories = await getCategoriesLocal()
   return {
     props: {
       categories,
       isAIEnabled: !!process.env.OPENAI_API_KEY,
     },
-    revalidate: 60,
   }
 }
 

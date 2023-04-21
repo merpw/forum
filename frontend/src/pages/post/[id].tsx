@@ -174,7 +174,7 @@ export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
 export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = async ({
   params,
 }) => {
-  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
+  if (!params?.id) {
     return { notFound: true, revalidate: 60 }
   }
   try {
