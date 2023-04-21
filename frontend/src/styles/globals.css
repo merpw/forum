@@ -61,3 +61,18 @@ body {
     @apply text-gray-600 dark:text-gray-200;
   }
 }
+
+/* Inline code */
+.prose code:not(.prose pre code):before,
+.prose code:not(.prose pre code):after {
+  content: none;
+}
+
+.prose code:not(.prose pre code) {
+  @apply bg-gray-200 dark:bg-gray-800 p-1 px-2 rounded;
+}
+
+/* Code block */
+.prose pre:has(code) {
+  @apply p-0 rounded;
+}

@@ -4,15 +4,17 @@ import { FC, useEffect, useId, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
 import Select from "react-select"
-import remarkHtml from "remark-html"
 import { remark } from "remark"
 import stripMarkdown from "strip-markdown"
+import dynamic from "next/dynamic"
 
 import { useMe } from "@/api/auth"
 import { CreatePost, generateDescription } from "@/api/posts/create"
 import { FormError } from "@/components/error"
 import { getCategoriesLocal } from "@/api/posts/fetch"
 import { Capitalize } from "@/helpers/text"
+
+const Markdown = dynamic(() => import("@/components/markdown"))
 
 const CreatePostPage: NextPage<{ categories: string[]; isAIEnabled: boolean }> = ({
   categories,
@@ -35,25 +37,6 @@ const CreatePostPage: NextPage<{ categories: string[]; isAIEnabled: boolean }> =
 
       <CreatePostForm categories={categories} isAIEnabled={isAIEnabled} />
     </>
-  )
-}
-
-const MarkdownPreview: FC<{ content: string }> = ({ content }) => {
-  const [html, setHtml] = useState("")
-  useEffect(() => {
-    remark()
-      .use(remarkHtml)
-      .process(content, (err, file) => {
-        if (err) throw err
-        setHtml(String(file))
-      })
-  }, [content])
-  return (
-    <div
-      className={"prose dark:prose-invert"}
-      id={"preview"}
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
   )
 }
 
@@ -166,8 +149,8 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         />
       </div>
 
-      <div className={"mb-3"}>
-        <MarkdownPreview content={formFields.content} />
+      <div className={"mb-3"} id={"preview"}>
+        <Markdown content={formFields.content} />
       </div>
 
       <ReactTextAreaAutosize

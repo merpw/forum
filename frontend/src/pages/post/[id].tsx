@@ -5,8 +5,6 @@ import { SWRConfig, SWRConfiguration } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
 import { AxiosError } from "axios"
-import { remark } from "remark"
-import remarkHtml from "remark-html"
 
 import { Comment, Post } from "@/custom"
 import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
@@ -15,6 +13,9 @@ import { CreateComment, useComments } from "@/api/posts/comment"
 import { FormError } from "@/components/error"
 import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
 import useDates from "@/helpers/dates"
+import { RenderMarkdown } from "@/components/markdown"
+
+import "highlight.js/styles/github-dark.css"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   const { localDate, relativeDate } = useDates(post.date)
@@ -186,8 +187,7 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
     const post = await getPostLocal(+params.id)
     const comments = await getPostCommentsLocal(+params.id)
 
-    const contentHtml = await remark().use(remarkHtml).process(post.content)
-    post.content = contentHtml.toString()
+    post.content = await RenderMarkdown(post.content)
 
     return {
       props: {
