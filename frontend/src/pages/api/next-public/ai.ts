@@ -70,7 +70,6 @@ const generateDescription = async (req: NextApiRequest, res: NextApiResponse) =>
         },
       ],
       max_tokens: 200,
-      temperature: 1.5,
       n: 1,
       stream: false,
       stop: ">>",
