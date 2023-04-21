@@ -51,7 +51,7 @@ const LoginPage: NextPage = () => {
         }}
       >
         <div className={"mb-6"}>
-          <label htmlFor={"login"} className={"label"}>
+          <label className={"label"}>
             <p className={"inputbox-title"}>Your email or username</p>
             <input
               type={login.match("@") ? "email" : "text"}
@@ -63,7 +63,7 @@ const LoginPage: NextPage = () => {
           </label>
         </div>
         <div className={"mb-6"}>
-          <label htmlFor={"password"} className={"label"}>
+          <label className={"label"}>
             <p className={"inputbox-title"}>Your password</p>
             <input
               onInput={(e) => setPassword(e.currentTarget.value)}

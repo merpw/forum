@@ -11,12 +11,7 @@ export default function Custom404() {
           <h2 className={"text-2xl"}>Not Found</h2>
         </div>
         <p className={"text-xl my-16 font-light"}>
-          <Link
-            href={"/"}
-            className={
-              "button"
-            }
-          >
+          <Link href={"/"} className={"button"}>
             Back to homepage
           </Link>
         </p>

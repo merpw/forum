@@ -14,12 +14,7 @@ export default function Custom500() {
         <h1 className={"text-5xl m-auto"}>500 Internal Server Error</h1>
         <p className={"text-2xl my-5 font-light"}>
           {"Please, try to update page or visit "}
-          <Link
-            href={"/"}
-            className={
-              "button"
-            }
-          >
+          <Link href={"/"} className={"button"}>
             Back to homepage
           </Link>
         </p>

@@ -93,7 +93,7 @@ const SignupPage: NextPage = () => {
             })
         }}
       >
-        <label htmlFor={"username"} className={"mb-6 label"}>
+        <label className={"mb-6 label"}>
           <p className={"inputbox-title"}>Username</p>
           <input
             type={"text"}
@@ -106,7 +106,7 @@ const SignupPage: NextPage = () => {
 
         <div className={"mb-6 flex flex-raw gap-3"}>
           <div className={"w-full"}>
-            <label htmlFor={"first_name"} className={"label"}>
+            <label className={"label"}>
               <p className={"inputbox-title"}>First Name </p>
               <input
                 type={"text"}
@@ -118,7 +118,7 @@ const SignupPage: NextPage = () => {
             </label>
           </div>
           <div className={"w-full"}>
-            <label htmlFor={"last_name"} className={"label"}>
+            <label className={"label"}>
               <p className={"inputbox-title"}>Last Name </p>
               <input
                 type={"text"}
@@ -132,10 +132,11 @@ const SignupPage: NextPage = () => {
         </div>
         <div className={"mb-6 flex flex-raw gap-3"}>
           <div className={"w-full flex-1 overflow-x-hidden"}>
-            <label htmlFor={"dob"} className={"label"}>
+            <label className={"label"}>
               <p className={"inputbox-title"}>Date of Birth </p>
               <input
                 type={"date"}
+                min={"1900-01-01"}
                 max={new Date().toISOString().split("T")[0]}
                 className={"inputbox"}
                 name={"dob"}
@@ -145,7 +146,7 @@ const SignupPage: NextPage = () => {
             </label>
           </div>
           <div className={"w-full flex-1"}>
-            <label htmlFor={"gender"} className={"label"}>
+            <label className={"label"}>
               <p className={"inputbox-title"}>Gender </p>
               <select className={"inputbox"} name={"gender"} placeholder={"Gender"} required>
                 <option value={""}>Select</option>
@@ -157,7 +158,7 @@ const SignupPage: NextPage = () => {
           </div>
         </div>
 
-        <label htmlFor={"email"} className={"mb-6 label"}>
+        <label className={"mb-6 label"}>
           <p className={"inputbox-title"}>Your email</p>
           <input
             type={"email"}
@@ -168,12 +169,12 @@ const SignupPage: NextPage = () => {
           />
         </label>
 
-        <label htmlFor={"password"} className={"mb-6 label"}>
+        <label className={"mb-6 label"}>
           <p className={"inputbox-title"}>Create password </p>
           <input type={"password"} className={"inputbox"} name={"password"} required />
         </label>
 
-        <label htmlFor={"repeat-password"} className={"mb-6 label"}>
+        <label className={"mb-6 label"}>
           <p className={"inputbox-title"}>Repeat password </p>
           <input
             type={"password"}
