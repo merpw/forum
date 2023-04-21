@@ -5,6 +5,8 @@ import { SWRConfig, SWRConfiguration } from "swr"
 import ReactTextareaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
 import { AxiosError } from "axios"
+import { remark } from "remark"
+import remarkHtml from "remark-html"
 
 import { Comment, Post } from "@/custom"
 import { getPostCommentsLocal, getPostLocal, getPostsLocal } from "@/api/posts/fetch"
@@ -26,7 +28,10 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
           <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
           <hr />
         </div>
-        <p className={"whitespace-pre-line"}>{post.content}</p>
+        <div
+          className={"prose dark:prose-invert"}
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
         <hr className={"mt-4"} />
         <div className={"border-t py-2 flex flex-wrap"}>
           <ReactionsButtons post={post} />
@@ -180,6 +185,9 @@ export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = as
   try {
     const post = await getPostLocal(+params.id)
     const comments = await getPostCommentsLocal(+params.id)
+
+    const contentHtml = await remark().use(remarkHtml).process(post.content)
+    post.content = contentHtml.toString()
 
     return {
       props: {
