@@ -6,11 +6,13 @@ func TestOpsComments(t *testing.T) {
 
 	var authorId, postId int
 	// add user to database, to add post authored by user
-	t.Run("AddUser", func(t *testing.T) {
+	t.Run(`
+		Refactored tests which depend on each other,
+	  so there's no need to split them to separate t.Runs.
+	  If something will go wrong,
+		panic trace will show which function caused it.
+	`, func(t *testing.T) {
 		authorId = srv.DB.AddUser("testuser", "user@email", "password")
-	})
-	// add post to database, to add comment to it
-	t.Run("AddPost", func(t *testing.T) {
 		postId = srv.DB.AddPost("TEST POST TITLE", "test post content", authorId, "dummyCategory testCategory")
 	})
 

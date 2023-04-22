@@ -1,16 +1,19 @@
 package database_test
 
-import "testing"
+import (
+	"forum/database"
+	"testing"
+)
 
 func TestOpsChats(t *testing.T) {
 	var privateChatId, userId, oponentId, channelChatId int
 
 	t.Run("AddChat", func(t *testing.T) {
-		privateChatId = srv.DB.AddChat(2)
+		privateChatId = srv.DB.AddChat(database.PrivateChat)
 	})
 
 	t.Run("AddEmptyChat", func(t *testing.T) {
-		channelChatId = srv.DB.AddChat(0)
+		channelChatId = srv.DB.AddChat(database.ChannelChat)
 	})
 
 	t.Run("AddUser", func(t *testing.T) {
@@ -143,20 +146,23 @@ func TestOpsChats(t *testing.T) {
 		}
 	})
 
+	// TODO: uncomment this and extend to check GetAllMessagesByChatId, when logic will be approved
 	// add messages to chat
 
-	t.Run("AddUserMessage", func(t *testing.T) {
-		srv.DB.AddMessage(userId, privateChatId, "helloFromUser")
-	})
+	/*
+		t.Run("AddUserMessage", func(t *testing.T) {
+			srv.DB.AddMessage(userId, privateChatId, "helloFromUser")
+		})
 
-	t.Run("AddOponentMessage", func(t *testing.T) {
-		srv.DB.AddMessage(oponentId, privateChatId, "helloFromOponent")
-	})
+		t.Run("AddOponentMessage", func(t *testing.T) {
+			srv.DB.AddMessage(oponentId, privateChatId, "helloFromOponent")
+		})
 
-	// add messages to channel chat, but only from user, let is say he is owner
+		// add messages to channel chat, but only from user, let is say he is owner
 
-	t.Run("AddUserMessageToChannel", func(t *testing.T) {
-		srv.DB.AddMessage(userId, channelChatId, "helloFromUserToChannel")
-	})
+		t.Run("AddUserMessageToChannel", func(t *testing.T) {
+			srv.DB.AddMessage(userId, channelChatId, "helloFromUserToChannel")
+		})
+	*/
 
 }
