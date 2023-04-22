@@ -36,8 +36,6 @@ type Session struct {
 	UserId int
 }
 
-// TODO: remove this later
-
 // chat section
 type Chat struct {
 	Id   int
