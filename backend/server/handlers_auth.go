@@ -53,6 +53,44 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Name is already in use", http.StatusBadRequest)
 		return
 	}
+
+	if len(requestBody.FirstName) > 15 {
+		http.Error(w, "First name is too long", http.StatusBadRequest)
+		return
+	}
+	if strings.TrimSpace(requestBody.FirstName) == "" {
+		http.Error(w, "First name is not valid", http.StatusBadRequest)
+		return
+	}
+	if len(requestBody.LastName) > 15 {
+		http.Error(w, "Last name is too long", http.StatusBadRequest)
+		return
+	}
+	if strings.TrimSpace(requestBody.LastName) == "" {
+		http.Error(w, "Last name is not valid", http.StatusBadRequest)
+		return
+	}
+
+	if requestBody.DoB != "" {
+		dob, err := time.Parse("2006-01-02", requestBody.DoB)
+		if err != nil {
+			http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+			return
+		}
+		now := time.Now()
+		minDoB := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+		if dob.After(now) || dob.Before(minDoB) {
+			http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if requestBody.Gender != "male" && requestBody.Gender != "female" && requestBody.Gender != "other" {
+		http.Error(w, "Gender id not valid", http.StatusBadRequest)
+		return
+	}
+
 	// check if email is a valid email
 	_, err = mail.ParseAddress(requestBody.Email)
 	if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) {
