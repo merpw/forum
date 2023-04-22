@@ -13,20 +13,26 @@ import { CreateComment, useComments } from "@/api/posts/comment"
 import { FormError } from "@/components/error"
 import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
 import useDates from "@/helpers/dates"
+import { RenderMarkdown } from "@/components/markdown"
+
+import "highlight.js/styles/github-dark.css"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   const { localDate, relativeDate } = useDates(post.date)
 
   return (
     <SWRConfig value={{ fallback }}>
-      <NextSeo title={post.title} description={post.content.slice(0, 200)} />
+      <NextSeo title={post.title} description={post.description} />
 
       <div className={"m-5"}>
         <div className={"mb-3"}>
           <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
           <hr />
         </div>
-        <p className={"whitespace-pre-line"}>{post.content}</p>
+        <div
+          className={"prose dark:prose-invert"}
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
         <hr className={"mt-4"} />
         <div className={"border-t py-2 flex flex-wrap"}>
           <ReactionsButtons post={post} />
@@ -174,12 +180,14 @@ export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
 export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = async ({
   params,
 }) => {
-  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
+  if (!params?.id) {
     return { notFound: true, revalidate: 60 }
   }
   try {
     const post = await getPostLocal(+params.id)
     const comments = await getPostCommentsLocal(+params.id)
+
+    post.content = await RenderMarkdown(post.content)
 
     return {
       props: {

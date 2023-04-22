@@ -36,8 +36,7 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
           <hr className={"mt-2"} />
         </div>
 
-        {/* TODO: change to description */}
-        <p>{post.content}</p>
+        <p>{post.description}</p>
       </div>
 
       <div className={"border-t flex flex-wrap p-3 gap-y-2 "}>

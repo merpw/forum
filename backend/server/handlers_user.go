@@ -60,7 +60,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 			SafePost: SafePost{
 				Id:            post.Id,
 				Title:         post.Title,
-				Content:       shortenContent(post.Content),
+				Description:   post.Description,
 				Author:        SafeUser{Id: user.Id, Name: user.Name},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
@@ -97,7 +97,7 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 			SafePost: SafePost{
 				Id:            post.Id,
 				Title:         post.Title,
-				Content:       shortenContent(post.Content),
+				Description:   post.Description,
 				Author:        SafeUser{Id: author.Id, Name: author.Name},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
@@ -160,7 +160,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,
-			Content:       shortenContent(post.Content),
+			Description:   post.Description,
 			Author:        SafeUser{user.Id, user.Name},
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,
