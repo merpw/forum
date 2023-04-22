@@ -79,27 +79,27 @@ const UserPage: NextPage = () => {
   )
 }
 
+const calculateAge = (dob: string | undefined): string | null => {
+  if (!dob) return null
+  const dobDate = dayjs(dob, "YYYY-MM-DD")
+  if (!dobDate.isValid()) return null
+  const ageInYears = dayjs().diff(dobDate, "year")
+  if (ageInYears < 1) {
+    const ageInMonths = dayjs().diff(dobDate, "month")
+    if (ageInMonths < 1) {
+      const ageInDays = dayjs().diff(dobDate, "day")
+      if (ageInDays < 1) {
+        return `newborn ☺︎`
+      }
+      return `${ageInDays} day${ageInDays > 1 ? "s" + " old" : ""}`
+    }
+    return `${ageInMonths} month${ageInMonths > 1 ? "s" + " old" : ""}`
+  }
+  return `${ageInYears} y.o.`
+}
+
 const UserInfo = () => {
   const { user } = useMe()
-
-  const calculateAge = (dob: string | undefined): string | null => {
-    if (!dob) return null
-    const dobDate = dayjs(dob, "YYYY-MM-DD")
-    if (!dobDate.isValid()) return null
-    const ageInYears = dayjs().diff(dobDate, "year")
-    if (ageInYears < 1) {
-      const ageInMonths = dayjs().diff(dobDate, "month")
-      if (ageInMonths < 1) {
-        const ageInDays = dayjs().diff(dobDate, "day")
-        if (ageInDays < 1) {
-          return `newborn ☺︎`
-        }
-        return `${ageInDays} day${ageInDays > 1 ? "s" + " old" : ""}`
-      }
-      return `${ageInMonths} month${ageInMonths > 1 ? "s" + " old" : ""}`
-    }
-    return `${ageInYears} y.o.`
-  }
 
   const age = calculateAge(user?.dob ?? undefined)
 
