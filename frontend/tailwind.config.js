@@ -11,7 +11,15 @@ module.exports = {
         // TODO: remove when we will have more content to display (e.g. sidebar)
       },
     },
-    extend: {},
+    extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "100ch", // add required value here
+          },
+        },
+      },
+    },
   },
   plugins: [require("@tailwindcss/typography")],
 }
