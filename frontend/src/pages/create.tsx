@@ -75,14 +75,22 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
 
         if (formError != null) setFormError(null)
         setIsSame(true)
-        if (formFields.categories.length == 0) {
-          setFormError("Category is not selected")
-          return
-        }
+
+        formFields.title = formFields.title.trim()
+        formFields.content = formFields.content.trim()
+        formFields.description = formFields.description.trim()
+
         if (formFields.description == "") {
+          // "stupid" description generation, converts content to plain text and cuts it to 200 characters
           const description = await remark().use(stripMarkdown).process(formFields.content)
           formFields.description = description.toString().replace(/\n+/g, " ").trim()
+          if (formFields.description.length > 200) {
+            formFields.description = formFields.description.slice(0, 200) + "..."
+          }
         }
+
+        setFormFields({ ...formFields })
+        // fields were trimmed, description may be filled automatically
 
         if (document.querySelector("#preview h1")) {
           return setFormError(
@@ -90,17 +98,9 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           )
         }
 
-        setFormFields({ ...formFields }) // to show generated description in the input field
-
         CreatePost(formFields)
           .then((id) => router.push(`/post/${id}`))
-          .catch((err) => {
-            if (err.code == "ERR_BAD_REQUEST") {
-              setFormError(err.response?.data as string)
-            } else {
-              // TODO: unexpected error
-            }
-          })
+          .catch((err) => setFormError(err.message))
       }}
     >
       <div className={"mb-3"}>
@@ -111,6 +111,8 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
             "bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
           }
           placeholder={"Title"}
+          value={formFields.title}
+          onChange={() => void 0}
           required
         />
       </div>
@@ -146,6 +148,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           minRows={5}
           placeholder={"Content"}
           required
+          value={formFields.content}
         />
       </div>
 
