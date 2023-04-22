@@ -5,15 +5,16 @@ import (
 	"time"
 )
 
-/*
-AddChat adds chat to database, returns id of new chat
+type ChatType int
 
-	chatType:
-	  2 (private 1vs1) or
-	  1 (group chat) or
-	  0 (the channel owner is posting to subscribers)
-*/
-func (db DB) AddChat(chatType int) int {
+const (
+	ChannelChat ChatType = iota // the channel owner is posting to subscribers
+	GroupChat                   // unlimited number of members
+	PrivateChat                 // 1vs1 chat
+)
+
+// AddChat adds chat to database, returns id of new chat
+func (db DB) AddChat(chatType ChatType) int {
 	result, err := db.Exec("INSERT INTO chats (type, date) VALUES (?, ?)", chatType,
 		time.Now().Format(time.RFC3339))
 	if err != nil {
@@ -47,9 +48,8 @@ func (db DB) GetChatsByUserId(userId int) []Chat {
 	return chats
 }
 
-/** GetPrivateChatsByUserId reads private chats from database by user_id, does not require user to be logged in
- *  Returns nil if no such chats exist.
- */
+// GetPrivateChatsByUserId reads private chats from database by user_id, does not require user to be logged in
+// Returns nil if no such chats exist.
 func (db DB) GetPrivateChatsByUserId(userId int) []Chat {
 	query, err := db.Query(
 		"SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?) AND type = 2",
@@ -109,17 +109,14 @@ type OnlineUser struct {
 	Name string
 }
 
-/*
-GetOnlineUsersIdsAndNames reads online users from database, does not require user to be logged in.
-
-	Use this to get the list of online users for a user side panel with available users to chat with.
-*/
+// GetOnlineUsersIdsAndNames reads online users from database, does not require user to be logged in.
+// Use this to get the list of online users for a user side panel with available users to chat with.
 func (db DB) GetOnlineUsersIdsAndNames(userId int) []OnlineUser {
-	query, err := db.Query(
-		"SELECT users.id, users.name FROM users "+
-			"JOIN sessions ON sessions.user_id = users.id "+
-			"WHERE users.id != ?",
-		userId)
+	query, err := db.Query(`
+		  SELECT users.id, users.name FROM users 
+			JOIN sessions ON sessions.user_id = users.id 
+			WHERE users.id != ?
+		`, userId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -145,14 +142,14 @@ func (db DB) GetPrivateChatOponentsByUserId(userId int) []OnlineUser {
 	// users.id != userId to get oponents, not the user itself
 	// o = oponent, u = user
 	// TODO: check this properly. It looks not clear. But at the moment there is no data and tests to check it.
-	query, err := db.Query(
-		"SELECT o.id, o.name FROM users AS o "+
-			"JOIN memberships AS om ON om.user_id = o.id "+
-			"JOIN chats AS c ON c.id = om.chat_id "+
-			"JOIN memberships AS um ON um.chat_id = c.id "+
-			"JOIN users AS u ON u.id = um.user_id "+
-			"WHERE c.type = 2 AND o.id != ? AND u.id = ?",
-		userId, userId)
+	query, err := db.Query(`
+			SELECT o.id, o.name FROM users AS o 
+			JOIN memberships AS om ON om.user_id = o.id 
+			JOIN chats AS c ON c.id = om.chat_id 
+			JOIN memberships AS um ON um.chat_id = c.id 
+			JOIN users AS u ON u.id = um.user_id 
+			WHERE c.type = 2 AND o.id != ? AND u.id = ?
+		`, userId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -172,9 +169,7 @@ func (db DB) GetPrivateChatOponentsByUserId(userId int) []OnlineUser {
 }
 
 // TODO: implement tests, later, after approving the logic
-/*
-GetChatsIdsByUserId reads chats ids from database by user_id, does not require user to be logged in.
-*/
+// GetChatsIdsByUserId reads chats ids from database by user_id, does not require user to be logged in.
 func (db DB) GetChatsIdsByUserId(userId int) []int {
 	query, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
 	if err != nil {
@@ -196,9 +191,7 @@ func (db DB) GetChatsIdsByUserId(userId int) []int {
 }
 
 // TODO: implement tests, later, after approving the logic
-/*
-GetAllMessagesByChatId reads messages from database by chat_id, does not require user to be logged in.
-*/
+// GetAllMessagesByChatId reads messages from database by chat_id, does not require user to be logged in.
 func (db DB) GetAllMessagesByChatId(chatId int) []Message {
 	query, err := db.Query("SELECT * FROM messages WHERE chat_id = ?", chatId)
 	if err != nil {
