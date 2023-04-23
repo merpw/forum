@@ -29,37 +29,36 @@ func TestGet(t *testing.T) {
 
 	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
 	srv.DB.AddPost("test", "test", userId, "facts")
-	srv.DB.AddPost("test2", "test2", userId, "facts")
 
 	tests := []struct {
 		url          string
 		expectedCode int
 	}{
-		{"/api/posts", 200},
-		{"/api/posts/", 200},
+		{"/api/posts", http.StatusOK},
+		{"/api/posts/", http.StatusOK},
 
-		{"/api/posts/1", 200},
+		{"/api/posts/1", http.StatusOK},
 
-		{"/api/user/1", 200},
-		{"/api/user/1/posts", 200},
+		{"/api/user/1", http.StatusOK},
+		{"/api/user/1/posts", http.StatusOK},
 
-		{"/api/posts/categories", 200},
-		{"/api/posts/categories/rumors", 200},
+		{"/api/posts/categories", http.StatusOK},
+		{"/api/posts/categories/rumors", http.StatusOK},
 
-		{"/api/posts/-1", 404},
-		{"/api/posts/cat", 404},
+		{"/api/posts/-1", http.StatusNotFound},
+		{"/api/posts/cat", http.StatusNotFound},
 
-		{"/api/user/-1", 404},
-		{"/api/user/cat", 404},
-		{"/api/user/cat/posts", 404},
-		{"/api/user/", 404},
+		{"/api/user/-1", http.StatusNotFound},
+		{"/api/user/cat", http.StatusNotFound},
+		{"/api/user/cat/posts", http.StatusNotFound},
+		{"/api/user/", http.StatusNotFound},
 
-		{"/api/posts/categories/cat", 404},
+		{"/api/posts/categories/cat", http.StatusNotFound},
 
-		{"/cat/", 404},
-		{"/api/cat/", 404},
-		{"/api/", 404},
-		{"/", 404},
+		{"/cat/", http.StatusNotFound},
+		{"/api/cat/", http.StatusNotFound},
+		{"/api/", http.StatusNotFound},
+		{"/", http.StatusNotFound},
 
 		{"/api/posts/0/comments", http.StatusNotFound},
 		{"/api/posts/1/comment/1/reaction", http.StatusUnauthorized},
@@ -88,14 +87,4 @@ func TestGet(t *testing.T) {
 			}
 		})
 	}
-
-	// Possibly combine this test with the test below named "TestDatabaseQueries"
-	t.Run("databaseQueries", func(t *testing.T) {
-		comments := srv.DB.GetPostComments(1)
-
-		if len(comments) != 0 {
-			t.Errorf("Expected 0 comments, but got %d", len(comments))
-		}
-
-	})
 }
