@@ -11,6 +11,7 @@ const (
 	ChannelChat ChatType = iota // the channel owner is posting to subscribers
 	GroupChat                   // unlimited number of members
 	PrivateChat                 // 1vs1 chat
+	AnyChat                     // any chat type
 )
 
 // AddChat adds chat to database, returns id of new chat
@@ -27,35 +28,14 @@ func (db DB) AddChat(chatType ChatType) int {
 	return int(id)
 }
 
-// GetChats reads chats from database by user_id
-func (db DB) GetChats(userId int) []Chat {
-	query, err := db.Query("SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?)", userId)
-	if err != nil {
-		log.Panic(err)
+// GetChats reads chats from database by user_id, and chat type.
+func (db DB) GetChats(userId int, chatType ChatType) []Chat {
+	qs := "SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?)"
+	if chatType != AnyChat {
+		qs += " AND type = ?"
 	}
 
-	var chats []Chat
-	for query.Next() {
-		var chat Chat
-		err = query.Scan(&chat.Id, &chat.Type, &chat.Date)
-		if err != nil {
-			log.Panic(err)
-		}
-		chats = append(chats, chat)
-	}
-	query.Close()
-
-	return chats
-}
-
-// GetPrivateChats reads private chats from database by user_id.
-//
-// Returns nil if no such chats exist.
-func (db DB) GetPrivateChats(userId int) []Chat {
-	query, err := db.Query(
-		"SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?) AND type = 2",
-		userId,
-	)
+	query, err := db.Query(qs, userId, chatType)
 	if err != nil {
 		log.Panic(err)
 	}
