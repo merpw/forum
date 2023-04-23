@@ -1,18 +1,22 @@
 package migrations
 
-import (
-	"database/sql"
-)
+import "database/sql"
 
+// v003 adds a description field to the post table
+//
+// For already existing posts, the description is set to the first 200 characters of the content
 var v003 = Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
-
-		ALTER TABLE users ADD COLUMN first_name TEXT  NOT NULL DEFAULT '';
-		ALTER TABLE users ADD COLUMN last_name TEXT  NOT NULL DEFAULT '';
-		ALTER TABLE users ADD COLUMN dob TEXT  NOT NULL DEFAULT '';
-		ALTER TABLE users ADD COLUMN gender TEXT NOT NULL DEFAULT '';
-`)
+		ALTER TABLE posts
+			ADD COLUMN description TEXT NOT NULL default '';
+		UPDATE posts
+			SET description = SUBSTR(content, 0, 200)
+			WHERE description = '';
+		UPDATE posts
+			SET description = description || '...'
+			WHERE length(description) = 199;
+		`)
 		if err != nil {
 			return err
 		}
@@ -20,15 +24,10 @@ var v003 = Migration{
 	},
 
 	Down: func(db *sql.DB) error {
-
 		_, err := db.Exec(`
-
-		ALTER TABLE users DROP COLUMN first_name;
-		ALTER TABLE users DROP COLUMN last_name;
-		ALTER TABLE users DROP COLUMN dob;
-		ALTER TABLE users DROP COLUMN gender;
-		VACUUM;
-`)
+		ALTER TABLE posts
+			DROP COLUMN description
+		`)
 		if err != nil {
 			return err
 		}

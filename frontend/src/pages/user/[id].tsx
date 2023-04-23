@@ -48,7 +48,7 @@ export const getStaticProps: GetStaticProps<
   { user: User; posts: Post[] },
   { id: string }
 > = async ({ params }) => {
-  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
+  if (!params?.id) {
     return { notFound: true, revalidate: 60 }
   }
   try {

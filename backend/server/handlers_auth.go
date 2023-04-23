@@ -126,7 +126,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = revalidateURL(fmt.Sprintf("/user/%d", id))
 	if err != nil {
-		log.Println(err)
+		log.Printf("Error while revalidating `/user/%d`: %v", id, err)
 	}
 }
 

@@ -17,9 +17,10 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody := struct {
-		Title      string   `json:"title"`
-		Content    string   `json:"content"`
-		Categories []string `json:"categories"`
+		Title       string   `json:"title"`
+		Content     string   `json:"content"`
+		Description string   `json:"description"`
+		Categories  []string `json:"categories"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -30,19 +31,31 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 	requestBody.Title = strings.TrimSpace(requestBody.Title)
 	requestBody.Content = strings.TrimSpace(requestBody.Content)
+	requestBody.Description = strings.TrimSpace(requestBody.Description)
 
-	if len(requestBody.Title) < 1 {
+	if requestBody.Title == "" {
 		http.Error(w, "Title is too short", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.Content) < 1 {
-		http.Error(w, "Content is too short", http.StatusBadRequest)
-		return
-	}
-
 	if len(requestBody.Title) > 25 {
 		http.Error(w, "Title is too long, maximum length is 25", http.StatusBadRequest)
 		return
+	}
+
+	if requestBody.Content == "" {
+		http.Error(w, "Content is too short", http.StatusBadRequest)
+		return
+	}
+	if len(requestBody.Content) > 10000 {
+		http.Error(w, "Content is too long, maximum length is 10000", http.StatusBadRequest)
+		return
+	}
+
+	if requestBody.Description == "" {
+		requestBody.Description = shortenContent(requestBody.Content)
+	}
+	if len(requestBody.Description) > 200 {
+		requestBody.Description = shortenContent(requestBody.Description)
 	}
 
 	for i, cat := range requestBody.Categories {
@@ -67,15 +80,22 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId, strings.Join(requestBody.Categories, ","))
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
+		userId, strings.Join(requestBody.Categories, ","))
 	sendObject(w, id)
 
 	err = revalidateURL(fmt.Sprintf("/post/%v", id))
 	if err != nil {
-		log.Printf("Error while revalidating URL: %v", err)
+		log.Printf("Error while revalidating `/post/%v`: %v", id, err)
 	}
 	err = revalidateURL("/")
 	if err != nil {
-		log.Printf("Error while revalidating URL: %v", err)
+		log.Printf("Error while revalidating '/': %v", err)
+	}
+	for _, category := range categories {
+		err = revalidateURL(fmt.Sprintf("/category/%v", category))
+		if err != nil {
+			log.Printf("Error while revalidating `/category/%v`: %v", category, err)
+		}
 	}
 }
