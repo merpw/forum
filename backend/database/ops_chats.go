@@ -27,8 +27,8 @@ func (db DB) AddChat(chatType ChatType) int {
 	return int(id)
 }
 
-// GetChatsByUserId reads chats from database by user_id, does not require user to be logged in
-func (db DB) GetChatsByUserId(userId int) []Chat {
+// GetChats reads chats from database by user_id, does not require user to be logged in
+func (db DB) GetChats(userId int) []Chat {
 	query, err := db.Query("SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?)", userId)
 	if err != nil {
 		log.Panic(err)
@@ -48,9 +48,9 @@ func (db DB) GetChatsByUserId(userId int) []Chat {
 	return chats
 }
 
-// GetPrivateChatsByUserId reads private chats from database by user_id, does not require user to be logged in
+// GetPrivateChats reads private chats from database by user_id, does not require user to be logged in
 // Returns nil if no such chats exist.
-func (db DB) GetPrivateChatsByUserId(userId int) []Chat {
+func (db DB) GetPrivateChats(userId int) []Chat {
 	query, err := db.Query(
 		"SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?) AND type = 2",
 		userId,
@@ -103,15 +103,9 @@ func (db DB) AddMessage(userId, chatId int, content string) int {
 	return int(id)
 }
 
-// TODO: perhaps move it later to models.go. Not approved yet.
-type OnlineUser struct {
-	Id   int
-	Name string
-}
-
-// GetOnlineUsersIdsAndNames reads online users from database, does not require user to be logged in.
+// GetOnlineUsers reads online users from database, does not require user to be logged in.
 // Use this to get the list of online users for a user side panel with available users to chat with.
-func (db DB) GetOnlineUsersIdsAndNames(userId int) []OnlineUser {
+func (db DB) GetOnlineUsers(userId int) []User {
 	query, err := db.Query(`
 		  SELECT users.id, users.name FROM users 
 			JOIN sessions ON sessions.user_id = users.id 
@@ -121,22 +115,22 @@ func (db DB) GetOnlineUsersIdsAndNames(userId int) []OnlineUser {
 		log.Panic(err)
 	}
 
-	var onlineUsers []OnlineUser
+	var users []User
 	for query.Next() {
-		var onlineUser OnlineUser
-		err = query.Scan(&onlineUser.Id, &onlineUser.Name)
+		var user User
+		err = query.Scan(&user.Id, &user.Name)
 		if err != nil {
 			log.Panic(err)
 		}
-		onlineUsers = append(onlineUsers, onlineUser)
+		users = append(users, user)
 	}
 	query.Close()
 
-	return onlineUsers
+	return users
 }
 
-// GetPrivateChatOponentsByUserId reads private chat oponents from database by user_id
-func (db DB) GetPrivateChatOponentsByUserId(userId int) []OnlineUser {
+// GetContacts reads private chat oponents from database by userId
+func (db DB) GetContacts(userId int) []User {
 	// requirements:
 	// chat.type = 2 to get private chats,
 	// users.id != userId to get oponents, not the user itself
@@ -154,23 +148,23 @@ func (db DB) GetPrivateChatOponentsByUserId(userId int) []OnlineUser {
 		log.Panic(err)
 	}
 
-	var oponents []OnlineUser
+	var users []User
 	for query.Next() {
-		var oponent OnlineUser
-		err = query.Scan(&oponent.Id, &oponent.Name)
+		var user User
+		err = query.Scan(&user.Id, &user.Name)
 		if err != nil {
 			log.Panic(err)
 		}
-		oponents = append(oponents, oponent)
+		users = append(users, user)
 	}
 	query.Close()
 
-	return oponents
+	return users
 }
 
 // TODO: implement tests, later, after approving the logic
-// GetChatsIdsByUserId reads chats ids from database by user_id, does not require user to be logged in.
-func (db DB) GetChatsIdsByUserId(userId int) []int {
+// GetChatsIds reads chats ids from database by userId, does not require user to be logged in.
+func (db DB) GetChatsIds(userId int) []int {
 	query, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
 	if err != nil {
 		log.Panic(err)
@@ -191,23 +185,23 @@ func (db DB) GetChatsIdsByUserId(userId int) []int {
 }
 
 // TODO: implement tests, later, after approving the logic
-// GetAllMessagesByChatId reads messages from database by chat_id, does not require user to be logged in.
-func (db DB) GetAllMessagesByChatId(chatId int) []Message {
+// GetChat reads messages from database by chatId, does not require user to be logged in.
+func (db DB) GetChat(chatId int) []Message {
 	query, err := db.Query("SELECT * FROM messages WHERE chat_id = ?", chatId)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	var messages []Message
+	var chat []Message
 	for query.Next() {
-		var message Message
-		err = query.Scan(&message.Id, &message.UserId, &message.ChatId, &message.Content, &message.Date)
+		var m Message
+		err = query.Scan(&m.Id, &m.UserId, &m.ChatId, &m.Content, &m.Date)
 		if err != nil {
 			log.Panic(err)
 		}
-		messages = append(messages, message)
+		chat = append(chat, m)
 	}
 	query.Close()
 
-	return messages
+	return chat
 }

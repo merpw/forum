@@ -53,12 +53,12 @@ func TestOpsChats(t *testing.T) {
 	// get chats by user id
 
 	t.Run("GetChatsByUserId", func(t *testing.T) {
-		chats := srv.DB.GetChatsByUserId(userId)
+		chats := srv.DB.GetChats(userId)
 		if len(chats) != 1 {
 			t.Fatal("Expected 1 chat, got", len(chats))
 		}
 
-		oponentChats := srv.DB.GetChatsByUserId(oponentId)
+		oponentChats := srv.DB.GetChats(oponentId)
 		if len(oponentChats) != 1 {
 			t.Fatal("Expected 1 chat, got", len(oponentChats))
 		}
@@ -77,19 +77,19 @@ func TestOpsChats(t *testing.T) {
 	// get chats by user id, including channel chat
 
 	t.Run("GetChatsByUserIdIncludingChannelChat", func(t *testing.T) {
-		chats := srv.DB.GetChatsByUserId(userId)
+		chats := srv.DB.GetChats(userId)
 		if len(chats) != 2 {
 			t.Fatal("Expected 2 chats, got", len(chats))
 		}
 	})
 
 	t.Run("GetPrivateChatsByUserId", func(t *testing.T) {
-		chats := srv.DB.GetPrivateChatsByUserId(userId)
+		chats := srv.DB.GetPrivateChats(userId)
 		if len(chats) != 1 {
 			t.Fatal("Expected 1 chat, got", len(chats))
 		}
 
-		oponentChats := srv.DB.GetPrivateChatsByUserId(oponentId)
+		oponentChats := srv.DB.GetPrivateChats(oponentId)
 		if len(oponentChats) != 1 {
 			t.Fatal("Expected 1 chat, got", len(oponentChats))
 		}
@@ -103,12 +103,12 @@ func TestOpsChats(t *testing.T) {
 	// get online users
 
 	t.Run("GetOnlineUsers", func(t *testing.T) {
-		userOponents := srv.DB.GetOnlineUsersIdsAndNames(userId)
+		userOponents := srv.DB.GetOnlineUsers(userId)
 		if len(userOponents) != 1 {
 			t.Fatal("Expected 1 user, got", len(userOponents))
 		}
 
-		oponentOponents := srv.DB.GetOnlineUsersIdsAndNames(oponentId)
+		oponentOponents := srv.DB.GetOnlineUsers(oponentId)
 		if len(oponentOponents) != 1 {
 			t.Fatal("Expected 1 user, got", len(oponentOponents))
 		}
@@ -125,13 +125,13 @@ func TestOpsChats(t *testing.T) {
 
 	// get private chat oponents by user id
 
-	t.Run("GetPrivateChatOponentsByUserId", func(t *testing.T) {
-		oponents := srv.DB.GetPrivateChatOponentsByUserId(userId)
+	t.Run("GetContacts", func(t *testing.T) {
+		oponents := srv.DB.GetContacts(userId)
 		if len(oponents) != 1 {
 			t.Fatal("Expected 1 oponent, got", len(oponents))
 		}
 
-		oponentOponents := srv.DB.GetPrivateChatOponentsByUserId(oponentId)
+		oponentOponents := srv.DB.GetContacts(oponentId)
 		if len(oponentOponents) != 1 {
 			t.Fatal("Expected 1 oponent, got", len(oponentOponents))
 		}
@@ -146,7 +146,7 @@ func TestOpsChats(t *testing.T) {
 		}
 	})
 
-	// TODO: uncomment this and extend to check GetAllMessagesByChatId, when logic will be approved
+	// TODO: uncomment this and extend to check GetChat, when logic will be approved
 	// add messages to chat
 
 	/*
