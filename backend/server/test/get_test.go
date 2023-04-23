@@ -12,12 +12,10 @@ import (
 
 // TestGet tests all GET routes for valid status codes
 func TestGet(t *testing.T) {
-	// Opens sqlite3
 	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
 	if err != nil {
 		t.Fatal(err)
 	}
-	// connects server to DB, and initiates the DB
 	srv := server.Connect(db)
 	err = srv.DB.InitDatabase()
 	if err != nil {
@@ -31,7 +29,6 @@ func TestGet(t *testing.T) {
 
 	cli := testServer.Client()
 
-	// Adds an user and a post to the database
 	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
 	srv.DB.AddPost("test", "test", userId, "facts")
 	srv.DB.AddPost("test2", "test2", userId, "facts")
@@ -96,10 +93,8 @@ func TestGet(t *testing.T) {
 
 	// Possibly combine this test with the test below named "TestDatabaseQueries"
 	t.Run("databaseQueries", func(t *testing.T) {
-		// Call GetPostComments to get comments for post 1
 		comments := srv.DB.GetPostComments(1)
 
-		// Check that the comments slice contains no comments
 		if len(comments) != 0 {
 			t.Errorf("Expected 0 comments, but got %d", len(comments))
 		}
