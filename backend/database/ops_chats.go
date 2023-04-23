@@ -115,7 +115,6 @@ func (db DB) GetOnlineUsers(userId int) []User {
 func (db DB) GetContacts(userId int) []User {
 	// requirements:
 	// chat.type = 2 to get private chats,
-	// users.id != userId to get oponents, not the user itself
 	// o = oponent, u = user
 	// TODO: check this properly. It looks not clear. But at the moment there is no data and tests to check it.
 	query, err := db.Query(`
@@ -124,8 +123,8 @@ func (db DB) GetContacts(userId int) []User {
 			JOIN chats AS c ON c.id = om.chat_id 
 			JOIN memberships AS um ON um.chat_id = c.id 
 			JOIN users AS u ON u.id = um.user_id 
-			WHERE c.type = 2 AND o.id != ? AND u.id = ?
-		`, userId, userId)
+			WHERE c.type = 2 AND u.id = ?
+		`, userId)
 	if err != nil {
 		log.Panic(err)
 	}

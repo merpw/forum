@@ -127,21 +127,21 @@ func TestOpsChats(t *testing.T) {
 
 	t.Run("GetContacts", func(t *testing.T) {
 		oponents := srv.DB.GetContacts(userId)
-		if len(oponents) != 1 {
-			t.Fatal("Expected 1 oponent, got", len(oponents))
+		if len(oponents) != 2 {
+			t.Fatal("Expected 2 oponents, got", len(oponents))
 		}
 
 		oponentOponents := srv.DB.GetContacts(oponentId)
-		if len(oponentOponents) != 1 {
-			t.Fatal("Expected 1 oponent, got", len(oponentOponents))
+		if len(oponentOponents) != 2 {
+			t.Fatal("Expected 2 oponents, got", len(oponentOponents))
 		}
 
 		// check if users are the expected
-		if oponents[0].Id != oponentId {
+		if oponents[0].Id != oponentId && oponents[1].Id != oponentId {
 			t.Fatal("Expected oponentId, got different")
 		}
 
-		if oponentOponents[0].Id != userId {
+		if oponentOponents[0].Id != userId && oponentOponents[1].Id != userId {
 			t.Fatal("Expected userId, got different")
 		}
 	})
