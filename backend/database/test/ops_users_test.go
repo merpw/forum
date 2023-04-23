@@ -9,20 +9,20 @@ func TestOpsUsers(t *testing.T) {
 	// add user
 	var userId int
 	t.Run("AddUser", func(t *testing.T) {
-		userId = srv.DB.AddUser("OpsUserTestUser", "opsusertest@email", "password")
+		userId = DB.AddUser("OpsUserTestUser", "opsusertest@email", "password")
 	})
 
 	// get user by id
 	var user *database.User
 	t.Run("GetUserById", func(t *testing.T) {
-		user = srv.DB.GetUserById(userId)
+		user = DB.GetUserById(userId)
 		if user == nil {
 			t.Fatalf("Expected user with id %d, got nil", userId)
 		}
 		if user.Id != userId {
 			t.Fatalf("Expected user with id %d, got %d", userId, user.Id)
 		}
-		noUser := srv.DB.GetUserById(-1)
+		noUser := DB.GetUserById(-1)
 		if noUser != nil {
 			t.Fatalf("Expected nil, got user with id %d", noUser.Id)
 		}
@@ -30,7 +30,7 @@ func TestOpsUsers(t *testing.T) {
 
 	// get user by login
 	t.Run("GetUserByLogin", func(t *testing.T) {
-		userByName := srv.DB.GetUserByLogin(user.Name)
+		userByName := DB.GetUserByLogin(user.Name)
 		if userByName == nil {
 			t.Fatalf("Expected user with login %s, got nil", user.Name)
 		}
@@ -38,12 +38,12 @@ func TestOpsUsers(t *testing.T) {
 			t.Fatalf("Expected user with name %s, got %s", user.Name, userByName.Name)
 		}
 
-		userByEmail := srv.DB.GetUserByLogin(user.Email)
+		userByEmail := DB.GetUserByLogin(user.Email)
 		if userByEmail == nil {
 			t.Fatalf("Expected user with email %s, got nil", user.Email)
 		}
 
-		noUser := srv.DB.GetUserByLogin("noUser")
+		noUser := DB.GetUserByLogin("noUser")
 		if noUser != nil {
 			t.Fatalf("Expected nil, got user with Name %s", noUser.Name)
 		}
@@ -51,10 +51,10 @@ func TestOpsUsers(t *testing.T) {
 
 	// check is email or name taken
 	t.Run("IsEmailOrNameTaken", func(t *testing.T) {
-		if !srv.DB.IsNameTaken(user.Name) {
+		if !DB.IsNameTaken(user.Name) {
 			t.Fatalf("Expected name %s to be taken", user.Name)
 		}
-		if !srv.DB.IsEmailTaken(user.Email) {
+		if !DB.IsEmailTaken(user.Email) {
 			t.Fatalf("Expected email %s to be taken", user.Email)
 		}
 	})

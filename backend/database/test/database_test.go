@@ -2,7 +2,7 @@ package database_test
 
 import (
 	"database/sql"
-	"forum/server"
+	"forum/database"
 	"log"
 	"os"
 	"testing"
@@ -10,21 +10,22 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var db *sql.DB
-var srv *server.Server
+var DB *database.DB
 
 func TestMain(m *testing.M) {
 	tmpDB, err := os.CreateTemp(".", "test.db")
 	if err != nil {
 		log.Fatal(err)
 	}
-	db, err = sql.Open("sqlite3", tmpDB.Name()+"?_foreign_keys=true")
+	db, err := sql.Open("sqlite3", tmpDB.Name()+"?_foreign_keys=true")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	srv = server.Connect(db)
-	err = srv.DB.InitDatabase()
+	DB = &database.DB{DB: db}
+
+	// srv = server.Connect(db)
+	err = DB.InitDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +36,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Clean only if all tests are successful (code=0)
-	db.Close()
+	DB.Close()
 	tmpDB.Close()
 	os.Remove(tmpDB.Name())
 }

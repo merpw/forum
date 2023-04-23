@@ -12,16 +12,16 @@ func TestOpsComments(t *testing.T) {
 	  If something will go wrong,
 		panic trace will show which function caused it.
 	`, func(t *testing.T) {
-		authorId = srv.DB.AddUser("testuser", "user@email", "password")
-		postId = srv.DB.AddPost("TEST POST TITLE", "test post content", authorId, "dummyCategory testCategory")
+		authorId = DB.AddUser("testuser", "user@email", "password")
+		postId = DB.AddPost("TEST POST TITLE", "test post content", authorId, "dummyCategory testCategory")
 	})
 
 	t.Run("AddComment", func(t *testing.T) {
-		srv.DB.AddComment("test comment", postId, 1)
+		DB.AddComment("test comment", postId, 1)
 	})
 
 	t.Run("UpdatePostsCommentsCount", func(t *testing.T) {
-		srv.DB.UpdatePostsCommentsCount(postId, 1)
+		DB.UpdatePostsCommentsCount(postId, 1)
 	})
 
 }
