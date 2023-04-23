@@ -27,7 +27,7 @@ func (db DB) AddChat(chatType ChatType) int {
 	return int(id)
 }
 
-// GetChats reads chats from database by user_id, does not require user to be logged in
+// GetChats reads chats from database by user_id
 func (db DB) GetChats(userId int) []Chat {
 	query, err := db.Query("SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?)", userId)
 	if err != nil {
@@ -48,7 +48,8 @@ func (db DB) GetChats(userId int) []Chat {
 	return chats
 }
 
-// GetPrivateChats reads private chats from database by user_id, does not require user to be logged in
+// GetPrivateChats reads private chats from database by user_id.
+//
 // Returns nil if no such chats exist.
 func (db DB) GetPrivateChats(userId int) []Chat {
 	query, err := db.Query(
@@ -103,7 +104,8 @@ func (db DB) AddMessage(userId, chatId int, content string) int {
 	return int(id)
 }
 
-// GetOnlineUsers reads online users from database, does not require user to be logged in.
+// GetOnlineUsers reads online users from database.
+//
 // Use this to get the list of online users for a user side panel with available users to chat with.
 func (db DB) GetOnlineUsers(userId int) []User {
 	query, err := db.Query(`
@@ -163,7 +165,7 @@ func (db DB) GetContacts(userId int) []User {
 }
 
 // TODO: implement tests, later, after approving the logic
-// GetChatsIds reads chats ids from database by userId, does not require user to be logged in.
+// GetChatsIds reads chats ids from database by userId
 func (db DB) GetChatsIds(userId int) []int {
 	query, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
 	if err != nil {
@@ -185,7 +187,7 @@ func (db DB) GetChatsIds(userId int) []int {
 }
 
 // TODO: implement tests, later, after approving the logic
-// GetChat reads messages from database by chatId, does not require user to be logged in.
+// GetChat reads messages from database by chatId
 func (db DB) GetChat(chatId int) []Message {
 	query, err := db.Query("SELECT * FROM messages WHERE chat_id = ?", chatId)
 	if err != nil {
