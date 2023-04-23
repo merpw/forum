@@ -5,13 +5,7 @@ import (
 	"time"
 )
 
-// # GetAllPosts reads all posts from database (reads only userId, not user object)
-//
-// panics if error occurs
-//
-// METHOD: GET
-//
-// URL: /api/posts
+// GetAllPosts reads all posts from database
 func (db DB) GetAllPosts() []Post {
 	query, err := db.Query("SELECT * FROM posts")
 	if err != nil {
