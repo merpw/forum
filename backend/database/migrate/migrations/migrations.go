@@ -13,4 +13,5 @@ var Migrations = []Migration{
 	v001,
 	v002,
 	v003,
+	v004,
 }
