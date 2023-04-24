@@ -3,27 +3,34 @@ package database_test
 import "testing"
 
 func TestOpsReactions(t *testing.T) {
-	// add user, to be able to add post
-	var userId int
-	t.Run("AddUser", func(t *testing.T) {
+	var userId, postId, commentId int
+	t.Run("TestPostReaction", func(t *testing.T) {
 		userId = DB.AddUser("OpsReactionTestUser", "opsreactiontest@email", "password")
-	})
-
-	// add post, to be able to add reaction and comment
-	var postId int
-	t.Run("AddPost", func(t *testing.T) {
 		postId = DB.AddPost("Post Title", "post content", userId, "OpsReactionCategory testCategory")
-	})
-
-	// add comment, to be able to add reaction
-	var commentId int
-	t.Run("AddComment", func(t *testing.T) {
 		commentId = DB.AddComment("Comment content", postId, userId)
+		DB.AddPostReaction(postId, userId, 1)
+		reaction := DB.GetPostReaction(postId, userId)
+		if reaction != 1 {
+			t.Fatalf("Expected reaction 1, got %d", reaction)
+		}
+		DB.RemovePostReaction(postId, userId)
+		reaction = DB.GetPostReaction(postId, userId)
+		if reaction != 0 {
+			t.Fatalf("Expected reaction 0, got %d", reaction)
+		}
 	})
 
-	// add reaction to post
-	t.Run("AddPostReaction", func(t *testing.T) {
-		DB.AddPostReaction(postId, userId, 1)
+	t.Run("TestCommentReaction", func(t *testing.T) {
+		DB.AddCommentReaction(commentId, userId, -1)
+		reaction := DB.GetCommentReaction(commentId, userId)
+		if reaction != -1 {
+			t.Fatalf("Expected reaction -1, got %d", reaction)
+		}
+		DB.RemoveCommentReaction(commentId, userId)
+		reaction = DB.GetCommentReaction(commentId, userId)
+		if reaction != 0 {
+			t.Fatalf("Expected reaction 0, got %d", reaction)
+		}
 	})
 
 	// update post likes count
@@ -36,24 +43,6 @@ func TestOpsReactions(t *testing.T) {
 		DB.UpdatePostDislikeCount(postId, 1)
 	})
 
-	// get post reactions
-	t.Run("GetPostReactions", func(t *testing.T) {
-		reaction := DB.GetPostReaction(postId, userId)
-		if reaction != 1 {
-			t.Fatalf("Expected reaction 1, got %d", reaction)
-		}
-	})
-
-	// remove post reaction
-	t.Run("RemovePostReaction", func(t *testing.T) {
-		DB.RemovePostReaction(postId, userId)
-	})
-
-	// add reaction to comment
-	t.Run("AddCommentReaction", func(t *testing.T) {
-		DB.AddCommentReaction(commentId, userId, -1)
-	})
-
 	// update comment likes count
 	t.Run("UpdateCommentLikesCount", func(t *testing.T) {
 		DB.UpdateCommentLikesCount(commentId, 1)
@@ -62,19 +51,6 @@ func TestOpsReactions(t *testing.T) {
 	// update comment dislikes count
 	t.Run("UpdateCommentDislikeCount", func(t *testing.T) {
 		DB.UpdateCommentDislikeCount(commentId, 1)
-	})
-
-	// get comment reactions
-	t.Run("GetCommentReactions", func(t *testing.T) {
-		reaction := DB.GetCommentReaction(commentId, userId)
-		if reaction != -1 {
-			t.Fatalf("Expected reaction -1, got %d", reaction)
-		}
-	})
-
-	// remove comment reaction
-	t.Run("RemoveCommentReaction", func(t *testing.T) {
-		DB.RemoveCommentReaction(commentId, userId)
 	})
 
 }
