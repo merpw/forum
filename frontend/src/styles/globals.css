@@ -21,6 +21,80 @@ body {
   }
 }
 
-.categoryMultiselect {
-  color: black;
+@layer components {
+  /* TODO: improve when design concept will be ready */
+  .react-select-container .react-select__control {
+    @apply dark:bg-gray-700 border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500;
+  }
+
+  .react-select-container .react-select__control--is-focused {
+    @apply dark:border-gray-400 shadow-none;
+  }
+
+  .react-select-container .react-select__menu {
+    @apply dark:bg-gray-700 border-gray-300 dark:border-gray-600;
+  }
+
+  .react-select-container .react-select__option {
+    @apply dark:text-white bg-gray-100 dark:bg-gray-700;
+  }
+
+  .react-select-container .react-select__option--is-focused {
+    @apply bg-gray-200 dark:bg-gray-800;
+  }
+
+  .react-select-container .react-select__indicator-separator {
+    @apply bg-gray-400;
+  }
+
+  .react-select-container .react-select__input-container,
+  .react-select-container .react-select__placeholder,
+  .react-select-container .react-select__single-value {
+    @apply text-gray-400;
+  }
+
+  .react-select-container .react-select__multi-value {
+    @apply bg-gray-200 dark:bg-gray-800;
+  }
+
+  .react-select-container .react-select__multi-value__label {
+    @apply text-gray-600 dark:text-gray-200;
+  }
+}
+
+/* Inline code */
+.prose code:not(.prose pre code):before,
+.prose code:not(.prose pre code):after {
+  content: none;
+}
+
+.prose code:not(.prose pre code) {
+  @apply bg-gray-200 dark:bg-gray-800 p-1 px-2 rounded;
+}
+
+/* Code block */
+.prose pre:has(code) {
+  @apply p-0 rounded;
+}
+
+@layer components {
+  .clickable {
+    @apply hover:opacity-50;
+  }
+
+  .button {
+    @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800;
+  }
+
+  .inputbox-title {
+    @apply text-sm font-medium text-gray-900 dark:text-white mb-2;
+  }
+
+  .inputbox {
+    @apply bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
+  }
+
+  .inputbox-singlerow {
+    @apply inputbox h-10;
+  }
 }

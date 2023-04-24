@@ -13,20 +13,26 @@ import { CreateComment, useComments } from "@/api/posts/comment"
 import { FormError } from "@/components/error"
 import { Category, ReactionsButtons, ReactionsCommentButtons } from "@/components/posts/reactions"
 import useDates from "@/helpers/dates"
+import { RenderMarkdown } from "@/components/markdown"
+
+import "highlight.js/styles/github-dark.css"
 
 const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, fallback }) => {
   const { localDate, relativeDate } = useDates(post.date)
 
   return (
     <SWRConfig value={{ fallback }}>
-      <NextSeo title={post.title} description={post.content.slice(0, 200)} />
+      <NextSeo title={post.title} description={post.description} />
 
       <div className={"m-5"}>
         <div className={"mb-3"}>
           <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
           <hr />
         </div>
-        <p className={"whitespace-pre-line"}>{post.content}</p>
+        <div
+          className={"prose dark:prose-invert"}
+          dangerouslySetInnerHTML={{ __html: post.content }}
+        />
         <hr className={"mt-4"} />
         <div className={"border-t py-2 flex flex-wrap"}>
           <ReactionsButtons post={post} />
@@ -35,7 +41,7 @@ const PostPage: NextPage<{ post: Post; fallback: SWRConfiguration }> = ({ post, 
           <span className={"ml-auto"}>
             <span title={localDate}>{relativeDate}</span>
             {" by "}
-            <span className={"text-xl hover:opacity-50"}>
+            <span className={"clickable text-xl"}>
               <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
             </span>
           </span>
@@ -98,9 +104,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
         <ReactTextareaAutosize
           id={"comment-text"}
-          className={
-            "w-full bg-gray-50 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 "
-          }
+          className={"inputbox"}
           value={text}
           onInput={(e) => setText(e.currentTarget.value)}
           required
@@ -109,12 +113,7 @@ const CommentForm: FC<{ post: Post }> = ({ post }) => {
 
       <FormError error={formError} />
 
-      <button
-        type={"submit"}
-        className={
-          "text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-        }
-      >
+      <button type={"submit"} className={"button"}>
         Submit
       </button>
     </form>
@@ -143,7 +142,7 @@ const CommentCard: FC<{ comment: Comment; post: Post }> = ({ comment, post }) =>
   return (
     <div className={"border rounded p-5"}>
       <Link href={`/user/${comment.author.id}`}>
-        <h3 className={"text-lg hover:opacity-50"}>{comment.author.name}</h3>
+        <h3 className={"clickable text-lg"}>{comment.author.name}</h3>
       </Link>
       <p className={"whitespace-pre-line"}>{comment.content}</p>
       <hr className={"mt-4 mb-2"}></hr>
@@ -174,12 +173,14 @@ export const getStaticPaths: GetStaticPaths<{ id: string }> = async () => {
 export const getStaticProps: GetStaticProps<{ post: Post }, { id: string }> = async ({
   params,
 }) => {
-  if (!process.env.FORUM_BACKEND_PRIVATE_URL || params == undefined) {
+  if (!params?.id) {
     return { notFound: true, revalidate: 60 }
   }
   try {
     const post = await getPostLocal(+params.id)
     const comments = await getPostCommentsLocal(+params.id)
+
+    post.content = await RenderMarkdown(post.content)
 
     return {
       props: {

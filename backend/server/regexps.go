@@ -48,6 +48,8 @@ var reApiPostsCategoriesName = pt(`^/api/posts/categories/[[:alnum:]]+/?$`)
 
 var reApiPostsId = pt(`^/api/posts/[[:digit:]]+/?$`)
 
+var reApiInternalCheckSession = pt(`^/api/internal/check-session/?$`)
+
 // ****************************************************
 // *********** method POST endpoints ******************
 // ****************************************************
@@ -87,6 +89,8 @@ var getRegexps = []string{
 
 	reApiPostsIdCommentIdReaction.String(),
 	reApiPostsIdComments.String(),
+
+	reApiInternalCheckSession.String(),
 }
 var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 

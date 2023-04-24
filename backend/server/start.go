@@ -41,6 +41,8 @@ func (srv *Server) Start() http.Handler {
 	router.HandleFunc("/api/signup", srv.signupHandler)
 	router.HandleFunc("/api/logout", srv.logoutHandler)
 
+	router.HandleFunc("/api/internal/check-session", srv.checkSessionHandler)
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {

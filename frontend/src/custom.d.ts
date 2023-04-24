@@ -2,6 +2,7 @@ export type Post = {
   id: number
   title: string
   content: string
+  description: string
   likes_count: number
   dislikes_count: number
   comments_count: number
@@ -15,6 +16,10 @@ export type User = {
   name: string
   id: number
   email: string
+  first_name?: string
+  last_name?: string
+  dob?: string
+  gender?: string
 }
 
 export type Comment = {

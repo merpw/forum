@@ -1,19 +1,23 @@
+/* eslint-disable import/no-named-as-default-member */ /* https://github.com/iamkun/dayjs/issues/1242 */
+import dayjs from "dayjs"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { NextSeo } from "next-seo"
+import relativeTime from "dayjs/plugin/relativeTime"
 
 import { useMe } from "@/api/auth"
 import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
+import { User } from "@/custom"
 
 /* TODO: add placeholders */
 
 const UserPage: NextPage = () => {
   const router = useRouter()
-  const { isLoading, isLoggedIn } = useMe()
+  const { user, isLoading, isLoggedIn } = useMe()
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
 
@@ -30,12 +34,14 @@ const UserPage: NextPage = () => {
     }
   }, [router, isLoggedIn, isRedirecting, isLoading])
 
+  if (isLoading || !user) return <div>Loading...</div>
+
   return (
     <>
       <NextSeo title={"Profile"} />
 
-      <UserInfo />
-      <Link href={"/create"} className={"text-2xl hover:opacity-50 mb-5 flex gap-1 max-w-fit"}>
+      <UserInfo user={user} />
+      <Link href={"/create"} className={"clickable text-2xl mb-5 flex gap-1 max-w-fit"}>
         <span className={"my-auto"}>
           <svg
             xmlns={"http://www.w3.org/2000/svg"}
@@ -57,13 +63,13 @@ const UserPage: NextPage = () => {
         <span>Create a new post</span>
       </Link>
 
-      <ul className={"flex flex-wrap gap-2 text-2xl mb-3"}>
+      <ul className={"text-2xl my-3 flex flex-wrap gap-5"}>
         {tabs.map(({ title }, key) => (
           <li key={key}>
             <button
               key={key}
               className={
-                "cursor-pointer hover:opacity-60 p-1 " +
+                "clickable cursor-pointer p-1 " +
                 (activeTab == key ? "border-b-2 border-b-blue-500" : "")
               }
               onClick={() => setActiveTab(key)}
@@ -78,17 +84,48 @@ const UserPage: NextPage = () => {
   )
 }
 
-const UserInfo = () => {
-  const { user } = useMe()
+/* "2000-01-24" -> "23 years"
+ * "2021-01-24" -> "baby👶"
+ */
+const calculateAge = (dob: string): string | null => {
+  dayjs.extend(relativeTime)
 
+  const parsedDob = dayjs(dob, "YYYY-MM-DD")
+  if (!parsedDob.isValid()) return null
+
+  const age = parsedDob.fromNow(true)
+  return age.includes("year") ? age : "baby👶"
+}
+
+const UserInfo: FC<{ user: User }> = ({ user }) => {
+  const age = user.dob ? calculateAge(user.dob) : null
   return (
     <>
       <h1 className={"text-2xl font-thin mb-5"}>
         {"Hello, "}
-        <span className={"text-3xl font-normal"}>{user?.name}</span>
+        <span className={"text-3xl font-normal"}>{user.name}</span>
       </h1>
+      {user.first_name || user.last_name ? (
+        <p>
+          {"Full name: "}
+          <span className={"text-2xl"}>{`${user.first_name} ${user.last_name}`}</span>
+        </p>
+      ) : null}
+      {age ? (
+        <p>
+          {"Age: "}
+          <span className={"text-2xl"}>{age}</span>
+        </p>
+      ) : null}
+      {user.gender ? (
+        <p>
+          {"Gender: "}
+          <span className={"text-2xl"}>{user.gender}</span>
+        </p>
+      ) : null}
       <p>
-        {"Your email is "} <span className={"text-2xl"}> {user?.email} </span>
+        {"Email: "}
+        <span className={"text-2xl"}>{user.email}</span>
       </p>
       <hr className={"my-5"} />
     </>
