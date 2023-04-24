@@ -138,19 +138,21 @@ const SignupPage: NextPage = () => {
               required
             />
           </label>
-          <label className={"grow basis-1/3"}>
-            <span className={"inputbox-title"}>Gender </span>
-            <select
-              className={"inputbox-singlerow"}
-              name={"gender"}
-              placeholder={"Gender"}
-              required
-            >
-              <option value={""}>Select</option>
-              <option value={"male"}>Male</option>
-              <option value={"female"}>Female</option>
-              <option value={"other"}>Other</option>
-            </select>
+          <label className={"grow basis-1/3 block"}>
+            <span className={"inputbox-title m-0"}>Gender </span>
+            <div>
+              <select
+                className={"inputbox-singlerow my-1 py-1"}
+                name={"gender"}
+                placeholder={"Gender"}
+                required
+              >
+                <option value={""}>Select</option>
+                <option value={"male"}>Male</option>
+                <option value={"female"}>Female</option>
+                <option value={"other"}>Other</option>
+              </select>
+            </div>
           </label>
         </div>
 
