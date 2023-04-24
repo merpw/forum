@@ -1,20 +1,23 @@
+/* eslint-disable import/no-named-as-default-member */ /* https://github.com/iamkun/dayjs/issues/1242 */
+import dayjs from "dayjs"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import { NextPage } from "next/types"
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import { NextSeo } from "next-seo"
-import dayjs from "dayjs"
+import relativeTime from "dayjs/plugin/relativeTime"
 
 import { useMe } from "@/api/auth"
 import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
+import { User } from "@/custom"
 
 /* TODO: add placeholders */
 
 const UserPage: NextPage = () => {
   const router = useRouter()
-  const { isLoading, isLoggedIn } = useMe()
+  const { user, isLoading, isLoggedIn } = useMe()
 
   const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
 
@@ -31,11 +34,13 @@ const UserPage: NextPage = () => {
     }
   }, [router, isLoggedIn, isRedirecting, isLoading])
 
+  if (isLoading || !user) return <div>Loading...</div>
+
   return (
     <>
       <NextSeo title={"Profile"} />
 
-      <UserInfo />
+      <UserInfo user={user} />
       <Link href={"/create"} className={"clickable text-2xl mb-5 flex gap-1 max-w-fit"}>
         <span className={"my-auto"}>
           <svg
@@ -79,57 +84,48 @@ const UserPage: NextPage = () => {
   )
 }
 
+/* "2000-01-24" -> "23 years"
+ * "2021-01-24" -> "baby👶"
+ */
+const calculateAge = (dob: string): string | null => {
+  dayjs.extend(relativeTime)
 
-const UserInfo = () => {
-  const { user } = useMe()
+  const parsedDob = dayjs(dob, "YYYY-MM-DD")
+  if (!parsedDob.isValid()) return null
 
-const calculateAge = (dob: string | undefined): string | null => {
-  if (!dob) return null
-  const dobDate = dayjs(dob, "YYYY-MM-DD")
-  if (!dobDate.isValid()) return null
-  const ageInYears = dayjs().diff(dobDate, "year")
-  if (ageInYears < 1) {
-    const ageInMonths = dayjs().diff(dobDate, "month")
-    if (ageInMonths < 1) {
-      const ageInDays = dayjs().diff(dobDate, "day")
-      if (ageInDays < 1) {
-        return `newborn ☺︎`
-      }
-      return `${ageInDays} day${ageInDays > 1 ? "s" + " old" : ""}`
-    }
-    return `${ageInMonths} month${ageInMonths > 1 ? "s" + " old" : ""}`
-  }
-  return `${ageInYears} y.o.`
+  const age = parsedDob.fromNow(true)
+  return age.includes("year") ? age : "baby👶"
 }
 
-  const age = calculateAge(user?.dob ?? undefined)
-
+const UserInfo: FC<{ user: User }> = ({ user }) => {
+  const age = user.dob ? calculateAge(user.dob) : null
   return (
     <>
       <h1 className={"text-2xl font-thin mb-5"}>
         {"Hello, "}
-        <span className={"text-3xl font-normal"}>{user?.name}</span>
+        <span className={"text-3xl font-normal"}>{user.name}</span>
       </h1>
-      {user?.first_name || user?.last_name ? (
+      {user.first_name || user.last_name ? (
         <p>
           {"Full name: "}
-          <span className={"text-2xl"}> {user?.first_name + " "} </span>
-          <span className={"text-2xl"}> {user?.last_name} </span>
+          <span className={"text-2xl"}>{`${user.first_name} ${user.last_name}`}</span>
         </p>
       ) : null}
-      {user?.dob ? (
+      {age ? (
         <p>
           {"Age: "}
-          <span className={"text-2xl"}> {age} </span>
+          <span className={"text-2xl"}>{age}</span>
         </p>
       ) : null}
-      {user?.gender ? (
+      {user.gender ? (
         <p>
-          {"Gender: "} <span className={"text-2xl"}> {user?.gender} </span>
+          {"Gender: "}
+          <span className={"text-2xl"}>{user.gender}</span>
         </p>
       ) : null}
       <p>
-        {"Email: "} <span className={"text-2xl"}> {user?.email} </span>
+        {"Email: "}
+        <span className={"text-2xl"}>{user.email}</span>
       </p>
       <hr className={"my-5"} />
     </>
