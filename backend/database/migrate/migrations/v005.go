@@ -2,8 +2,8 @@ package migrations
 
 import "database/sql"
 
-// v003 - create tables: chats, memberships, messages
-var v003 = Migration{
+// v005 - create tables: chats, memberships, messages
+var v005 = Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
 		CREATE TABLE chats (
