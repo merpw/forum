@@ -29,7 +29,9 @@ const getMe = async () =>
     : { user: undefined }
 
 export const logIn = async (login: string, password: string) =>
-  axios.post("/api/login", { login, password }, { withCredentials: true })
+  axios.post("/api/login", { login, password }, { withCredentials: true }).catch((err) => {
+    throw new Error(err.response?.data?.length < 200 ? err.response.data : "Unexpected error")
+  })
 
 export const logOut = async (): Promise<void> =>
   axios.post("/api/logout", {}, { withCredentials: true })
@@ -42,4 +44,7 @@ export const SignUp = async (data: {
   last_name: string
   dob: string
   gender: string
-}) => axios.post("/api/signup", data, { withCredentials: true })
+}) =>
+  axios.post("/api/signup", data, { withCredentials: true }).catch((err) => {
+    throw new Error(err.response?.data?.length < 200 ? err.response.data : "Unexpected error")
+  })

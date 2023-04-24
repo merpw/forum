@@ -1,4 +1,3 @@
-import { AxiosError } from "axios"
 import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
@@ -57,6 +56,14 @@ const SignupPage: NextPage = () => {
           const target = e.target as HTMLInputElement
           setFormFields({ ...formFields, [target.name]: target.value })
         }}
+        onBlur={() => {
+          formFields.name = formFields.name.trim()
+          formFields.first_name = formFields.first_name.trim()
+          formFields.last_name = formFields.last_name.trim()
+          formFields.email = formFields.email.trim()
+
+          setFormFields({ ...formFields })
+        }}
         onSubmit={async (e) => {
           e.preventDefault()
 
@@ -71,18 +78,8 @@ const SignupPage: NextPage = () => {
           }
 
           SignUp(formFields)
-            .then((response) => {
-              if (response.status == 200) {
-                logIn(formFields.email, formFields.password).then(() => mutate())
-              }
-            })
-            .catch((err: AxiosError) => {
-              if (err.code == "ERR_BAD_REQUEST") {
-                setFormError(err.response?.data as string)
-              } else {
-                // TODO: unexpected error
-              }
-            })
+            .then(() => logIn(formFields.email, formFields.password).then(() => mutate()))
+            .catch((err) => setFormError(err.message))
         }}
       >
         <label className={"mb-4 block"}>
@@ -91,7 +88,11 @@ const SignupPage: NextPage = () => {
             type={"text"}
             className={"inputbox-singlerow"}
             name={"name"}
+            minLength={3}
+            maxLength={15}
             placeholder={"Username"}
+            value={formFields.name}
+            onChange={() => void 0 /* handled by Form */}
             required
           />
         </label>
@@ -104,6 +105,9 @@ const SignupPage: NextPage = () => {
               className={"inputbox-singlerow"}
               name={"first_name"}
               placeholder={"First Name"}
+              value={formFields.first_name}
+              onChange={() => void 0 /* handled by Form */}
+              maxLength={15}
               required
             />
           </label>
@@ -114,6 +118,9 @@ const SignupPage: NextPage = () => {
               className={"inputbox-singlerow"}
               name={"last_name"}
               placeholder={"Last Name"}
+              value={formFields.last_name}
+              onChange={() => void 0 /* handled by Form */}
+              maxLength={15}
               required
             />
           </label>
@@ -154,13 +161,21 @@ const SignupPage: NextPage = () => {
             className={"inputbox-singlerow"}
             name={"email"}
             placeholder={"Email"}
+            value={formFields.email}
+            onChange={() => void 0 /* handled by Form */}
             required
           />
         </label>
 
         <label className={"mb-4 block"}>
           <p className={"inputbox-title"}>Create password </p>
-          <input type={"password"} className={"inputbox-singlerow"} name={"password"} required />
+          <input
+            type={"password"}
+            className={"inputbox-singlerow"}
+            name={"password"}
+            required
+            minLength={8}
+          />
         </label>
 
         <label className={"mb-6 block"}>

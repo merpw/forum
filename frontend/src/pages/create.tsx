@@ -68,6 +68,12 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         const { name, value } = e.target as HTMLInputElement
         setFormFields({ ...formFields, [name]: value })
       }}
+      onBlur={() => {
+        formFields.title = formFields.title.trim()
+        formFields.content = formFields.content.trim()
+        formFields.description = formFields.description.trim()
+        setFormFields({ ...formFields })
+      }}
       onSubmit={async (e) => {
         e.preventDefault()
 
@@ -76,10 +82,6 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         if (formError != null) setFormError(null)
         setIsSame(true)
 
-        formFields.title = formFields.title.trim()
-        formFields.content = formFields.content.trim()
-        formFields.description = formFields.description.trim()
-
         if (formFields.description == "") {
           // "stupid" description generation, converts content to plain text and cuts it to 200 characters
           const description = await remark().use(stripMarkdown).process(formFields.content)
@@ -87,10 +89,8 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           if (formFields.description.length > 200) {
             formFields.description = formFields.description.slice(0, 200) + "..."
           }
+          setFormFields({ ...formFields })
         }
-
-        setFormFields({ ...formFields })
-        // fields were trimmed, description may be filled automatically
 
         if (document.querySelector("#preview h1")) {
           return setFormError(
@@ -107,11 +107,12 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         <input
           type={"text"}
           name={"title"}
-          className={"inputbox-singlerow w-auto"}
+          className={"inputbox-singlerow sm:w-60"}
           placeholder={"Title"}
           value={formFields.title}
-          onChange={() => void 0}
+          onChange={() => void 0 /* handled by Form */}
           required
+          maxLength={25}
         />
       </div>
       <div className={"mb-3"}>
@@ -143,8 +144,9 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           rows={5}
           minRows={5}
           placeholder={"Content"}
-          required
           value={formFields.content}
+          required
+          maxLength={10000}
         />
       </div>
 
@@ -159,19 +161,24 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         minRows={2}
         placeholder={"Description"}
         value={formFields.description}
+        maxLength={205}
       />
       {isAIEnabled && (
         <button
           onClick={async () => {
+            if (!formFields.title) {
+              return setFormError("Title is required")
+            }
+            if (!formFields.content) {
+              return setFormError("Content is required")
+            }
             setFormFields({ ...formFields, isDescriptionLoading: true })
             generateDescription(formFields)
               .then((description) => {
                 setFormError(null)
                 setFormFields((prev) => ({ ...prev, description }))
               })
-              .catch((err) => {
-                setFormError(err.message)
-              })
+              .catch((err) => setFormError(err.message))
               .finally(() => setFormFields((prev) => ({ ...prev, isDescriptionLoading: false })))
           }}
           type={"button"}
@@ -231,6 +238,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
             setFormFields({ ...formFields, categories: newValue.map((v) => v.value) })
           }
           options={categories.map((name) => ({ label: Capitalize(name), value: name }))}
+          required
         />
       </div>
       <FormError error={formError} />

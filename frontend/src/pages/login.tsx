@@ -1,4 +1,3 @@
-import { AxiosError } from "axios"
 import { NextPage } from "next"
 import Link from "next/link"
 import { useRouter } from "next/router"
@@ -45,9 +44,7 @@ const LoginPage: NextPage = () => {
 
           logIn(login, password)
             .then(() => mutate())
-            .catch((err: AxiosError) => {
-              setFormError(err.response?.data as string)
-            })
+            .catch((err) => setFormError(err.message))
         }}
       >
         <div className={"mb-6"}>
@@ -56,7 +53,8 @@ const LoginPage: NextPage = () => {
             <input
               type={login.match("@") ? "email" : "text"}
               className={"inputbox-singlerow"}
-              onInput={(e) => setLogin(e.currentTarget.value)}
+              value={login}
+              onChange={(e) => setLogin(e.currentTarget.value.trim())}
               placeholder={"Email or username"}
               required
             />
@@ -66,7 +64,7 @@ const LoginPage: NextPage = () => {
           <label className={"label"}>
             <p className={"inputbox-title"}>Your password</p>
             <input
-              onInput={(e) => setPassword(e.currentTarget.value)}
+              onChange={(e) => setPassword(e.currentTarget.value)}
               type={"password"}
               id={"password"}
               className={"inputbox-singlerow"}
