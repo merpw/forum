@@ -1,15 +1,44 @@
 package database_test
 
 import (
+	"database/sql"
+	"fmt"
 	"forum/database"
 	"testing"
 )
 
+// AddUser(name, email, password string, firstName, lastName, dob, gender sql.NullString)
+type TestUserSqlNullString struct {
+	Name      string
+	Email     string
+	Password  string
+	FirstName sql.NullString
+	LastName  sql.NullString
+	DoB       sql.NullString
+	Gender    sql.NullString
+}
+
+func createTestUser(userIndex int) TestUserSqlNullString {
+	return TestUserSqlNullString{
+		Name:      "testUser " + fmt.Sprint(userIndex),
+		Email:     "testUser" + fmt.Sprint(userIndex) + "@test.com",
+		Password:  "testPassword",
+		FirstName: sql.NullString{String: "testFirstName" + fmt.Sprint(userIndex), Valid: true},
+		LastName:  sql.NullString{String: "testLastName" + fmt.Sprint(userIndex), Valid: true},
+		DoB:       sql.NullString{String: "testDoB" + fmt.Sprint(userIndex), Valid: true},
+		Gender:    sql.NullString{String: "testGender" + fmt.Sprint(userIndex), Valid: true},
+	}
+}
+
 func TestOpsUsers(t *testing.T) {
 	// add user
+	testUser := createTestUser(1)
 	var userId int
 	t.Run("AddUser", func(t *testing.T) {
-		userId = DB.AddUser("OpsUserTestUser", "opsusertest@email", "password")
+		userId = DB.AddUser(
+			testUser.Name, testUser.Email, testUser.Password,
+			testUser.FirstName, testUser.LastName, testUser.DoB, testUser.Gender,
+		)
 	})
 
 	// get user by id

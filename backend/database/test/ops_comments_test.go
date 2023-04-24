@@ -3,12 +3,15 @@ package database_test
 import "testing"
 
 func TestOpsComments(t *testing.T) {
-
+	testUser := createTestUser(1)
 	var authorId, postId, commentId int
 	// add user to database, to add post authored by user
 	t.Run("AddPost", func(t *testing.T) {
-		authorId = DB.AddUser("testuser", "user@email", "password")
-		postId = DB.AddPost("TEST POST TITLE", "test post content", authorId, "dummyCategory testCategory")
+		authorId = DB.AddUser(
+			testUser.Name, testUser.Email, testUser.Password,
+			testUser.FirstName, testUser.LastName, testUser.DoB, testUser.Gender,
+		)
+		postId = DB.AddPost("TEST POST TITLE", "test post content", "description", authorId, "dummyCategory testCategory")
 	})
 
 	t.Run("AddComment", func(t *testing.T) {

@@ -3,10 +3,14 @@ package database_test
 import "testing"
 
 func TestOpsReactions(t *testing.T) {
+	testUser := createTestUser(1)
 	var userId, postId, commentId int
 	t.Run("TestPostReaction", func(t *testing.T) {
-		userId = DB.AddUser("OpsReactionTestUser", "opsreactiontest@email", "password")
-		postId = DB.AddPost("Post Title", "post content", userId, "OpsReactionCategory testCategory")
+		userId = DB.AddUser(
+			testUser.Name, testUser.Email, testUser.Password,
+			testUser.FirstName, testUser.LastName, testUser.DoB, testUser.Gender,
+		)
+		postId = DB.AddPost("Post Title", "post content", "super description", userId, "OpsReactionCategory testCategory")
 		commentId = DB.AddComment("Comment content", postId, userId)
 		DB.AddPostReaction(postId, userId, 1)
 		reaction := DB.GetPostReaction(postId, userId)

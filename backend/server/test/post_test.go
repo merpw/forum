@@ -19,9 +19,13 @@ import (
 
 // TestUser to be used in all Post tests.
 type TestUser struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	DoB       string `json:"dob"`
+	Gender    string `json:"gender"`
 }
 
 // cookie to simulate logged in user.
@@ -154,7 +158,7 @@ func createPost(cli *http.Client, sURL string, ck *http.Cookie, p Post) (*http.R
 
 // TestWithAuth tests all routes that require authentication
 func TestWithAuth(t *testing.T) {
-	db, srv, testServer, cli, err := setupServer()
+	db, _, testServer, cli, err := setupServer()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -183,7 +187,7 @@ func TestWithAuth(t *testing.T) {
 	invalidUsers := getInvalidUsers()
 
 	t.Run("signup", func(t *testing.T) {
-		resp, err := signup(cli, testServer, validUser)
+		resp, err := signup(cli, testServer, testUser)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -222,7 +226,7 @@ func TestWithAuth(t *testing.T) {
 	})
 
 	t.Run("login", func(t *testing.T) {
-		cookie = dummyLogin(t, cli, testServer, validUser)
+		cookie = dummyLogin(t, cli, testServer, testUser)
 		// TODO: Improve this test.
 	})
 

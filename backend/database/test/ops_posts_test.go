@@ -3,21 +3,25 @@ package database_test
 import "testing"
 
 func TestOpsPosts(t *testing.T) {
+	testUser := createTestUser(1)
 	var userId int
 	// Add user, to be able to add posts
 
 	t.Run("AddUserToTestOpsPosts", func(t *testing.T) {
-		userId = DB.AddUser("OpsPostTestUser", "opsposttest@email", "password")
+		userId = DB.AddUser(
+			testUser.Name, testUser.Email, testUser.Password,
+			testUser.FirstName, testUser.LastName, testUser.DoB, testUser.Gender,
+		)
 	})
 
 	// Add two posts
 
 	var postId1, postId2 int
 	t.Run("AddPost1ToTestOpsPosts", func(t *testing.T) {
-		postId1 = DB.AddPost("Post Title 1", "post content 1", userId, "OpsPostCategory testCategory")
+		postId1 = DB.AddPost("Post Title 1", "post content 1", "description", userId, "OpsPostCategory testCategory")
 	})
 	t.Run("AddPost2ToTestOpsPosts", func(t *testing.T) {
-		postId2 = DB.AddPost("Post Title 2", "post content 2", userId, "OpsPostCategory testCategory")
+		postId2 = DB.AddPost("Post Title 2", "post content 2", "description", userId, "OpsPostCategory testCategory")
 	})
 
 	// Get all posts

@@ -6,6 +6,10 @@ import (
 )
 
 func TestOpsChats(t *testing.T) {
+	testUser := createTestUser(1)
+	testOpponent := createTestUser(2)
+	testDummy := createTestUser(3)
+
 	var privateChatId, userId, oponentId, channelChatId int
 
 	t.Run("AddChat", func(t *testing.T) {
@@ -17,17 +21,26 @@ func TestOpsChats(t *testing.T) {
 	})
 
 	t.Run("AddUser", func(t *testing.T) {
-		userId = DB.AddUser("testuser", "user@email", "password")
+		userId = DB.AddUser(
+			testUser.Name, testUser.Email, testUser.Password,
+			testUser.FirstName, testUser.LastName, testUser.DoB, testUser.Gender,
+		)
 	})
 
 	t.Run("AddOponent", func(t *testing.T) {
-		oponentId = DB.AddUser("testoponent", "oponent@email", "password")
+		oponentId = DB.AddUser(
+			testOpponent.Name, testOpponent.Email, testOpponent.Password,
+			testOpponent.FirstName, testOpponent.LastName, testOpponent.DoB, testOpponent.Gender,
+		)
 	})
 
 	// add dummy user, without session, to check if it is ignored
 
 	t.Run("AddDummyUser", func(t *testing.T) {
-		DB.AddUser("dummy", "dummy@email", "password")
+		DB.AddUser(
+			testDummy.Name, testDummy.Email, testDummy.Password,
+			testDummy.FirstName, testDummy.LastName, testDummy.DoB, testDummy.Gender,
+		)
 	})
 
 	// login user and oponent, to create sessions, to get online users later
