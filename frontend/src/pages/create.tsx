@@ -107,7 +107,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         <input
           type={"text"}
           name={"title"}
-          className={"inputbox-singlerow"}
+          className={"inputbox-singlerow w-auto"}
           placeholder={"Title"}
           value={formFields.title}
           onChange={() => void 0}
@@ -148,16 +148,13 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         />
       </div>
 
-
       <div className={"mb-3"} id={"preview"}>
         <Markdown content={formFields.content} />
       </div>
 
       <ReactTextAreaAutosize
         name={"description"}
-        className={
-          "mb-2 bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-        }
+        className={"inputbox mb-3"}
         rows={2}
         minRows={2}
         placeholder={"Description"}
@@ -178,7 +175,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
               .finally(() => setFormFields((prev) => ({ ...prev, isDescriptionLoading: false })))
           }}
           type={"button"}
-          className={"inputbox text-xl capitalize"}
+          className={"button flex mb-3 p-2"}
         >
           {formFields.isDescriptionLoading ? (
             <svg

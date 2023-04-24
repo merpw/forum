@@ -85,7 +85,7 @@ const SignupPage: NextPage = () => {
             })
         }}
       >
-        <label className={"mb-6 label"}>
+        <label className={"mb-4 block"}>
           <p className={"inputbox-title"}>Username</p>
           <input
             type={"text"}
@@ -96,66 +96,58 @@ const SignupPage: NextPage = () => {
           />
         </label>
 
-        <div className={"mb-6 flex flex-raw gap-3"}>
-          <div className={"w-full"}>
-            <label className={"label"}>
-              <p className={"inputbox-title"}>First Name </p>
-              <input
-                type={"text"}
-                className={"inputbox-singlerow"}
-                name={"first_name"}
-                placeholder={"First Name"}
-                required
-              />
-            </label>
-          </div>
-          <div className={"w-full"}>
-            <label className={"label"}>
-              <p className={"inputbox-title"}>Last Name </p>
-              <input
-                type={"text"}
-                className={"inputbox-singlerow"}
-                name={"last_name"}
-                placeholder={"Last Name"}
-                required
-              />
-            </label>
-          </div>
+        <div className={"mb-4 flex flex-wrap gap-3"}>
+          <label className={"grow basis-1/3"}>
+            <p className={"inputbox-title"}>First Name </p>
+            <input
+              type={"text"}
+              className={"inputbox-singlerow"}
+              name={"first_name"}
+              placeholder={"First Name"}
+              required
+            />
+          </label>
+          <label className={"grow basis-1/3"}>
+            <p className={"inputbox-title"}>Last Name</p>
+            <input
+              type={"text"}
+              className={"inputbox-singlerow"}
+              name={"last_name"}
+              placeholder={"Last Name"}
+              required
+            />
+          </label>
         </div>
-        <div className={"mb-6 flex flex-raw gap-3"}>
-          <div className={"w-full flex-1 overflow-x-hidden"}>
-            <label className={"label"}>
-              <p className={"inputbox-title"}>Date of Birth </p>
-              <input
-                type={"date"}
-                min={"1900-01-01"}
-                max={new Date().toISOString().split("T")[0]}
-                className={"inputbox-singlerow"}
-                name={"dob"}
-                placeholder={"Date of Birth"}
-                required
-              />
-            </label>
-          </div>
-          <div className={"w-full flex-1"}>
-            <label className={"label"}>
-              <p className={"inputbox-title"}>Gender </p>
-              <select
-                className={"inputbox-singlerow"}
-                name={"gender"}
-                placeholder={"Gender"}
-                required
-              >
-                <option value={""}>Select</option>
-                <option value={"male"}>Male</option>
-                <option value={"female"}>Female</option>
-                <option value={"other"}>Other</option>
-              </select>
-            </label>
-          </div>
+        <div className={"mb-4 flex flex-wrap gap-3"}>
+          <label className={"grow basis-1/3"}>
+            <p className={"inputbox-title"}>Date of Birth </p>
+            <input
+              type={"date"}
+              min={"1900-01-01"}
+              max={new Date().toISOString().split("T")[0]}
+              className={"inputbox-singlerow"}
+              name={"dob"}
+              placeholder={"Date of Birth"}
+              required
+            />
+          </label>
+          <label className={"grow basis-1/3"}>
+            <span className={"inputbox-title"}>Gender </span>
+            <select
+              className={"inputbox-singlerow"}
+              name={"gender"}
+              placeholder={"Gender"}
+              required
+            >
+              <option value={""}>Select</option>
+              <option value={"male"}>Male</option>
+              <option value={"female"}>Female</option>
+              <option value={"other"}>Other</option>
+            </select>
+          </label>
         </div>
 
-        <label className={"mb-6 label"}>
+        <label className={"mb-4 block"}>
           <p className={"inputbox-title"}>Your email</p>
           <input
             type={"email"}
@@ -166,12 +158,12 @@ const SignupPage: NextPage = () => {
           />
         </label>
 
-        <label className={"mb-6 label"}>
+        <label className={"mb-4 block"}>
           <p className={"inputbox-title"}>Create password </p>
           <input type={"password"} className={"inputbox-singlerow"} name={"password"} required />
         </label>
 
-        <label className={"mb-6 label"}>
+        <label className={"mb-6 block"}>
           <p className={"inputbox-title"}>Repeat password </p>
           <input
             type={"password"}
