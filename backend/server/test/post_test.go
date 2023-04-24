@@ -19,13 +19,21 @@ func TestWithAuth(t *testing.T) {
 	cli := testServer.Client()
 
 	testUser := struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Name      string `json:"name"`
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		DoB       string `json:"dob"`
+		Gender    string `json:"gender"`
 	}{
-		Name:     "test",
-		Email:    "test@test.com",
-		Password: "SuperAmazingPassword()!@*#)(!@#",
+		Name:      "test",
+		Email:     "test@test.com",
+		Password:  "SuperAmazingPassword()!@*#)(!@#",
+		FirstName: "John",
+		LastName:  "Doe",
+		DoB:       "2000-01-01",
+		Gender:    "male",
 	}
 
 	t.Run("signup", func(t *testing.T) {
@@ -41,6 +49,8 @@ func TestWithAuth(t *testing.T) {
 
 		// bug found, if the user is already present, we give back 400 instead of 409
 		if resp.StatusCode != http.StatusOK {
+			errBody, _ := io.ReadAll(resp.Body)
+			fmt.Println(string(errBody))
 			t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
 		}
 	})

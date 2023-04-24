@@ -30,7 +30,7 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
     >
       <div className={"m-5"}>
         <div className={"mb-3"}>
-          <h1 className={"text-2xl hover:opacity-50 max-w-fit"}>
+          <h1 className={"clickable text-2xl max-w-fit"}>
             <Link href={`/post/${post.id}`}>{post.title}</Link>
           </h1>
           <hr className={"mt-2"} />
@@ -48,7 +48,7 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
             {relativeDate}
           </span>
           {" by "}
-          <span className={"text-xl hover:opacity-50"}>
+          <span className={"clickable text-xl"}>
             <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
           </span>
         </span>

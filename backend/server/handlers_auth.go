@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -20,34 +21,76 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody := struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Name      string `json:"name"`
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		DoB       string `json:"dob"`
+		Gender    string `json:"gender"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
-	requestBody.Email = strings.ToLower(requestBody.Email)
+
+	requestBody.Name = strings.TrimSpace(requestBody.Name)
 	if len(requestBody.Name) < 3 {
-		http.Error(w, "Name is too short", http.StatusBadRequest)
+		http.Error(w, "Username is too short", http.StatusBadRequest)
 		return
 	}
 	if len(requestBody.Name) > 15 {
-		http.Error(w, "Name is too long", http.StatusBadRequest)
+		http.Error(w, "Username is too long", http.StatusBadRequest)
 		return
 	}
-	if requestBody.Name != strings.TrimSpace(requestBody.Name) {
-		http.Error(w, "Name is not valid", http.StatusBadRequest)
-		return
-	}
-	// here is checking name is already in use,
-	// statement above checks the incoming name do not include spaces before and after
 	if srv.DB.IsNameTaken(requestBody.Name) {
-		http.Error(w, "Name is already in use", http.StatusBadRequest)
+		http.Error(w, "Username is already in use", http.StatusBadRequest)
 		return
 	}
+	requestBody.FirstName = strings.TrimSpace(requestBody.FirstName)
+	if requestBody.FirstName == "" {
+		http.Error(w, "First name is not valid", http.StatusBadRequest)
+		return
+	}
+	if len(requestBody.FirstName) > 15 {
+		http.Error(w, "First name is too long", http.StatusBadRequest)
+		return
+	}
+	requestBody.LastName = strings.TrimSpace(requestBody.LastName)
+	if requestBody.LastName == "" {
+		http.Error(w, "Last name is not valid", http.StatusBadRequest)
+		return
+	}
+	if len(requestBody.LastName) > 15 {
+		http.Error(w, "Last name is too long", http.StatusBadRequest)
+		return
+	}
+
+	if requestBody.DoB == "" {
+		http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+		return
+	}
+
+	dob, err := time.Parse("2006-01-02", requestBody.DoB)
+	if err != nil {
+		http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+		return
+	}
+	now := time.Now()
+	minDoB := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	if dob.After(now) || dob.Before(minDoB) {
+		http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+		return
+	}
+
+	if requestBody.Gender != "male" && requestBody.Gender != "female" && requestBody.Gender != "other" {
+		http.Error(w, "Gender is not valid", http.StatusBadRequest)
+		return
+	}
+
+	requestBody.Email = strings.TrimSpace(strings.ToLower(requestBody.Email))
 	// check if email is a valid email
 	_, err = mail.ParseAddress(requestBody.Email)
 	if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) {
@@ -70,7 +113,16 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Password is not valid", http.StatusBadRequest)
 		return
 	}
-	id := srv.DB.AddUser(requestBody.Name, requestBody.Email, string(encryptedPassword))
+
+	id := srv.DB.AddUser(
+		requestBody.Name,
+		requestBody.Email,
+		string(encryptedPassword),
+		sql.NullString{String: requestBody.FirstName, Valid: true},
+		sql.NullString{String: requestBody.LastName, Valid: true},
+		sql.NullString{String: requestBody.DoB, Valid: true},
+		sql.NullString{String: requestBody.Gender, Valid: true},
+	)
 
 	err = revalidateURL(fmt.Sprintf("/user/%d", id))
 	if err != nil {
