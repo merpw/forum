@@ -7,10 +7,10 @@ import (
 var v004 = Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
-		ALTER TABLE users ADD COLUMN first_name TEXT  NOT NULL DEFAULT '';
-		ALTER TABLE users ADD COLUMN last_name TEXT  NOT NULL DEFAULT '';
-		ALTER TABLE users ADD COLUMN dob TEXT  NOT NULL DEFAULT '';
-		ALTER TABLE users ADD COLUMN gender TEXT NOT NULL DEFAULT '';
+		ALTER TABLE users ADD COLUMN first_name TEXT;
+		ALTER TABLE users ADD COLUMN last_name TEXT;
+		ALTER TABLE users ADD COLUMN dob TEXT;
+		ALTER TABLE users ADD COLUMN gender TEXT;
 `)
 		if err != nil {
 			return err

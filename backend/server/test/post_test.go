@@ -49,6 +49,8 @@ func TestWithAuth(t *testing.T) {
 
 		// bug found, if the user is already present, we give back 400 instead of 409
 		if resp.StatusCode != http.StatusOK {
+			errBody, _ := io.ReadAll(resp.Body)
+			fmt.Println(string(errBody))
 			t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
 		}
 	})
