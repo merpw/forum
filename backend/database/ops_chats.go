@@ -8,13 +8,13 @@ import (
 type ChatType int
 
 const (
-	ChannelChat ChatType = iota // the channel owner is posting to subscribers
-	GroupChat                   // unlimited number of members
-	PrivateChat                 // 1vs1 chat
-	AnyChat                     // any chat type
+	ChannelChat ChatType = iota // One to many, one writer, many readers
+	GroupChat                   // Several members
+	PrivateChat                 // Two members
+	AnyChat                     // Any chat type, should be used only for reading
 )
 
-// AddChat adds chat to database, returns id of new chat
+// AddChat adds a new empty chat to the database, returns id of the new chat
 func (db DB) AddChat(chatType ChatType) int {
 	result, err := db.Exec("INSERT INTO chats (type, date) VALUES (?, ?)", chatType,
 		time.Now().Format(time.RFC3339))
@@ -28,7 +28,7 @@ func (db DB) AddChat(chatType ChatType) int {
 	return int(id)
 }
 
-// GetChats reads chats from database by user_id, and chat type.
+// GetChats reads from database all user's chats with specified ChatType
 func (db DB) GetChats(userId int, chatType ChatType) []Chat {
 	qs := "SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?)"
 	if chatType != AnyChat {
@@ -54,7 +54,7 @@ func (db DB) GetChats(userId int, chatType ChatType) []Chat {
 	return chats
 }
 
-// AddMembership adds membership to database, returns id of new membership
+// AddMembership adds membership to database, returns id of the new membership
 func (db DB) AddMembership(userId, chatId int) int {
 	result, err := db.Exec(
 		"INSERT INTO memberships (user_id, chat_id, date) VALUES (?, ?, ?)",
@@ -69,7 +69,7 @@ func (db DB) AddMembership(userId, chatId int) int {
 	return int(id)
 }
 
-// AddMessage adds message to database, returns id of new message, plus updates last_message_date in chats table
+// AddMessage adds message to database, returns id of the new message
 func (db DB) AddMessage(userId, chatId int, content string) int {
 	result, err := db.Exec(
 		"INSERT INTO messages (user_id, chat_id, content, date) VALUES (?, ?, ?, ?)",
@@ -84,9 +84,6 @@ func (db DB) AddMessage(userId, chatId int, content string) int {
 	return int(id)
 }
 
-// GetOnlineUsers reads online users from database.
-//
-// Use this to get the list of online users for a user side panel with available users to chat with.
 func (db DB) GetOnlineUsers(userId int) []User {
 	query, err := db.Query(`
 		  SELECT users.id, users.name FROM users 
@@ -113,9 +110,6 @@ func (db DB) GetOnlineUsers(userId int) []User {
 
 // GetContacts reads private chat oponents from database by userId
 func (db DB) GetContacts(userId int) []User {
-	// requirements:
-	// chat.type = 2 to get private chats,
-	// o = oponent, u = user
 	// TODO: check this properly. It looks not clear. But at the moment there is no data and tests to check it.
 	query, err := db.Query(`
 			SELECT o.id, o.name FROM users AS o 
@@ -143,8 +137,8 @@ func (db DB) GetContacts(userId int) []User {
 	return users
 }
 
-// TODO: implement tests, later, after approving the logic
 // GetChatsIds reads chats ids from database by userId
+// TODO: implement tests, later, after approving the logic
 func (db DB) GetChatsIds(userId int) []int {
 	query, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
 	if err != nil {
@@ -165,8 +159,8 @@ func (db DB) GetChatsIds(userId int) []int {
 	return chatsIds
 }
 
-// TODO: implement tests, later, after approving the logic
 // GetChat reads messages from database by chatId
+// TODO: implement tests, later, after approving the logic
 func (db DB) GetChat(chatId int) []Message {
 	query, err := db.Query("SELECT * FROM messages WHERE chat_id = ?", chatId)
 	if err != nil {

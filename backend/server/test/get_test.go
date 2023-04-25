@@ -20,7 +20,6 @@ func TestGet(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Opens the available routes
 	router := srv.Start()
 	testServer := httptest.NewServer(router)
 	defer testServer.Close()

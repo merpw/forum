@@ -43,10 +43,9 @@ type Session struct {
 	UserId int
 }
 
-// chat section
 type Chat struct {
 	Id   int
-	Type int // 2 (private 1vs1) or 1 (group chat) or 0 (the channel owner is posting to subscribers)
+	Type ChatType
 	Date string
 }
 
@@ -54,6 +53,6 @@ type Message struct {
 	Id      int
 	UserId  int
 	ChatId  int
-	Content string // text of message, includes links to images (not approved yet)
+	Content string
 	Date    string
 }

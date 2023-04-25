@@ -17,6 +17,38 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+// cookie to simulate logged-in user.
+var cookie *http.Cookie
+
+type TestPost struct {
+	Title      string
+	Content    string
+	Categories []string
+}
+
+var invalidPosts = []TestPost{
+	{
+		Title:      "",
+		Content:    "Valid Content",
+		Categories: []string{"facts"},
+	},
+	{
+		Title:      "invalidTitleTooLongItWillExceed25length",
+		Content:    "Valid Content",
+		Categories: []string{"facts"},
+	},
+	{
+		Title:      "Valid Title",
+		Content:    "",
+		Categories: []string{"facts"},
+	},
+	{
+		Title:      "Valid Title",
+		Content:    "Valid title",
+		Categories: []string{"Invalid category"},
+	},
+}
+
 // TestUser to be used in all Post tests.
 type TestUser struct {
 	Name      string `json:"name"`
@@ -28,77 +60,47 @@ type TestUser struct {
 	Gender    string `json:"gender"`
 }
 
-// cookie to simulate logged in user.
-var cookie *http.Cookie
-
-func getInvalidPosts() []Post {
-	return []Post{
-		{
-			Title:      "",
-			Content:    "Valid Content",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "invalidTitleTooLongItWillExceed25length",
-			Content:    "Valid Content",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "Valid Title",
-			Content:    "",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "Valid Title",
-			Content:    "Valid title",
-			Categories: []string{"Invalid category"},
-		},
-	}
-}
-
-func getInvalidUsers() []TestUser {
-	return []TestUser{
-		{
-			Name:     "test1",
-			Email:    "test@test.com", // email already in use
-			Password: "SuperAmazingPassword()!@*#)(!@#",
-		},
-		{
-			Name:     "",
-			Email:    "",
-			Password: "",
-		},
-		{
-			Name:     "ThisUserNameIsWayTooLong",
-			Email:    "valid@test.com",
-			Password: "ValidPassword123",
-		},
-		{
-			Name:     "ValidName",
-			Email:    "😂😂😂😂😂😂😂😂😂😂😂", // invalid email
-			Password: "ValidPassword123",
-		},
-		{
-			Name:     "ValidName",
-			Email:    "valid@test.com",
-			Password: "1234", // invalid password: too short
-		},
-		{
-			Name:     "Steve", // Invalid name: already in use
-			Email:    "valid@test.com",
-			Password: "12345678",
-		},
-		{
-			Name:     "ValidName",
-			Email:    "steve@apple.com", // Invalid e-mail: Already in use
-			Password: "12345678",
-		},
-		{
-			Name:     "  WsName  ", // Invalid name: Contains leading or trailing whitespace
-			Email:    "valid@test.com",
-			Password: "ValidPassword123",
-		},
-	}
+var invalidUsers = []TestUser{
+	{
+		Name:     "test1",
+		Email:    "test@test.com", // email already in use
+		Password: "SuperAmazingPassword()!@*#)(!@#",
+	},
+	{
+		Name:     "",
+		Email:    "",
+		Password: "",
+	},
+	{
+		Name:     "ThisUserNameIsWayTooLong",
+		Email:    "valid@test.com",
+		Password: "ValidPassword123",
+	},
+	{
+		Name:     "ValidName",
+		Email:    "😂😂😂😂😂😂😂😂😂😂😂", // invalid email
+		Password: "ValidPassword123",
+	},
+	{
+		Name:     "ValidName",
+		Email:    "valid@test.com",
+		Password: "1234", // invalid password: too short
+	},
+	{
+		Name:     "Steve", // Invalid name: already in use
+		Email:    "valid@test.com",
+		Password: "12345678",
+	},
+	{
+		Name:     "ValidName",
+		Email:    "steve@apple.com", // Invalid e-mail: Already in use
+		Password: "12345678",
+	},
+	{
+		Name:     "  WsName  ", // Invalid name: Contains leading or trailing whitespace
+		Email:    "valid@test.com",
+		Password: "ValidPassword123",
+	},
 }
 
 func setupServer() (*sql.DB, *server.Server, *httptest.Server, *http.Client, error) {
@@ -134,14 +136,8 @@ func signup(cli *http.Client, testServer *httptest.Server, user TestUser) (*http
 	return resp, nil
 }
 
-type Post struct {
-	Title      string
-	Content    string
-	Categories []string
-}
-
 // err := createPost(cli, testServer, cookie, title, content, []string{"facts"})
-func createPost(cli *http.Client, sURL string, ck *http.Cookie, p Post) (*http.Response, error) {
+func createPost(cli *http.Client, sURL string, ck *http.Cookie, p TestPost) (*http.Response, error) {
 	requestBodyBytes, err := json.Marshal(p)
 	if err != nil {
 		return nil, err
@@ -183,16 +179,12 @@ func TestWithAuth(t *testing.T) {
 		Gender:    "male",
 	}
 
-	// Slice of invalid users. It will cover most nonDB test cases.
-	invalidUsers := getInvalidUsers()
-
 	t.Run("signup", func(t *testing.T) {
 		resp, err := signup(cli, testServer, testUser)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		// bug found, if the user is already present, we give back 400 instead of 409
 		if resp.StatusCode != http.StatusOK {
 			errBody, _ := io.ReadAll(resp.Body)
 			fmt.Println(string(errBody))
@@ -249,13 +241,10 @@ func TestWithAuth(t *testing.T) {
 		}
 	})
 
-	// Invalid posts to be used in the "invalid posts" test
-	invalidPosts := getInvalidPosts()
-
 	// test create 5 posts
 	t.Run("createPost", func(t *testing.T) {
 		for i := 1; i <= 5; i++ {
-			p := Post{
+			p := TestPost{
 				Title:      fmt.Sprintf("Test Title %d", i),
 				Content:    fmt.Sprintf("Test Content %d", i),
 				Categories: []string{"facts"}, // Categories
@@ -277,7 +266,7 @@ func TestWithAuth(t *testing.T) {
 
 	// TODO: DOCUMENTATION
 	t.Run("createInvalidPost", func(t *testing.T) {
-		resp, err := createPost(cli, testServer.URL, cookie, Post{"", "", []string{""}})
+		resp, err := createPost(cli, testServer.URL, cookie, TestPost{"", "", []string{""}})
 		if err != nil {
 			t.Fatal(err)
 		}
