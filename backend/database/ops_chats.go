@@ -108,7 +108,7 @@ func (db DB) GetOnlineUsers(userId int) []User {
 	return users
 }
 
-// GetContacts reads private chat oponents from database by userId
+// GetContacts reads private chat opponents from database by userId
 func (db DB) GetContacts(userId int) []User {
 	// TODO: check this properly. It looks not clear. But at the moment there is no data and tests to check it.
 	query, err := db.Query(`

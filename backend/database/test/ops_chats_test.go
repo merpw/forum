@@ -10,7 +10,7 @@ func TestOpsChats(t *testing.T) {
 	testOpponent := createTestUser(2)
 	testDummy := createTestUser(3)
 
-	var privateChatId, userId, oponentId, channelChatId int
+	var privateChatId, userId, opponentId, channelChatId int
 
 	t.Run("AddChat", func(t *testing.T) {
 		privateChatId = DB.AddChat(database.PrivateChat)
@@ -27,8 +27,8 @@ func TestOpsChats(t *testing.T) {
 		)
 	})
 
-	t.Run("AddOponent", func(t *testing.T) {
-		oponentId = DB.AddUser(
+	t.Run("AddOpponent", func(t *testing.T) {
+		opponentId = DB.AddUser(
 			testOpponent.Name, testOpponent.Email, testOpponent.Password,
 			testOpponent.FirstName, testOpponent.LastName, testOpponent.DoB, testOpponent.Gender,
 		)
@@ -43,14 +43,14 @@ func TestOpsChats(t *testing.T) {
 		)
 	})
 
-	// login user and oponent, to create sessions, to get online users later
+	// login user and opponent, to create sessions, to get online users later
 
 	t.Run("AddUserSession", func(t *testing.T) {
 		DB.AddSession("userToken", 9999999999, userId)
 	})
 
-	t.Run("AddOponentSession", func(t *testing.T) {
-		DB.AddSession("oponentToken", 9999999999, oponentId)
+	t.Run("AddOpponentSession", func(t *testing.T) {
+		DB.AddSession("opponentToken", 9999999999, opponentId)
 	})
 
 	// add memberships to chat
@@ -59,8 +59,8 @@ func TestOpsChats(t *testing.T) {
 		DB.AddMembership(userId, privateChatId)
 	})
 
-	t.Run("AddOponentMembershipToPrivateChat", func(t *testing.T) {
-		DB.AddMembership(oponentId, privateChatId)
+	t.Run("AddOpponentMembershipToPrivateChat", func(t *testing.T) {
+		DB.AddMembership(opponentId, privateChatId)
 	})
 
 	// get chats by user id
@@ -71,13 +71,13 @@ func TestOpsChats(t *testing.T) {
 			t.Fatal("Expected 1 chat, got", len(chats))
 		}
 
-		oponentChats := DB.GetChats(oponentId, database.PrivateChat)
-		if len(oponentChats) != 1 {
-			t.Fatal("Expected 1 chat, got", len(oponentChats))
+		opponentChats := DB.GetChats(opponentId, database.PrivateChat)
+		if len(opponentChats) != 1 {
+			t.Fatal("Expected 1 chat, got", len(opponentChats))
 		}
 
 		// check if chats are the same
-		if chats[0].Id != oponentChats[0].Id {
+		if chats[0].Id != opponentChats[0].Id {
 			t.Fatal("Expected same chat, got different")
 		}
 	})
@@ -102,13 +102,13 @@ func TestOpsChats(t *testing.T) {
 			t.Fatal("Expected 1 chat, got", len(chats))
 		}
 
-		oponentChats := DB.GetChats(oponentId, database.PrivateChat)
-		if len(oponentChats) != 1 {
-			t.Fatal("Expected 1 chat, got", len(oponentChats))
+		opponentChats := DB.GetChats(opponentId, database.PrivateChat)
+		if len(opponentChats) != 1 {
+			t.Fatal("Expected 1 chat, got", len(opponentChats))
 		}
 
 		// check if chats are the same
-		if chats[0].Id != oponentChats[0].Id {
+		if chats[0].Id != opponentChats[0].Id {
 			t.Fatal("Expected same chat, got different")
 		}
 	})
@@ -116,45 +116,45 @@ func TestOpsChats(t *testing.T) {
 	// get online users
 
 	t.Run("GetOnlineUsers", func(t *testing.T) {
-		userOponents := DB.GetOnlineUsers(userId)
-		if len(userOponents) != 1 {
-			t.Fatal("Expected 1 user, got", len(userOponents))
+		userOpponents := DB.GetOnlineUsers(userId)
+		if len(userOpponents) != 1 {
+			t.Fatal("Expected 1 user, got", len(userOpponents))
 		}
 
-		oponentOponents := DB.GetOnlineUsers(oponentId)
-		if len(oponentOponents) != 1 {
-			t.Fatal("Expected 1 user, got", len(oponentOponents))
+		opponentOpponents := DB.GetOnlineUsers(opponentId)
+		if len(opponentOpponents) != 1 {
+			t.Fatal("Expected 1 user, got", len(opponentOpponents))
 		}
 
 		// check if users are the expected
-		if userOponents[0].Id != oponentId {
-			t.Fatal("Expected oponentId, got different")
+		if userOpponents[0].Id != opponentId {
+			t.Fatal("Expected opponentId, got different")
 		}
 
-		if oponentOponents[0].Id != userId {
+		if opponentOpponents[0].Id != userId {
 			t.Fatal("Expected userId, got different")
 		}
 	})
 
-	// get private chat oponents by user id
+	// get private chat opponents by user id
 
 	t.Run("GetContacts", func(t *testing.T) {
-		oponents := DB.GetContacts(userId)
-		if len(oponents) != 2 {
-			t.Fatal("Expected 2 oponents, got", len(oponents))
+		opponents := DB.GetContacts(userId)
+		if len(opponents) != 2 {
+			t.Fatal("Expected 2 opponents, got", len(opponents))
 		}
 
-		oponentOponents := DB.GetContacts(oponentId)
-		if len(oponentOponents) != 2 {
-			t.Fatal("Expected 2 oponents, got", len(oponentOponents))
+		opponentOpponents := DB.GetContacts(opponentId)
+		if len(opponentOpponents) != 2 {
+			t.Fatal("Expected 2 opponents, got", len(opponentOpponents))
 		}
 
 		// check if users are the expected
-		if oponents[0].Id != oponentId && oponents[1].Id != oponentId {
-			t.Fatal("Expected oponentId, got different")
+		if opponents[0].Id != opponentId && opponents[1].Id != opponentId {
+			t.Fatal("Expected opponentId, got different")
 		}
 
-		if oponentOponents[0].Id != userId && oponentOponents[1].Id != userId {
+		if opponentOpponents[0].Id != userId && opponentOpponents[1].Id != userId {
 			t.Fatal("Expected userId, got different")
 		}
 	})
@@ -167,8 +167,8 @@ func TestOpsChats(t *testing.T) {
 			DB.AddMessage(userId, privateChatId, "helloFromUser")
 		})
 
-		t.Run("AddOponentMessage", func(t *testing.T) {
-			DB.AddMessage(oponentId, privateChatId, "helloFromOponent")
+		t.Run("AddOpponentMessage", func(t *testing.T) {
+			DB.AddMessage(opponentId, privateChatId, "helloFromOpponent")
 		})
 
 		// add messages to channel chat, but only from user, let is say he is owner
