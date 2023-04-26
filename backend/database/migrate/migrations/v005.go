@@ -8,21 +8,21 @@ var v005 = Migration{
 		_, err := db.Exec(`
 		CREATE TABLE chats (
 			id INTEGER PRIMARY KEY,
-			type INTEGER,
-			date TEXT);
+			type INTEGER NOT NULL,
+			date TEXT NOT NULL);
 		CREATE TABLE memberships (
 			id INTEGER PRIMARY KEY,
-			user_id INTEGER,
-			chat_id INTEGER,
-			date TEXT,
+			user_id INTEGER NOT NULL,
+			chat_id INTEGER NOT NULL,
+			date TEXT NOT NULL,
 			FOREIGN KEY(user_id) REFERENCES users(id),
 			FOREIGN KEY(chat_id) REFERENCES chats(id));
 		CREATE TABLE messages (
 			id INTEGER PRIMARY KEY,
-			user_id INTEGER,
-			chat_id INTEGER,
-			content TEXT,
-			date TEXT,
+			user_id INTEGER NOT NULL,
+			chat_id INTEGER NOT NULL,
+			content TEXT NOT NULL,
+			date TEXT NOT NULL,
 			FOREIGN KEY(user_id) REFERENCES users(id),
 			FOREIGN KEY(chat_id) REFERENCES chats(id));
 		`)
