@@ -84,14 +84,9 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
-// apiMePostsLikedHandler
-// returns liked posts of the currently logged in user.
+// apiMePostsLikedHandler returns liked posts of the currently logged in user.
 //
-// returns the current user's liked posts to the current user if he is logged in.
-//
-// Method: POST
-//
-// Route: /api/me/posts/liked
+// GET /api/me/posts/liked
 func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) {
 	userId := srv.getUserId(w, r)
 	if userId == -1 {
