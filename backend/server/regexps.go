@@ -10,7 +10,7 @@ func addSlashes(s string) string {
 	return strings.ReplaceAll(s, "/", "\\/")
 }
 
-// # Pattern Translator
+// pt (Pattern Translator)
 //
 // pt function passes incoming pattern to regexp.MustCompile(addSlashes(pattern))
 // The purpose of this function is to make it easier to read long regexps.
