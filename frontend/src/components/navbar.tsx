@@ -1,5 +1,6 @@
 import { NextComponentType } from "next"
 import Link from "next/link"
+import { useRouter } from "next/router"
 
 import { logOut, useMe } from "@/api/auth"
 
@@ -24,6 +25,8 @@ const Navbar: NextComponentType = () => {
 
 const UserInfo = () => {
   const { isError, isLoading, isLoggedIn, user, mutate } = useMe()
+  const router = useRouter()
+
   if (isError || isLoading) {
     return null
   }
@@ -65,7 +68,10 @@ const UserInfo = () => {
         className={"clickable cursor-pointer m-auto"}
         onClick={() =>
           logOut()
-            .then(() => mutate())
+            .then(() => {
+              router.push("/login")
+              mutate()
+            })
             .catch(null)
         }
       >
