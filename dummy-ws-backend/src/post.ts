@@ -56,14 +56,14 @@ const postHandler = ({
     chatUserConn?.send(
       JSON.stringify(
         getHandler({
-          url: `/user/${userId}/chat`,
+          url: `/users/${userId}/chat`,
           userId: chatUserId,
         })
       )
     )
 
     return getHandler({
-      url: `/user/${chatUserId}/chat`,
+      url: `/users/${chatUserId}/chat`,
       userId,
     })
   }
