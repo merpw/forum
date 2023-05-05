@@ -4,8 +4,6 @@ import { FC, useEffect, useId, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import { NextSeo } from "next-seo"
 import Select from "react-select"
-import { remark } from "remark"
-import stripMarkdown from "strip-markdown"
 import dynamic from "next/dynamic"
 
 import { useMe } from "@/api/auth"
@@ -13,6 +11,7 @@ import { CreatePost, generateDescription } from "@/api/posts/create"
 import { FormError } from "@/components/error"
 import { getCategoriesLocal } from "@/api/posts/fetch"
 import { Capitalize } from "@/helpers/text"
+import { MarkdownToPlain } from "@/components/markdown"
 
 const Markdown = dynamic(() => import("@/components/markdown"))
 
@@ -84,11 +83,11 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
 
         if (formFields.description == "") {
           // "stupid" description generation, converts content to plain text and cuts it to 200 characters
-          const description = await remark().use(stripMarkdown).process(formFields.content)
-          formFields.description = description.toString().replace(/\n+/g, " ").trim()
-          if (formFields.description.length > 200) {
-            formFields.description = formFields.description.slice(0, 200) + "..."
-          }
+          formFields.description = await MarkdownToPlain(formFields.content, {
+            limit: 200,
+            removeNewLines: true,
+          })
+
           setFormFields({ ...formFields })
         }
 
