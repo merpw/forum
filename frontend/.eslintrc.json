@@ -15,7 +15,9 @@
     "react/prop-types": "off",
     // TODO: props validation
 
-    "no-unused-vars": "warn",
+    "no-unused-vars": "off",
+    //handled by typescript-eslint
+
     "react/jsx-curly-brace-presence": [
       "warn",
       {
