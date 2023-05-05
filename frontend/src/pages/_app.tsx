@@ -1,13 +1,24 @@
 import "../styles/globals.css"
 import type { AppProps } from "next/app"
-import React from "react"
+import React, { ReactElement, ReactNode } from "react"
 import { NextSeo } from "next-seo"
+import { NextPage } from "next"
 
 import Layout from "@/components/layout"
 
-export default function App({ Component, pageProps }: AppProps) {
-  return (
-    <Layout>
+export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode
+}
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout
+}
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout ?? ((page) => <Layout>{page}</Layout>)
+
+  return getLayout(
+    <>
       <NextSeo
         titleTemplate={"%s - Forum"}
         description={"The friendliest forum"}
@@ -18,6 +29,6 @@ export default function App({ Component, pageProps }: AppProps) {
         ]}
       />
       <Component {...pageProps} />
-    </Layout>
+    </>
   )
 }

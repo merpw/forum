@@ -1,12 +1,13 @@
-import { NextPage } from "next"
 import { useRouter } from "next/router"
 import { useEffect, useState } from "react"
 import { NextSeo } from "next-seo"
 
 import { logIn, SignUp, useMe } from "@/api/auth"
 import { FormError } from "@/components/error"
+import { NextPageWithLayout } from "@/pages/_app"
+import Layout from "@/components/layout"
 
-const SignupPage: NextPage = () => {
+const SignupPage: NextPageWithLayout = () => {
   const router = useRouter()
 
   const { isLoading, isLoggedIn, mutate } = useMe()
@@ -199,5 +200,7 @@ const SignupPage: NextPage = () => {
     </>
   )
 }
+
+SignupPage.getLayout = (page) => <Layout withChat={false}>{page}</Layout>
 
 export default SignupPage
