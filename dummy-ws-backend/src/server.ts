@@ -31,6 +31,8 @@ const checkSession = async (token: string) => {
 
 const wss = new WebSocketServer({ port: 6969 })
 
+console.log("Server started on ws://localhost:6969")
+
 export const connections = new Map<
   WebSocket.WebSocket,
   {
@@ -40,6 +42,9 @@ export const connections = new Map<
 >()
 
 wss.on("connection", async (ws) => {
+  // to show hidden properties
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.log("New connection from", (ws as any)._socket.localAddress)
   ws.on("message", async (rawMessage) => {
     try {
       const message: WebSocketRequest<never> = JSON.parse(rawMessage.toString())
@@ -69,6 +74,7 @@ wss.on("connection", async (ws) => {
       const { userId, token } = connections.get(ws) || {}
 
       if (!userId || !token) {
+        console.log(`Not handshaked, closing connection`)
         return ws.close()
       }
 
@@ -90,6 +96,9 @@ wss.on("connection", async (ws) => {
         )
       )
     } catch (err) {
+      if ((err as Error).message === "fetch failed") {
+        console.log("Fetch failed, Forum backend is unavailable")
+      }
       const errResponse: WSErrorResponse = {
         type: "error",
         item: {
