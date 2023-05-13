@@ -11,7 +11,7 @@ Simple dummy websocket server for development purposes written in TypeScript.
 
 - Server accepts WebSocket connections
 - We use JSON as a message format
-- Each message has a `type` property that defines the message type, it can be `handshake`, `get` or `post`
+- Each message has a `type` property that defines the message type, it can be `handshake`, `get`, `post` or `error`
 - Each message has an `item` property that contains the payload of the message
 
 ## Postman Workspace
