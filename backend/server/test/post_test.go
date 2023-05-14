@@ -19,9 +19,13 @@ import (
 
 // TestUser to be used in all Post tests.
 type TestUser struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	DoB       string `json:"dob"`
+	Gender    string `json:"gender"`
 }
 
 // cookie to simulate logged in user.
@@ -162,10 +166,10 @@ func TestWithAuth(t *testing.T) {
 	defer testServer.Close()
 
 	// Adds an user and a post to the database
-	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
-	srv.DB.AddPost("test", "test", userId, "facts")
+	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@", sql.NullString{String: "Steve", Valid: true}, sql.NullString{String: "Jobs", Valid: true}, sql.NullString{String: "1955-02-24", Valid: true}, sql.NullString{String: "male", Valid: true})
+	srv.DB.AddPost("test", "test", userId, "facts", "beatufiul, amazing, wonderful facts")
 
-	testUser := struct {
+	validUser := struct {
 		Name      string `json:"name"`
 		Email     string `json:"email"`
 		Password  string `json:"password"`

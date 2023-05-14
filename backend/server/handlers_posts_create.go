@@ -80,8 +80,8 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
-		userId, strings.Join(requestBody.Categories, ","))
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId,
+		strings.Join(requestBody.Categories, ","), requestBody.Description)
 	sendObject(w, id)
 
 	err = revalidateURL(fmt.Sprintf("/post/%v", id))

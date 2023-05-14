@@ -37,7 +37,7 @@ func TestGet(t *testing.T) {
 	gender := sql.NullString{String: "male", Valid: true}
 
 	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@", firstName, lastName, dob, gender)
-	srv.DB.AddPost("test", "test", "test", userId, "facts")
+	srv.DB.AddPost("test", "test", userId, "test", "facts")
 
 	tests := []struct {
 		url          string
