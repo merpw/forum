@@ -31,10 +31,13 @@ func TestGet(t *testing.T) {
 
 	cli := testServer.Client()
 
-	// Adds an user and a post to the database
-	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
-	srv.DB.AddPost("test", "test", userId, "facts")
-	srv.DB.AddPost("test2", "test2", userId, "facts")
+	firstName := sql.NullString{String: "Steven", Valid: true}
+	lastName := sql.NullString{String: "Smith", Valid: true}
+	dob := sql.NullString{String: "2023-04-08", Valid: true}
+	gender := sql.NullString{String: "male", Valid: true}
+
+	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@", firstName, lastName, dob, gender)
+	srv.DB.AddPost("test", "test", "test", userId, "facts")
 
 	tests := []struct {
 		url          string

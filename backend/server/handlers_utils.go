@@ -18,6 +18,7 @@ type SafePost struct {
 	Id            int      `json:"id"`
 	Title         string   `json:"title"`
 	Content       string   `json:"content"`
+	Description   string   `json:"description"`
 	Author        SafeUser `json:"author"`
 	Date          string   `json:"date"`
 	CommentsCount int      `json:"comments_count"`

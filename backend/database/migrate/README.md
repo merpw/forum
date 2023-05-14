@@ -31,39 +31,33 @@ You can use this package as a CLI or as a function.
 1. Create a new migration file `vXXX.go`, in `./migrations` directory
 2. Define a new variable:
 
-```go
-package migrations
+   ```go
+   package migrations
 
-import "database/sql"
+   import "database/sql"
 
-var vXXX = Migration{
-   Up: func(db *sql.DB) error {
-      // Up migration instructions
-   },
-   Down: func(db *sql.DB) error {
-      // Down migration instructions
-   },
-}
+   var vXXX = Migration{
+      Up: func(db *sql.DB) error {
+         // Up migration instructions
+      },
+      Down: func(db *sql.DB) error {
+         // Down migration instructions
+      },
+   }
+   ```
 
-```
-
-3. In the `Up` function, specify all the instructions to migrate to the new version. It can be `db.Exec`, `db.Query` or
-   any
-   other Golang functions.
-4. In the `Down` function, specify how to roll back your changes if necessary. For example, if you added a new column,
-   you have
-   to `DROP` it in the `Down` function.
+3. In the `Up` function, specify all the instructions to migrate to the new version. It can be `db.Exec`, `db.Query` or any other Golang functions.
+4. In the `Down` function, specify how to roll back your changes if necessary. For example, if you added a new column, you have to `DROP` it in the `Down` function.
 5. Add your migration to the end of the `migrations` slice in `./migrations/migrations.go`:
 
-```go
-var migrations = []Migration{
-v001,
-v002,
-//...
-vXXX,
-}
-
-```
+   ```go
+   var migrations = []Migration{
+      v001,
+      v002,
+      //...
+      vXXX,
+   }
+   ```
 
 6. Done. Now your migration is ready to be used. It automatically marked as `latest` migration.
 
@@ -79,7 +73,6 @@ var vYYY = Migration{
     Up: vXXX.Down,
     Down: vXXX.Up,
 }
-
 ```
 
 > Why do we use `.go` files for migrations? (and not `.sql`)

@@ -10,7 +10,7 @@ const Navbar: NextComponentType = () => {
     <div className={"border-b mb-5 pb-2"}>
       <nav className={"flex justify-between flex-wrap"}>
         <div>
-          <Link href={"/"} className={"text-3xl hover:opacity-50"}>
+          <Link href={"/"} className={"clickable text-3xl"}>
             FORUM
           </Link>
         </div>
@@ -30,7 +30,7 @@ const UserInfo = () => {
 
   if (!isLoggedIn) {
     return (
-      <Link className={"hover:opacity-50 flex"} href={"/login"}>
+      <Link className={"clickable flex"} href={"/login"}>
         <span>Login</span>
         <svg
           xmlns={"http://www.w3.org/2000/svg"}
@@ -57,11 +57,12 @@ const UserInfo = () => {
       <div className={"text-lg"}>
         {"Hello, "}
         <Link href={"/me"}>
-          <span className={"font-bold hover:opacity-50"}>{user?.name}</span>
+          <span className={"clickable font-bold"}>{user?.name}</span>
         </Link>
       </div>
       <button
-        className={"cursor-pointer hover:opacity-50 m-auto"}
+        title={"Logout"}
+        className={"clickable cursor-pointer m-auto"}
         onClick={() =>
           logOut()
             .then(() => mutate())

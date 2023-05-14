@@ -22,7 +22,7 @@ func (db DB) GetAllPosts() []Post {
 	for query.Next() {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories, &post.Description)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -45,7 +45,7 @@ func (db DB) GetPostById(id int) *Post {
 		return nil
 	}
 	err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-		&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
+		&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories, &post.Description)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -61,9 +61,9 @@ func (db DB) GetPostById(id int) *Post {
 // URL: /api/posts/create/
 func (db DB) AddPost(title, content string, authorId int, categories string) int {
 	result, err := db.Exec(`INSERT INTO posts 
-    	(title, content, author, date, likes_count, dislikes_count, comments_count, categories)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categories)
+    	(title, content, author, date, likes_count, dislikes_count, comments_count, categories, description)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categories, description)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -84,7 +84,7 @@ func (db DB) GetUserPosts(userId int) []Post {
 	for query.Next() {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories, &post.Description)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -115,7 +115,7 @@ func (db DB) GetUserPostsLiked(userId int) []Post {
 	for query.Next() {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories, &post.Description)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -136,7 +136,7 @@ func (db DB) GetCategoryPosts(category string) []Post {
 	for query.Next() {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories)
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories, &post.Description)
 		if err != nil {
 			log.Panic(err)
 		}

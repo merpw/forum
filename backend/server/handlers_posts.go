@@ -62,7 +62,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, _ *http.Request) {
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,
-			Content:       shortenContent(post.Content),
+			Description:   post.Description,
 			Date:          post.Date,
 			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
 			CommentsCount: post.CommentsCount,

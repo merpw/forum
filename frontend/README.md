@@ -22,6 +22,9 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 - `FRONTEND_REVALIDATE_TOKEN` - optional, should be set if `/api/revalidate` endpoint is going to be public. By default,
   it is not public and available only in private network.
 
+- `OPENAI_API_KEY` - optional. API key for [OpenAI](https://openai.com/) API. If set, it will be used
+  to generate post descriptions.
+
 ## Usage
 
 You need Node.js installed to run frontend separately

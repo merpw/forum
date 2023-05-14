@@ -15,7 +15,9 @@ func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// apiMeHandler returns current user information (id, name, email) if the current user is logged in.
+// apiMeHandler returns the currently logged in user's information.
+//
+// (id, name, email, first name, last name, date of birth, gender)
 //
 //	GET /api/me
 func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
@@ -29,16 +31,24 @@ func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) {
 
 	response := struct {
 		SafeUser
-		Email string `json:"email"`
+		Email     string `json:"email"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+		DoB       string `json:"dob,omitempty"`
+		Gender    string `json:"gender,omitempty"`
 	}{
-		SafeUser: SafeUser{Id: user.Id, Name: user.Name},
-		Email:    user.Email,
+		SafeUser:  SafeUser{Id: user.Id, Name: user.Name},
+		Email:     user.Email,
+		FirstName: user.FirstName.String,
+		LastName:  user.LastName.String,
+		DoB:       user.DoB.String,
+		Gender:    user.Gender.String,
 	}
 
 	sendObject(w, response)
 }
 
-// apiMePostsHandler returns the current user's posts to the current user if he is logged in.
+// apiMePostsHandler returns the posts of the currently logged in user.
 //
 //	GET /api/me/posts
 func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +70,7 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 			SafePost: SafePost{
 				Id:            post.Id,
 				Title:         post.Title,
-				Content:       shortenContent(post.Content),
+				Description:   post.Description,
 				Author:        SafeUser{Id: user.Id, Name: user.Name},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
@@ -74,11 +84,8 @@ func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, response)
 }
 
-// # api Me(logged in user) Posts Liked Handler
-//
-// returns the current user's liked posts to the current user if he is logged in.
-//
-// Method: POST
+// apiMePostsLikedHandler
+// returns liked posts of the currently logged in user.
 //
 // Route: /api/me/posts/liked
 func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) {
@@ -100,7 +107,7 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 			SafePost: SafePost{
 				Id:            post.Id,
 				Title:         post.Title,
-				Content:       shortenContent(post.Content),
+				Description:   post.Description,
 				Author:        SafeUser{Id: author.Id, Name: author.Name},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
@@ -136,7 +143,8 @@ func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, SafeUser{Id: user.Id, Name: user.Name})
 }
 
-// apiMePostsHandler Returns the posts of the user with the given id. The requester does not need to be logged in.
+// apiMePostsHandler Returns the posts of the user with the given id.
+// The requester does not need to be logged in.
 //
 //	GET /api/user/:id/posts
 func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request) {
@@ -163,7 +171,7 @@ func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request)
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,
-			Content:       shortenContent(post.Content),
+			Description:   post.Description,
 			Author:        SafeUser{user.Id, user.Name},
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,

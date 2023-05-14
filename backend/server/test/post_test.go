@@ -165,10 +165,22 @@ func TestWithAuth(t *testing.T) {
 	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@")
 	srv.DB.AddPost("test", "test", userId, "facts")
 
-	validUser := TestUser{
-		Name:     "test",
-		Email:    "test@test.com",
-		Password: "SuperAmazingPassword()!@*#)(!@#",
+	testUser := struct {
+		Name      string `json:"name"`
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		DoB       string `json:"dob"`
+		Gender    string `json:"gender"`
+	}{
+		Name:      "test",
+		Email:     "test@test.com",
+		Password:  "SuperAmazingPassword()!@*#)(!@#",
+		FirstName: "John",
+		LastName:  "Doe",
+		DoB:       "2000-01-01",
+		Gender:    "male",
 	}
 
 	// Slice of invalid users. It will cover most nonDB test cases.
@@ -182,6 +194,8 @@ func TestWithAuth(t *testing.T) {
 
 		// bug found, if the user is already present, we give back 400 instead of 409
 		if resp.StatusCode != http.StatusOK {
+			errBody, _ := io.ReadAll(resp.Body)
+			fmt.Println(string(errBody))
 			t.Fatalf("expected %d, got %d", http.StatusOK, resp.StatusCode)
 		}
 	})
