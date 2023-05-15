@@ -165,8 +165,27 @@ func TestWithAuth(t *testing.T) {
 	defer db.Close()
 	defer testServer.Close()
 
+	// Create a user for db queries
+	u := struct {
+		Name   string
+		Email  string
+		Pass   string
+		FName  sql.NullString
+		LName  sql.NullString
+		DoB    sql.NullString
+		Gender sql.NullString
+	}{
+		Name:   "Steve",
+		Email:  "steve@apple.com",
+		Pass:   "@@@l1sa@@@",
+		FName:  sql.NullString{String: "Steve", Valid: true},
+		LName:  sql.NullString{String: "Jobs", Valid: true},
+		DoB:    sql.NullString{String: "1955-02-24", Valid: true},
+		Gender: sql.NullString{String: "male", Valid: true},
+	}
+
 	// Adds an user and a post to the database
-	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@", sql.NullString{String: "Steve", Valid: true}, sql.NullString{String: "Jobs", Valid: true}, sql.NullString{String: "1955-02-24", Valid: true}, sql.NullString{String: "male", Valid: true})
+	userId := srv.DB.AddUser(u.Name, u.Email, u.Pass, u.FName, u.LName, u.DoB, u.Gender)
 	srv.DB.AddPost("test", "test", userId, "facts", "beatufiul, amazing, wonderful facts")
 
 	validUser := struct {
@@ -279,6 +298,8 @@ func TestWithAuth(t *testing.T) {
 		}
 	})
 
+	// test revalidate func by using url route /post/id
+
 	// TODO: DOCUMENTATION
 	t.Run("createInvalidPost", func(t *testing.T) {
 		resp, err := createPost(cli, testServer.URL, cookie, Post{"", "", []string{""}})
@@ -321,9 +342,6 @@ func TestWithAuth(t *testing.T) {
 		// before starting, we have already created 5 posts
 		// test getting all posts [this is a GET request]
 		// {"/api/posts return 5", "/api/posts", nil, "5"},
-		// TODO DISCUSS WITH TEAM: should we return all posts on Post request also or only on GET request?
-		// in the current implementation, we return all posts on GET request only
-		// when we make a POST request currently to fetch allPosts, we get a method not allowed error,
 
 		// test liking post 1 and then unliking it by clicking again on the like button
 		{"/api/posts/1/like return 1", "/api/posts/1/like", nil, "1"},

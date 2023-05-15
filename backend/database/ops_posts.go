@@ -34,6 +34,12 @@ func (db DB) GetAllPosts() []Post {
 }
 
 // GetPostById reads post from database by post_id, does not require user to be logged in
+//
+// returns nil if post not found
+//
+// METHOD: GET
+//
+// URL: /api/posts/{id}
 func (db DB) GetPostById(id int) *Post {
 	query, err := db.Query("SELECT * FROM posts WHERE id = ?", id)
 	if err != nil {
