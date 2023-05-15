@@ -1,0 +1,590 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap");
+
+body {
+  background-color: #4070f4;
+  height: 100vh;
+}
+
+#super-division {
+  background-color: #4070f4;
+  display: flex;
+}
+
+.login-style {
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.index-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* LOGIN/SIGNIN STYLES */
+.container {
+  position: relative;
+  max-width: 430px;
+  width: 100%;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.container .forms {
+  display: flex;
+  align-items: center;
+  height: 440px;
+  width: 200%;
+  transition: height 0.2s ease;
+}
+
+.container .form {
+  width: 50%;
+  padding: 30px;
+  background-color: #fff;
+  transition: margin-left 0.18s ease;
+}
+
+.container.active .login {
+  margin-left: -50%;
+  opacity: 0;
+  transition: margin-left 0.18s ease, opacity 0.15s ease;
+}
+
+.container .signup {
+  opacity: 0;
+  transition: opacity 0.09s ease;
+}
+
+.container.active .signup {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+.container.active .forms {
+  height: 800px;
+}
+.title {
+  position: relative;
+  font-size: 27px;
+  font-weight: 600;
+}
+
+.title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 30px;
+  background-color: #4070f4;
+  border-radius: 25px;
+}
+
+.form .input-field {
+  position: relative;
+  height: 50px;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.input-field input {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  padding: 0 35px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  border-bottom: 2px solid #ccc;
+  border-top: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.name-fields {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-field input:is(:focus, :valid) {
+  border-bottom-color: #4070f4;
+}
+
+.input-field i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 23px;
+}
+
+.input-field input:is(:focus, :valid) ~ i {
+  color: #4070f4;
+}
+
+.input-field i.icon {
+  left: 0;
+}
+
+.input-field i.showHidePw {
+  right: 0;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.form .checkbox-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.checkbox-text .checkbox-content {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-content input {
+  margin: 0 8px -2px 4px;
+  accent-color: #4070f4;
+}
+
+.form .text {
+  color: #333;
+  font-size: 14px;
+}
+
+.form a.text {
+  color: #4070f4;
+  text-decoration: none;
+}
+
+.form a:hover {
+  text-decoration: underline;
+}
+
+.form .button {
+  margin-top: 35px;
+}
+
+.form .button input {
+  border: none;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  background-color: #4070f4;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button input:hover {
+  background-color: #265df2;
+}
+
+.form .login-signup {
+  margin-top: 30px;
+  text-align: center;
+}
+/* END OF LOGIN STYLES */
+
+/* TOPNAV STYLES */
+.topnav {
+  display: flex;
+  justify-content: space-between;
+  background-color: #333;
+  overflow: hidden;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  color: #f2f2f2;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  transition: 0.4s ease;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add an active class to highlight the current page */
+.topnav a.active {
+  background-color: #72bee4;
+  color: white;
+}
+
+.topnav input[type="text"] {
+  padding: 6px;
+  border: none;
+  margin-top: 8px;
+  font-size: 17px;
+}
+
+.topnav .search-container button {
+  float: right;
+  padding: 6px 10px;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+  transition: 0.4s ease;
+}
+
+.topnav .search-container button:hover {
+  color: white;
+  background: #403e3e;
+}
+
+/* Hide the link that should open and close the topnav on small screens */
+.topnav .icon {
+  display: none;
+}
+
+/* The side navigation menu */
+.chatlist {
+  height: 100%; /* 100% Full-height */
+  width: 0; /* 0 width - change this with JavaScript */
+  position: fixed;
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: #111; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px; /* Place content 60px from the top */
+}
+
+/* The navigation menu links */
+.chatlist a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.chatlist a:hover {
+  color: #f1f1f1;
+}
+
+/* Position and style the close button (top right corner) */
+.chatlist .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+}
+
+.chatlist .chat-users {
+  margin-left: 20px;
+  color: white;
+}
+
+.chatlist ul li {
+  /* Text color */
+  list-style-type: none;
+  cursor: pointer;
+}
+
+.chatlist li:before {
+  /* Unicode bullet symbol */
+  content: "\2022 ";
+  font-size: 22px;
+  padding-right: 0.5em;
+}
+
+.online:before {
+  color: green;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the chatlist (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .chatlist {
+    padding-top: 15px;
+  }
+  .chatlist a {
+    font-size: 18px;
+  }
+}
+
+.chat-window {
+  display: flex;
+  justify-content: center;
+  width: 220px;
+  height: 300px;
+  background-color: grey;
+  overflow: hidden;
+}
+
+.chat-window .chat-form {
+  margin-top: 270px;
+}
+
+.chat-window .send-btn {
+  border-width: 0px;
+  background-color: #f2f2f2;
+  padding: 1px 1px 0 1px;
+  border-radius: 4px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+/**
+* Flex Boxes
+*/
+.feed {
+  display: flex;
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.categories .category-selection {
+  display: flex;
+  flex-direction: row;
+}
+
+.categories .selected {
+  color: blueviolet;
+}
+
+.feed {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 500px;
+  margin: 6px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.categories h3 {
+  margin: 10px;
+  color: blue;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.feed .post {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 10px;
+  /* height: 300px; */
+  width: 480px;
+  background-color: #265df2;
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+  transition: 0.3s ease;
+}
+
+.post:hover {
+  box-shadow: 0 6px 12px rgb(0, 0, 0);
+}
+
+.post-information {
+  /* margin-bottom: 5px; */
+  padding: 0px 5px; /* Add padding on the sides */
+}
+
+.post .post-content {
+  box-sizing: border-box;
+  max-height: 120px;
+  padding: 5px; /* Add padding on the sides */
+  margin: 5px 0px;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.post .post-footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  overflow: hidden;
+  color: black;
+  background-color: lightblue;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-top: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+.post-footer .post-comments {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 35%;
+  transition: 0.3s ease;
+}
+.post-comments:hover {
+  background-color: #4070f4;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+.post-footer .post-likes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 35%;
+  transition: 0.3s ease;
+}
+
+.post-likes:hover {
+  background-color: #4070f4;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+.post-footer .post-dislikes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 30%;
+  transition: 0.3s ease;
+}
+
+.post-dislikes:hover {
+  background-color: #4070f4;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes expand {
+  from {
+    height: 0px;
+  }
+  to {
+    height: auto;
+  }
+}
+
+.open {
+  display: flex;
+  animation-name: expand;
+  animation-duration: 0.5s;
+  animation-direction: normal;
+}
+
+.close {
+  display: none;
+  animation-name: expand;
+  animation-duration: 0.5s;
+  animation-direction: reverse;
+}
+
+.comments-section {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 140px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.comments-section > #comment-content {
+  margin: 5px;
+  width: 400px;
+  border-radius: 5px;
+}
+
+.comment-submit {
+  height: 30px;
+  padding: 5px 10px 5px 10px;
+  border: none;
+  border-radius: 3px;
+  margin-left: 10px;
+  background-color: #72bee4;
+  transition: 0.4s ease;
+}
+
+.comment-submit:hover {
+  background-color: #4672ea;
+  cursor: pointer;
+}
+
+/* CREATE POST STYLES */
+#create-post {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 230px;
+  width: 500px;
+  padding: 6px 0px 6px 0px;
+  border-radius: 10px;
+  background-color: #fff;
+  margin: 6px 0px 4px 0px;
+  overflow: hidden;
+}
+
+#post-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#create-post-flexbox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#post-title {
+  margin-top: 10px;
+  width: 200px;
+}
+
+#post-content {
+  margin: 5px;
+  width: 400px;
+  border-radius: 5px;
+}
+
+#create-post-footer {
+  align-self: self-start;
+  margin-left: 5px;
+}
+
+#post-submit {
+  height: 30px;
+  padding: 5px 10px 5px 10px;
+  border: none;
+  border-radius: 3px;
+  margin-left: 10px;
+  background-color: #72bee4;
+  transition: 0.4s ease;
+}
+
+#post-submit:hover {
+  background-color: #4672ea;
+  cursor: pointer;
+}
+
+#post-category {
+  height: 30px;
+}
