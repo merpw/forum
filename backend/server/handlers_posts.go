@@ -8,6 +8,7 @@ var categories = []string{"facts", "rumors", "other"}
 
 func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) {
 	switch {
+
 	case reApiPosts.MatchString(r.URL.Path):
 		srv.postsHandler(w, r)
 
@@ -29,9 +30,8 @@ func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request)
 	case reApiPostsIdDislike.MatchString(r.URL.Path):
 		srv.postsIdDislikeHandler(w, r)
 
-	// TODO: remove this after discussion with team
-	// case reApiPostsIdReaction.MatchString(r.URL.Path):
-	//	srv.postsIdReactionHandler(w, r)
+	case reApiPostsIdReaction.MatchString(r.URL.Path):
+		srv.postsIdReactionHandler(w, r)
 
 	case reApiPostsIdCommentIdReaction.MatchString(r.URL.Path):
 		srv.postsIdCommentIdReactionHandler(w, r)

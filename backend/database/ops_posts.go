@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// # GetAllPosts reads all posts from database (reads only userId, not user object)
+// GetAllPosts reads all posts from database (reads only userId, not user object)
 //
 // panics if error occurs
 //
@@ -60,7 +60,7 @@ func (db DB) GetPostById(id int) *Post {
 	return &post
 }
 
-// # AddPost adds post to database, returns id of new post
+// AddPost adds post to database, returns id of new post
 //
 // METHOD: POST
 //
@@ -101,7 +101,7 @@ func (db DB) GetUserPosts(userId int) []Post {
 	return posts
 }
 
-// # GetUserPostsLiked: retrieves all posts liked by user with specified userId.
+// GetUserPostsLiked: retrieves all posts liked by user with specified userId.
 //
 // GetUserPostsLiked is a method of the DB object. It takes userId (int) and returns a slice of Post objects.
 // This function retrieves all the posts that have been liked by the user with the specified userId.
@@ -174,7 +174,7 @@ func (db DB) GetCommentById(id int) *Comment {
 	return &comment
 }
 
-// # GetPostComments gets all comments for post using post_id
+// GetPostComments gets all comments for post using post_id
 //
 // Example:
 //

@@ -21,13 +21,15 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ## Docker compose: `docker compose up`
 
+If using localhost, Docker compose up will run the app on <http://localhost/>
+
 ### Natively (dev)
 
 requirements: Node.js, Golang, GCC
 
 #### Script: `sh dev.sh`
 
-#### Commands:
+### Commands
 
 #### Backend: `cd backend && go run .`
 

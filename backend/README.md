@@ -19,7 +19,7 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 #### Example: `go run .` to run on default port 8080
 
-### Params:
+### Params
 
 - `--port` - port to run API server on (default: 8080)
 - `--db` - database file path (default: `./database.db`)

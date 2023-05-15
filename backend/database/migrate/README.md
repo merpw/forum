@@ -67,13 +67,13 @@ The only rule is to **not delete any migrations** that have already been pushed 
 database. If migration you want to remove was already applied, you have to create a new migration that will roll back
 your changes.
 
-```go
-// vYYY rolls back vXXX
-var vYYY = Migration{
-    Up: vXXX.Down,
-    Down: vXXX.Up,
-}
-```
+   ```go
+   // vYYY rolls back vXXX
+   var vYYY = Migration{
+      Up: vXXX.Down,
+      Down: vXXX.Up,
+   }
+   ```
 
 > Why do we use `.go` files for migrations? (and not `.sql`)
 
