@@ -432,6 +432,7 @@ body {
   border-radius: 5px;
   margin-top: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
 }
 
 .post-footer .post-comments {

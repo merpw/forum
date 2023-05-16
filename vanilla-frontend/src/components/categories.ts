@@ -30,13 +30,13 @@ export const categoriesSelector = async () => {
   return
 }
 
-const categoriesController = async () => {
+const categoriesController = () => {
   switch (category.selected) {
     case "category-facts":
       displayPosts("/api/posts/categories/facts")
       break
-    case "category-opinions":
-      displayPosts("/api/posts/categories/opinions")
+    case "category-other":
+      displayPosts("/api/posts/categories/other")
       break
     case "category-rumors":
       displayPosts("/api/posts/categories/rumors")

@@ -23,6 +23,10 @@ declare module "POST" {
     Description: string
     Categories: string[]
   }
+  export type SafePost = {
+    HTML: string
+    Content: string
+  }
 }
 
 // Change name to GET Module
