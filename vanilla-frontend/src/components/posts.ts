@@ -1,41 +1,44 @@
-import { CreatePostBody } from "POST"
+import { CreatePostBody, SafePost } from "POST"
 import { openCloseCreatePost } from "./topnav.js"
 import { displayCommentSection } from "./comments.js"
 
 export const displayPosts = (endpoint: string) => {
   const postsDisplay = document.getElementById("posts-display") as HTMLElement
   postsDisplay.innerHTML = ""
-  const postList: string[] = []
-  // const postBuffer: string[] = [];
+  const postList: SafePost[] = [];
+  // const postBuffer: SafePost[] = [];
   fetch(endpoint)
     .then((response) => response.json())
     .then((posts) => {
       // Posts is the array of objects sent by the server
       for (const post of posts) {
-        postList.push(
-          formattedPost(
+        const PostData: SafePost = {
+          HTML:  formattedPost (
             post.id.toString(),
             post.title,
             post.author.name,
             post.author.id.toString(),
             post.categories,
-            post.content,
             post.comments_count.toString(),
             post.likes_count.toString(),
             post.dislikes_count.toString()
-          )
-        )
+          ),
+          Content: post.content
+        }
+        postList.push(PostData)
       }
+
       postList.reverse()
 
-      // TODO: some kind of buffer for the posts.
+      // TODO: some kind of buffer for the posts. Can and will be reused for chat.
       // for (const post of postList) {
       // }
 
       for (const post of postList) {
         const postElement = document.createElement("div")
         postElement.className = "post-wrapper"
-        postElement.innerHTML = post
+        postElement.innerHTML = post.HTML;
+
         postsDisplay.appendChild(postElement)
       }
 
@@ -149,6 +152,7 @@ export class PostCreator {
       .then((response) => {
         if (response.ok) {
           openCloseCreatePost()
+          displayPosts("/api/posts")
           return
           // TODO: Something after post is created. Maybe close post window?
         } else {
@@ -188,7 +192,6 @@ const formattedPost = (
   author: string,
   authorId: string,
   category: string,
-  content: string,
   commentCount: string,
   likeCount: string,
   dislikeCount: string
@@ -203,7 +206,7 @@ const formattedPost = (
 	</div>
 
 	<div class="post-content">
-		${content}
+		
 	</div>
 
 	<div class="post-footer" id="${id}">

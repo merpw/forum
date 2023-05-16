@@ -1,57 +1,7 @@
 import { LoginForm, SignupForm } from "LoginModule"
 import { Auth } from "./auth.js"
 
-// All functionality for the login/signup form
-export const loginController = () => {
-  const loginSignupForm = document.querySelector(".container") as HTMLElement,
-    pwShowHide = document.querySelectorAll(
-      ".showHidePw"
-    ) as NodeListOf<HTMLElement>,
-    pwFields = document.querySelectorAll(
-      ".password"
-    ) as NodeListOf<HTMLInputElement>,
-    signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
-    loginLink = document.querySelector(".login-link") as HTMLInputElement
 
-  loginSignupForm.classList.remove("active")
-
-  // To show/hide password in Auth form.
-  pwShowHide.forEach((eyeIcon) => {
-    eyeIcon.addEventListener("click", () => {
-      pwFields.forEach((pwField) => {
-        if (pwField.type === "password") {
-          pwField.type = "text"
-          pwShowHide.forEach((icon) => {
-            icon.classList.replace("uil-eye-slash", "uil-eye")
-          })
-        } else {
-          pwField.type = "password"
-          pwShowHide.forEach((icon) => {
-            icon.classList.replace("uil-eye", "uil-eye-slash")
-          })
-        }
-      })
-    })
-  })
-  // To go from login to sign in.
-  signUpLink?.addEventListener("click", () => {
-    loginSignupForm.classList.add("active")
-  })
-
-  // To go from sign in to login.
-  loginLink?.addEventListener("click", () => {
-    loginSignupForm.classList.remove("active")
-  })
-
-  const signupForm = document.querySelector<HTMLFormElement>("#signup-form")
-  const loginForm = document.querySelector<HTMLFormElement>("#login-form")
-  if (signupForm && loginForm) {
-    new Signup(signupForm)
-    new Login(loginForm)
-  } else {
-    // TODO: Error handling here maybe?
-  }
-}
 
 class Login {
   private readonly form: HTMLFormElement
@@ -96,6 +46,7 @@ class Login {
     }
   }
 }
+
 
 class Signup {
   private readonly form: HTMLFormElement
@@ -176,4 +127,56 @@ class Signup {
     }
     throw new Error("Could not find form input fields.")
   }
+}
+
+// All functionality for the login/signup form
+export const loginController = () => {
+  const loginSignupForm = document.querySelector(".container") as HTMLElement,
+    pwShowHide = document.querySelectorAll(
+      ".showHidePw"
+    ) as NodeListOf<HTMLElement>,
+    pwFields = document.querySelectorAll(
+      ".password"
+    ) as NodeListOf<HTMLInputElement>,
+    signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
+    loginLink = document.querySelector(".login-link") as HTMLInputElement
+
+  loginSignupForm.classList.remove("active")
+
+  // To show/hide password in Auth form.
+  pwShowHide.forEach((eyeIcon) => {
+    eyeIcon.addEventListener("click", () => {
+      pwFields.forEach((pwField) => {
+        if (pwField.type === "password") {
+          pwField.type = "text"
+          pwShowHide.forEach((icon) => {
+            icon.classList.replace("uil-eye-slash", "uil-eye")
+          })
+        } else {
+          pwField.type = "password"
+          pwShowHide.forEach((icon) => {
+            icon.classList.replace("uil-eye", "uil-eye-slash")
+          })
+        }
+      })
+    })
+  })
+  // To go from login to sign in.
+  signUpLink?.addEventListener("click", () => {
+    loginSignupForm.classList.add("active")
+  })
+
+  // To go from sign in to login.
+  loginLink?.addEventListener("click", () => {
+    loginSignupForm.classList.remove("active")
+  })
+
+  const signupForm = document.querySelector<HTMLFormElement>("#signup-form")
+  const loginForm = document.querySelector<HTMLFormElement>("#login-form")
+  if (signupForm && loginForm) {
+    new Signup(signupForm)
+    new Login(loginForm)
+  } else {
+    // TODO: error handling here maybe?
+}
 }

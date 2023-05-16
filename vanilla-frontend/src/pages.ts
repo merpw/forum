@@ -147,8 +147,8 @@ export const Index = (): string => {
 		<span class="title">Categories:</span>
 			<div class="category-selection">
 				<h3 class="category-title" id="category-facts">#facts</h3>
-				<h3 class="category-title" id="category-opinions">#opinions</h3>
 				<h3 class="category-title" id="category-rumors">#rumors</h3>
+				<h3 class="category-title" id="category-other">#other</h3>
 			</div>
 		</div>
 		<div id="posts-display"></div>
@@ -170,7 +170,7 @@ export const postForm = (): string => {
 		<select id="post-category" name="post-category">
 			<option value="facts">Facts</option>
 			<option value="rumors">Rumors</option>
-			<option value="opinions">Opinions</option>
+			<option value="other">Other</option>
 		</select>
 		<input id="post-submit" type="submit" value="Post">
 	</div>	
