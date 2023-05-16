@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// apiUserIdHandler handles paths /api/me and /api/me/posts, passing them to the appropriate handler.
 func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case reApiUserId.MatchString(r.URL.Path):
@@ -126,7 +127,6 @@ func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request
 //	GET /api/user/:id
 func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
-	// /api/user/1 -> 1
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
@@ -150,7 +150,6 @@ func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) {
 func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
 	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
-	// /api/user/1/posts -> 1
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {

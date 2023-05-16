@@ -131,6 +131,18 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// loginHandler handles user login requests. It first checks if the user is
+// already logged in by calling the `getUserId` method. If the user is already
+// logged in, it returns an error message. If not, it decodes the request body
+// to get the user's login credentials (username/email and password). It then
+// checks if the user exists in the database and if the password is correct
+// using the `GetUserByLogin` and `CompareHashAndPassword` methods respectively.
+// If the user exists and the password is correct, it generates a new session
+// token using the `uuid.NewV4()` method, adds the session to the database using
+// the `AddSession` method, and sets a cookie with the session token using
+// the `http.SetCookie` method. Finally, it returns a success response.
+//
+// Path: /api/login
 func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	if srv.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
@@ -175,6 +187,15 @@ func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// logoutHandler handles user logout requests. It first checks if the user has a
+// valid session token by checking the "forum-token" cookie in the request. If the
+// cookie is not present or invalid, it returns an unauthorized error response
+// using the `errorResponse` function. If the cookie is valid, it removes the
+// session from the database using the `RemoveSession` method and sets a new cookie
+// with an empty value and an expired time using the `http.SetCookie` method. This
+// effectively logs the user out by invalidating their session token.
+//
+// Path: /api/logout
 func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
@@ -191,6 +212,11 @@ func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// `func (srv *Server) getUserId(w http.ResponseWriter, r *http.Request) int` is a
+// method of the `Server` struct that takes in a `http.ResponseWriter` and a
+// `http.Request` as arguments and returns an integer.
+//
+// It first checks if the user has a valid session token by checking the "forum-token"
 func (srv *Server) getUserId(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {

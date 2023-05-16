@@ -83,6 +83,7 @@ var getRegexps = []string{
 
 	reApiMe.String(),
 	reApiMePosts.String(),
+	reApiMePostsLiked.String(),
 	reApiPostsIdReaction.String(),
 
 	reApiPostsCategories.String(),
@@ -97,8 +98,6 @@ var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
 
 var postRegexps = []string{
 	reApiPostsCreate.String(),
-
-	reApiMePostsLiked.String(),
 
 	reApiPostsIdLike.String(),
 	reApiPostsIdDislike.String(),

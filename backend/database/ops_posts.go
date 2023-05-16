@@ -104,11 +104,10 @@ func (db DB) GetUserPosts(userId int) []Post {
 // GetUserPostsLiked: retrieves all posts liked by user with specified userId.
 //
 // GetUserPostsLiked is a method of the DB object. It takes userId (int) and returns a slice of Post objects.
-// This function retrieves all the posts that have been liked by the user with the specified userId.
 //
 // Method: POST
 //
-// Route: /api/me/posts/liked
+// One possible route taken: /api/me/posts/liked
 func (db DB) GetUserPostsLiked(userId int) []Post {
 	query, err := db.Query(`SELECT * FROM posts WHERE id IN 
 	(SELECT post_id FROM post_reactions WHERE author_id = ? AND reaction = 1)`, userId)

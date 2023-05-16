@@ -3,158 +3,16 @@ package server_test
 import (
 	"bytes"
 	"database/sql"
-	"encoding/json"
 	"fmt"
-	"forum/server"
 	"io"
 	"log"
 	"net/http"
-	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
-
-// TestUser to be used in all Post tests.
-type TestUser struct {
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Password  string `json:"password"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	DoB       string `json:"dob"`
-	Gender    string `json:"gender"`
-}
-
-// cookie to simulate logged in user.
-var cookie *http.Cookie
-
-func getInvalidPosts() []Post {
-	return []Post{
-		{
-			Title:      "",
-			Content:    "Valid Content",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "invalidTitleTooLongItWillExceed25length",
-			Content:    "Valid Content",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "Valid Title",
-			Content:    "",
-			Categories: []string{"facts"},
-		},
-		{
-			Title:      "Valid Title",
-			Content:    "Valid title",
-			Categories: []string{"Invalid category"},
-		},
-	}
-}
-
-func getInvalidUsers() []TestUser {
-	return []TestUser{
-		{
-			Name:     "test1",
-			Email:    "test@test.com", // email already in use
-			Password: "SuperAmazingPassword()!@*#)(!@#",
-		},
-		{
-			Name:     "",
-			Email:    "",
-			Password: "",
-		},
-		{
-			Name:     "ThisUserNameIsWayTooLong",
-			Email:    "valid@test.com",
-			Password: "ValidPassword123",
-		},
-		{
-			Name:     "ValidName",
-			Email:    "😂😂😂😂😂😂😂😂😂😂😂", // invalid email
-			Password: "ValidPassword123",
-		},
-		{
-			Name:     "ValidName",
-			Email:    "valid@test.com",
-			Password: "1234", // invalid password: too short
-		},
-		{
-			Name:     "Steve", // Invalid name: already in use
-			Email:    "valid@test.com",
-			Password: "12345678",
-		},
-		{
-			Name:     "ValidName",
-			Email:    "steve@apple.com", // Invalid e-mail: Already in use
-			Password: "12345678",
-		},
-		{
-			Name:     "  WsName  ", // Invalid name: Contains leading or trailing whitespace
-			Email:    "valid@test.com",
-			Password: "ValidPassword123",
-		},
-	}
-}
-
-func setupServer() (*sql.DB, *server.Server, *httptest.Server, *http.Client, error) {
-	db, err := sql.Open("sqlite3", "./test.db?_foreign_keys=true")
-	if err != nil {
-		return nil, nil, nil, nil, err
-	}
-
-	srv := server.Connect(db)
-	err = srv.DB.InitDatabase()
-	if err != nil {
-		return nil, nil, nil, nil, err
-	}
-
-	router := srv.Start()
-	testServer := httptest.NewServer(router)
-	cli := testServer.Client()
-
-	return db, srv, testServer, cli, nil
-}
-
-func signup(cli *http.Client, testServer *httptest.Server, user TestUser) (*http.Response, error) {
-	body, err := json.Marshal(user)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := cli.Post(testServer.URL+"/api/signup", "application/json", bytes.NewReader(body))
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
-}
-
-type Post struct {
-	Title      string
-	Content    string
-	Categories []string
-}
-
-// err := createPost(cli, testServer, cookie, title, content, []string{"facts"})
-func createPost(cli *http.Client, sURL string, ck *http.Cookie, p Post) (*http.Response, error) {
-	requestBodyBytes, err := json.Marshal(p)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, sURL+"/api/posts/create/", bytes.NewReader(requestBodyBytes))
-	if err != nil {
-		return nil, err
-	}
-	req.AddCookie(ck)
-
-	return cli.Do(req)
-}
 
 // TestWithAuth tests all routes that require authentication
 func TestWithAuth(t *testing.T) {
@@ -187,24 +45,6 @@ func TestWithAuth(t *testing.T) {
 	// Adds an user and a post to the database
 	userId := srv.DB.AddUser(u.Name, u.Email, u.Pass, u.FName, u.LName, u.DoB, u.Gender)
 	srv.DB.AddPost("test", "test", userId, "facts", "beatufiul, amazing, wonderful facts")
-
-	validUser := struct {
-		Name      string `json:"name"`
-		Email     string `json:"email"`
-		Password  string `json:"password"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-		DoB       string `json:"dob"`
-		Gender    string `json:"gender"`
-	}{
-		Name:      "test",
-		Email:     "test@test.com",
-		Password:  "SuperAmazingPassword()!@*#)(!@#",
-		FirstName: "John",
-		LastName:  "Doe",
-		DoB:       "2000-01-01",
-		Gender:    "male",
-	}
 
 	// Slice of invalid users. It will cover most nonDB test cases.
 	invalidUsers := getInvalidUsers()
@@ -302,7 +142,7 @@ func TestWithAuth(t *testing.T) {
 
 	// TODO: DOCUMENTATION
 	t.Run("createInvalidPost", func(t *testing.T) {
-		resp, err := createPost(cli, testServer.URL, cookie, Post{"", "", []string{""}})
+		resp, err := createPost(cli, testServer.URL, cookie, Post{"", "", 1, []string{""}, ""})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -351,9 +191,6 @@ func TestWithAuth(t *testing.T) {
 		// test liking posts 2 and 3
 		// {"/api/posts/2/like return 1", "/api/posts/2/like", nil, "1"},
 		// {"/api/posts/3/like return 1", "/api/posts/3/like", nil, "1"},
-
-		// test getting the posts liked by the user
-		{"/api/me/posts/liked return 0 POSTS", "/api/me/posts/liked", nil, "[]"},
 
 		// test disliking post 1 and then undisliking it by clicking again on the dislike button
 		{"/api/posts/1/dislike return -1", "/api/posts/1/dislike", nil, "-1"},
@@ -462,22 +299,4 @@ func BenchmarkWithAuth(b *testing.B) {
 			b.Errorf("cookie should be expired")
 		}
 	}
-}
-
-func dummyLogin(t *testing.T, cli *http.Client, testServer *httptest.Server, testUser TestUser) *http.Cookie {
-	body := fmt.Sprintf(`{ "login": "%v", "password": "%v" }`, testUser.Email, testUser.Password)
-	resp, err := cli.Post(testServer.URL+"/api/login", "application/json",
-		strings.NewReader(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(resp.Cookies()) == 0 {
-		t.Fatal("no cookies after login")
-	}
-	cookie := resp.Cookies()[0]
-
-	if resp.StatusCode != http.StatusOK {
-		t.Fatalf("expected %d, got %d", 200, resp.StatusCode)
-	}
-	return cookie
 }

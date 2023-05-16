@@ -42,12 +42,12 @@ type SafeReaction struct {
 	DislikesCount int `json:"dislikes_count"`
 }
 
-// errorResponse responses with specified error code in format "404 Not Found"
+// errorResponse responds with specified error code in format "404 Not Found"
 func errorResponse(w http.ResponseWriter, code int) {
 	http.Error(w, fmt.Sprintf("%v %v", code, http.StatusText(code)), code)
 }
 
-// sendObject sends object to http.ResponseWriter
+// sendObject sends JSON object to http.ResponseWriter
 //
 // panics if error occurs
 func sendObject(w http.ResponseWriter, object any) {
@@ -72,6 +72,7 @@ func shortenContent(content string) string {
 	return content
 }
 
+// isPresent returns true if item is present in slice, false otherwise
 func isPresent(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {

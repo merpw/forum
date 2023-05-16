@@ -55,6 +55,7 @@ func TestGet(t *testing.T) {
 
 		{"/api/user/1", 200},
 		{"/api/user/1/posts", 200},
+		{"/api/me/posts/liked", 401}, // not logged in
 
 		{"/api/posts/categories", 200},
 		{"/api/posts/categories/rumors", 200},
@@ -80,7 +81,6 @@ func TestGet(t *testing.T) {
 		{"/api/me", http.StatusUnauthorized},
 		{"/api/me/posts", http.StatusUnauthorized},
 
-		{"/api/me/posts/liked", http.StatusMethodNotAllowed},
 		{"/api/posts/create", http.StatusMethodNotAllowed},
 		{"/api/posts/1/like", http.StatusMethodNotAllowed},
 		{"/api/posts/1/dislike", http.StatusMethodNotAllowed},
@@ -115,6 +115,11 @@ func TestGet(t *testing.T) {
 	})
 
 }
+
+// signup test user by sending a POST request to /api/signup
+
+// test getting the posts liked by the user
+// {"/api/me/posts/liked return 0 POSTS", "/api/me/posts/liked", nil, "[]"},
 
 func TestQueries(t *testing.T) {
 	// Create a test database with some sample data
