@@ -12,6 +12,10 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        Alatsi: ["Alatsi", "sans-serif"],
+        Yesteryear: ["Yesteryear", "cursive"],
+      },
       typography: {
         DEFAULT: {
           css: {

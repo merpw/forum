@@ -1,7 +1,9 @@
 import { ReactNode } from "react"
 import { Metadata } from "next"
 
+import "@/styles/font.css"
 import "@/styles/globals.css"
+
 import Layout from "@/components/layout"
 
 export const metadata: Metadata = {
