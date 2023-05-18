@@ -54,9 +54,11 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 	if requestBody.Description == "" {
 		requestBody.Description = shortenContent(requestBody.Content)
 	}
+	fmt.Println(requestBody.Description)
 	if len(requestBody.Description) > 200 {
 		requestBody.Description = shortenContent(requestBody.Description)
 	}
+	fmt.Println(requestBody.Description)
 
 	for i, cat := range requestBody.Categories {
 		cat = strings.TrimSpace(cat)
@@ -80,8 +82,8 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
-		userId, strings.Join(requestBody.Categories, ","))
+	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId,
+		strings.Join(requestBody.Categories, ","), requestBody.Description)
 	sendObject(w, id)
 
 	err = revalidateURL(fmt.Sprintf("/post/%v", id))

@@ -46,7 +46,7 @@ func (db DB) GetPostById(id int) *Post {
 	return &post
 }
 
-func (db DB) AddPost(title, content, description string, authorId int, categories string) int {
+func (db DB) AddPost(title, content string, authorId int, categories string, description string) int {
 	result, err := db.Exec(`INSERT INTO posts 
     	(title, content, author, date, likes_count, dislikes_count, comments_count, categories, description)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
