@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 )
+
 type ChatType int
 
 const (
@@ -104,7 +105,7 @@ func (db DB) GetOnlineUsers(userId int) []User {
 
 // GetContacts reads private chat oponents from database by userId
 func (db DB) GetContacts(userId int) []User {
-		query, err := db.Query(`
+	query, err := db.Query(`
 		SELECT o.id, o.name FROM users AS o 
 		JOIN memberships AS om ON om.user_id = o.id 
 		JOIN chats AS c ON c.id = om.chat_id 
@@ -112,20 +113,20 @@ func (db DB) GetContacts(userId int) []User {
 		JOIN users AS u ON u.id = um.user_id 
 		WHERE c.type = 2 AND u.id = ?
 	`, userId)
-if err != nil {
-	log.Panic(err)
-}
-var users []User
-for query.Next() {
-	var user User
-	err = query.Scan(&user.Id, &user.Name)
 	if err != nil {
 		log.Panic(err)
 	}
-	users = append(users, user)
-}
-query.Close()
-return users
+	var users []User
+	for query.Next() {
+		var user User
+		err = query.Scan(&user.Id, &user.Name)
+		if err != nil {
+			log.Panic(err)
+		}
+		users = append(users, user)
+	}
+	query.Close()
+	return users
 }
 
 // GetChatsIds reads chats ids from database by userId
