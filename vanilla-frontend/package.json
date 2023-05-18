@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "tsc -w & serve public",
     "start": "serve public",
-    "build": "tsc",
+    "build": "npx tsc",
     "lint": "eslint .",
     "format": "prettier -w ."
   },

@@ -145,21 +145,6 @@ export const loginController = () => {
 
   // To show/hide password in Auth form.
   pwShowHide.forEach((eyeIcon) => {
-    eyeIcon.addEventListener("click", () => {
-      pwFields.forEach((pwField) => {
-        if (pwField.type === "password") {
-          pwField.type = "text"
-          pwShowHide.forEach((icon) => {
-            icon.classList.replace("uil-eye-slash", "uil-eye")
-          })
-        } else {
-          pwField.type = "password"
-          pwShowHide.forEach((icon) => {
-            icon.classList.replace("uil-eye", "uil-eye-slash")
-          })
-        }
-      })
-    })
   })
   // To go from login to sign in.
   signUpLink?.addEventListener("click", () => {

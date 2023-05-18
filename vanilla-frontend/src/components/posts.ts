@@ -1,105 +1,40 @@
-import { CreatePostBody, SafePost } from "POST"
+import { CreatePostBody } from "POST"
 import { openCloseCreatePost } from "./topnav.js"
 import { displayCommentSection } from "./comments.js"
 
 export const displayPosts = (endpoint: string) => {
   const postsDisplay = document.getElementById("posts-display") as HTMLElement
-  postsDisplay.innerHTML = ""
-  const postList: SafePost[] = [];
-  // const postBuffer: SafePost[] = [];
+  postsDisplay.replaceChildren()
+  const postList: Array<HTMLDivElement> = [];
   fetch(endpoint)
     .then((response) => response.json())
     .then((posts) => {
       // Posts is the array of objects sent by the server
       for (const post of posts) {
-        const PostData: SafePost = {
-          HTML:  formattedPost (
+       const postDiv = formattedPost (
             post.id.toString(),
             post.title,
             post.author.name,
             post.author.id.toString(),
             post.categories,
+            post.content,
             post.comments_count.toString(),
             post.likes_count.toString(),
             post.dislikes_count.toString()
-          ),
-          Content: post.content
-        }
-        postList.push(PostData)
+          )
+        postList.push(postDiv)
       }
-
       postList.reverse()
-
       // TODO: some kind of buffer for the posts. Can and will be reused for chat.
       // for (const post of postList) {
       // }
-
       for (const post of postList) {
-        const postElement = document.createElement("div")
-        postElement.className = "post-wrapper"
-        postElement.innerHTML = post.HTML;
-
-        postsDisplay.appendChild(postElement)
+        postsDisplay.appendChild(post)
       }
-
-      // Event listener for the like button
-      const likeButton = document.querySelectorAll(
-        ".post-likes"
-      ) as NodeListOf<HTMLElement>
-      likeButton.forEach((button) => {
-        button.addEventListener("click", () => {
-          fetch(`/api/posts/${button.id.slice(1)}/like`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-            .then((res) => {
-              if (!res.ok) throw new Error()
-              // Call the function to update the post values after liking
-              updatePostValues(button.id.slice(1))
-            })
-            .catch((error) => {
-              console.error(error)
-              // Handle the error if the request fails
-            })
-        })
-      })
-      const dislikeButton = document.querySelectorAll(
-        ".post-dislikes"
-      ) as NodeListOf<HTMLElement>
-      dislikeButton.forEach((button) => {
-        button.addEventListener("click", () => {
-          fetch(`/api/posts/${button.id.slice(1)}/dislike`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-            .then((res) => {
-              if (!res.ok) throw new Error()
-              // Call the function to update the post values after liking
-              updatePostValues(button.id.slice(1))
-            })
-            .catch((error) => {
-              console.error(error)
-              // Handle the error if the request fails
-            })
-        })
-      })
-      const commentButton = document.querySelectorAll(
-        ".post-comments"
-      ) as NodeListOf<HTMLElement>
-      commentButton.forEach((button) => {
-        button.addEventListener("click", () => {
-          displayCommentSection(button.id.slice(1))
-          updatePostValues(button.id.slice(1))
-        })
-      })
     })
 }
 
-const updatePostValues = (postId: string) => {
+export const updatePostValues = (postId: string) => {
   fetch(`/api/posts/${postId}`, {
     method: "GET",
     headers: {
@@ -108,20 +43,15 @@ const updatePostValues = (postId: string) => {
   })
     .then((response) => response.json())
     .then((data) => {
-      // Extract the updated values from the response data
-      const updatedCommentsCount = data.comments_count
-      const updatedLikesCount = data.likes_count
-      const updatedDislikesCount = data.dislikes_count
-
       // Update the post UI elements with the new values
       const postCommentsElement = document.getElementById(`C${postId}`)
       const postLikesElement = document.getElementById(`L${postId}`)
       const postDislikesElement = document.getElementById(`D${postId}`)
 
       if (postCommentsElement && postLikesElement && postDislikesElement) {
-        postCommentsElement.innerHTML = `<i class='bx bx-comment'></i> ${updatedCommentsCount}`
-        postLikesElement.innerHTML = `<i class='bx bx-like'></i> ${updatedLikesCount}`
-        postDislikesElement.innerHTML = `<i class='bx bx-dislike'></i> ${updatedDislikesCount}`
+        postCommentsElement.innerHTML = `<i class='bx bx-comment'></i> ${data.comments_count}`
+        postLikesElement.innerHTML = `<i class='bx bx-like'></i> ${data.likes_count}`
+        postDislikesElement.innerHTML = `<i class='bx bx-dislike'></i> ${data.dislikes_count}`
       }
     })
     .catch((error) => {
@@ -152,7 +82,7 @@ export class PostCreator {
       .then((response) => {
         if (response.ok) {
           openCloseCreatePost()
-          displayPosts("/api/posts")
+          displayPosts("/api/posts/")
           return
           // TODO: Something after post is created. Maybe close post window?
         } else {
@@ -192,29 +122,130 @@ const formattedPost = (
   author: string,
   authorId: string,
   category: string,
+  content: string,
   commentCount: string,
   likeCount: string,
   dislikeCount: string
-): string => {
-  return `
-  <div class="post" id="${id}">
-	<div class="post-information">
-		<div class="post-title"><h4>${title}</h4></div>
-		<div class="post-author" id="${authorId}">by ${author}</div>
-		<div class="post-categories">#${category}</div>
-		<hr>
-	</div>
+): HTMLDivElement => {
+  const newPost = document.createElement("div")
+  newPost.className = "post"
+  newPost.id = `${id}`
 
-	<div class="post-content">
-		
-	</div>
+  // Creates the post information div
+  const postInformation = document.createElement("div")
+  postInformation.classList.add("post-information")
 
-	<div class="post-footer" id="${id}">
-		<div class="post-comments post-icon" id="C${id}"><i class='bx bx-comment'></i> ${commentCount}</div>
-		<div class="post-likes post-icon" id="L${id}"><i class='bx bx-like' ></i> ${likeCount}</div>
-		<div class="post-dislikes post-icon" id="D${id}"><i class='bx bx-dislike' ></i> ${dislikeCount}</div>
-	</div>
-  <section class="comments-section close" id=CS${id}></section>
-  </div>
-	`
+  // Creates the post title
+  const postTitle = document.createElement("div")
+  postTitle.className = "post-title"
+  const titleContent = document.createElement("h4")
+  titleContent.textContent = `${title}`
+  postTitle.appendChild(titleContent)
+
+  // Creates the author div
+  const postAuthor = document.createElement("div")
+  postAuthor.className = "post-author"
+  postAuthor.id = `${authorId}`
+  postAuthor.textContent = `by ${author}`
+
+  // Creates the category div 
+  const postCategories = document.createElement("div")
+  postCategories.className = "post-categories"
+  postCategories.textContent = `#${category}` 
+
+  postInformation.append(postTitle, postAuthor, postCategories, document.createElement("hr"))
+  
+  // Creates post-content 
+  const postContent = document.createElement("div")
+  postContent.className = "post-content"
+  postContent.textContent = `${content}`
+
+  // Creates postFooter
+  const postFooter = document.createElement("div")
+  postFooter.className = "post-footer"
+  postFooter.id = `${id}`
+
+  // Creates comments count div
+  const postComments = document.createElement("div")
+  postComments.className = "post-comments post-icon"
+  postComments.id = `C${id}`
+  postComments.innerHTML = `<i class="bx bx-comment"></i> ${commentCount}`
+  postComments.addEventListener("click", () => {
+    displayCommentSection(id)
+    updatePostValues(id)
+  })
+
+  const postLikes = document.createElement("div")
+  postLikes.className = "post-likes post-icon"
+  postLikes.id = `L${id}`
+  postLikes.innerHTML = `<i class="bx bx-like"></i> ${likeCount}`
+  postLikes.addEventListener("click", () => {
+    fetch(`/api/posts/${id}/like`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error()
+        // Call the function to update the post values after liking
+        updatePostValues(id)
+      })
+      .catch((error) => {
+        console.error(error)
+        // Handle the error if the request fails
+      })
+  })
+
+  const postDislikes = document.createElement("div")
+  postDislikes.className = "post-dislikes post-icon"
+  postDislikes.id = `D${id}`
+  postDislikes.innerHTML = `<i class="bx bx-dislike"></i> ${dislikeCount}`
+  postDislikes.addEventListener("click", () => {
+    fetch(`/api/posts/${id}/dislike`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error()
+        // Call the function to update the post values after liking
+        updatePostValues(id)
+      })
+      .catch((error) => {
+        console.error(error)
+        // Handle the error if the request fails
+      })
+  })
+  postFooter.append(postComments, postLikes, postDislikes)
+
+  const commentSection = document.createElement("section")
+  commentSection.className = "comments-section close"
+  commentSection.id = `CS${id}`
+
+  newPost.append(postInformation, postContent, postFooter, commentSection)
+
+  return newPost  
+ //  return `
+ //  <div class="post" id="${id}">
+ //    <div class="post-information">
+ //      <div class="post-title"><h4>${title}</h4></div>
+ //      <div class="post-author" id="${authorId}">by ${author}</div>
+ //      <div class="post-categories">#${category}</div>
+ //      <hr>
+ //  	</div>
+
+	// <div class="post-content">
+
+	// </div>
+
+	// <div class="post-footer" id="${id}">
+	// 	<div class="post-comments post-icon" id="C${id}"><i class='bx bx-comment'></i> ${commentCount}</div>
+	// 	<div class="post-likes post-icon" id="L${id}"><i class='bx bx-like' ></i> ${likeCount}</div>
+	// 	<div class="post-dislikes post-icon" id="D${id}"><i class='bx bx-dislike' ></i> ${dislikeCount}</div>
+	// </div>
+ //  <section class="comments-section close" id=CS${id}></section>
+ //  </div>
+	// `
 }
