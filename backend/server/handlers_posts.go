@@ -64,6 +64,7 @@ func (srv *Server) postsHandler(w http.ResponseWriter, _ *http.Request) {
 			Description:   post.Description,
 			Date:          post.Date,
 			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+      Content:       post.Content,
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
 			DislikesCount: post.DislikesCount,

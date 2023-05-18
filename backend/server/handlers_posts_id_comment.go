@@ -187,7 +187,7 @@ func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request
 	post := srv.DB.GetPostById(postId)
 	if post == nil {
 		errorResponse(w, http.StatusNotFound)
-		return
+    return
 	}
 
 	// posts := srv.DB.GetUserPosts(userId)

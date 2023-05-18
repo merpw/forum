@@ -116,15 +116,6 @@ export const Index = (): string => {
         <a id="topnav-home" href="#index">
         <i class='bx bx-home'></i> Home
         </a>
-        <a id="topnav-profile" href="#profile">
-        <i class='bx bx-user'></i> Profile
-        </a>
-		<div class="search-container">
-		<form action="submit">
-		  <input type="text" placeholder="Search.." name="search">
-		  <button type="submit"><i class="fa fa-search"></i></button>
-		</form>
-	  </div>
         <a id="topnav-logout" class="logout" href="#logout"><i class='bx bx-log-out'></i> Logout</a>
     </div>
 
@@ -178,9 +169,9 @@ export const postForm = (): string => {
 	`
 }
 
-export const commentForm = (id: string): string => {
+export const commentForm = (postId: string): string => {
   return `
-	<form id="comment-form-${id}" (submit)="onSubmit()">	
+	<form id="comment-form-${postId}" (submit)="onSubmit()">	
 		<textarea id="comment-content" rows=5 style="resize: none;" type="text"></textarea>
 		<div id="create-post-footer">
 			<input class="comment-submit" type="submit" value="Post">

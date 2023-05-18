@@ -230,30 +230,6 @@ body {
   color: white;
 }
 
-.topnav input[type="text"] {
-  padding: 6px;
-  border: none;
-  margin-top: 8px;
-  font-size: 17px;
-}
-
-.topnav .search-container button {
-  float: right;
-  padding: 6px 10px;
-  margin-top: 8px;
-  margin-right: 16px;
-  background: #ddd;
-  font-size: 17px;
-  border: none;
-  cursor: pointer;
-  transition: 0.4s ease;
-}
-
-.topnav .search-container button:hover {
-  color: white;
-  background: #403e3e;
-}
-
 /* Hide the link that should open and close the topnav on small screens */
 .topnav .icon {
   display: none;
@@ -476,15 +452,6 @@ body {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
 
-@keyframes expand {
-  from {
-    height: 0px;
-  }
-  to {
-    height: auto;
-  }
-}
-
 .open {
   display: flex;
   animation-name: expand;
@@ -503,7 +470,7 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 140px;
+  max-height: 1000px;
   overflow: hidden;
   margin-top: 10px;
 }
