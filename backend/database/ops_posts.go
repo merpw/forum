@@ -5,9 +5,6 @@ import (
 	"time"
 )
 
-// GetAllPosts reads all posts from database (reads only userId, not user object)
-//
-// panics if error occurs
 func (db DB) GetAllPosts() []Post {
 	query, err := db.Query("SELECT * FROM posts")
 	if err != nil {
@@ -29,7 +26,6 @@ func (db DB) GetAllPosts() []Post {
 	return posts
 }
 
-// GetPostById reads post from database by post_id, does not require user to be logged in
 func (db DB) GetPostById(id int) *Post {
 	query, err := db.Query("SELECT * FROM posts WHERE id = ?", id)
 	if err != nil {
@@ -50,7 +46,6 @@ func (db DB) GetPostById(id int) *Post {
 	return &post
 }
 
-// AddPost adds post to database, returns id of new post
 func (db DB) AddPost(title, content, description string, authorId int, categories string) int {
 	result, err := db.Exec(`INSERT INTO posts 
     	(title, content, author, date, likes_count, dislikes_count, comments_count, categories, description)
@@ -90,11 +85,9 @@ func (db DB) GetUserPosts(userId int) []Post {
 func (db DB) GetUserPostsLiked(userId int) []Post {
 	query, err := db.Query(`SELECT * FROM posts WHERE id IN 
 	(SELECT post_id FROM post_reactions WHERE author_id = ? AND reaction = 1)`, userId)
-
 	if err != nil {
 		log.Panic(err)
 	}
-
 	var posts []Post
 	for query.Next() {
 		var post Post
@@ -106,7 +99,6 @@ func (db DB) GetUserPostsLiked(userId int) []Post {
 		posts = append(posts, post)
 	}
 	query.Close()
-
 	return posts
 }
 
@@ -115,7 +107,6 @@ func (db DB) GetCategoryPosts(category string) []Post {
 	if err != nil {
 		log.Panic(err)
 	}
-
 	var posts []Post
 	for query.Next() {
 		var post Post
@@ -127,17 +118,14 @@ func (db DB) GetCategoryPosts(category string) []Post {
 		posts = append(posts, post)
 	}
 	query.Close()
-
 	return posts
 }
 
-// GetCommentById gets Comment Struct Pointer by comment_id from the database, does not require user to be logged in
 func (db DB) GetCommentById(id int) *Comment {
 	query, err := db.Query("SELECT * FROM comments WHERE id = ?", id)
 	if err != nil {
 		log.Panic(err)
 	}
-
 	if !query.Next() {
 		return nil
 	}
@@ -148,21 +136,14 @@ func (db DB) GetCommentById(id int) *Comment {
 		log.Panic(err)
 	}
 	query.Close()
-
 	return &comment
 }
 
-// GetPostComments gets all comments for post using post_id
-//
-// Example:
-//
-//	comments := db.GetPostComments(1)
 func (db DB) GetPostComments(postId int) []Comment {
 	query, err := db.Query("SELECT * FROM comments WHERE post_id = ?", postId)
 	if err != nil {
 		log.Panic(err)
 	}
-
 	var comments []Comment
 	for query.Next() {
 		var comment Comment
@@ -174,6 +155,5 @@ func (db DB) GetPostComments(postId int) []Comment {
 		comments = append(comments, comment)
 	}
 	query.Close()
-
 	return comments
 }
