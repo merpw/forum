@@ -42,17 +42,3 @@ type Session struct {
 	Expire int
 	UserId int
 }
-
-type Chat struct {
-	Id   int
-	Type ChatType
-	Date string
-}
-
-type Message struct {
-	Id      int
-	UserId  int
-	ChatId  int
-	Content string
-	Date    string
-}

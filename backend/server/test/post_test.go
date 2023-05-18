@@ -42,7 +42,7 @@ func TestWithAuth(t *testing.T) {
 	}
 
 	userId := srv.DB.AddUser(u.Name, u.Email, u.Pass, u.FName, u.LName, u.DoB, u.Gender)
-	srv.DB.AddPost("test", "test", userId, "facts", "beatufiul, amazing, wonderful facts")
+	srv.DB.AddPost("test title", "test content", "test description", userId, "facts")
 
 	invalidUsers := getInvalidUsers()
 

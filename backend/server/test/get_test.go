@@ -40,7 +40,7 @@ func TestGet(t *testing.T) {
 	ullamcorper, nisl nisl aliquet nunc, eget lobortis diam diam vitae velit.`
 
 	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@", firstName, lastName, dob, gender)
-	srv.DB.AddPost("test", "test", userId, "fact", longDescription)
+	srv.DB.AddPost("test", "test", "test", userId, longDescription)
 
 	tests := []struct {
 		url          string
