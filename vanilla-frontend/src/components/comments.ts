@@ -6,32 +6,13 @@ export const displayCommentSection = (id: string) => {
     fetch(`/api/posts/${id}/comments`)
       .then((resp) => resp.json())
       .then((comments) => {
-
-        if (!comments) return;
-        const commentSection = document.getElementById(`CS${id}`)!
-        if (commentSection.classList.contains("close")) {
-
-        // This loops through all the comments and creates them in the DOM.
-        for (let i = 0; i < comments.length; i++) {
-          // Parent element
-          const comment = document.createElement("div")
-          comment.className = "comment"
-          comment.id = `CommentID${comments[i].id}`
-          // Comment-info Child
-          const commentInfo = document.createElement("div")
-          commentInfo.className = "comment-info"
-          commentInfo.textContent = `@${comments[i].author.name}\n\tat ${comments[i].date}`
-            
-          // Comment content Child
-          const commentContent = document.createElement("div")
-          commentContent.className = "comment-content"
-          commentContent.textContent = `${comments[i].content}`
-
-          comment.append(commentInfo, commentContent)
-          commentSection.appendChild(comment)
-        }
+      if (!comments) return;
+      const commentSection = document.getElementById(`CS${id}`)!
+      // If statement for opening the comment section
+      if (commentSection.classList.contains("close")) {
         // Appends the form to the commentSection
         const commentFormElement = document.createElement("div")
+        commentFormElement.className = "comment-form"
         commentFormElement.innerHTML = commentForm(id)
         commentSection.appendChild(commentFormElement)
 
@@ -42,6 +23,29 @@ export const displayCommentSection = (id: string) => {
         if (createPostForm) {
           new CommentCreator(createPostForm)
         }
+        // This loops through all the comments and creates them in the DOM.
+        comments.reverse()
+        for (let i = 0; i < comments.length; i++) {
+          // Parent element
+          const comment = document.createElement("div")
+          comment.className = "comment"
+          comment.id = `CommentID${comments[i].id}`
+          // Comment-info Child
+          const commentInfo = document.createElement("div")
+          commentInfo.className = "comment-info"
+          const date = new Date(comments[i].date)
+          const formatDate = date.toLocaleString('en-GB', { timeZone: 'EET' })
+          commentInfo.textContent = `${comments[i].author.name}\n\tat ${formatDate}`
+            
+          // Comment content Child
+          const commentContent = document.createElement("div")
+          commentContent.className = "comment-content"
+          commentContent.textContent = `${comments[i].content}`
+
+          comment.append(commentInfo, commentContent)
+          commentSection.appendChild(comment)
+        }
+      // Else statement for closing the comment section
       } else {
         commentSection.replaceChildren()
         commentSection.classList.replace("open", "close")
@@ -70,8 +74,9 @@ export class CommentCreator {
   private onSubmit(event: Event) {
     event.preventDefault()
     const formData: { content: string } = this.getFormData()
+    const postID = this.form.id.slice(13)
 
-    fetch(`/api/posts/${this.form.id.slice(13)}/comment`, {
+    fetch(`/api/posts/${postID}/comment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,8 +85,12 @@ export class CommentCreator {
     })
       .then((response) => {
         if (response.ok) {
-          console.log("this.form.id", this.form.id.slice(13))
-          updatePostValues(this.form.id.slice(13))
+          console.log("PostID in CommentCreator", postID)
+          const commentSection = document.getElementById(`CS${postID}`) as HTMLElement
+          commentSection.replaceChildren()
+          commentSection.classList.replace("open", "close")
+          updatePostValues(postID)
+          displayCommentSection(postID)
           return
           // TODO: Something after post is created. Maybe close post window?
         } else {

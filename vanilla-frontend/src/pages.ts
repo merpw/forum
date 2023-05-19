@@ -172,7 +172,7 @@ export const postForm = (): string => {
 export const commentForm = (postId: string): string => {
   return `
 	<form id="comment-form-${postId}" (submit)="onSubmit()">	
-		<textarea id="comment-content" rows=5 style="resize: none;" type="text"></textarea>
+		<textarea id="comment-content" rows=5 maxlength="250" style="resize: none;" type="text"></textarea>
 		<div id="create-post-footer">
 			<input class="comment-submit" type="submit" value="Post">
 		</div>	

@@ -452,33 +452,36 @@ body {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
 
+/* Classes that will open and close elements */
 .open {
   display: flex;
-  animation-name: expand;
-  animation-duration: 0.5s;
-  animation-direction: normal;
 }
 
 .close {
   display: none;
-  animation-name: expand;
-  animation-duration: 0.5s;
-  animation-direction: reverse;
 }
 
 .comments-section {
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  max-height: 1000px;
-  overflow: hidden;
+  overflow: auto;
   margin-top: 10px;
+  width: 100%;
 }
 
-.comments-section > #comment-content {
-  margin: 5px;
-  width: 400px;
+.comment-form {
+  background-color: lightblue;
   border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  margin-bottom: 5px;
+}
+
+#comment-content {
+  margin: 5px;
+  width: 100%;
+  padding: 5px;
+  border-radius: 10px;
 }
 
 .comment-submit {
@@ -486,7 +489,6 @@ body {
   padding: 5px 10px 5px 10px;
   border: none;
   border-radius: 3px;
-  margin-left: 10px;
   background-color: #72bee4;
   transition: 0.4s ease;
 }
@@ -496,11 +498,20 @@ body {
   cursor: pointer;
 }
 
+.comment {
+  color: black;
+  background-color: lightblue;
+  border-radius: 5px;
+  margin: 5px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  padding: 5px;
+  word-wrap: break-word;
+}
+
 /* CREATE POST STYLES */
 #create-post {
   flex-direction: column;
   justify-content: center;
-  align-items: center;
   height: 230px;
   width: 500px;
   padding: 6px 0px 6px 0px;
@@ -556,3 +567,27 @@ body {
 #post-category {
   height: 30px;
 }
+/* On smaller screens, where width is less than 500px, change the style of the chatlist (less padding and a smaller font size) */
+@media screen and (max-width: 500px) {
+  .feed {
+    width: 100%;
+  }
+
+  .feed .post {
+    width: 100%;
+  }
+
+  .openChatlist {
+    width: 100%;
+  }
+
+  .topnav a {
+    font-size: 12px;
+  }
+  
+  #create-post {
+    width: 100%;
+  }
+
+}
+
