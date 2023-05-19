@@ -96,7 +96,14 @@ export class PostCreator {
         console.error(error)
       })
   }
-
+  
+  // Gets all values from the form, and puts it in CreatePostBody type.
+  // CreatePostBody {
+  //  Title:       string
+  //  Content:     string
+  //  Description: string
+  //  Categories:  string[]
+  // }
   private getFormData(): CreatePostBody {
     // Form inputs
     const title = this.form.querySelector<HTMLInputElement>("#post-title"),
