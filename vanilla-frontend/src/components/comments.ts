@@ -7,7 +7,10 @@ export const displayCommentSection = (id: string) => {
       .then((resp) => resp.json())
       .then((comments) => {
       if (!comments) return;
-      const commentSection = document.getElementById(`CS${id}`)!
+      const commentSection = document.getElementById(`CS${id}`) as HTMLElement
+      if (!commentSection){
+        return // Add error handling here
+      }
       // If statement for opening the comment section
       if (commentSection.classList.contains("close")) {
         // Appends the form to the commentSection

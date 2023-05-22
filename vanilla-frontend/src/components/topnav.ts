@@ -14,7 +14,7 @@ export const homeBtn = document.getElementById(
 
 // Opens the create post section of the feed
 export const openCloseCreatePost = () => {
-  const postFormElement = document.getElementById("create-post")!
+  const postFormElement = document.getElementById("create-post") as HTMLElement
   if (postFormElement.classList.contains("close")) {
     // opened.state = true;
     postFormElement.innerHTML = postForm()
@@ -34,7 +34,7 @@ export const openCloseCreatePost = () => {
 
 // Goes to home page
 export const goHome = () => {
-  const postFormElement = document.getElementById("create-post")!
+  const postFormElement = document.getElementById("create-post") as HTMLElement
   // opened.state = false;
   if (postFormElement.classList.contains("open-create-post")) {
     postFormElement.classList.replace("open-create-post", "close-create-post")
@@ -43,11 +43,15 @@ export const goHome = () => {
 }
 
 export const topnavController = () => {
-  document
-    .getElementById("topnav-post")!
-    .addEventListener("click", openCloseCreatePost)
-  document.getElementById("topnav-home")!.addEventListener("click", goHome)
-  document.querySelector(".logout")?.addEventListener("click", logout)
+  const topNavPost = document.getElementById("topnav-post") as HTMLElement
+  const topNavHome = document.getElementById("topnav-post") as HTMLElement
+  const topNavLogout = document.querySelector(".logout") as HTMLElement
+  if (topNavPost && topNavHome && topNavLogout){
+
+  topNavPost.addEventListener("click", openCloseCreatePost)
+  topNavHome.addEventListener("click", goHome)
+  topNavLogout.addEventListener("click", logout)
+  }
 }
 
 // Logs out the user, deletes the cookie from backend.

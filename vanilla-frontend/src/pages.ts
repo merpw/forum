@@ -41,16 +41,18 @@ export const LoginSignup = (): string => {
 			<span class="title">Registration</span>
 
 			<form (submit)="onSubmit()" id="signup-form">
+        <label for="username"></label>
 				<div class="input-field">
 					<input id="username-register" type="text" placeholder="Nickname" required>
 					<i class="uil uil-user-circle"></i>
 				</div>
 
+        <label for="email"></label>
 				<div class="input-field">
 					<input id="email" type="email" placeholder="Email" required>
 					<i class="uil uil-envelope icon"></i>
 				</div>
-
+        <label for="name"></label>
 				<div class="name-fields">
 
 					<div class="input-field">
@@ -66,7 +68,7 @@ export const LoginSignup = (): string => {
 			  	</div>
 
 				<div class="input-field">
-				
+				<label for="age"></label>
 				<input type="date" id="age" name="age"
        			value="Age"
        			min="1900-01-01" max="2020-01-01" required>
@@ -74,22 +76,26 @@ export const LoginSignup = (): string => {
 				</div>
 
 				<div class="input-field">
+				<label for="gender"></label>
 					<input id="gender" type="text" placeholder="Gender" required>
 					<i class="uil uil-android-alt"></i>
 				</div>
 
 				<div class="input-field">
+          <label for="password"></label>
 					<input id="password-register" type="password" class="password" placeholder="Password" required>
 					<i class="uil uil-lock icon"></i>
 				</div>
 				
 				<div class="input-field">
+          <label for="password-register-repeat"></label>
 					<input id="password-register-repeat" type="password" class="password" placeholder="Repeat Password" required>
 					<i class="uil uil-lock icon"></i>
 					<i class="uil uil-eye-slash showHidePw"></i>
 				</div>
 
 				<div class="input-field button">
+          <label for="submit"></label>
 					<input type="submit" value="Sign Up" class="signup">
 				</div>
 
@@ -120,7 +126,7 @@ export const Index = (): string => {
     </div>
 
     <div id="chatlist" class="chatlist">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <a href="#close-chat" class="closebtn" onclick="closeNav()">&times;</a>
         <h2 style="color: white; margin-left: 20px;">Chats:</h2>
         <ul class="chat-users">
             <li class="online">Online user
