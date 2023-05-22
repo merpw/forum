@@ -1,5 +1,6 @@
 import { LoginForm, SignupForm } from "LoginModule"
 import { Auth } from "./auth.js"
+// import { WS } from "../main.js"
 
 
 
@@ -34,10 +35,11 @@ class Login {
         body: JSON.stringify(formData),
       }).then((response) => {
         if (response.ok) {
+          // const WSConn = new WebSocket("wss://localhost:8080/api/ws")
+          // WS.push(WSConn)
           Auth(true)
-          // return response.json();
         } else {
-          // login unsuccessful
+          // TODO: Fix this error handling. It is super bad.
           response.text().then((error) => {
             console.log(`Error: ${error}`)
           })
@@ -85,18 +87,15 @@ class Signup {
 
   private getFormData(): SignupForm {
     // Form inputs
-    const usernameInput =
-        this.form.querySelector<HTMLInputElement>("#username-register"),
-      emailInput = this.form.querySelector<HTMLInputElement>("#email"),
-      passwordInput =
-        this.form.querySelector<HTMLInputElement>("#password-register"),
-      firstNameInput = this.form.querySelector<HTMLInputElement>("#first-name"),
-      lastNameInput = this.form.querySelector<HTMLInputElement>("#last-name"),
-      ageInput = this.form.querySelector<HTMLInputElement>("#age"),
-      genderInput = this.form.querySelector<HTMLInputElement>("#gender"),
-      passwordRepeatInput = this.form.querySelector<HTMLInputElement>(
-        "#password-register-repeat"
-      )
+    const 
+    usernameInput = this.form.querySelector<HTMLInputElement>("#username-register"),
+    emailInput = this.form.querySelector<HTMLInputElement>("#email"),
+    passwordInput = this.form.querySelector<HTMLInputElement>("#password-register"),
+    firstNameInput = this.form.querySelector<HTMLInputElement>("#first-name"),
+    lastNameInput = this.form.querySelector<HTMLInputElement>("#last-name"),
+    ageInput = this.form.querySelector<HTMLInputElement>("#age"),
+    genderInput = this.form.querySelector<HTMLInputElement>("#gender"),
+    passwordRepeatInput = this.form.querySelector<HTMLInputElement>("#password-register-repeat")
 
     if (
       firstNameInput &&
@@ -162,6 +161,7 @@ export const loginController = () => {
     new Signup(signupForm)
     new Login(loginForm)
   } else {
+    console.error("Something went wrong.")
     // TODO: error handling here maybe?
 }
 }

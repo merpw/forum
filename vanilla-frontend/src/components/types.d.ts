@@ -64,3 +64,18 @@ declare module "ContentModule" {
     Dislikes: number
   }
 }
+
+declare module "Chat" {
+  export type ActiveUser = {
+    Name: string
+    ID: number
+    Online: boolean
+    UnreadMSG: boolean
+  }
+
+  export type InactiveUser = {
+    Name: string
+    ID: number
+    Online: boolean
+  }
+}
