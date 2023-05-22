@@ -186,6 +186,48 @@ export const commentForm = (postId: string): string => {
 	`
 }
 
+export const errorPage = (errorcode: number): string => {
+	let errorHTML: string;
+	switch(errorcode){
+		case 400:
+			errorHTML = `
+			<h1 class="error-code">${errorcode.toString()}:</h1>
+			<br>
+			<h1 class="error-title">Bad request</h1>
+		`
+		break
+		case 401:
+			errorHTML = `
+			<h1 class="error-code">${errorcode.toString()}:</h1>
+			<br>
+			<h1 class="error-title">Unauthorized.</h1>
+		`
+			break
+		case 404:
+			errorHTML = `
+			<h1 class="error-code">${errorcode.toString()}:</h1>
+			<br>
+			<h1 class="error-title">Not found.</h1>
+		`
+		break
+		case 405:
+			errorHTML = `
+			<h1 class="error-code">${errorcode.toString()}:</h1>
+			<br>
+			<h1 class="error-title">Method not allowed.</h1>
+		`
+		break
+		default:
+			errorHTML = `
+			<h1 class="error-code">${errorcode.toString()}:</h1>
+			<br>
+			<h1 class="error-title">Internal server error.</h1>
+		`
+
+	}
+	return errorHTML
+}
+
 /*
 <div class="chat-window hide">
     <ul class="messages-display"></ul>

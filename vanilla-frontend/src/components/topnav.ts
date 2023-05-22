@@ -1,4 +1,5 @@
-import { postForm } from "../pages.js"
+import { superDivision } from "../main.js"
+import { errorPage, postForm } from "../pages.js"
 import { Auth } from "./auth.js"
 import { PostCreator, displayPosts } from "./posts.js"
 
@@ -15,8 +16,8 @@ export const homeBtn = document.getElementById(
 // Opens the create post section of the feed
 export const openCloseCreatePost = () => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
+  if (!postFormElement) return;
   if (postFormElement.classList.contains("close")) {
-    // opened.state = true;
     postFormElement.innerHTML = postForm()
     postFormElement.classList.replace("close", "open")
     const createPostForm = document.querySelector<HTMLFormElement>("#post-form")
@@ -25,7 +26,6 @@ export const openCloseCreatePost = () => {
     }
     return
   } else {
-    // opened.state = false;
     postFormElement.innerHTML = ""
     postFormElement.classList.replace("open", "close")
     return
@@ -35,7 +35,6 @@ export const openCloseCreatePost = () => {
 // Goes to home page
 export const goHome = () => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
-  // opened.state = false;
   if (postFormElement.classList.contains("open-create-post")) {
     postFormElement.classList.replace("open-create-post", "close-create-post")
   }
@@ -47,10 +46,9 @@ export const topnavController = () => {
   const topNavHome = document.getElementById("topnav-post") as HTMLElement
   const topNavLogout = document.querySelector(".logout") as HTMLElement
   if (topNavPost && topNavHome && topNavLogout){
-
-  topNavPost.addEventListener("click", openCloseCreatePost)
-  topNavHome.addEventListener("click", goHome)
-  topNavLogout.addEventListener("click", logout)
+    topNavPost.addEventListener("click", openCloseCreatePost)
+    topNavHome.addEventListener("click", goHome)
+    topNavLogout.addEventListener("click", logout)
   }
 }
 
@@ -64,11 +62,12 @@ const logout = () => {
   })
     .then((response) => {
       if (response.ok) {
-        console.log("cookie removed. Logging out.")
+        // WS[0].close(1000, "User logging out. Closing connection.")
+        // WS.pop()
         Auth(false)
+      } else {
+        superDivision.innerHTML = errorPage(response.status)
+        return
       }
-    })
-    .catch((error) => {
-      console.error(error)
     })
 }
