@@ -11,11 +11,16 @@ export const displayPosts = (endpoint: string) => {
     .then((posts) => {
       // Posts is the array of objects sent by the server
       for (const post of posts) {
+          console.log(post)
+          const date = new Date(post.date)
+          const formatDate = date.toLocaleString('en-GB', { timeZone: 'EET' })
+  
        const postDiv = formattedPost (
             post.id.toString(),
             post.title,
             post.author.name,
             post.author.id.toString(),
+            formatDate,
             post.categories,
             post.content,
             post.comments_count.toString(),
@@ -128,6 +133,7 @@ const formattedPost = (
   title: string,
   author: string,
   authorId: string,
+  dateAndTime: string,
   category: string,
   content: string,
   commentCount: string,
@@ -149,12 +155,12 @@ const formattedPost = (
   titleContent.textContent = `${title}`
   postTitle.appendChild(titleContent)
 
-  // Creates the author div
+  // Creates the author and time div
   const postAuthor = document.createElement("div")
   postAuthor.className = "post-author"
   postAuthor.id = `${authorId}`
-  postAuthor.textContent = `by ${author}`
-
+  postAuthor.textContent = `by ${author} at ${dateAndTime}`
+  
   // Creates the category div 
   const postCategories = document.createElement("div")
   postCategories.className = "post-categories"
@@ -238,7 +244,7 @@ const formattedPost = (
  //  <div class="post" id="${id}">
  //    <div class="post-information">
  //      <div class="post-title"><h4>${title}</h4></div>
- //      <div class="post-author" id="${authorId}">by ${author}</div>
+ //      <div class="post-author" id="${authorId}">by ${author} at ${date}</div>
  //      <div class="post-categories">#${category}</div>
  //      <hr>
  //  	</div>

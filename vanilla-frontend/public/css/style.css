@@ -165,7 +165,7 @@ body {
 }
 
 .form a.text {
-  color: #4070f4;
+  color: blue;
   text-decoration: none;
 }
 
@@ -184,7 +184,7 @@ body {
   font-weight: 500;
   letter-spacing: 1px;
   border-radius: 6px;
-  background-color: #4070f4;
+  background-color: blue;
   cursor: pointer;
   transition: all 0.3s ease;
 }
@@ -376,6 +376,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
   transition: 0.3s ease;
+  overflow: hidden;
 }
 
 .post:hover {
@@ -512,6 +513,7 @@ body {
 #create-post {
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   height: 230px;
   width: 500px;
   padding: 6px 0px 6px 0px;
@@ -540,7 +542,7 @@ body {
 
 #post-content {
   margin: 5px;
-  width: 400px;
+  width: 100%;
   border-radius: 5px;
 }
 
@@ -570,7 +572,11 @@ body {
 /* On smaller screens, where width is less than 500px, change the style of the chatlist (less padding and a smaller font size) */
 @media screen and (max-width: 500px) {
   .feed {
-    width: 100%;
+    width: 80%;
+  }
+
+  #posts-display {
+    width: 90%;
   }
 
   .feed .post {
@@ -586,7 +592,8 @@ body {
   }
   
   #create-post {
-    width: 100%;
+    width: 80%;
+    padding: 6px;
   }
 
 }

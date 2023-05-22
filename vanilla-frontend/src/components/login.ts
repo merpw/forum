@@ -132,20 +132,20 @@ class Signup {
 // All functionality for the login/signup form
 export const loginController = () => {
   const loginSignupForm = document.querySelector(".container") as HTMLElement,
-    pwShowHide = document.querySelectorAll(
-      ".showHidePw"
-    ) as NodeListOf<HTMLElement>,
-    pwFields = document.querySelectorAll(
-      ".password"
-    ) as NodeListOf<HTMLInputElement>,
+    // pwShowHide = document.querySelectorAll(
+    //   ".showHidePw"
+    // ) as NodeListOf<HTMLElement>,
+    // pwFields = document.querySelectorAll(
+    //   ".password"
+    // ) as NodeListOf<HTMLInputElement>, WHY IS THIS REMOVED..? WILL FIX AT HOME. 
     signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
     loginLink = document.querySelector(".login-link") as HTMLInputElement
 
   loginSignupForm.classList.remove("active")
 
   // To show/hide password in Auth form.
-  pwShowHide.forEach((eyeIcon) => {
-  })
+  // pwShowHide.forEach((eyeIcon) => {
+  // }) SOMEHOW THIS GOT REMOVED... WHY?
   // To go from login to sign in.
   signUpLink?.addEventListener("click", () => {
     loginSignupForm.classList.add("active")
