@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next"
 
+// TODO: revalidate app router pages
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // Secret token is optional, by default frontend /api/ is not public
   if (req.query.secret !== process.env.FRONTEND_REVALIDATE_TOKEN) {
@@ -11,11 +13,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const url = req.query.url as string
-    await res.revalidate(url)
+    if (!url) {
+      return res.status(400).send("No url provided")
+    }
+
     return res.json({ revalidated: true })
   } catch (err) {
-    if ((err as Error).message.includes("Invalid response 404")) {
-      return res.status(400).send("Revalidated page is 404")
+    if ((err as Error).message.includes("Invalid response")) {
+      return res.status(400).send((err as Error).message)
     }
     console.error(err)
     return res.status(500).send("Error revalidating")
