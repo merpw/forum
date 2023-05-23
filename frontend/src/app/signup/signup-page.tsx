@@ -1,12 +1,12 @@
-import { NextPage } from "next"
-import { useRouter } from "next/router"
+"use client"
+
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { NextSeo } from "next-seo"
 
 import { logIn, SignUp, useMe } from "@/api/auth"
 import { FormError } from "@/components/error"
 
-const SignupPage: NextPage = () => {
+const SignupPage = () => {
   const router = useRouter()
 
   const { isLoading, isLoggedIn, mutate } = useMe()
@@ -49,8 +49,6 @@ const SignupPage: NextPage = () => {
 
   return (
     <>
-      <NextSeo title={"Sign Up"} />
-
       <form
         onChange={(e) => {
           const target = e.target as HTMLInputElement
