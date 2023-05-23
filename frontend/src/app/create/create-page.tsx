@@ -13,7 +13,7 @@ import { CreatePost, generateDescription } from "@/api/posts/create"
 import { FormError } from "@/components/error"
 import { Capitalize } from "@/helpers/text"
 
-const Markdown = dynamic(() => import("@/components/markdown"))
+const Markdown = dynamic(() => import("@/components/markdown/markdown"))
 
 const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
   categories,
