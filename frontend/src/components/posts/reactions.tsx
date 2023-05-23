@@ -1,6 +1,8 @@
+"use client"
+
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { FC, useEffect } from "react"
 
 import { useMe } from "@/api/auth"

@@ -9,7 +9,7 @@ const nextConfig = {
   //   scrollRestoration: true,
   // },
   async rewrites() {
-    if (process.env.DEV_FORUM_BACKEND_REWRITE_URL) {
+    if (process.env.DEV_FORUM_BACKEND_REWRITE_URL.includes("http") !== undefined) {
       return [
         {
           source: "/api/:path*",
