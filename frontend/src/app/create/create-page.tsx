@@ -1,8 +1,8 @@
-import { GetServerSideProps, NextPage } from "next"
-import { useRouter } from "next/router"
+"use client"
+
+import { useRouter } from "next/navigation"
 import { FC, useEffect, useId, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
-import { NextSeo } from "next-seo"
 import Select from "react-select"
 import { remark } from "remark"
 import stripMarkdown from "strip-markdown"
@@ -11,12 +11,11 @@ import dynamic from "next/dynamic"
 import { useMe } from "@/api/auth"
 import { CreatePost, generateDescription } from "@/api/posts/create"
 import { FormError } from "@/components/error"
-import { getCategoriesLocal } from "@/api/posts/fetch"
 import { Capitalize } from "@/helpers/text"
 
 const Markdown = dynamic(() => import("@/components/markdown"))
 
-const CreatePostPage: NextPage<{ categories: string[]; isAIEnabled: boolean }> = ({
+const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
   categories,
   isAIEnabled,
 }) => {
@@ -31,13 +30,7 @@ const CreatePostPage: NextPage<{ categories: string[]; isAIEnabled: boolean }> =
     }
   }, [router, isLoggedIn, isRedirecting, isLoading])
 
-  return (
-    <>
-      <NextSeo title={"Create new post"} />
-
-      <CreatePostForm categories={categories} isAIEnabled={isAIEnabled} />
-    </>
-  )
+  return <CreatePostForm categories={categories} isAIEnabled={isAIEnabled} />
 }
 
 const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
@@ -248,16 +241,6 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
       </button>
     </form>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const categories = await getCategoriesLocal()
-  return {
-    props: {
-      categories,
-      isAIEnabled: !!process.env.OPENAI_API_KEY,
-    },
-  }
 }
 
 export default CreatePostPage
