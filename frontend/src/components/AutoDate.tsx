@@ -1,8 +1,11 @@
-/* eslint-disable import/no-named-as-default-member */ // https://github.com/iamkun/dayjs/issues/1242
+"use client"
+
+/* eslint-disable import/no-named-as-default-member */
+// https://github.com/iamkun/dayjs/issues/1242
 import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 
 const REFRESH_INTERVAL = 30 * 1000
 
@@ -32,4 +35,14 @@ const useDates = (date: string | number) => {
   return { localDate, relativeDate }
 }
 
-export default useDates
+const AutoDate: FC<{ date: string | number; className?: string }> = ({ date, className }) => {
+  const { localDate, relativeDate } = useDates(date)
+
+  return (
+    <span suppressHydrationWarning title={localDate} className={className}>
+      {relativeDate}
+    </span>
+  )
+}
+
+export default AutoDate

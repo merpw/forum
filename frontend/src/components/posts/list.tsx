@@ -6,7 +6,7 @@ import { FC } from "react"
 import { Category, CommentsCount, ReactionsButtons } from "./reactions"
 
 import { Post } from "@/custom"
-import useDates from "@/helpers/dates"
+import AutoDate from "@/components/AutoDate"
 
 export const PostList: FC<{ posts: Post[] }> = ({ posts }) => {
   if (posts.length == 0) {
@@ -22,8 +22,6 @@ export const PostList: FC<{ posts: Post[] }> = ({ posts }) => {
 }
 
 const PostCard: FC<{ post: Post }> = ({ post }) => {
-  const { localDate, relativeDate } = useDates(post.date)
-
   return (
     <div
       className={
@@ -46,9 +44,7 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
         <CommentsCount post={post} />
         <Category post={post} />
         <span className={"ml-auto"}>
-          <span suppressHydrationWarning title={localDate}>
-            {relativeDate}
-          </span>
+          <AutoDate date={post.date} />
           {" by "}
           <span className={"clickable text-xl"}>
             <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
