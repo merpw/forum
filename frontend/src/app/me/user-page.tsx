@@ -1,10 +1,12 @@
-/* eslint-disable import/no-named-as-default-member */ /* https://github.com/iamkun/dayjs/issues/1242 */
+"use client"
+
+/* eslint-disable import/no-named-as-default-member */
+/* https://github.com/iamkun/dayjs/issues/1242 */
 import dayjs from "dayjs"
 import Link from "next/link"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { NextPage } from "next/types"
 import { FC, useEffect, useState } from "react"
-import { NextSeo } from "next-seo"
 import relativeTime from "dayjs/plugin/relativeTime"
 
 import { useMe } from "@/api/auth"
@@ -38,8 +40,6 @@ const UserPage: NextPage = () => {
 
   return (
     <>
-      <NextSeo title={"Profile"} />
-
       <UserInfo user={user} />
       <Link href={"/create"} className={"clickable text-2xl mb-5 flex gap-1 max-w-fit"}>
         <span className={"my-auto"}>
