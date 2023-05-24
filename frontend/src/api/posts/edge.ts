@@ -29,3 +29,9 @@ export const getUserPostsLocal = (user_id: number): Promise<Post[]> =>
     if (!res.ok) throw new Error("Network response was not ok")
     return res.json()
   })
+
+export const getCategoryPostsLocal = (category: string): Promise<Post[]> =>
+  fetch(`${process.env.FORUM_BACKEND_PRIVATE_URL}/api/posts/categories/${category}`).then((res) => {
+    if (!res.ok) throw new Error("Network response was not ok")
+    return res.json()
+  })
