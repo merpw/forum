@@ -12,7 +12,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
   if (isNaN(id)) {
     return notFound()
   }
-  const post = await getPostLocal(id)
+  const post = await getPostLocal(id).catch(notFound)
 
   return {
     title: post.title,
@@ -32,14 +32,10 @@ export const generateStaticParams = async () => {
 }
 
 const Page = async ({ params }: { params: { id: string } }) => {
-  const id = +params.id
-  if (isNaN(id)) {
-    return notFound()
-  }
-  const post = await getPostLocal(id)
+  const post = await getPostLocal(+params.id)
   post.content = await RenderMarkdown(post.content)
 
-  const comments = await getPostCommentsLocal(+params.id)
+  const comments = await getPostCommentsLocal(+params.id).catch(() => [])
 
   return <PostPage post={post} comments={comments} />
 }
