@@ -7,6 +7,8 @@ import { Capitalize } from "@/helpers/text"
 
 type Props = { params: { name: string } }
 
+export const revalidate = 60
+
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const posts = await getCategoryPostsLocal(params.name).catch(notFound)
 

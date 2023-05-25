@@ -7,6 +7,8 @@ import { getUserPostsLocal } from "@/api/posts/edge"
 
 type Props = { params: { id: string } }
 
+export const revalidate = 60
+
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const id = +params.id
   if (isNaN(id)) {
