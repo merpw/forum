@@ -20,9 +20,9 @@ export const LoginSignup = (): string => {
 				<div class="checkbox-text">
 					<div class="checkbox-content">
 						<input type="checkbox" id="logCheck">
-						<label for="logCheck" class="text">Remember me</label>
+						<label for="forgot-pw" class="text">Remember me</label>
 					</div>
-					<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="text">Forgot password?</a>
+					<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="text" id="forgot-pw">Forgot password?</a>
 				</div>
 
 				<div class="input-field button">
@@ -41,26 +41,27 @@ export const LoginSignup = (): string => {
 			<span class="title">Registration</span>
 
 			<form (submit)="onSubmit()" id="signup-form">
-        <label for="username"></label>
+        <label for="username-register"></label>
 				<div class="input-field">
 					<input id="username-register" type="text" placeholder="Nickname" required>
 					<i class="uil uil-user-circle"></i>
 				</div>
 
-        <label for="email"></label>
 				<div class="input-field">
+          <label for="email"></label>
 					<input id="email" type="email" placeholder="Email" required>
 					<i class="uil uil-envelope icon"></i>
 				</div>
-        <label for="name"></label>
 				<div class="name-fields">
 
 					<div class="input-field">
+            <label for="first-name"></label>
 						<input id="first-name" type="text" placeholder="First name" required>
 						<i class="uil uil-user"></i>
 					</div>
 		  
 					<div class="input-field">
+            <label for="last-name"></label>
 						<input id="last-name" type="text" placeholder="Last name" required>
 						<i class="uil uil-user"></i>
 					</div>
@@ -82,7 +83,7 @@ export const LoginSignup = (): string => {
 				</div>
 
 				<div class="input-field">
-          <label for="password"></label>
+          <label for="password-register"></label>
 					<input id="password-register" type="password" class="password" placeholder="Password" required>
 					<i class="uil uil-lock icon"></i>
 				</div>
@@ -115,7 +116,7 @@ export const LoginSignup = (): string => {
 export const Index = (): string => {
   return `
     <div class="topnav" id="myTopnav">
-        <a href="#chat" onclick="openNav()"><i class='bx bx-chat' ></i> Chat</a>
+        <a id="topnav-chat"><i class='bx bx-chat' ></i> Chat</a>
 		<a id="topnav-post" href="#post">
 		<i class='bx bx-duplicate' ></i> Post
 		</a>
@@ -126,30 +127,26 @@ export const Index = (): string => {
     </div>
 
     <div id="chatlist" class="chatlist">
-        <a href="#close-chat" class="closebtn" onclick="closeNav()">&times;</a>
-        <h2 style="color: white; margin-left: 20px;">Chats:</h2>
-        <ul class="chat-users">
-            <li class="online">Online user
-                <i class='bx bx-message-dots'></i>
-            </li>
-            <li class="offline">Offline user</li>
-        </ul>
+        <a href="#close-chat" id="chat-close" class="closebtn"><i class='bx bx-x'></i></a>
+        <h2 style="color: white; margin-left: 20px;">Online:</h2>
+        <ul id="online-users" class="chat-users"></ul>
+        <h2 style="color: white; margin-left: 20px;">Offline:</h2>
+        <ul id="offline-users" class="chat-users"></ul>
     </div>
-
-<section id="create-post" class="close">
-
-</section>
-<section class="feed">
-        <div class="categories">
-		<span class="title">Categories:</span>
-			<div class="category-selection">
-				<h3 class="category-title" id="category-facts">#facts</h3>
-				<h3 class="category-title" id="category-rumors">#rumors</h3>
-				<h3 class="category-title" id="category-other">#other</h3>
-			</div>
-		</div>
-		<div id="posts-display"></div>
-</section>
+<main id="main">
+  <section id="create-post" class="close"></section>
+  <section id="feed">
+          <div class="categories">
+      <span class="title">Categories:</span>
+        <div class="category-selection">
+          <h3 class="category-title" id="category-facts">#facts</h3>
+          <h3 class="category-title" id="category-rumors">#rumors</h3>
+          <h3 class="category-title" id="category-other">#other</h3>
+        </div>
+      </div>
+      <div id="posts-display"></div>
+  </section>
+</main>
 `
 }
 
@@ -157,12 +154,12 @@ export const postForm = (): string => {
   return `
 <span class="title">New post:</span>
 <form id="post-form" (submit)="onSubmit()">
-	<div id="create-post-flexbox">
-		<input id="post-title" placeholder="Title"></input>
-	</div>
-
-	<textarea id="post-content" rows=5 style="resize: none;" type="text"></textarea>
-
+	<input id="post-title" placeholder="Title"></input>
+	<textarea id="post-content" 
+            rows=5 
+            style="resize: none;" 
+            type="text" 
+            placeholder="Write something..."></textarea>
 	<div id="create-post-footer">
 		<select id="post-category" name="post-category">
 			<option value="facts">Facts</option>
@@ -178,54 +175,57 @@ export const postForm = (): string => {
 export const commentForm = (postId: string): string => {
   return `
 	<form id="comment-form-${postId}" (submit)="onSubmit()">	
-		<textarea id="comment-content" rows=5 maxlength="250" style="resize: none;" type="text"></textarea>
+		<textarea id="comment-content" 
+              rows=5 maxlength="250" 
+              style="resize: none;" 
+              type="text"
+              placeholder="Write something..."></textarea>
 		<div id="create-post-footer">
-			<input class="comment-submit" type="submit" value="Post">
+			<input class="comment-submit" type="submit" value="Comment">
 		</div>	
 	</form>
 	`
 }
 
 export const errorPage = (errorcode: number): string => {
-	let errorHTML: string;
-	switch(errorcode){
-		case 400:
-			errorHTML = `
+  let errorHTML: string
+  switch (errorcode) {
+    case 400:
+      errorHTML = `
 			<h1 class="error-code">${errorcode.toString()}:</h1>
 			<br>
 			<h1 class="error-title">Bad request</h1>
 		`
-		break
-		case 401:
-			errorHTML = `
+      break
+    case 401:
+      errorHTML = `
 			<h1 class="error-code">${errorcode.toString()}:</h1>
 			<br>
 			<h1 class="error-title">Unauthorized.</h1>
 		`
-			break
-		case 404:
-			errorHTML = `
+      break
+    case 404:
+      errorHTML = `
 			<h1 class="error-code">${errorcode.toString()}:</h1>
 			<br>
 			<h1 class="error-title">Not found.</h1>
 		`
-		break
-		case 405:
-			errorHTML = `
+      break
+    case 405:
+      errorHTML = `
 			<h1 class="error-code">${errorcode.toString()}:</h1>
 			<br>
 			<h1 class="error-title">Method not allowed.</h1>
 		`
-		break
-		default:
-			errorHTML = `
+      break
+    default:
+      errorHTML = `
 			<h1 class="error-code">${errorcode.toString()}:</h1>
 			<br>
 			<h1 class="error-title">Internal server error.</h1>
 		`
-
-	}
-	return errorHTML
+  }
+  return errorHTML
 }
 
 /*

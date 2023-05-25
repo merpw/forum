@@ -1,0 +1,2590 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>database: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">forum/database/init.go (100.0%)</option>
+				
+				<option value="file1">forum/database/migrate/helpers.go (88.9%)</option>
+				
+				<option value="file2">forum/database/migrate/migrate.go (48.8%)</option>
+				
+				<option value="file3">forum/database/migrate/migrations/v001.go (60.0%)</option>
+				
+				<option value="file4">forum/database/migrate/migrations/v002.go (37.5%)</option>
+				
+				<option value="file5">forum/database/migrate/migrations/v003.go (37.5%)</option>
+				
+				<option value="file6">forum/database/migrate/migrations/v004.go (37.5%)</option>
+				
+				<option value="file7">forum/database/ops_chats.go (0.0%)</option>
+				
+				<option value="file8">forum/database/ops_comments.go (70.0%)</option>
+				
+				<option value="file9">forum/database/ops_posts.go (65.2%)</option>
+				
+				<option value="file10">forum/database/ops_reactions.go (73.9%)</option>
+				
+				<option value="file11">forum/database/ops_sessions.go (54.5%)</option>
+				
+				<option value="file12">forum/database/ops_users.go (75.6%)</option>
+				
+				<option value="file13">forum/server/handlers_auth.go (60.8%)</option>
+				
+				<option value="file14">forum/server/handlers_internal.go (0.0%)</option>
+				
+				<option value="file15">forum/server/handlers_posts.go (85.7%)</option>
+				
+				<option value="file16">forum/server/handlers_posts_category.go (83.3%)</option>
+				
+				<option value="file17">forum/server/handlers_posts_create.go (80.4%)</option>
+				
+				<option value="file18">forum/server/handlers_posts_id.go (81.2%)</option>
+				
+				<option value="file19">forum/server/handlers_posts_id_comment.go (62.7%)</option>
+				
+				<option value="file20">forum/server/handlers_reactions.go (0.0%)</option>
+				
+				<option value="file21">forum/server/handlers_user.go (56.1%)</option>
+				
+				<option value="file22">forum/server/handlers_utils.go (41.7%)</option>
+				
+				<option value="file23">forum/server/regexps.go (100.0%)</option>
+				
+				<option value="file24">forum/server/start.go (86.2%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package database
+
+import (
+        "database/sql"
+        "forum/database/migrate"
+
+        _ "github.com/mattn/go-sqlite3"
+)
+
+type DB struct {
+        *sql.DB
+}
+
+func (db DB) InitDatabase() error <span class="cov8" title="1">{
+        return migrate.Migrate(db.DB, migrate.LATEST)
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package migrate
+
+import (
+        "database/sql"
+        "fmt"
+)
+
+// GetVersion returns the current database version (user_version pragma)
+func GetVersion(db *sql.DB) (int, error) <span class="cov8" title="1">{
+        var version int
+        err := db.QueryRow("PRAGMA user_version").Scan(&amp;version)
+        if err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+        <span class="cov8" title="1">return version, nil</span>
+}
+
+// SetVersion sets the current database version (user_version pragma)
+func SetVersion(db *sql.DB, version int) error <span class="cov8" title="1">{
+        _, err := db.Exec(fmt.Sprintf("PRAGMA user_version = %d", version))
+        return err
+}</span>
+
+// Check checks the database for errors (integrity_check pragma)
+func Check(db *sql.DB) error <span class="cov8" title="1">{
+        _, err := db.Exec("PRAGMA integrity_check")
+        return err
+}</span>
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package migrate
+
+import (
+        "bufio"
+        "database/sql"
+        "errors"
+        "fmt"
+        . "forum/database/migrate/migrations"
+        "io"
+        "log"
+        "os"
+        "strings"
+)
+
+// LATEST is latest available revision
+var LATEST = len(Migrations)
+
+// Migrate migrates the database to the specified revision
+//
+// If the database is empty, it will create the initial schema
+func Migrate(db *sql.DB, toRevision int) error <span class="cov8" title="1">{
+        err := Check(db)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("database precheck failed: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">dbRevision, err := GetVersion(db)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov8" title="1">if dbRevision == toRevision </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+
+        <span class="cov8" title="1">if toRevision &gt; LATEST || toRevision &lt; 1 </span><span class="cov0" title="0">{
+                return fmt.Errorf("invalid revision %d, availible revisions 1..%d", toRevision, LATEST)
+        }</span>
+
+        <span class="cov8" title="1">if dbRevision &gt; LATEST || dbRevision &lt; 0 </span><span class="cov0" title="0">{
+                return fmt.Errorf("database revision %d is not supported, supported revisions 1..%d",
+                        dbRevision, LATEST)
+        }</span>
+
+        <span class="cov8" title="1">if dbRevision == 0 </span><span class="cov8" title="1">{
+                log.Printf("Empty/unknown database, initial schema will be created")
+        }</span>
+
+        <span class="cov8" title="1">if dbRevision &gt; toRevision </span><span class="cov0" title="0">{
+                log.Printf(`WARNING: migrating database DOWN from %d to %d
+Down migrations may remove columns and tables, so some data can be lost. Make sure you have a backup.
+If you still want to continue, type YES, otherwise press Ctrl+C to abort.
+`, dbRevision, toRevision)
+                reader := bufio.NewReader(os.Stdin)
+                text, err := reader.ReadString('\n')
+                if err != nil &amp;&amp; !errors.Is(err, io.EOF) </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">if strings.TrimSpace(text) != "YES" </span><span class="cov0" title="0">{
+                        return fmt.Errorf("aborted by user")
+                }</span>
+                <span class="cov0" title="0">for i := dbRevision; i &gt; toRevision; i-- </span><span class="cov0" title="0">{
+                        err := Migrations[i-1].Down(db)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                        <span class="cov0" title="0">err = SetVersion(db, i-1)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                }
+        } else<span class="cov8" title="1"> {
+                log.Printf("Migrating database up from revision %d to %d", dbRevision, toRevision)
+                for i := dbRevision; i &lt; toRevision; i++ </span><span class="cov8" title="1">{
+                        err := Migrations[i].Up(db)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                        <span class="cov8" title="1">err = SetVersion(db, i+1)
+                        if err != nil </span><span class="cov0" title="0">{
+                                return err
+                        }</span>
+                }
+        }
+
+        <span class="cov8" title="1">err = Check(db)
+        if err != nil </span><span class="cov0" title="0">{
+                return fmt.Errorf("database postcheck failed: %w", err)
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package migrations
+
+import (
+        "database/sql"
+        "fmt"
+)
+
+// V001 is the initial revision. It creates the tables users, posts, comments, sessions and reactions.
+var v001 = Migration{
+        Up: func(db *sql.DB) error <span class="cov8" title="1">{
+                _, err := db.Exec(`
+                CREATE TABLE IF NOT EXISTS users (
+                        id INTEGER PRIMARY KEY,
+                        name TEXT,
+                        email TEXT,
+                        password TEXT
+                );
+                CREATE TABLE IF NOT EXISTS posts (
+                        id INTEGER PRIMARY KEY,
+                        title TEXT,
+                        content TEXT,
+                        author INTEGER,
+                        date TEXT,
+                        likes_count INTEGER,
+                        dislikes_count INTEGER,
+                        comments_count INTEGER,
+                        categories TEXT,
+                        FOREIGN KEY(author) REFERENCES users(id)
+                );
+                CREATE TABLE IF NOT EXISTS comments (
+                        id INTEGER PRIMARY KEY,
+                        post_id INTEGER,
+                        author_id INTEGER,                                        
+                        content TEXT,
+                        date TEXT,
+                        likes_count INTEGER,
+                        dislikes_count INTEGER,
+                        FOREIGN KEY(post_id) REFERENCES posts(id),
+                        FOREIGN KEY(author_id) REFERENCES users(id)
+                );
+                CREATE TABLE IF NOT EXISTS sessions (
+                        id INTEGER PRIMARY KEY,
+                        token TEXT,
+                        expire INTEGER,
+                        user_id INTEGER,
+                        FOREIGN KEY(user_id) REFERENCES users(id)
+        );
+                CREATE TABLE IF NOT EXISTS post_reactions (
+                        id INTEGER PRIMARY KEY,
+                        post_id INTEGER,
+                        author_id INTEGER,
+                        reaction INTEGER,
+                        FOREIGN KEY(author_id) REFERENCES users(id),
+                    FOREIGN KEY(post_id) REFERENCES posts(id)
+                );
+                CREATE TABLE IF NOT EXISTS comment_reactions (
+                        id INTEGER PRIMARY KEY,
+                        comment_id INTEGER,
+                        author_id INTEGER,
+                        reaction INTEGER,
+                        FOREIGN KEY(author_id) REFERENCES users(id),
+                    FOREIGN KEY(comment_id) REFERENCES comments(id)
+                )`)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return nil</span>
+        },
+        Down: func(db *sql.DB) error <span class="cov0" title="0">{
+                return fmt.Errorf("cannot rollback initial revision")
+        }</span>,
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package migrations
+
+import "database/sql"
+
+// v002 makes all fields in all tables NOT NULL
+var v002 = Migration{
+        Up: func(db *sql.DB) error <span class="cov8" title="1">{
+                _, err := db.Exec(`
+                PRAGMA writable_schema = 1;
+                UPDATE sqlite_master SET sql = REPLACE(sql, 'TEXT', 'TEXT NOT NULL');
+                UPDATE sqlite_master SET sql = REPLACE(sql, 'INTEGER', 'INTEGER NOT NULL');
+                UPDATE sqlite_master SET sql = REPLACE(sql, 'NOT NULL PRIMARY KEY', 'PRIMARY KEY');
+                UPDATE sqlite_master SET sql = REPLACE(sql, 'NOT NULL NOT NULL', 'NOT NULL');
+                PRAGMA writable_schema = 0;
+                VACUUM;
+`)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return nil</span>
+        },
+
+        Down: func(db *sql.DB) error <span class="cov0" title="0">{
+                _, err := db.Exec(`
+                PRAGMA writable_schema = 1;
+                UPDATE sqlite_master SET sql = REPLACE(sql, 'TEXT NOT NULL', 'TEXT');
+                UPDATE sqlite_master SET sql = REPLACE(sql, 'INTEGER NOT NULL', 'INTEGER');
+                PRAGMA writable_schema = 0;
+                VACUUM;
+`)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        },
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package migrations
+
+import "database/sql"
+
+// v003 adds a description field to the post table
+//
+// For already existing posts, the description is set to the first 200 characters of the content
+var v003 = Migration{
+        Up: func(db *sql.DB) error <span class="cov8" title="1">{
+                _, err := db.Exec(`
+                ALTER TABLE posts
+                        ADD COLUMN description TEXT NOT NULL default '';
+                UPDATE posts
+                        SET description = SUBSTR(content, 0, 200)
+                        WHERE description = '';
+                UPDATE posts
+                        SET description = description || '...'
+                        WHERE length(description) = 199;
+                `)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return nil</span>
+        },
+
+        Down: func(db *sql.DB) error <span class="cov0" title="0">{
+                _, err := db.Exec(`
+                ALTER TABLE posts
+                        DROP COLUMN description
+                `)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        },
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package migrations
+
+import (
+        "database/sql"
+)
+
+var v004 = Migration{
+        Up: func(db *sql.DB) error <span class="cov8" title="1">{
+                _, err := db.Exec(`
+                ALTER TABLE users ADD COLUMN first_name TEXT;
+                ALTER TABLE users ADD COLUMN last_name TEXT;
+                ALTER TABLE users ADD COLUMN dob TEXT;
+                ALTER TABLE users ADD COLUMN gender TEXT;
+`)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov8" title="1">return nil</span>
+        },
+
+        Down: func(db *sql.DB) error <span class="cov0" title="0">{
+
+                _, err := db.Exec(`
+                ALTER TABLE users DROP COLUMN first_name;
+                ALTER TABLE users DROP COLUMN last_name;
+                ALTER TABLE users DROP COLUMN dob;
+                ALTER TABLE users DROP COLUMN gender;
+                VACUUM;
+`)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">return nil</span>
+        },
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package database
+
+import (
+        "log"
+        "time"
+)
+
+// AddChat adds chat to database, returns id of new chat
+func (db DB) AddChat() int <span class="cov0" title="0">{
+        result, err := db.Exec("INSERT INTO chats (last_message_date) VALUES (?)", time.Now().Format(time.RFC3339))
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov0" title="0">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov0" title="0">return int(id)</span>
+}
+
+// GetChatsByUserId reads chats from database by user_id, does not require user to be logged in
+func (db DB) GetChatsByUserId(userId int) []Chat <span class="cov0" title="0">{
+        query, err := db.Query("SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?)", userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov0" title="0">var chats []Chat
+        for query.Next() </span><span class="cov0" title="0">{
+                var chat Chat
+                err = query.Scan(&amp;chat.Id, &amp;chat.LastMessageDate)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov0" title="0">chats = append(chats, chat)</span>
+        }
+        <span class="cov0" title="0">query.Close()
+
+        return chats</span>
+}
+
+/** GetPrivateChatsByUserId reads private chats from database by user_id, does not require user to be logged in
+ *  Returns nil if no such chats exist.
+ */
+func (db DB) GetPrivateChatsByUserId(userId int) []Chat <span class="cov0" title="0">{
+        query, err := db.Query(
+                "SELECT * FROM chats WHERE id IN (SELECT chat_id FROM memberships WHERE user_id = ?) AND "+
+                        "id IN (SELECT chat_id FROM memberships GROUP BY chat_id HAVING COUNT(*) = 2)", userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov0" title="0">var chats []Chat
+        for query.Next() </span><span class="cov0" title="0">{
+                var chat Chat
+                err = query.Scan(&amp;chat.Id, &amp;chat.LastMessageDate)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov0" title="0">chats = append(chats, chat)</span>
+        }
+        <span class="cov0" title="0">query.Close()
+
+        return chats</span>
+}
+
+// TODO: perhaps move it later to models.go. Not approved yet.
+type PrivateChatOponent struct {
+        Id                  int    // opoent id
+        Name                string // oponent name
+        ChatId              int    // chat id
+        ChatLastMessageDate string // last message date, to sort chats by last message date
+}
+
+// TODO: remove it later. Not approved yet.
+/*
+* GetPrivateChatOponentsByUserId reads private chat oponents from database by user_id,
+does not require user to be logged in.
+
+ Use this to get the list of private chats for a user.
+ Can be sorted by last_message_date on frontend. To show in the list of private chats.
+
+The oponent is the user in the private chat that is not the user with the given user_id.
+The oponent has Name and Id.
+The ChatId is the id of the private chat. Only two users can be in a private chat.
+Returns nil if no such chats exist.
+*/
+func (db DB) GetPrivateChatOponentsByUserId(userId int) []PrivateChatOponent <span class="cov0" title="0">{
+        query, err := db.Query(
+                "SELECT users.id, users.name, chats.id, chats.last_message_date FROM users "+
+                        "JOIN memberships ON memberships.user_id = users.id "+
+                        "JOIN chats ON chats.id = memberships.chat_id "+
+                        "WHERE users.id != ? AND chats.id IN (SELECT chat_id FROM memberships GROUP BY chat_id HAVING COUNT(*) = 2)",
+                userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov0" title="0">var oponents []PrivateChatOponent
+        for query.Next() </span><span class="cov0" title="0">{
+                var oponent PrivateChatOponent
+                err = query.Scan(&amp;oponent.Id, &amp;oponent.Name, &amp;oponent.ChatId, &amp;oponent.ChatLastMessageDate)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov0" title="0">oponents = append(oponents, oponent)</span>
+        }
+        <span class="cov0" title="0">query.Close()
+
+        return oponents</span>
+}
+
+/*
+*
+GetChatsIdsByUserId reads chats ids from database by user_id, does not require user to be logged in
+*/
+func (db DB) GetChatsIdsByUserId(userId int) []int <span class="cov0" title="0">{
+        query, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov0" title="0">var chatIds []int
+        for query.Next() </span><span class="cov0" title="0">{
+                var chatId int
+                err = query.Scan(&amp;chatId)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov0" title="0">chatIds = append(chatIds, chatId)</span>
+        }
+        <span class="cov0" title="0">query.Close()
+
+        return chatIds</span>
+}
+
+// AddMembership adds membership to database, returns id of new membership
+func (db DB) AddMembership(chatId, userId int) int <span class="cov0" title="0">{
+        result, err := db.Exec(
+                "INSERT INTO memberships (chat_id, user_id, date) VALUES (?, ?, ?)",
+                chatId, userId, time.Now().Format(time.RFC3339))
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov0" title="0">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov0" title="0">return int(id)</span>
+}
+
+// AddMessage adds message to database, returns id of new message, plus updates last_message_date in chats table
+func (db DB) AddMessage(chatId, userId int, content string) int <span class="cov0" title="0">{
+        timeNow := time.Now().Format(time.RFC3339)
+        result, err := db.Exec(
+                "INSERT INTO messages (chat_id, user_id, content, date) VALUES (?, ?, ?, ?)",
+                chatId, userId, content, timeNow)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov0" title="0">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov0" title="0">_, err = db.Exec("UPDATE chats SET last_message_date = ? WHERE id = ?", timeNow, chatId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov0" title="0">return int(id)</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package database
+
+import (
+        "log"
+        "time"
+)
+
+// AddComment adds comment to database, returns id of new comment
+func (db DB) AddComment(content string, postId, authorId int) int <span class="cov8" title="1">{
+        result, err := db.Exec(`INSERT INTO comments (content, post_id, author_id, date, likes_count, dislikes_count) 
+                                                                  VALUES (?, ?, ?, ?, ?, ?)`, content, postId, authorId, time.Now().Format(time.RFC3339), 0, 0)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">return int(id)</span>
+}
+
+func (db DB) UpdatePostsCommentsCount(postId int, change int) <span class="cov8" title="1">{
+        _, err := db.Exec("UPDATE posts SET comments_count = comments_count + ? WHERE id = ?", change, postId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package database
+
+import (
+        "log"
+        "time"
+)
+
+// GetAllPosts reads all posts from database (reads only userId, not user object)
+//
+// panics if error occurs
+//
+// METHOD: GET
+//
+// URL: /api/posts
+func (db DB) GetAllPosts() []Post <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM posts")
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">var posts []Post
+        for query.Next() </span><span class="cov8" title="1">{
+                var post Post
+                err = query.Scan(&amp;post.Id, &amp;post.Title, &amp;post.Content, &amp;post.AuthorId, &amp;post.Date,
+                        &amp;post.LikesCount, &amp;post.DislikesCount, &amp;post.CommentsCount, &amp;post.Categories, &amp;post.Description)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov8" title="1">posts = append(posts, post)</span>
+        }
+        <span class="cov8" title="1">query.Close()
+
+        return posts</span>
+}
+
+// GetPostById reads post from database by post_id, does not require user to be logged in
+//
+// returns nil if post not found
+//
+// METHOD: GET
+//
+// URL: /api/posts/{id}
+func (db DB) GetPostById(id int) *Post <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM posts WHERE id = ?", id)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">var post Post
+        if !query.Next() </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">err = query.Scan(&amp;post.Id, &amp;post.Title, &amp;post.Content, &amp;post.AuthorId, &amp;post.Date,
+                &amp;post.LikesCount, &amp;post.DislikesCount, &amp;post.CommentsCount, &amp;post.Categories, &amp;post.Description)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">query.Close()
+
+        return &amp;post</span>
+}
+
+// AddPost adds post to database, returns id of new post
+//
+// METHOD: POST
+//
+// URL: /api/posts/create/
+func (db DB) AddPost(title, content string, authorId int, categories string, description string) int <span class="cov8" title="1">{
+        result, err := db.Exec(`INSERT INTO posts 
+            (title, content, author, date, likes_count, dislikes_count, comments_count, categories, description)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categories, description)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">return int(id)</span>
+}
+
+func (db DB) GetUserPosts(userId int) []Post <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM posts WHERE author = ?", userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">var posts []Post
+        for query.Next() </span><span class="cov8" title="1">{
+                var post Post
+                err = query.Scan(&amp;post.Id, &amp;post.Title, &amp;post.Content, &amp;post.AuthorId, &amp;post.Date,
+                        &amp;post.LikesCount, &amp;post.DislikesCount, &amp;post.CommentsCount, &amp;post.Categories, &amp;post.Description)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov8" title="1">posts = append(posts, post)</span>
+        }
+        <span class="cov8" title="1">query.Close()
+
+        return posts</span>
+}
+
+// GetUserPostsLiked: retrieves all posts liked by user with specified userId.
+//
+// GetUserPostsLiked is a method of the DB object. It takes userId (int) and returns a slice of Post objects.
+//
+// Method: POST
+//
+// One possible route taken: /api/me/posts/liked
+func (db DB) GetUserPostsLiked(userId int) []Post <span class="cov0" title="0">{
+        query, err := db.Query(`SELECT * FROM posts WHERE id IN 
+        (SELECT post_id FROM post_reactions WHERE author_id = ? AND reaction = 1)`, userId)
+
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov0" title="0">var posts []Post
+        for query.Next() </span><span class="cov0" title="0">{
+                var post Post
+                err = query.Scan(&amp;post.Id, &amp;post.Title, &amp;post.Content, &amp;post.AuthorId, &amp;post.Date,
+                        &amp;post.LikesCount, &amp;post.DislikesCount, &amp;post.CommentsCount, &amp;post.Categories, &amp;post.Description)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov0" title="0">posts = append(posts, post)</span>
+        }
+        <span class="cov0" title="0">query.Close()
+
+        return posts</span>
+}
+
+func (db DB) GetCategoryPosts(category string) []Post <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM posts WHERE categories LIKE '%' || ? || '%'", category)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">var posts []Post
+        for query.Next() </span><span class="cov0" title="0">{
+                var post Post
+                err = query.Scan(&amp;post.Id, &amp;post.Title, &amp;post.Content, &amp;post.AuthorId, &amp;post.Date,
+                        &amp;post.LikesCount, &amp;post.DislikesCount, &amp;post.CommentsCount, &amp;post.Categories, &amp;post.Description)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov0" title="0">posts = append(posts, post)</span>
+        }
+        <span class="cov8" title="1">query.Close()
+
+        return posts</span>
+}
+
+// GetCommentById gets Comment Struct Pointer by comment_id from the database, does not require user to be logged in
+func (db DB) GetCommentById(id int) *Comment <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM comments WHERE id = ?", id)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">if !query.Next() </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">var comment Comment
+        err = query.Scan(&amp;comment.Id, &amp;comment.PostId, &amp;comment.AuthorId, &amp;comment.Content, &amp;comment.Date,
+                &amp;comment.LikesCount, &amp;comment.DislikesCount)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">query.Close()
+
+        return &amp;comment</span>
+}
+
+// GetPostComments gets all comments for post using post_id
+//
+// Example:
+//
+// comments := db.GetPostComments(1)
+func (db DB) GetPostComments(postId int) []Comment <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM comments WHERE post_id = ?", postId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">var comments []Comment
+        for query.Next() </span><span class="cov8" title="1">{
+                var comment Comment
+                err = query.Scan(&amp;comment.Id, &amp;comment.PostId, &amp;comment.AuthorId, &amp;comment.Content, &amp;comment.Date,
+                        &amp;comment.LikesCount, &amp;comment.DislikesCount)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov8" title="1">comments = append(comments, comment)</span>
+        }
+        <span class="cov8" title="1">query.Close()
+
+        return comments</span>
+}
+</pre>
+		
+		<pre class="file" id="file10" style="display: none">package database
+
+import (
+        "log"
+)
+
+// AddPostReaction adds specified reaction to post
+//
+// reaction=1 is like and reaction=-1 is dislike
+func (db DB) AddPostReaction(postId, userId, reaction int) <span class="cov8" title="1">{
+        _, err := db.Exec(`INSERT INTO post_reactions 
+            (post_id, author_id, reaction) VALUES (?, ?, ?)`,
+                postId, userId, reaction)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// UpdatePostLikesCount changes post's likes_count value
+func (db DB) UpdatePostLikesCount(postId int, change int) <span class="cov8" title="1">{
+        _, err := db.Exec("UPDATE posts SET likes_count = likes_count + ? WHERE id = ?", change, postId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// UpdatePostDislikeCount changes post's dislikes_count value
+func (db DB) UpdatePostDislikeCount(postId int, change int) <span class="cov8" title="1">{
+        _, err := db.Exec("UPDATE posts SET dislikes_count = posts.dislikes_count + ? WHERE id = ?", change, postId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// RemovePostReaction removes user's post reaction
+func (db DB) RemovePostReaction(postId, userId int) <span class="cov8" title="1">{
+        _, err := db.Exec("DELETE FROM post_reactions WHERE post_id = ? AND author_id = ?", postId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// GetPostReaction returns user's reaction to post
+//
+// returns 1 if user liked post, -1 if disliked and 0 if not reacted
+func (db DB) GetPostReaction(postId, userId int) int <span class="cov8" title="1">{
+        query, err := db.Query("SELECT reaction FROM post_reactions WHERE post_id = ? AND author_id = ?", postId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">defer query.Close()
+
+        if !query.Next() </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">var reaction int
+        err = query.Scan(&amp;reaction)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">return reaction</span>
+}
+
+// GetCommentReaction returns user's reaction to comment
+//
+// returns 1 if user liked comment, -1 if disliked and 0 if not reacted
+func (db DB) GetCommentReaction(commentId, userId int) int <span class="cov8" title="1">{
+        query, err := db.Query(`SELECT reaction FROM comment_reactions 
+                WHERE comment_id = ? AND author_id = ?`, commentId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">defer query.Close()
+
+        if !query.Next() </span><span class="cov8" title="1">{
+                return 0
+        }</span>
+        <span class="cov8" title="1">var reaction int
+        err = query.Scan(&amp;reaction)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">return reaction</span>
+}
+
+// AddCommentReaction adds specified reaction to comment
+//
+// reaction=1 is like and reaction=-1 is dislike
+func (db DB) AddCommentReaction(commentId, userId, reaction int) <span class="cov8" title="1">{
+        _, err := db.Exec(`INSERT INTO comment_reactions 
+            (comment_id, author_id, reaction) VALUES (?, ?, ?)`,
+                commentId, userId, reaction)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// UpdateCommentLikesCount changes comment's likes_count value
+func (db DB) UpdateCommentLikesCount(commentId int, change int) <span class="cov8" title="1">{
+        _, err := db.Exec("UPDATE comments SET likes_count = likes_count + ? WHERE id = ?", change, commentId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// UpdateCommentDislikeCount changes comment's dislikes_count value
+func (db DB) UpdateCommentDislikeCount(commentId int, change int) <span class="cov8" title="1">{
+        _, err := db.Exec("UPDATE comments SET dislikes_count = comments.dislikes_count + ? WHERE id = ?", change, commentId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// RemoveCommentReaction removes user's comment reaction
+func (db DB) RemoveCommentReaction(commentId, userId int) <span class="cov8" title="1">{
+        _, err := db.Exec("DELETE FROM comment_reactions WHERE comment_id = ? AND author_id = ?", commentId, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file11" style="display: none">package database
+
+import (
+        "log"
+        "time"
+)
+
+// AddSession adds session to database
+func (db DB) AddSession(token string, expire, userId int) <span class="cov8" title="1">{
+
+        // check if session already exists
+        query, err := db.Query("SELECT * FROM sessions WHERE user_id = ?", userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        // if session exists, delete it
+        <span class="cov8" title="1">if query.Next() </span><span class="cov0" title="0">{
+                var session Session
+                err = query.Scan(&amp;session.Id, &amp;session.Token, &amp;session.Expire, &amp;session.UserId)
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Panic(err)
+                }</span>
+                <span class="cov0" title="0">query.Close()
+                db.RemoveSession(session.Token)</span>
+        }
+
+        <span class="cov8" title="1">_, err = db.Exec(`INSERT INTO sessions (token, expire, user_id) VALUES (?, ?, ?)`, token, expire, userId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+// CheckSession checks if session is valid
+//
+// returns UserId if session is valid or -1 if not
+func (db DB) CheckSession(token string) int <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM sessions WHERE token = ?", token)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">if !query.Next() </span><span class="cov0" title="0">{
+                return -1
+        }</span>
+        <span class="cov8" title="1">var session Session
+        err = query.Scan(&amp;session.Id, &amp;session.Token, &amp;session.Expire, &amp;session.UserId)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">query.Close()
+
+        if session.Expire &lt; int(time.Now().Unix()) </span><span class="cov0" title="0">{
+                db.RemoveExpiredSessions()
+                return -1
+        }</span>
+        <span class="cov8" title="1">return session.UserId</span>
+}
+
+func (db DB) RemoveExpiredSessions() <span class="cov8" title="1">{
+        _, err := db.Exec("DELETE FROM sessions WHERE expire &lt; ?", time.Now().Unix())
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+
+func (db DB) RemoveSession(token string) <span class="cov8" title="1">{
+        _, err := db.Exec("DELETE FROM sessions WHERE token = ?", token)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package database
+
+import (
+        "database/sql"
+        "log"
+)
+
+// GetUserById returns user with specified id
+//
+// returns nil if user not found
+func (db DB) GetUserById(id int) *User <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM users WHERE id = ?", id)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">var user User
+        if !query.Next() </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">err = query.Scan(
+                &amp;user.Id, &amp;user.Name, &amp;user.Email, &amp;user.Password,
+                &amp;user.FirstName, &amp;user.LastName, &amp;user.DoB, &amp;user.Gender)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">query.Close()
+
+        return &amp;user</span>
+}
+
+// GetUserByLogin returns user with specified login
+//
+// returns nil if user not found
+func (db DB) GetUserByLogin(login string) *User <span class="cov8" title="1">{
+        query, err := db.Query("SELECT * FROM users WHERE email = ? OR name = ? COLLATE NOCASE", login, login)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">if !query.Next() </span><span class="cov0" title="0">{
+                return nil
+        }</span>
+        <span class="cov8" title="1">var user User
+        err = query.Scan(
+                &amp;user.Id, &amp;user.Name, &amp;user.Email, &amp;user.Password,
+                &amp;user.FirstName, &amp;user.LastName, &amp;user.DoB, &amp;user.Gender)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">query.Close()
+
+        return &amp;user</span>
+}
+
+// AddUser adds user to database, returns id of new user
+func (db DB) AddUser(name, email, password string, firstName, lastName, dob, gender sql.NullString) int <span class="cov8" title="1">{
+        result, err := db.Exec(
+                `INSERT INTO users (name, email, password, first_name, last_name, dob, gender)
+                VALUES (?, ?, ?, ?, ?, ?, ?)`,
+                name, email, password, firstName.String, lastName.String, dob.String, gender.String)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+
+        <span class="cov8" title="1">id, err := result.LastInsertId()
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">return int(id)</span>
+}
+
+// IsEmailTaken checks if email is already in use
+func (db DB) IsEmailTaken(email string) bool <span class="cov8" title="1">{
+        query, err := db.Query("SELECT 1 FROM users WHERE email = ?", email)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">isTaken := query.Next()
+        query.Close()
+
+        return isTaken</span>
+}
+
+// IsNameTaken checks if name is already in use.
+// Added because authorization supports the name and the email as login
+func (db DB) IsNameTaken(name string) bool <span class="cov8" title="1">{
+        query, err := db.Query("SELECT 1 FROM users WHERE name = ? COLLATE NOCASE", name)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+        }</span>
+        <span class="cov8" title="1">isTaken := query.Next()
+        query.Close()
+
+        return isTaken</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package server
+
+import (
+        "database/sql"
+        "encoding/json"
+        "fmt"
+        "log"
+        "net/http"
+        "net/mail"
+        "strings"
+        "time"
+
+        "github.com/gofrs/uuid"
+        "golang.org/x/crypto/bcrypt"
+)
+
+func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        if srv.getUserId(w, r) != -1 </span><span class="cov0" title="0">{
+                http.Error(w, "You are already logged in", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody := struct {
+                Name      string `json:"name"`
+                Email     string `json:"email"`
+                Password  string `json:"password"`
+                FirstName string `json:"first_name"`
+                LastName  string `json:"last_name"`
+                DoB       string `json:"dob"`
+                Gender    string `json:"gender"`
+        }{}
+        err := json.NewDecoder(r.Body).Decode(&amp;requestBody)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Body is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody.Name = strings.TrimSpace(requestBody.Name)
+        if len(requestBody.Name) &lt; 3 </span><span class="cov8" title="1">{
+                http.Error(w, "Username is too short", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if len(requestBody.Name) &gt; 15 </span><span class="cov8" title="1">{
+                http.Error(w, "Username is too long", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">if srv.DB.IsNameTaken(requestBody.Name) </span><span class="cov8" title="1">{
+                http.Error(w, "Username is already in use", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">requestBody.FirstName = strings.TrimSpace(requestBody.FirstName)
+        if requestBody.FirstName == "" </span><span class="cov8" title="1">{
+                http.Error(w, "First name is not valid", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">if len(requestBody.FirstName) &gt; 15 </span><span class="cov0" title="0">{
+                http.Error(w, "First name is too long", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">requestBody.LastName = strings.TrimSpace(requestBody.LastName)
+        if requestBody.LastName == "" </span><span class="cov0" title="0">{
+                http.Error(w, "Last name is not valid", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">if len(requestBody.LastName) &gt; 15 </span><span class="cov0" title="0">{
+                http.Error(w, "Last name is too long", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if requestBody.DoB == "" </span><span class="cov0" title="0">{
+                http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">dob, err := time.Parse("2006-01-02", requestBody.DoB)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">now := time.Now()
+        minDoB := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+        if dob.After(now) || dob.Before(minDoB) </span><span class="cov0" title="0">{
+                http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if requestBody.Gender != "male" &amp;&amp; requestBody.Gender != "female" &amp;&amp; requestBody.Gender != "other" </span><span class="cov0" title="0">{
+                http.Error(w, "Gender is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody.Email = strings.TrimSpace(strings.ToLower(requestBody.Email))
+        // check if email is a valid email
+        _, err = mail.ParseAddress(requestBody.Email)
+        if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) </span><span class="cov0" title="0">{
+                http.Error(w, "Email is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if srv.DB.IsEmailTaken(requestBody.Email) </span><span class="cov0" title="0">{
+                http.Error(w, "Email is already taken", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if len(requestBody.Password) &lt; 8 </span><span class="cov0" title="0">{
+                http.Error(w, "Password is too short", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(requestBody.Password), 10)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Password is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">id := srv.DB.AddUser(
+                requestBody.Name,
+                requestBody.Email,
+                string(encryptedPassword),
+                sql.NullString{String: requestBody.FirstName, Valid: true},
+                sql.NullString{String: requestBody.LastName, Valid: true},
+                sql.NullString{String: requestBody.DoB, Valid: true},
+                sql.NullString{String: requestBody.Gender, Valid: true},
+        )
+
+        err = revalidateURL(fmt.Sprintf("/user/%d", id))
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error while revalidating `/user/%d`: %v", id, err)
+        }</span>
+}
+
+// loginHandler handles user login requests. It first checks if the user is
+// already logged in by calling the `getUserId` method. If the user is already
+// logged in, it returns an error message. If not, it decodes the request body
+// to get the user's login credentials (username/email and password). It then
+// checks if the user exists in the database and if the password is correct
+// using the `GetUserByLogin` and `CompareHashAndPassword` methods respectively.
+// If the user exists and the password is correct, it generates a new session
+// token using the `uuid.NewV4()` method, adds the session to the database using
+// the `AddSession` method, and sets a cookie with the session token using
+// the `http.SetCookie` method. Finally, it returns a success response.
+//
+// Path: /api/login
+func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        if srv.getUserId(w, r) != -1 </span><span class="cov0" title="0">{
+                http.Error(w, "You are already logged in", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody := struct {
+                Login    string `json:"login"`
+                Password string `json:"password"`
+        }{}
+        err := json.NewDecoder(r.Body).Decode(&amp;requestBody)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Body is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">user := srv.DB.GetUserByLogin(strings.ToLower(requestBody.Login))
+        if user == nil </span><span class="cov0" title="0">{
+                http.Error(w, "Invalid login or password", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(requestBody.Password))
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Invalid password", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">token, err := uuid.NewV4()
+        if err != nil </span><span class="cov0" title="0">{
+                panic(err)</span>
+        }
+        <span class="cov8" title="1">expire := time.Now().Add(24 * time.Hour)
+
+        srv.DB.AddSession(token.String(), int(expire.Unix()), user.Id)
+
+        http.SetCookie(w, &amp;http.Cookie{
+                Name:    "forum-token",
+                Value:   token.String(),
+                Expires: expire,
+                Path:    "/",
+                //        TODO: add secure on production
+        })</span>
+}
+
+// logoutHandler handles user logout requests. It first checks if the user has a
+// valid session token by checking the "forum-token" cookie in the request. If the
+// cookie is not present or invalid, it returns an unauthorized error response
+// using the `errorResponse` function. If the cookie is valid, it removes the
+// session from the database using the `RemoveSession` method and sets a new cookie
+// with an empty value and an expired time using the `http.SetCookie` method. This
+// effectively logs the user out by invalidating their session token.
+//
+// Path: /api/logout
+func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        cookie, err := r.Cookie("forum-token")
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+        <span class="cov8" title="1">srv.DB.RemoveSession(cookie.Value)
+
+        http.SetCookie(w, &amp;http.Cookie{
+                Name:    "forum-token",
+                Value:   "",
+                Expires: time.Now(),
+                Path:    "/",
+        })</span>
+}
+
+// `func (srv *Server) getUserId(w http.ResponseWriter, r *http.Request) int` is a
+// method of the `Server` struct that takes in a `http.ResponseWriter` and a
+// `http.Request` as arguments and returns an integer.
+//
+// It first checks if the user has a valid session token by checking the "forum-token"
+func (srv *Server) getUserId(w http.ResponseWriter, r *http.Request) int <span class="cov8" title="1">{
+        cookie, err := r.Cookie("forum-token")
+        if err != nil </span><span class="cov8" title="1">{
+                return -1
+        }</span>
+        <span class="cov8" title="1">userId := srv.DB.CheckSession(cookie.Value)
+
+        if userId == -1 </span><span class="cov0" title="0">{
+                http.SetCookie(w, &amp;http.Cookie{
+                        Name:    "forum-token",
+                        Value:   "",
+                        Expires: time.Now(),
+                        Path:    "/",
+                })
+                return -1
+        }</span>
+
+        <span class="cov8" title="1">return userId</span>
+}
+</pre>
+		
+		<pre class="file" id="file14" style="display: none">package server
+
+import "net/http"
+
+func (srv *Server) checkSessionHandler(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        token := r.URL.Query().Get("token")
+        if token == "" </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov0" title="0">userId := srv.DB.CheckSession(token)
+        if userId == -1 </span><span class="cov0" title="0">{
+                sendObject(w, struct {
+                        Error string `json:"error"`
+                }{
+                        Error: "Invalid token",
+                })
+                return
+        }</span>
+        <span class="cov0" title="0">sendObject(w, userId)</span>
+}
+</pre>
+		
+		<pre class="file" id="file15" style="display: none">package server
+
+import (
+        "net/http"
+)
+
+var categories = []string{"facts", "rumors", "other"}
+
+func (srv *Server) apiPostsMasterHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        switch </span>{
+
+        case reApiPosts.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsHandler(w, r)</span> // /api/posts
+
+        case reApiPostsCategories.MatchString(r.URL.Path):<span class="cov0" title="0">
+                srv.postsCategoriesHandler(w, r)</span> // /api/posts/categories - list of all categories in forum
+
+        case reApiPostsCategoriesName.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsCategoriesNameHandler(w, r)</span> // /api/posts/categories/{name} - list of all posts in category
+
+        case reApiPostsId.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdHandler(w, r)</span> // /api/posts/{id} - get post by id
+
+        case reApiPostsCreate.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsCreateHandler(w, r)</span> // /api/posts/create - create new post
+
+        case reApiPostsIdLike.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdLikeHandler(w, r)</span> // /api/posts/{id}/like - like post
+
+        case reApiPostsIdDislike.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdDislikeHandler(w, r)</span> // /api/posts/{id}/dislike - dislike post
+
+        case reApiPostsIdReaction.MatchString(r.URL.Path):<span class="cov0" title="0">
+                srv.postsIdReactionHandler(w, r)</span> // /api/posts/{id}/reaction - get post reaction of current user
+
+        // /api/posts/{id}/comment/{id}/reaction - get comment reaction of current user
+        case reApiPostsIdCommentIdReaction.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdCommentIdReactionHandler(w, r)</span>
+
+        case reApiPostsIdComment.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdCommentCreateHandler(w, r)</span> // /api/posts/{id}/comment - create new comment
+
+        case reApiPostsIdComments.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdCommentsHandler(w, r)</span> // /api/posts/{id}/comments - get all comments of post
+
+        case reApiPostsIdCommentIdLike.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdCommentIdLikeHandler(w, r)</span> // /api/posts/{id}/comment/{id}/like - like comment
+
+        case reApiPostsIdCommentIdDislike.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.postsIdCommentIdDislikeHandler(w, r)</span> // /api/posts/{id}/comment/{id}/dislike - dislike comment
+        default:<span class="cov0" title="0">
+                http.NotFound(w, r)</span>
+        }
+}
+
+// postsHandler returns a json list of all posts in the forum.
+//
+// Example: /api/posts
+func (srv *Server) postsHandler(w http.ResponseWriter, _ *http.Request) <span class="cov8" title="1">{
+        posts := srv.DB.GetAllPosts()
+
+        response := make([]SafePost, 0)
+        for _, post := range posts </span><span class="cov8" title="1">{
+                postAuthor := srv.DB.GetUserById(post.AuthorId)
+                response = append(response, SafePost{
+                        Id:            post.Id,
+                        Title:         post.Title,
+                        Description:   post.Description,
+                        Date:          post.Date,
+                        Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+                        CommentsCount: post.CommentsCount,
+                        LikesCount:    post.LikesCount,
+                        DislikesCount: post.DislikesCount,
+                        Categories:    post.Categories,
+                })
+        }</span>
+
+        <span class="cov8" title="1">sendObject(w, response)</span>
+}
+</pre>
+		
+		<pre class="file" id="file16" style="display: none">package server
+
+import (
+        "net/http"
+        "strings"
+)
+
+// postsCategoriesHandler returns a json list of all categories from the database
+//
+// Example: /api/posts/categories
+func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, _ *http.Request) <span class="cov8" title="1">{
+        sendObject(w, categories)
+}</span>
+
+// postsCategoriesNameHandler returns a json list of all posts belonging to the specified category
+//
+// Example: /api/posts/categories/name
+func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        categoryName := strings.TrimPrefix(r.URL.Path, "/api/posts/categories/")
+
+        categoryName = strings.ToLower(categoryName)
+
+        if !isPresent(categories, categoryName) </span><span class="cov8" title="1">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">posts := srv.DB.GetCategoryPosts(categoryName)
+
+        response := make([]SafePost, 0)
+        for _, post := range posts </span><span class="cov0" title="0">{
+                postAuthor := srv.DB.GetUserById(post.AuthorId)
+                response = append(response, SafePost{
+                        Id:            post.Id,
+                        Title:         post.Title,
+                        Description:   post.Description,
+                        Date:          post.Date,
+                        Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+                        CommentsCount: post.CommentsCount,
+                        LikesCount:    post.LikesCount,
+                        DislikesCount: post.DislikesCount,
+                        Categories:    post.Categories,
+                })
+        }</span>
+
+        <span class="cov8" title="1">sendObject(w, response)</span>
+}
+</pre>
+		
+		<pre class="file" id="file17" style="display: none">package server
+
+import (
+        "encoding/json"
+        "fmt"
+        "log"
+        "net/http"
+        "strings"
+)
+
+// postsCreateHandler creates a new post in the database
+func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody := struct {
+                Title       string   `json:"title"`
+                Content     string   `json:"content"`
+                Description string   `json:"description"`
+                Categories  []string `json:"categories"`
+        }{}
+
+        err := json.NewDecoder(r.Body).Decode(&amp;requestBody)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Body is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody.Title = strings.TrimSpace(requestBody.Title)
+        requestBody.Content = strings.TrimSpace(requestBody.Content)
+        requestBody.Description = strings.TrimSpace(requestBody.Description)
+
+        if requestBody.Title == "" </span><span class="cov8" title="1">{
+                http.Error(w, "Title is too short", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">if len(requestBody.Title) &gt; 25 </span><span class="cov8" title="1">{
+                http.Error(w, "Title is too long, maximum length is 25", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if requestBody.Content == "" </span><span class="cov8" title="1">{
+                http.Error(w, "Content is too short", http.StatusBadRequest)
+                return
+        }</span>
+        <span class="cov8" title="1">if len(requestBody.Content) &gt; 10000 </span><span class="cov0" title="0">{
+                http.Error(w, "Content is too long, maximum length is 10000", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if requestBody.Description == "" </span><span class="cov8" title="1">{
+                requestBody.Description = shortenContent(requestBody.Content)
+        }</span>
+        <span class="cov8" title="1">fmt.Println(requestBody.Description)
+        if len(requestBody.Description) &gt; 200 </span><span class="cov0" title="0">{
+                requestBody.Description = shortenContent(requestBody.Description)
+        }</span>
+        <span class="cov8" title="1">fmt.Println(requestBody.Description)
+
+        for i, cat := range requestBody.Categories </span><span class="cov8" title="1">{
+                cat = strings.TrimSpace(cat)
+                cat = strings.ToLower(cat)
+                requestBody.Categories[i] = cat
+        }</span>
+
+        <span class="cov8" title="1">isValid := true
+        for _, cat := range requestBody.Categories </span><span class="cov8" title="1">{
+                if !isPresent(categories, cat) </span><span class="cov8" title="1">{
+                        isValid = false
+                        break</span>
+                }
+        }
+        <span class="cov8" title="1">if len(requestBody.Categories) == 0 </span><span class="cov0" title="0">{
+                isValid = false
+        }</span>
+
+        <span class="cov8" title="1">if !isValid </span><span class="cov8" title="1">{
+                http.Error(w, "Categories are not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">id := srv.DB.AddPost(requestBody.Title, requestBody.Content, userId,
+                strings.Join(requestBody.Categories, ","), requestBody.Description)
+        sendObject(w, id)
+
+        err = revalidateURL(fmt.Sprintf("/post/%v", id))
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error while revalidating `/post/%v`: %v", id, err)
+        }</span>
+        <span class="cov8" title="1">err = revalidateURL("/")
+        if err != nil </span><span class="cov0" title="0">{
+                log.Printf("Error while revalidating '/': %v", err)
+        }</span>
+        <span class="cov8" title="1">for _, category := range categories </span><span class="cov8" title="1">{
+                err = revalidateURL(fmt.Sprintf("/category/%v", category))
+                if err != nil </span><span class="cov0" title="0">{
+                        log.Printf("Error while revalidating `/category/%v`: %v", category, err)
+                }</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file18" style="display: none">package server
+
+import (
+        "net/http"
+        "strconv"
+        "strings"
+)
+
+// postsIdHandler returns a single post from the database that matches the incoming id of the post in the url
+//
+// Example: /api/posts/1
+func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+        // /api/posts/1 -&gt; 1
+
+        id, err := strconv.Atoi(idStr)
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        // Get the post from the database
+        <span class="cov8" title="1">post := srv.DB.GetPostById(id)
+        if post == nil </span><span class="cov8" title="1">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">postAuthor := srv.DB.GetUserById(post.AuthorId)
+        safePost := SafePost{
+                Id:            post.Id,
+                Title:         post.Title,
+                Content:       post.Content,
+                Description:   post.Description,
+                Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+                Date:          post.Date,
+                CommentsCount: post.CommentsCount,
+                LikesCount:    post.LikesCount,
+                DislikesCount: post.DislikesCount,
+                Categories:    post.Categories,
+        }
+
+        sendObject(w, safePost)</span>
+}
+
+// postsIdLikeHandler likes a post in the database
+func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov8" title="1">postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+        postIdStr = strings.TrimSuffix(postIdStr, "/like")
+        // /api/posts/1/like -&gt; 1
+
+        postId, err := strconv.Atoi(postIdStr)
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+        }</span>
+
+        <span class="cov8" title="1">post := srv.DB.GetPostById(postId)
+        if post == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">reaction := srv.DB.GetPostReaction(postId, userId)
+
+        switch reaction </span>{
+        case 0:<span class="cov8" title="1"> // if not reacted, add like
+                srv.DB.AddPostReaction(postId, userId, 1)
+                srv.DB.UpdatePostLikesCount(postId, +1)
+
+                sendObject(w, +1)</span>
+
+        case 1:<span class="cov8" title="1"> // if already liked, unlike
+                srv.DB.RemovePostReaction(postId, userId)
+                srv.DB.UpdatePostLikesCount(postId, -1)
+
+                sendObject(w, 0)</span>
+
+        case -1:<span class="cov8" title="1"> // if disliked, remove dislike and add like
+                srv.DB.RemovePostReaction(postId, userId)
+                srv.DB.UpdatePostDislikeCount(postId, -1)
+
+                srv.DB.AddPostReaction(postId, userId, 1)
+                srv.DB.UpdatePostLikesCount(postId, +1)
+
+                sendObject(w, 1)</span>
+        }
+}
+
+// postsPostsIdDislikeHandler dislikes a post in the database
+func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+        <span class="cov8" title="1">postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+        postIdStr = strings.TrimSuffix(postIdStr, "/dislike")
+        // /api/posts/1/dislike -&gt; 1
+
+        postId, err := strconv.Atoi(postIdStr)
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+        }</span>
+
+        <span class="cov8" title="1">post := srv.DB.GetPostById(postId)
+        if post == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">reaction := srv.DB.GetPostReaction(postId, userId)
+
+        switch reaction </span>{
+        case 0:<span class="cov8" title="1"> // if not reacted, add dislike
+                srv.DB.AddPostReaction(postId, userId, -1)
+                srv.DB.UpdatePostDislikeCount(postId, +1)
+
+                sendObject(w, -1)</span>
+
+        case -1:<span class="cov8" title="1"> // if already disliked, remove dislike
+                srv.DB.RemovePostReaction(postId, userId)
+                srv.DB.UpdatePostDislikeCount(postId, -1)
+
+                sendObject(w, 0)</span>
+
+        case 1:<span class="cov8" title="1"> // if liked, remove like and add dislike
+                srv.DB.RemovePostReaction(postId, userId)
+                srv.DB.UpdatePostLikesCount(postId, -1)
+
+                srv.DB.AddPostReaction(postId, userId, -1)
+                srv.DB.UpdatePostDislikeCount(postId, +1)
+
+                sendObject(w, -1)</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file19" style="display: none">package server
+
+import (
+        "encoding/json"
+        "net/http"
+        "strconv"
+        "strings"
+)
+
+// postsIdCommentIdLikeHandler likes a comment on a post in the database
+func (srv *Server) postsIdCommentIdLikeHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov8" title="1">commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
+        // /api/posts/1/comment/2/like -&gt;2
+
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+        }</span>
+
+        <span class="cov8" title="1">comment := srv.DB.GetCommentById(commentId)
+        if comment == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">reaction := srv.DB.GetCommentReaction(commentId, userId)
+
+        switch reaction </span>{
+        case 0:<span class="cov8" title="1"> // if not reacted, add like
+                srv.DB.AddCommentReaction(commentId, userId, 1)
+                srv.DB.UpdateCommentLikesCount(commentId, +1)
+
+                sendObject(w, +1)</span>
+
+        case 1:<span class="cov8" title="1"> // if already liked, unlike
+                srv.DB.RemoveCommentReaction(commentId, userId)
+                srv.DB.UpdateCommentLikesCount(commentId, -1)
+
+                sendObject(w, 0)</span>
+
+        case -1:<span class="cov8" title="1"> // if disliked, remove dislike and add like
+                srv.DB.RemoveCommentReaction(commentId, userId)
+                srv.DB.UpdateCommentDislikeCount(commentId, -1)
+
+                srv.DB.AddCommentReaction(commentId, userId, 1)
+                srv.DB.UpdateCommentLikesCount(commentId, +1)
+
+                sendObject(w, 1)</span>
+        }
+}
+
+// postsIdCommentIdDislikeHandler dislikes a comment on a post in the database
+func (srv *Server) postsIdCommentIdDislikeHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov8" title="1">commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+        }</span>
+
+        <span class="cov8" title="1">comment := srv.DB.GetCommentById(commentId)
+        if comment == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">reaction := srv.DB.GetCommentReaction(commentId, userId)
+
+        switch reaction </span>{
+        case 0:<span class="cov8" title="1"> // if not reacted, add dislike
+                srv.DB.AddCommentReaction(commentId, userId, -1)
+                srv.DB.UpdateCommentDislikeCount(commentId, +1)
+
+                sendObject(w, -1)</span>
+
+        case -1:<span class="cov8" title="1"> // if already disliked, remove dislike
+                srv.DB.RemoveCommentReaction(commentId, userId)
+                srv.DB.UpdateCommentDislikeCount(commentId, -1)
+
+                sendObject(w, 0)</span>
+
+        case 1:<span class="cov8" title="1"> // if liked, remove like and add dislike
+                srv.DB.RemoveCommentReaction(commentId, userId)
+                srv.DB.UpdateCommentLikesCount(commentId, -1)
+
+                srv.DB.AddCommentReaction(commentId, userId, -1)
+                srv.DB.UpdateCommentDislikeCount(commentId, +1)
+
+                sendObject(w, -1)</span>
+        }
+}
+
+func (srv *Server) postsIdCommentIdReactionHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov8" title="1">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov0" title="0">comment := srv.DB.GetCommentById(commentId)
+        if comment == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov0" title="0">reaction := srv.DB.GetCommentReaction(commentId, userId)
+        sendObject(w,
+                SafeReaction{
+                        Reaction:      reaction,
+                        LikesCount:    comment.LikesCount,
+                        DislikesCount: comment.DislikesCount,
+                })</span>
+}
+
+// postsIdCommentCreateHandler Add comments on a post in the database
+func (srv *Server) postsIdCommentCreateHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov8" title="1">postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+        postIdStr = strings.TrimSuffix(postIdStr, "/comment")
+        // /api/posts/1/comment -&gt; 1
+
+        postId, err := strconv.Atoi(postIdStr)
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+        <span class="cov8" title="1">post := srv.DB.GetPostById(postId)
+        if post == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody := struct {
+                Content string `json:"content"`
+        }{}
+
+        err = json.NewDecoder(r.Body).Decode(&amp;requestBody)
+        if err != nil </span><span class="cov0" title="0">{
+                http.Error(w, "Body is not valid", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">requestBody.Content = strings.TrimSpace(requestBody.Content)
+
+        if len(requestBody.Content) &lt; 1 </span><span class="cov0" title="0">{
+                http.Error(w, "Content is too short", http.StatusBadRequest)
+                return
+        }</span>
+
+        <span class="cov8" title="1">id := srv.DB.AddComment(requestBody.Content, postId, userId)
+        srv.DB.UpdatePostsCommentsCount(postId, +1)
+
+        sendObject(w, id)</span>
+}
+
+// postsIdCommentsHandler returns all comments on a post in the database
+func (srv *Server) postsIdCommentsHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
+        // /api/posts/1/comments -&gt; 1
+
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">post := srv.DB.GetPostById(postId)
+        if post == nil </span><span class="cov8" title="1">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        // type ResponseComment struct {
+        //         Id            int      `json:"id"`
+        //         PostId        int      `json:"post_id"`
+        //         AuthorId      int      `json:"author_id"`
+        //         Content       string   `json:"content"`
+        //         Author        SafeUser `json:"author"`
+        //         Date          string   `json:"date"`
+        //         LikesCount    int      `json:"likes_count"`
+        //         DislikesCount int      `json:"dislikes_count"`
+        // }
+
+        // posts := srv.DB.GetUserPosts(userId)
+        <span class="cov0" title="0">comments := srv.DB.GetPostComments(postId)
+
+        response := make([]SafeComment, 0)
+        for _, comment := range comments </span><span class="cov0" title="0">{
+                user := srv.DB.GetUserById(comment.AuthorId)
+                response = append(response, SafeComment{
+                        Id:            comment.Id,
+                        Content:       comment.Content,
+                        Author:        SafeUser{user.Id, user.Name},
+                        Date:          comment.Date,
+                        LikesCount:    comment.LikesCount,
+                        DislikesCount: comment.DislikesCount,
+                })
+        }</span>
+
+        <span class="cov0" title="0">sendObject(w, response)</span>
+}
+</pre>
+		
+		<pre class="file" id="file20" style="display: none">package server
+
+import (
+        "net/http"
+        "strconv"
+        "strings"
+)
+
+func (srv *Server) postsIdReactionHandler(w http.ResponseWriter, r *http.Request) <span class="cov0" title="0">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
+        postIdStr = strings.TrimSuffix(postIdStr, "/reaction")
+        // /api/posts/1/reaction -&gt; 1
+
+        postId, err := strconv.Atoi(postIdStr)
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov0" title="0">post := srv.DB.GetPostById(postId)
+        if post == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov0" title="0">reaction := srv.DB.GetPostReaction(postId, userId)
+        if userId == post.AuthorId </span><span class="cov0" title="0">{
+                sendObject(w, struct {
+                        Reaction      int `json:"reaction"`
+                        LikesCount    int `json:"likes_count"`
+                        DislikesCount int `json:"dislikes_count"`
+                }{
+                        Reaction:      reaction,
+                        LikesCount:    post.LikesCount,
+                        DislikesCount: post.DislikesCount,
+                })
+        }</span> else<span class="cov0" title="0"> {
+                sendObject(w, struct {
+                        Reaction   int `json:"reaction"`
+                        LikesCount int `json:"likes_count"`
+                }{
+                        Reaction:   reaction,
+                        LikesCount: post.LikesCount,
+                })
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file21" style="display: none">package server
+
+import (
+        "net/http"
+        "strconv"
+        "strings"
+)
+
+// apiUserIdHandler handles paths /api/me and /api/me/posts, passing them to the appropriate handler.
+func (srv *Server) apiUserMasterHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        switch </span>{
+        case reApiUserId.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.apiUserIdHandler(w, r)</span>
+        case reApiUserIdPosts.MatchString(r.URL.Path):<span class="cov8" title="1">
+                srv.apiUserIdPostsHandler(w, r)</span>
+        }
+}
+
+// apiMeHandler returns the currently logged in user's information.
+//
+// (id, name, email, first name, last name, date of birth, gender)
+//
+//        GET /api/me
+func (srv *Server) apiMeHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov8" title="1">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+
+        <span class="cov0" title="0">user := srv.DB.GetUserById(userId)
+
+        response := struct {
+                SafeUser
+                Email     string `json:"email"`
+                FirstName string `json:"first_name,omitempty"`
+                LastName  string `json:"last_name,omitempty"`
+                DoB       string `json:"dob,omitempty"`
+                Gender    string `json:"gender,omitempty"`
+        }{
+                SafeUser:  SafeUser{Id: user.Id, Name: user.Name},
+                Email:     user.Email,
+                FirstName: user.FirstName.String,
+                LastName:  user.LastName.String,
+                DoB:       user.DoB.String,
+                Gender:    user.Gender.String,
+        }
+
+        sendObject(w, response)</span>
+}
+
+// apiMePostsHandler returns the posts of the currently logged in user.
+//
+//        GET /api/me/posts
+func (srv *Server) apiMePostsHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov8" title="1">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+        <span class="cov0" title="0">user := srv.DB.GetUserById(userId)
+        posts := srv.DB.GetUserPosts(userId)
+
+        type Response struct {
+                SafePost
+        }
+
+        response := make([]Response, 0)
+        for _, post := range posts </span><span class="cov0" title="0">{
+                response = append(response, Response{
+                        SafePost: SafePost{
+                                Id:            post.Id,
+                                Title:         post.Title,
+                                Description:   post.Description,
+                                Author:        SafeUser{Id: user.Id, Name: user.Name},
+                                Date:          post.Date,
+                                CommentsCount: post.CommentsCount,
+                                LikesCount:    post.LikesCount,
+                                DislikesCount: post.DislikesCount,
+                                Categories:    post.Categories,
+                        },
+                })
+        }</span>
+
+        <span class="cov0" title="0">sendObject(w, response)</span>
+}
+
+// apiMePostsLikedHandler
+// returns liked posts of the currently logged in user.
+//
+// Route: /api/me/posts/liked
+func (srv *Server) apiMePostsLikedHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userId := srv.getUserId(w, r)
+        if userId == -1 </span><span class="cov8" title="1">{
+                errorResponse(w, http.StatusUnauthorized)
+                return
+        }</span>
+        <span class="cov0" title="0">posts := srv.DB.GetUserPostsLiked(userId)
+
+        type Response struct {
+                SafePost
+        }
+
+        response := make([]Response, 0)
+        for _, post := range posts </span><span class="cov0" title="0">{
+                author := srv.DB.GetUserById(post.AuthorId)
+                response = append(response, Response{
+                        SafePost: SafePost{
+                                Id:            post.Id,
+                                Title:         post.Title,
+                                Description:   post.Description,
+                                Author:        SafeUser{Id: author.Id, Name: author.Name},
+                                Date:          post.Date,
+                                CommentsCount: post.CommentsCount,
+                                LikesCount:    post.LikesCount,
+                                DislikesCount: post.DislikesCount,
+                                Categories:    post.Categories,
+                        },
+                })
+        }</span>
+
+        <span class="cov0" title="0">sendObject(w, response)</span>
+}
+
+// apiMePostsHandler Returns the info of the user with the given id. The requester does not need to be logged in.
+//
+//        GET /api/user/:id
+func (srv *Server) apiUserIdHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+
+        userId, err := strconv.Atoi(userIdStr)
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">user := srv.DB.GetUserById(userId)
+        if user == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">sendObject(w, SafeUser{Id: user.Id, Name: user.Name})</span>
+}
+
+// apiMePostsHandler Returns the posts of the user with the given id.
+// The requester does not need to be logged in.
+//
+//        GET /api/user/:id/posts
+func (srv *Server) apiUserIdPostsHandler(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+        userIdStr = strings.TrimSuffix(userIdStr, "/posts")
+
+        userId, err := strconv.Atoi(userIdStr)
+        if err != nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">user := srv.DB.GetUserById(userId)
+        if user == nil </span><span class="cov0" title="0">{
+                errorResponse(w, http.StatusNotFound)
+                return
+        }</span>
+
+        <span class="cov8" title="1">posts := srv.DB.GetUserPosts(userId)
+
+        response := make([]SafePost, 0)
+        for _, post := range posts </span><span class="cov8" title="1">{
+                response = append(response, SafePost{
+                        Id:            post.Id,
+                        Title:         post.Title,
+                        Description:   post.Description,
+                        Author:        SafeUser{user.Id, user.Name},
+                        Date:          post.Date,
+                        CommentsCount: post.CommentsCount,
+                        LikesCount:    post.LikesCount,
+                        DislikesCount: post.DislikesCount,
+                        Categories:    post.Categories,
+                })
+        }</span>
+
+        <span class="cov8" title="1">sendObject(w, response)</span>
+}
+</pre>
+		
+		<pre class="file" id="file22" style="display: none">package server
+
+import (
+        "encoding/json"
+        "fmt"
+        "io"
+        "log"
+        "net/http"
+        "os"
+)
+
+type SafeUser struct {
+        Id   int    `json:"id"`
+        Name string `json:"name"`
+}
+
+type SafePost struct {
+        Id            int      `json:"id"`
+        Title         string   `json:"title"`
+        Content       string   `json:"content"`
+        Description   string   `json:"description"`
+        Author        SafeUser `json:"author"`
+        Date          string   `json:"date"`
+        CommentsCount int      `json:"comments_count"`
+        LikesCount    int      `json:"likes_count"`
+        DislikesCount int      `json:"dislikes_count"`
+        Categories    string   `json:"categories"`
+}
+
+type SafeComment struct {
+        Id            int      `json:"id"`
+        Content       string   `json:"content"`
+        Author        SafeUser `json:"author"`
+        Date          string   `json:"date"`
+        LikesCount    int      `json:"likes_count"`
+        DislikesCount int      `json:"dislikes_count"`
+}
+
+type SafeReaction struct {
+        Reaction      int `json:"reaction"`
+        LikesCount    int `json:"likes_count"`
+        DislikesCount int `json:"dislikes_count"`
+}
+
+// errorResponse responds with specified error code in format "404 Not Found"
+func errorResponse(w http.ResponseWriter, code int) <span class="cov8" title="1">{
+        http.Error(w, fmt.Sprintf("%v %v", code, http.StatusText(code)), code)
+}</span>
+
+// sendObject sends JSON object to http.ResponseWriter
+//
+// panics if error occurs
+func sendObject(w http.ResponseWriter, object any) <span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+        objJson, err := json.Marshal(object)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+                return
+        }</span>
+        <span class="cov8" title="1">_, err = w.Write(objJson)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Panic(err)
+                return
+        }</span>
+}
+
+// shortenContent shortens content to 200 characters, adds "..." at the end
+func shortenContent(content string) string <span class="cov8" title="1">{
+        if len(content) &gt; 200 </span><span class="cov0" title="0">{
+                return content[:200] + "..."
+        }</span>
+        <span class="cov8" title="1">return content</span>
+}
+
+// isPresent returns true if item is present in slice, false otherwise
+func isPresent(slice []string, item string) bool <span class="cov8" title="1">{
+        for _, s := range slice </span><span class="cov8" title="1">{
+                if s == item </span><span class="cov8" title="1">{
+                        return true
+                }</span>
+        }
+        <span class="cov8" title="1">return false</span>
+}
+
+// revalidateURL creates POST request to frontend to revalidate url
+//
+// Uses environment variables FRONTEND_REVALIDATE_URL and optional FRONTEND_REVALIDATE_TOKEN
+//
+// Does nothing if FRONTEND_REVALIDATE_URL is not set
+func revalidateURL(url string) error <span class="cov8" title="1">{
+        apiURL := os.Getenv("FRONTEND_REVALIDATE_URL")
+        if apiURL == "" </span><span class="cov8" title="1">{
+                return nil
+        }</span>
+        <span class="cov0" title="0">req, err := http.NewRequest(http.MethodPost, apiURL, nil)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+
+        <span class="cov0" title="0">q := req.URL.Query()
+        q.Add("url", url)
+        q.Add("token", os.Getenv("FRONTEND_REVALIDATE_TOKEN"))
+        req.URL.RawQuery = q.Encode()
+
+        res, err := http.DefaultClient.Do(req)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">if res.StatusCode != http.StatusOK </span><span class="cov0" title="0">{
+                bodyBytes, err := io.ReadAll(res.Body)
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">return fmt.Errorf("revalidation failed: %s, %s", res.Status, bodyBytes)</span>
+        }
+
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file23" style="display: none">package server
+
+import (
+        "regexp"
+        "strings"
+)
+
+// addSlashes escapes all slashes in a string ( / -&gt; \/ )
+func addSlashes(s string) string <span class="cov8" title="1">{
+        return strings.ReplaceAll(s, "/", "\\/")
+}</span>
+
+// Pattern Translator
+//
+// pt function passes incoming pattern to regexp.MustCompile(addSlashes(pattern))
+// The purpose of this function is to make it easier to read long regexps.
+//
+// Example:
+//
+//        pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`)
+//
+// is equivalent to
+//
+//        regexp.MustCompile(addSlashes(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`))
+func pt(pattern string) *regexp.Regexp <span class="cov8" title="1">{
+        return regexp.MustCompile(addSlashes(pattern))
+}</span>
+
+// ****************************************************
+// *********** method GET endpoints *******************
+// ****************************************************
+
+var reApiMe = pt(`^/api/me/?$`)
+var reApiMePosts = pt(`^/api/me/posts/?$`)
+var reApiMePostsLiked = pt(`^/api/me/posts/liked/?$`)
+
+var reApiUserId = pt(`^/api/user/[[:digit:]]+/?$`)
+var reApiUserIdPosts = pt(`^/api/user/[[:digit:]]+/posts/?$`)
+
+// macthes /api/posts/ and /api/posts
+var reApiPosts = pt(`^/api/posts/?$`)
+
+// macthes /api/posts/categories/ and /api/posts/categories
+var reApiPostsCategories = pt(`^/api/posts/categories/?$`)
+
+// macthes /api/posts/categories/[catName]/ and /api/posts/categories/[catName]
+var reApiPostsCategoriesName = pt(`^/api/posts/categories/[[:alnum:]]+/?$`)
+
+var reApiPostsId = pt(`^/api/posts/[[:digit:]]+/?$`)
+
+var reApiInternalCheckSession = pt(`^/api/internal/check-session/?$`)
+
+// method POST endpoints
+// ****************************************************
+// *********** method POST endpoints ******************
+// ****************************************************
+
+var reApiPostsCreate = pt(`^/api/posts/create/?$`)
+
+var reApiPostsIdLike = pt(`^/api/posts/[[:digit:]]+/like/?$`)
+var reApiPostsIdDislike = pt(`^/api/posts/[[:digit:]]+/dislike/?$`)
+var reApiPostsIdReaction = pt(`^/api/posts/[[:digit:]]+/reaction/?$`)
+
+var reApiPostsIdCommentIdReaction = pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/reaction/?$`)
+
+var reApiPostsIdComment = pt(`^/api/posts/[[:digit:]]+/comment/?$`)
+
+var reApiPostsIdComments = pt(`^/api/posts/[[:digit:]]+/comments/?$`)
+
+var reApiPostsIdCommentIdLike = pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/like/?$`)
+var reApiPostsIdCommentIdDislike = pt(`^/api/posts/[[:digit:]]+/comment/[[:digit:]]+/dislike/?$`)
+
+var reApiSignup = pt(`^/api/signup/?$`)
+var reApiLogin = pt(`^/api/login/?$`)
+var reApiLogout = pt(`^/api/logout/?$`)
+
+var getRegexps = []string{
+        reApiPosts.String(),
+        reApiPostsId.String(),
+
+        reApiUserId.String(),
+        reApiUserIdPosts.String(),
+
+        reApiMe.String(),
+        reApiMePosts.String(),
+        reApiMePostsLiked.String(),
+        reApiPostsIdReaction.String(),
+
+        reApiPostsCategories.String(),
+        reApiPostsCategoriesName.String(),
+
+        reApiPostsIdCommentIdReaction.String(),
+        reApiPostsIdComments.String(),
+
+        reApiInternalCheckSession.String(),
+}
+var GetRegexp = regexp.MustCompile(strings.Join(getRegexps, "|"))
+
+var postRegexps = []string{
+        reApiPostsCreate.String(),
+
+        reApiPostsIdLike.String(),
+        reApiPostsIdDislike.String(),
+
+        reApiPostsIdComment.String(),
+        reApiPostsIdCommentIdLike.String(),
+        reApiPostsIdCommentIdDislike.String(),
+
+        reApiSignup.String(),
+        reApiLogin.String(),
+        reApiLogout.String(),
+}
+var PostRegexp = regexp.MustCompile(strings.Join(postRegexps, "|"))
+</pre>
+		
+		<pre class="file" id="file24" style="display: none">package server
+
+import (
+        "database/sql"
+        "forum/database"
+        "log"
+        "net/http"
+        "strings"
+)
+
+type Server struct {
+        DB database.DB
+}
+
+// Connect returns Server with connected database
+func Connect(db *sql.DB) *Server <span class="cov8" title="1">{
+        return &amp;Server{DB: database.DB{DB: db}}
+}</span>
+
+// Start returns http.Handler with all routes
+func (srv *Server) Start() http.Handler <span class="cov8" title="1">{
+        router := http.NewServeMux()
+
+        // Master-handler for:
+        // /api/posts/{id}, /api/posts/{id}/like, /api/posts/{id}/dislike
+        // /api/posts/{id}/comment, /api/posts/{id}/comment/{id}/like, /api/posts/{id}/comment/{id}/dislike
+        router.HandleFunc("/api/posts/", srv.apiPostsMasterHandler)
+
+        // /api/posts handler
+        router.HandleFunc("/api/posts", srv.postsHandler)
+
+        // /api/categories handler
+        router.HandleFunc("/api/posts/categories", srv.postsCategoriesHandler)
+
+        // Master-handler for:
+        // /api/user/{id}, /api/user/{id}/posts, /api/user/{id}
+        router.HandleFunc("/api/user/", srv.apiUserMasterHandler)
+
+        router.HandleFunc("/api/me", srv.apiMeHandler)
+        router.HandleFunc("/api/me/posts", srv.apiMePostsHandler)
+        router.HandleFunc("/api/me/posts/liked", srv.apiMePostsLikedHandler)
+
+        router.HandleFunc("/api/login", srv.loginHandler)
+        router.HandleFunc("/api/signup", srv.signupHandler)
+        router.HandleFunc("/api/logout", srv.logoutHandler)
+
+        router.HandleFunc("/api/internal/check-session", srv.checkSessionHandler)
+
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                defer func() </span><span class="cov8" title="1">{
+                        if err := recover(); err != nil </span><span class="cov0" title="0">{
+                                log.Printf("ERROR %d. %v\n", http.StatusInternalServerError, err)
+                                errorResponse(w, http.StatusInternalServerError) // 500 ERROR
+                        }</span>
+                }()
+                <span class="cov8" title="1">r.URL.Path = strings.TrimSpace(r.URL.Path)
+                switch </span>{
+                case GetRegexp.MatchString(r.URL.Path):<span class="cov8" title="1">
+                        if r.Method != http.MethodGet </span><span class="cov0" title="0">{
+                                errorResponse(w, http.StatusMethodNotAllowed)
+                                return
+                        }</span>
+                case PostRegexp.MatchString(r.URL.Path):<span class="cov8" title="1">
+                        if r.Method != http.MethodPost </span><span class="cov8" title="1">{
+                                errorResponse(w, http.StatusMethodNotAllowed)
+                                return
+                        }</span>
+                default:<span class="cov8" title="1">
+                        errorResponse(w, http.StatusNotFound)
+                        return</span>
+                }
+                <span class="cov8" title="1">router.ServeHTTP(w, r)</span>
+        })
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

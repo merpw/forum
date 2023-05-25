@@ -2,13 +2,13 @@ import { commentForm } from "../pages.js"
 import { updatePostValues } from "./posts.js"
 
 export const displayCommentSection = (id: string) => {
-      // Opens and closes comment section if you press the comment section button
-    fetch(`/api/posts/${id}/comments`)
-      .then((resp) => resp.json())
-      .then((comments) => {
-      if (!comments) return;
+  // Opens and closes comment section if you press the comment section button
+  fetch(`/api/posts/${id}/comments`)
+    .then((resp) => resp.json())
+    .then((comments) => {
+      if (!comments) return
       const commentSection = document.getElementById(`CS${id}`) as HTMLElement
-      if (!commentSection){
+      if (!commentSection) {
         return // Add error handling here
       }
       // If statement for opening the comment section
@@ -37,9 +37,9 @@ export const displayCommentSection = (id: string) => {
           const commentInfo = document.createElement("div")
           commentInfo.className = "comment-info"
           const date = new Date(comments[i].date)
-          const formatDate = date.toLocaleString('en-GB', { timeZone: 'EET' })
+          const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
           commentInfo.textContent = `${comments[i].author.name}\n\tat ${formatDate}`
-            
+
           // Comment content Child
           const commentContent = document.createElement("div")
           commentContent.className = "comment-content"
@@ -48,13 +48,14 @@ export const displayCommentSection = (id: string) => {
           comment.append(commentInfo, commentContent)
           commentSection.appendChild(comment)
         }
-      // Else statement for closing the comment section
+        // Else statement for closing the comment section
       } else {
         commentSection.replaceChildren()
         commentSection.classList.replace("open", "close")
       }
       return
-    }).catch((error) => {
+    })
+    .catch((error) => {
       console.error(error)
     })
 }
@@ -89,7 +90,9 @@ export class CommentCreator {
       .then((response) => {
         if (response.ok) {
           console.log("PostID in CommentCreator", postID)
-          const commentSection = document.getElementById(`CS${postID}`) as HTMLElement
+          const commentSection = document.getElementById(
+            `CS${postID}`
+          ) as HTMLElement
           commentSection.replaceChildren()
           commentSection.classList.replace("open", "close")
           updatePostValues(postID)
@@ -114,8 +117,6 @@ export class CommentCreator {
     if (content) {
       return { content: content.value }
     }
-      throw new Error("Could not find form input fields.")
-    }
+    throw new Error("Could not find form input fields.")
   }
-
-
+}

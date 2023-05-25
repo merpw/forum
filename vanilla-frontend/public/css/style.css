@@ -201,6 +201,9 @@ body {
 
 /* TOPNAV STYLES */
 .topnav {
+  top: 0;
+  z-index: 99;
+  position: fixed;
   display: flex;
   justify-content: space-between;
   background-color: #333;
@@ -216,6 +219,7 @@ body {
   text-decoration: none;
   font-size: 17px;
   transition: 0.4s ease;
+  cursor: pointer;
 }
 
 /* Change the color of links on hover */
@@ -240,7 +244,7 @@ body {
   height: 100%; /* 100% Full-height */
   width: 0; /* 0 width - change this with JavaScript */
   position: fixed;
-  z-index: 1; /* Stay on top */
+  z-index: 999; /* Stay on top */
   top: 0; /* Stay at the top */
   left: 0;
   background-color: #111; /* Black*/
@@ -276,11 +280,22 @@ body {
   color: white;
 }
 
-.chatlist ul li {
-  /* Text color */
+.chat-users li {
+  display: flex;
+  color: white;
   list-style-type: none;
   cursor: pointer;
 }
+
+.chat-users p {
+  margin-right: 5px;
+}
+
+/* .chatlist ul li { */
+   /* Text color */ 
+/*   list-style-type: none; */
+/*   cursor: pointer; */
+/* } */
 
 .chatlist li:before {
   /* Unicode bullet symbol */
@@ -293,7 +308,10 @@ body {
   color: green;
 }
 
-/* On smaller screens, where height is less than 450px, change the style of the chatlist (less padding and a smaller font size) */
+/* 
+ * On smaller screens, where height is less than 450px, change the style of the chatlist.
+ * (less padding and a smaller font size) 
+ */
 @media screen and (max-height: 450px) {
   .chatlist {
     padding-top: 15px;
@@ -325,11 +343,8 @@ body {
   cursor: pointer;
 }
 
-/**
-* Flex Boxes
-*/
-.feed {
-  display: flex;
+#main {
+  margin-top: 53px;
 }
 
 .categories {
@@ -346,12 +361,14 @@ body {
   color: blueviolet;
 }
 
-.feed {
+#feed {
+  display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 500px;
   margin: 6px;
+  padding: 10px 20px;
   background-color: white;
   border-radius: 10px;
 }
@@ -363,14 +380,17 @@ body {
   font-weight: 400;
 }
 
-.feed .post {
+#posts-display {
+  width: 100%;
+}
+
+#feed .post {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin-bottom: 20px;
   padding: 10px;
-  /* height: 300px; */
-  width: 480px;
+  width: 100%; 
   background-color: #265df2;
   color: white;
   border-radius: 10px;
@@ -379,19 +399,18 @@ body {
   overflow: hidden;
 }
 
-.post:hover {
+#feed .post:hover {
   box-shadow: 0 6px 12px rgb(0, 0, 0);
 }
 
 .post-information {
-  /* margin-bottom: 5px; */
-  padding: 0px 5px; /* Add padding on the sides */
+  padding: 0px 5px; 
 }
 
 .post .post-content {
   box-sizing: border-box;
   max-height: 120px;
-  padding: 5px; /* Add padding on the sides */
+  padding: 5px; 
   margin: 5px 0px;
   overflow: hidden;
   word-wrap: break-word;
@@ -479,7 +498,6 @@ body {
 }
 
 #comment-content {
-  margin: 5px;
   width: 100%;
   padding: 5px;
   border-radius: 10px;
@@ -516,39 +534,36 @@ body {
   align-items: center;
   height: 230px;
   width: 500px;
-  padding: 6px 0px 6px 0px;
+  padding: 6px;
   border-radius: 10px;
   background-color: #fff;
-  margin: 6px 0px 4px 0px;
+  margin: 6px;
   overflow: hidden;
 }
 
 #post-form {
   display: flex;
+  width: 100%;
   flex-direction: column;
   align-items: center;
-}
-
-#create-post-flexbox {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  padding: 6px;
 }
 
 #post-title {
-  margin-top: 10px;
-  width: 200px;
+  width: 45%;
+  align-self: flex-start;
+  padding-left: 5px;
 }
 
 #post-content {
   margin: 5px;
+  padding: 5px; 
   width: 100%;
   border-radius: 5px;
 }
 
 #create-post-footer {
   align-self: self-start;
-  margin-left: 5px;
 }
 
 #post-submit {
@@ -568,10 +583,11 @@ body {
 
 #post-category {
   height: 30px;
+  border-radius: 3px;
 }
 /* On smaller screens, where width is less than 500px, change the style of the chatlist (less padding and a smaller font size) */
 @media screen and (max-width: 500px) {
-  .feed {
+  #feed {
     width: 80%;
   }
 
@@ -579,7 +595,7 @@ body {
     width: 90%;
   }
 
-  .feed .post {
+  #feed .post {
     width: 100%;
   }
 
@@ -590,11 +606,15 @@ body {
   .topnav a {
     font-size: 12px;
   }
-  
-  #create-post {
-    width: 80%;
-    padding: 6px;
+
+  .category-selection {
+    flex-direction: column;
   }
-
+  /* .title { */
+  /*   font-size: 12px; */
+  /* } */
+  /* #create-post { */
+  /*   width: 80%; */
+  /*   padding: 6px; */
+  /* } */
 }
-

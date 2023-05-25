@@ -1,7 +1,7 @@
 import { WebSocketResponse } from "./types"
 
 const WS_URL = "ws://localhost:6969"
-export let ws: WebSocket;
+export let ws: WebSocket
 
 export const wsHandler = async () => {
   ws = new WebSocket(WS_URL)
@@ -48,8 +48,4 @@ export const wsHandler = async () => {
   ws.onclose = () => {
     console.log("ws disconnected")
   }
-  
-
 }
-
-
