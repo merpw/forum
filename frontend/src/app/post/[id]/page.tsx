@@ -32,7 +32,7 @@ export const generateStaticParams = async () => {
 }
 
 const Page = async ({ params }: { params: { id: string } }) => {
-  const post = await getPostLocal(+params.id)
+  const post = await getPostLocal(+params.id).catch(notFound)
   post.content = await RenderMarkdown(post.content)
 
   const comments = await getPostCommentsLocal(+params.id).catch(() => [])

@@ -28,7 +28,7 @@ export const generateStaticParams = async () => {
 }
 
 const Page = async ({ params }: Props) => {
-  const posts = await getCategoryPostsLocal(params.name)
+  const posts = await getCategoryPostsLocal(params.name).catch(notFound)
 
   return <CategoryPage categoryName={Capitalize(params.name)} posts={posts} />
 }

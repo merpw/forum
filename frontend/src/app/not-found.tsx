@@ -1,10 +1,12 @@
 import Link from "next/link"
-import { NextSeo } from "next-seo"
+
+// unexpected error with edge runtime, the page is static
+export const runtime = "nodejs"
 
 export default function Custom404() {
   return (
     <>
-      <NextSeo title={"Not Found"} />
+      <title>Not Found - Forum</title>
       <div className={"text-center my-20"}>
         <div className={"text-5xl m-auto"}>
           <h1 className={"text-8xl opacity-80"}>404</h1>
