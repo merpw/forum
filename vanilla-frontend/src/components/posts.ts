@@ -180,7 +180,7 @@ const formattedPost = (
   const postComments = document.createElement("div")
   postComments.className = "post-comments post-icon"
   postComments.id = `C${id}`
-  postComments.innerHTML = `<i class="bx bx-comment"></i> ${commentCount}`
+  postComments.innerHTML = `<i class="bx bx-comment" style="font-size: 20px; margin-right: 5px;"></i>  ${commentCount}`
   postComments.addEventListener("click", () => {
     displayCommentSection(id)
     updatePostValues(id)
@@ -189,7 +189,7 @@ const formattedPost = (
   const postLikes = document.createElement("div")
   postLikes.className = "post-likes post-icon"
   postLikes.id = `L${id}`
-  postLikes.innerHTML = `<i class="bx bx-like"></i> ${likeCount}`
+  postLikes.innerHTML = `<i class="bx bx-like" style="font-size: 20px; margin-right: 5px;"></i>  ${likeCount}`
   postLikes.addEventListener("click", () => {
     fetch(`/api/posts/${id}/like`, {
       method: "POST",
@@ -211,7 +211,7 @@ const formattedPost = (
   const postDislikes = document.createElement("div")
   postDislikes.className = "post-dislikes post-icon"
   postDislikes.id = `D${id}`
-  postDislikes.innerHTML = `<i class="bx bx-dislike"></i> ${dislikeCount}`
+  postDislikes.innerHTML = `<i class="bx bx-dislike" style="font-size: 20px; margin-right: 5px;"></i>  ${dislikeCount}`
   postDislikes.addEventListener("click", () => {
     fetch(`/api/posts/${id}/dislike`, {
       method: "POST",

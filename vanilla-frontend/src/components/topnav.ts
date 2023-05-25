@@ -83,12 +83,12 @@ export const topnavController = () => {
     topNavHome.addEventListener("click", goHome)
     topNavLogout.addEventListener("click", logout)
     topNavChat.addEventListener("click", () => {
+      chatList.classList.add("chat-list-open")
       chatList.style.width = "200px"
     })
     chatClose.addEventListener("click", () => {
+      chatList.classList.remove("chat-list-open")
       chatList.style.width = "0"
     })
   }
 }
-
-
