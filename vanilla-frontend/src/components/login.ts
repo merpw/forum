@@ -1,8 +1,6 @@
-import { LoginForm, SignupForm } from "LoginModule"
+import { LoginForm, SignupForm } from "./types"
 import { Auth } from "./auth.js"
-// import { WS } from "../main.js"
-
-
+import { wsHandler } from "./ws.js"
 
 class Login {
   private readonly form: HTMLFormElement
@@ -12,13 +10,13 @@ class Login {
     this.form.addEventListener("submit", this.onSubmit.bind(this))
   }
 
-  private onSubmit(event: Event) {
+  private async onSubmit(event: Event) {
     event.preventDefault()
     const usernameInput =
-        this.form.querySelector<HTMLInputElement>("#username-login"),
-      passwordInput =
-        this.form.querySelector<HTMLInputElement>("#password-login"),
-      rememberMeInput = this.form.querySelector<HTMLInputElement>("#logCheck")
+    this.form.querySelector<HTMLInputElement>("#username-login"),
+    passwordInput =
+    this.form.querySelector<HTMLInputElement>("#password-login"),
+    rememberMeInput = this.form.querySelector<HTMLInputElement>("#logCheck")
 
     if (usernameInput && passwordInput && rememberMeInput) {
       const formData: LoginForm = {
@@ -34,21 +32,19 @@ class Login {
         },
         body: JSON.stringify(formData),
       }).then((response) => {
-        if (response.ok) {
-          // const WSConn = new WebSocket("wss://localhost:8080/api/ws")
-          // WS.push(WSConn)
-          Auth(true)
-        } else {
-          // TODO: Fix this error handling. It is super bad.
-          response.text().then((error) => {
-            console.log(`Error: ${error}`)
-          })
-        }
-      })
+          if (response.ok) {
+            wsHandler() 
+            Auth(true)
+          } else {
+            // TODO: Fix this error handling. It is super bad.
+            response.text().then((error) => {
+              console.log(`Error: ${error}`)
+            })
+          }
+        })
     }
   }
 }
-
 
 class Signup {
   private readonly form: HTMLFormElement
@@ -99,14 +95,14 @@ class Signup {
 
     if (
       firstNameInput &&
-      lastNameInput &&
-      usernameInput &&
-      emailInput &&
-      passwordInput &&
-      ageInput &&
-      genderInput &&
-      passwordInput &&
-      passwordRepeatInput
+        lastNameInput &&
+        usernameInput &&
+        emailInput &&
+        passwordInput &&
+        ageInput &&
+        genderInput &&
+        passwordInput &&
+        passwordRepeatInput
     ) {
       if (passwordInput.value != passwordRepeatInput.value) {
         //TODO: Display error message to user.
@@ -131,21 +127,29 @@ class Signup {
 // All functionality for the login/signup form
 export const loginController = () => {
   const loginSignupForm = document.querySelector(".container") as HTMLElement,
-    // pwShowHide = document.querySelectorAll(
-    //   ".showHidePw"
-    // ) as NodeListOf<HTMLElement>,
-    // pwFields = document.querySelectorAll(
-    //   ".password"
-    // ) as NodeListOf<HTMLInputElement>, WHY IS THIS REMOVED..? WILL FIX AT HOME. 
-    signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
-    loginLink = document.querySelector(".login-link") as HTMLInputElement
+  pwShowHide = document.querySelectorAll(".showHidePw") as NodeListOf<HTMLElement>,
+  pwFields = document.querySelectorAll(".password") as NodeListOf<HTMLInputElement>,  
+  signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
+  loginLink = document.querySelector(".login-link") as HTMLInputElement
 
-  loginSignupForm.classList.remove("active")
+  if (loginSignupForm.classList.contains("active")){
+    loginSignupForm.classList.remove("active")
+  }
 
-  // To show/hide password in Auth form.
-  // pwShowHide.forEach((eyeIcon) => {
-  // }) SOMEHOW THIS GOT REMOVED... WHY?
-  // To go from login to sign in.
+  pwShowHide.forEach((eyeIcon) => {
+    eyeIcon.addEventListener("click", () => {
+
+      pwFields.forEach((input) => {
+        if (input.getAttribute("type") === "password") {
+          input.setAttribute("type", "text")
+        } else {
+          input.setAttribute("type", "password")
+        }
+
+      })
+    })
+  }) 
+
   signUpLink?.addEventListener("click", () => {
     loginSignupForm.classList.add("active")
   })
@@ -162,6 +166,6 @@ export const loginController = () => {
     new Login(loginForm)
   } else {
     console.error("Something went wrong.")
-    // TODO: error handling here maybe?
-}
+    // TODO: error handling here
+  }
 }

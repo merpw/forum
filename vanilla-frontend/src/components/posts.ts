@@ -1,4 +1,4 @@
-import { CreatePostBody } from "POST"
+import { CreatePostBody } from "./types"
 import { openCloseCreatePost } from "./topnav.js"
 import { displayCommentSection } from "./comments.js"
 
@@ -11,7 +11,6 @@ export const displayPosts = (endpoint: string) => {
     .then((posts) => {
       // Posts is the array of objects sent by the server
       for (const post of posts) {
-          console.log(post)
           const date = new Date(post.date)
           const formatDate = date.toLocaleString('en-GB', { timeZone: 'EET' })
   

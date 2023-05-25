@@ -1,4 +1,4 @@
-import { ActiveUser, InactiveUser } from "Chat";
+import { ActiveUser, InactiveUser } from "./types";
 
 const chatUsers = {
     active: [] as ActiveUser[],    /* Active users are users you have a chat history with */ 
