@@ -1,23 +1,33 @@
+"use client"
+
 import Link from "next/link"
 import { useEffect, useState } from "react"
-import { NextSeo } from "next-seo"
 
-export default function Custom500() {
+// TODO: add error-global to handle layout errors
+// TODO: add automatic error reporting
+
+export default function Custom500({ reset }: { error: Error; reset: () => void }) {
   const [devMessage, setDevMessage] = useState("")
   useEffect(() => {
     setDevMessage(`Error 500 on ${document.URL}`)
   }, [])
   return (
     <>
-      <NextSeo title={"Oops... Error 500"} />
+      <title>Oops... Error 500 - Forum</title>
       <div className={"text-center"}>
         <h1 className={"text-5xl m-auto"}>500 Internal Server Error</h1>
         <p className={"text-2xl my-5 font-light"}>
-          {"Please, try to update page or visit "}
-          <Link href={"/"} className={"button"}>
-            Back to homepage
-          </Link>
+          {"Please, try again later or go to the Home page"}
         </p>
+        <div className={"flex gap-3 justify-center"}>
+          <button className={"text-2xl button"} onClick={reset}>
+            Try again
+          </button>
+          <Link href={"/"}>
+            <button className={"text-2xl button"}>To the home page</button>
+          </Link>
+        </div>
+
         <p className={"text-2xl my-5 font-light"}>
           {"If error persists, please, "}
           <Link
