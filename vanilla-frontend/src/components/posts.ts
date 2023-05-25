@@ -5,27 +5,27 @@ import { displayCommentSection } from "./comments.js"
 export const displayPosts = (endpoint: string) => {
   const postsDisplay = document.getElementById("posts-display") as HTMLElement
   postsDisplay.replaceChildren()
-  const postList: Array<HTMLDivElement> = [];
+  const postList: Array<HTMLDivElement> = []
   fetch(endpoint)
     .then((response) => response.json())
     .then((posts) => {
       // Posts is the array of objects sent by the server
       for (const post of posts) {
-          const date = new Date(post.date)
-          const formatDate = date.toLocaleString('en-GB', { timeZone: 'EET' })
-  
-       const postDiv = formattedPost (
-            post.id.toString(),
-            post.title,
-            post.author.name,
-            post.author.id.toString(),
-            formatDate,
-            post.categories,
-            post.content,
-            post.comments_count.toString(),
-            post.likes_count.toString(),
-            post.dislikes_count.toString()
-          )
+        const date = new Date(post.date)
+        const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
+
+        const postDiv = formattedPost(
+          post.id.toString(),
+          post.title,
+          post.author.name,
+          post.author.id.toString(),
+          formatDate,
+          post.categories,
+          post.content,
+          post.comments_count.toString(),
+          post.likes_count.toString(),
+          post.dislikes_count.toString()
+        )
         postList.push(postDiv)
       }
       postList.reverse()
@@ -100,14 +100,8 @@ export class PostCreator {
         console.error(error)
       })
   }
-  
+
   // Gets all values from the form, and puts it in CreatePostBody type.
-  // CreatePostBody {
-  //  Title:       string
-  //  Content:     string
-  //  Description: string
-  //  Categories:  string[]
-  // }
   private getFormData(): CreatePostBody {
     // Form inputs
     const title = this.form.querySelector<HTMLInputElement>("#post-title"),
@@ -159,15 +153,20 @@ const formattedPost = (
   postAuthor.className = "post-author"
   postAuthor.id = `${authorId}`
   postAuthor.textContent = `by ${author} at ${dateAndTime}`
-  
-  // Creates the category div 
+
+  // Creates the category div
   const postCategories = document.createElement("div")
   postCategories.className = "post-categories"
-  postCategories.textContent = `#${category}` 
+  postCategories.textContent = `#${category}`
 
-  postInformation.append(postTitle, postAuthor, postCategories, document.createElement("hr"))
-  
-  // Creates post-content 
+  postInformation.append(
+    postTitle,
+    postAuthor,
+    postCategories,
+    document.createElement("hr")
+  )
+
+  // Creates post-content
   const postContent = document.createElement("div")
   postContent.className = "post-content"
   postContent.textContent = `${content}`
@@ -238,26 +237,26 @@ const formattedPost = (
 
   newPost.append(postInformation, postContent, postFooter, commentSection)
 
-  return newPost  
- //  return `
- //  <div class="post" id="${id}">
- //    <div class="post-information">
- //      <div class="post-title"><h4>${title}</h4></div>
- //      <div class="post-author" id="${authorId}">by ${author} at ${date}</div>
- //      <div class="post-categories">#${category}</div>
- //      <hr>
- //  	</div>
+  return newPost
+  //  return `
+  //  <div class="post" id="${id}">
+  //    <div class="post-information">
+  //      <div class="post-title"><h4>${title}</h4></div>
+  //      <div class="post-author" id="${authorId}">by ${author} at ${date}</div>
+  //      <div class="post-categories">#${category}</div>
+  //      <hr>
+  //  	</div>
 
-	// <div class="post-content">
+  // <div class="post-content">
 
-	// </div>
+  // </div>
 
-	// <div class="post-footer" id="${id}">
-	// 	<div class="post-comments post-icon" id="C${id}"><i class='bx bx-comment'></i> ${commentCount}</div>
-	// 	<div class="post-likes post-icon" id="L${id}"><i class='bx bx-like' ></i> ${likeCount}</div>
-	// 	<div class="post-dislikes post-icon" id="D${id}"><i class='bx bx-dislike' ></i> ${dislikeCount}</div>
-	// </div>
- //  <section class="comments-section close" id=CS${id}></section>
- //  </div>
-	// `
+  // <div class="post-footer" id="${id}">
+  // 	<div class="post-comments post-icon" id="C${id}"><i class='bx bx-comment'></i> ${commentCount}</div>
+  // 	<div class="post-likes post-icon" id="L${id}"><i class='bx bx-like' ></i> ${likeCount}</div>
+  // 	<div class="post-dislikes post-icon" id="D${id}"><i class='bx bx-dislike' ></i> ${dislikeCount}</div>
+  // </div>
+  //  <section class="comments-section close" id=CS${id}></section>
+  //  </div>
+  // `
 }

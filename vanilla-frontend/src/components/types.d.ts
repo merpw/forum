@@ -147,9 +147,7 @@ export type WSErrorResponse = WSBase & {
 export type WebSocketRequest<T> = WSHandshake | WSGetRequest | WSPostRequest<T>
 
 export type WebSocketResponse<T> =
-| WSHandshake
-| WSGetResponse<T>
-| WSPostResponse<T>
-| WSErrorResponse
-
-
+  | WSHandshake
+  | WSGetResponse<T>
+  | WSPostResponse<T>
+  | WSErrorResponse

@@ -3,7 +3,7 @@ import { WebSocketRequest, WSErrorResponse } from "./types"
 import getHandler from "./get"
 import postHandler from "./post"
 
-const backendUrl = process.env.FORUM_BACKEND_URL || "http://localhost:8080"
+const backendUrl = "http://localhost:8080"
 
 /** Check if session is valid
  * @returns The id of the user
@@ -13,7 +13,6 @@ const checkSession = async (token: string) => {
   const resp = await fetch(
     `${backendUrl}/api/internal/check-session?token=${token}`
   )
-
   if (resp.status !== 200) {
     console.error(resp)
     throw new Error("Unexpected response from backend")
@@ -21,11 +20,11 @@ const checkSession = async (token: string) => {
 
   const response = (await resp.json()) as number | { error: string }
   // TODO: maybe change to return { userId: number }
-
+  console.log("response:", response)
+  console.log("typeof:", typeof response)
   if (typeof response !== "number") {
     throw new Error(response.error)
   }
-
   return response
 }
 
@@ -53,12 +52,12 @@ wss.on("connection", async (ws) => {
 
       if (message.type === "handshake") {
         const userId = await checkSession(message.item.token)
-
+        console.log("userID", userId)
         connections.set(ws, {
           userId,
           token: message.item.token,
         })
-
+        console.log("returns handshake")
         return ws.send(
           JSON.stringify({
             type: "handshake",
@@ -96,6 +95,7 @@ wss.on("connection", async (ws) => {
         )
       )
     } catch (err) {
+      console.log("catch:", err)
       if ((err as Error).message === "fetch failed") {
         console.log("Fetch failed, Forum backend is unavailable")
       }

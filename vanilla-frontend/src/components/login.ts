@@ -13,10 +13,10 @@ class Login {
   private async onSubmit(event: Event) {
     event.preventDefault()
     const usernameInput =
-    this.form.querySelector<HTMLInputElement>("#username-login"),
-    passwordInput =
-    this.form.querySelector<HTMLInputElement>("#password-login"),
-    rememberMeInput = this.form.querySelector<HTMLInputElement>("#logCheck")
+        this.form.querySelector<HTMLInputElement>("#username-login"),
+      passwordInput =
+        this.form.querySelector<HTMLInputElement>("#password-login"),
+      rememberMeInput = this.form.querySelector<HTMLInputElement>("#logCheck")
 
     if (usernameInput && passwordInput && rememberMeInput) {
       const formData: LoginForm = {
@@ -32,16 +32,16 @@ class Login {
         },
         body: JSON.stringify(formData),
       }).then((response) => {
-          if (response.ok) {
-            wsHandler() 
-            Auth(true)
-          } else {
-            // TODO: Fix this error handling. It is super bad.
-            response.text().then((error) => {
-              console.log(`Error: ${error}`)
-            })
-          }
-        })
+        if (response.ok) {
+          wsHandler()
+          Auth(true)
+        } else {
+          // TODO: Fix this error handling. It is super bad.
+          response.text().then((error) => {
+            console.log(`Error: ${error}`)
+          })
+        }
+      })
     }
   }
 }
@@ -83,26 +83,29 @@ class Signup {
 
   private getFormData(): SignupForm {
     // Form inputs
-    const 
-    usernameInput = this.form.querySelector<HTMLInputElement>("#username-register"),
-    emailInput = this.form.querySelector<HTMLInputElement>("#email"),
-    passwordInput = this.form.querySelector<HTMLInputElement>("#password-register"),
-    firstNameInput = this.form.querySelector<HTMLInputElement>("#first-name"),
-    lastNameInput = this.form.querySelector<HTMLInputElement>("#last-name"),
-    ageInput = this.form.querySelector<HTMLInputElement>("#age"),
-    genderInput = this.form.querySelector<HTMLInputElement>("#gender"),
-    passwordRepeatInput = this.form.querySelector<HTMLInputElement>("#password-register-repeat")
+    const usernameInput =
+        this.form.querySelector<HTMLInputElement>("#username-register"),
+      emailInput = this.form.querySelector<HTMLInputElement>("#email"),
+      passwordInput =
+        this.form.querySelector<HTMLInputElement>("#password-register"),
+      firstNameInput = this.form.querySelector<HTMLInputElement>("#first-name"),
+      lastNameInput = this.form.querySelector<HTMLInputElement>("#last-name"),
+      ageInput = this.form.querySelector<HTMLInputElement>("#age"),
+      genderInput = this.form.querySelector<HTMLInputElement>("#gender"),
+      passwordRepeatInput = this.form.querySelector<HTMLInputElement>(
+        "#password-register-repeat"
+      )
 
     if (
       firstNameInput &&
-        lastNameInput &&
-        usernameInput &&
-        emailInput &&
-        passwordInput &&
-        ageInput &&
-        genderInput &&
-        passwordInput &&
-        passwordRepeatInput
+      lastNameInput &&
+      usernameInput &&
+      emailInput &&
+      passwordInput &&
+      ageInput &&
+      genderInput &&
+      passwordInput &&
+      passwordRepeatInput
     ) {
       if (passwordInput.value != passwordRepeatInput.value) {
         //TODO: Display error message to user.
@@ -127,28 +130,30 @@ class Signup {
 // All functionality for the login/signup form
 export const loginController = () => {
   const loginSignupForm = document.querySelector(".container") as HTMLElement,
-  pwShowHide = document.querySelectorAll(".showHidePw") as NodeListOf<HTMLElement>,
-  pwFields = document.querySelectorAll(".password") as NodeListOf<HTMLInputElement>,  
-  signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
-  loginLink = document.querySelector(".login-link") as HTMLInputElement
+    pwShowHide = document.querySelectorAll(
+      ".showHidePw"
+    ) as NodeListOf<HTMLElement>,
+    pwFields = document.querySelectorAll(
+      ".password"
+    ) as NodeListOf<HTMLInputElement>,
+    signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
+    loginLink = document.querySelector(".login-link") as HTMLInputElement
 
-  if (loginSignupForm.classList.contains("active")){
+  if (loginSignupForm.classList.contains("active")) {
     loginSignupForm.classList.remove("active")
   }
 
   pwShowHide.forEach((eyeIcon) => {
     eyeIcon.addEventListener("click", () => {
-
       pwFields.forEach((input) => {
         if (input.getAttribute("type") === "password") {
           input.setAttribute("type", "text")
         } else {
           input.setAttribute("type", "password")
         }
-
       })
     })
-  }) 
+  })
 
   signUpLink?.addEventListener("click", () => {
     loginSignupForm.classList.add("active")

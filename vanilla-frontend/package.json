@@ -1,6 +1,6 @@
 {
-  "type": "module",
   "scripts": {
+    "server": "ts-node src/dummy-ws/server.ts",
     "dev": "tsc -w & serve public",
     "start": "serve public",
     "build": "npx tsc",
@@ -16,6 +16,7 @@
     "prettier": "^2.8.8",
     "serve": "^14.2.0",
     "tsc": "^2.0.4",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
   "eslintConfig": {

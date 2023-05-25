@@ -17,7 +17,7 @@ export const homeBtn = document.getElementById(
 // Opens the create post section of the feed
 export const openCloseCreatePost = () => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
-  if (!postFormElement) return;
+  if (!postFormElement) return
   if (postFormElement.classList.contains("close")) {
     postFormElement.innerHTML = postForm()
     postFormElement.classList.replace("close", "open")
@@ -42,17 +42,6 @@ export const goHome = () => {
   displayPosts("/api/posts")
 }
 
-export const topnavController = () => {
-  const topNavPost = document.getElementById("topnav-post") as HTMLElement
-  const topNavHome = document.getElementById("topnav-post") as HTMLElement
-  const topNavLogout = document.querySelector(".logout") as HTMLElement
-  if (topNavPost && topNavHome && topNavLogout){
-    topNavPost.addEventListener("click", openCloseCreatePost)
-    topNavHome.addEventListener("click", goHome)
-    topNavLogout.addEventListener("click", logout)
-  }
-}
-
 // Logs out the user, deletes the cookie from backend.
 const logout = () => {
   fetch("/api/logout", {
@@ -60,14 +49,46 @@ const logout = () => {
     headers: {
       "Content-Type": "application/json",
     },
+  }).then((response) => {
+    if (response.ok) {
+      ws.close(1000, "User logging out. Closing connection.")
+      Auth(false)
+    } else {
+      superDivision.innerHTML = errorPage(response.status)
+      return
+    }
   })
-    .then((response) => {
-      if (response.ok) {
-        ws.close(1000, "User logging out. Closing connection.")
-        Auth(false)
-      } else {
-        superDivision.innerHTML = errorPage(response.status)
-        return
-      }
-    })
 }
+// Adds event listener to the topNav
+export const topnavController = () => {
+  const topNavPost = document.getElementById(
+      "topnav-post"
+    ) as HTMLAnchorElement,
+    topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
+    topNavLogout = document.getElementById(
+      "topnav-logout"
+    ) as HTMLAnchorElement,
+    topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
+    chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
+    chatList = document.getElementById("chatlist") as HTMLDivElement
+
+  if (
+    topNavPost &&
+    topNavHome &&
+    topNavLogout &&
+    topNavChat &&
+    HTMLDivElement
+  ) {
+    topNavPost.addEventListener("click", openCloseCreatePost)
+    topNavHome.addEventListener("click", goHome)
+    topNavLogout.addEventListener("click", logout)
+    topNavChat.addEventListener("click", () => {
+      chatList.style.width = "200px"
+    })
+    chatClose.addEventListener("click", () => {
+      chatList.style.width = "0"
+    })
+  }
+}
+
+
