@@ -128,10 +128,10 @@ export const Index = (): string => {
 
     <div id="chatlist" class="chatlist">
         <a href="#close-chat" id="chat-close" class="closebtn"><i class='bx bx-x'></i></a>
-        <h2 style="color: white; margin-left: 20px;">Online:</h2>
+        <h2 id="online-title" style="color: black; margin-left: 20px;">Online <i id="online-toggle" class='bx bx-chevron-down'></i></h2>
         <ul id="online-users" class="chat-users"></ul>
-        <h2 style="color: white; margin-left: 20px;">Offline:</h2>
-        <ul id="offline-users" class="chat-users"></ul>
+        <h2 id="offline-title" style="color: black; margin: 10px 0px 0px 20px;">Offline <i id="offline-toggle" class='bx bx-chevron-right'></i></h2>
+        <ul id="offline-users" class="chat-users" style="display: none;"></ul>
     </div>
 <main id="main">
   <section id="create-post" class="close"></section>

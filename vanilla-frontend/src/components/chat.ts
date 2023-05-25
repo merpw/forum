@@ -47,8 +47,15 @@ function getChatUsers() {
 
 export const displayChatUsers = () => {
   const onlineList = document.getElementById("online-users") as HTMLUListElement
-  const offlineList = document.getElementById("offline-users") as HTMLUListElement
-  if (!onlineList || !offlineList) return
+  const offlineList = document.getElementById(
+    "offline-users"
+  ) as HTMLUListElement
+  const onlineTitle = document.getElementById("online-title") as HTMLElement
+  const offlineTitle = document.getElementById("offline-title") as HTMLElement
+  if (!onlineList || !offlineList || !onlineTitle || !offlineTitle) return
+  /* Add eventlisteners to show/hide users in chat list */
+  onlineTitle.addEventListener("click", toggleOnline)
+  offlineTitle.addEventListener("click", toggleOffline)
   getChatUsers()
 
   /* This loop gets all the ACTIVE users and appends them to chatlist */
@@ -58,11 +65,13 @@ export const displayChatUsers = () => {
     userName.id = user.ID.toString()
     userName.textContent = `${user.Name} `
     newElement.appendChild(userName)
+
     if (user.UnreadMSG) {
       const unreadElement = document.createElement("i")
       unreadElement.className = "bx bx-message-dots"
       newElement.appendChild(unreadElement)
     }
+
     if (user.Online) {
       newElement.className = "online"
       onlineList.appendChild(newElement)
@@ -86,5 +95,37 @@ export const displayChatUsers = () => {
       newElement.className = "offline"
       offlineList.appendChild(newElement)
     }
+  }
+}
+
+const toggleOnline = () => {
+  const onlineToggle = document.getElementById("online-toggle") as HTMLElement
+  const onlineUsers = document.getElementById(
+    "online-users"
+  ) as HTMLUListElement
+  if (!onlineToggle || !onlineUsers) return
+
+  if (onlineToggle.className === "bx bx-chevron-down") {
+    onlineToggle.className = "bx bx-chevron-right"
+    onlineUsers.style.display = "none"
+  } else {
+    onlineToggle.className = "bx bx-chevron-down"
+    onlineUsers.style.display = "block"
+  }
+}
+
+const toggleOffline = () => {
+  const offlineToggle = document.getElementById("offline-toggle") as HTMLElement
+  const offlineUsers = document.getElementById(
+    "offline-users"
+  ) as HTMLUListElement
+  if (!offlineToggle) return
+
+  if (offlineToggle.className === "bx bx-chevron-down") {
+    offlineToggle.className = "bx bx-chevron-right"
+    offlineUsers.style.display = "none"
+  } else {
+    offlineToggle.className = "bx bx-chevron-down"
+    offlineUsers.style.display = "block"
   }
 }

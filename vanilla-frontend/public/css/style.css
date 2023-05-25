@@ -3,6 +3,8 @@
 body {
   background-color: #4070f4;
   height: 100vh;
+  font-weight: 500;
+  overflow-y: scroll;
 }
 
 #super-division {
@@ -179,7 +181,7 @@ body {
 
 .form .button input {
   border: none;
-  color: #fff;
+  color: whitesmoke;
   font-size: 17px;
   font-weight: 500;
   letter-spacing: 1px;
@@ -206,7 +208,7 @@ body {
   position: fixed;
   display: flex;
   justify-content: space-between;
-  background-color: #333;
+  background-color: whitesmoke;
   overflow: hidden;
   width: 100%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
@@ -214,7 +216,9 @@ body {
 
 /* Style the links inside the navigation bar */
 .topnav a {
-  color: #f2f2f2;
+  display: flex;
+  align-items: center;
+  color: black;
   padding: 14px 16px;
   text-decoration: none;
   font-size: 17px;
@@ -222,10 +226,15 @@ body {
   cursor: pointer;
 }
 
+.topnav a i {
+  font-size: 20px; 
+  margin-right: 5px;
+}
+
 /* Change the color of links on hover */
 .topnav a:hover {
-  background-color: #ddd;
-  color: black;
+  background-color: #4070f4;
+  color: white;
 }
 
 /* Add an active class to highlight the current page */
@@ -241,15 +250,21 @@ body {
 
 /* The side navigation menu */
 .chatlist {
-  height: 100%; /* 100% Full-height */
-  width: 0; /* 0 width - change this with JavaScript */
+  height: 100%;
+  width: 0;
   position: fixed;
   z-index: 999; /* Stay on top */
-  top: 0; /* Stay at the top */
+  top: 0; 
   left: 0;
-  background-color: #111; /* Black*/
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 20px; /* Place content 60px from the top */
+  background-color: whitesmoke;
+  overflow-x: hidden; 
+  padding-top: 70px;
+  transition: 0.5s ease;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.chatlist h2 {
+  cursor: pointer;
 }
 
 /* The navigation menu links */
@@ -264,7 +279,7 @@ body {
 
 /* When you mouse over the navigation links, change their color */
 .chatlist a:hover {
-  color: #f1f1f1;
+  color: black;;
 }
 
 /* Position and style the close button (top right corner) */
@@ -277,12 +292,15 @@ body {
 
 .chatlist .chat-users {
   margin-left: 20px;
-  color: white;
+  color: black;
+  height: auto;
+  transition: 0.3s ease;
 }
 
 .chat-users li {
   display: flex;
-  color: white;
+  align-items: center;
+  color: black;
   list-style-type: none;
   cursor: pointer;
 }
@@ -290,12 +308,6 @@ body {
 .chat-users p {
   margin-right: 5px;
 }
-
-/* .chatlist ul li { */
-   /* Text color */ 
-/*   list-style-type: none; */
-/*   cursor: pointer; */
-/* } */
 
 .chatlist li:before {
   /* Unicode bullet symbol */
@@ -344,7 +356,13 @@ body {
 }
 
 #main {
-  margin-top: 53px;
+  margin-top: 56px; /* Just to put it below the navbar */
+  width: 700px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .categories {
@@ -366,11 +384,12 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 500px;
+  width: 100%;
   margin: 6px;
   padding: 10px 20px;
   background-color: white;
   border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
 
 .categories h3 {
@@ -390,7 +409,7 @@ body {
   justify-content: space-between;
   margin-bottom: 20px;
   padding: 10px;
-  width: 100%; 
+  width: 100%;
   background-color: #265df2;
   color: white;
   border-radius: 10px;
@@ -404,13 +423,13 @@ body {
 }
 
 .post-information {
-  padding: 0px 5px; 
+  padding: 0px 5px;
 }
 
 .post .post-content {
   box-sizing: border-box;
   max-height: 120px;
-  padding: 5px; 
+  padding: 5px;
   margin: 5px 0px;
   overflow: hidden;
   word-wrap: break-word;
@@ -422,7 +441,7 @@ body {
   align-items: center;
   overflow: hidden;
   color: black;
-  background-color: lightblue;
+  background-color: whitesmoke;
   height: 40px;
   font-size: 16px;
   border-radius: 5px;
@@ -467,6 +486,11 @@ body {
   transition: 0.3s ease;
 }
 
+.post-footer i {
+  font-size: 20px; 
+  margin-right: 5px;
+}
+
 .post-dislikes:hover {
   background-color: #4070f4;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
@@ -489,7 +513,7 @@ body {
 }
 
 .comment-form {
-  background-color: lightblue;
+  background-color: whitesmoke;
   border-radius: 5px;
   padding: 10px;
   width: 100%;
@@ -501,6 +525,7 @@ body {
   width: 100%;
   padding: 5px;
   border-radius: 10px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
 }
 
 .comment-submit {
@@ -510,6 +535,7 @@ body {
   border-radius: 3px;
   background-color: #72bee4;
   transition: 0.4s ease;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
 }
 
 .comment-submit:hover {
@@ -519,7 +545,7 @@ body {
 
 .comment {
   color: black;
-  background-color: lightblue;
+  background-color: whitesmoke;
   border-radius: 5px;
   margin: 5px;
   box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
@@ -527,18 +553,22 @@ body {
   word-wrap: break-word;
 }
 
+.comment-info {
+  font-weight: 600;
+}
+
 /* CREATE POST STYLES */
 #create-post {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 230px;
-  width: 500px;
+  overflow: hidden;
+  width: 100%;
   padding: 6px;
   border-radius: 10px;
-  background-color: #fff;
+  background-color: whitesmoke;
   margin: 6px;
-  overflow: hidden;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
 
 #post-form {
@@ -550,20 +580,26 @@ body {
 }
 
 #post-title {
-  width: 45%;
+  width: 35%;
   align-self: flex-start;
-  padding-left: 5px;
+  border-radius: 8px;
+  padding: 3px 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 #post-content {
   margin: 5px;
-  padding: 5px; 
+  padding: 5px;
   width: 100%;
-  border-radius: 5px;
+  border-radius: 4px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
 }
 
 #create-post-footer {
+  display: flex;
   align-self: self-start;
+  align-items: center;
+  margin-left: 5px;
 }
 
 #post-submit {
@@ -574,6 +610,7 @@ body {
   margin-left: 10px;
   background-color: #72bee4;
   transition: 0.4s ease;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
 }
 
 #post-submit:hover {
@@ -584,22 +621,15 @@ body {
 #post-category {
   height: 30px;
   border-radius: 3px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
 }
 /* On smaller screens, where width is less than 500px, change the style of the chatlist (less padding and a smaller font size) */
 @media screen and (max-width: 500px) {
-  #feed {
-    width: 80%;
-  }
-
-  #posts-display {
+  #main {
     width: 90%;
   }
 
-  #feed .post {
-    width: 100%;
-  }
-
-  .openChatlist {
+  .chat-list-open {
     width: 100%;
   }
 
