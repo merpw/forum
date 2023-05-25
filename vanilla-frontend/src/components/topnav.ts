@@ -2,6 +2,7 @@ import { superDivision } from "../main.js"
 import { errorPage, postForm } from "../pages.js"
 import { Auth } from "./auth.js"
 import { PostCreator, displayPosts } from "./posts.js"
+import { ws } from "./ws.js"
 
 export const postBtn = document.getElementById(
   "topnav-post"
@@ -62,8 +63,7 @@ const logout = () => {
   })
     .then((response) => {
       if (response.ok) {
-        // WS[0].close(1000, "User logging out. Closing connection.")
-        // WS.pop()
+        ws.close(1000, "User logging out. Closing connection.")
         Auth(false)
       } else {
         superDivision.innerHTML = errorPage(response.status)
