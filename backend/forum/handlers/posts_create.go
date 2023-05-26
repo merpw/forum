@@ -1,4 +1,4 @@
-package server
+package handlers
 
 import (
 	"encoding/json"
@@ -8,9 +8,9 @@ import (
 	"strings"
 )
 
-// postsCreateHandler creates a new post in the database
-func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+// postsCreate creates a new post in the database
+func (handlers *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
+	userId := handlers.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -80,7 +80,7 @@ func (srv *Server) postsCreateHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
+	id := handlers.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
 		userId, strings.Join(requestBody.Categories, ","))
 	sendObject(w, id)
 

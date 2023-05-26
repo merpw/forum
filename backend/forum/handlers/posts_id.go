@@ -1,4 +1,4 @@
-package server
+package handlers
 
 import (
 	"net/http"
@@ -6,10 +6,10 @@ import (
 	"strings"
 )
 
-// postsIdHandler returns a single post from the database that matches the incoming id of the post in the url
+// postsId returns a single post from the database that matches the incoming id of the post in the url
 //
 // Example: /api/posts/1
-func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
+func (handlers *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	// /api/posts/1 -> 1
 
@@ -20,13 +20,13 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the post from the database
-	post := srv.DB.GetPostById(id)
+	post := handlers.DB.GetPostById(id)
 	if post == nil {
 		errorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	postAuthor := srv.DB.GetUserById(post.AuthorId)
+	postAuthor := handlers.DB.GetUserById(post.AuthorId)
 	safePost := SafePost{
 		Id:            post.Id,
 		Title:         post.Title,
@@ -43,10 +43,10 @@ func (srv *Server) postsIdHandler(w http.ResponseWriter, r *http.Request) {
 	sendObject(w, safePost)
 }
 
-// postsIdLikeHandler likes a post in the database
-func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
+// postsIdLike likes a post in the database
+func (handlers *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 
-	userId := srv.getUserId(w, r)
+	userId := handlers.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -61,41 +61,41 @@ func (srv *Server) postsIdLikeHandler(w http.ResponseWriter, r *http.Request) {
 		errorResponse(w, http.StatusNotFound)
 	}
 
-	post := srv.DB.GetPostById(postId)
+	post := handlers.DB.GetPostById(postId)
 	if post == nil {
 		errorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	reaction := srv.DB.GetPostReaction(postId, userId)
+	reaction := handlers.DB.GetPostReaction(postId, userId)
 
 	switch reaction {
 	case 0: // if not reacted, add like
-		srv.DB.AddPostReaction(postId, userId, 1)
-		srv.DB.UpdatePostLikesCount(postId, +1)
+		handlers.DB.AddPostReaction(postId, userId, 1)
+		handlers.DB.UpdatePostLikesCount(postId, +1)
 
 		sendObject(w, +1)
 
 	case 1: // if already liked, unlike
-		srv.DB.RemovePostReaction(postId, userId)
-		srv.DB.UpdatePostLikesCount(postId, -1)
+		handlers.DB.RemovePostReaction(postId, userId)
+		handlers.DB.UpdatePostLikesCount(postId, -1)
 
 		sendObject(w, 0)
 
 	case -1: // if disliked, remove dislike and add like
-		srv.DB.RemovePostReaction(postId, userId)
-		srv.DB.UpdatePostDislikeCount(postId, -1)
+		handlers.DB.RemovePostReaction(postId, userId)
+		handlers.DB.UpdatePostDislikeCount(postId, -1)
 
-		srv.DB.AddPostReaction(postId, userId, 1)
-		srv.DB.UpdatePostLikesCount(postId, +1)
+		handlers.DB.AddPostReaction(postId, userId, 1)
+		handlers.DB.UpdatePostLikesCount(postId, +1)
 
 		sendObject(w, 1)
 	}
 }
 
 // postsPostsIdDislikeHandler dislikes a post in the database
-func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+func (handlers *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
+	userId := handlers.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -109,40 +109,40 @@ func (srv *Server) postsIdDislikeHandler(w http.ResponseWriter, r *http.Request)
 		errorResponse(w, http.StatusNotFound)
 	}
 
-	post := srv.DB.GetPostById(postId)
+	post := handlers.DB.GetPostById(postId)
 	if post == nil {
 		errorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	reaction := srv.DB.GetPostReaction(postId, userId)
+	reaction := handlers.DB.GetPostReaction(postId, userId)
 
 	switch reaction {
 	case 0: // if not reacted, add dislike
-		srv.DB.AddPostReaction(postId, userId, -1)
-		srv.DB.UpdatePostDislikeCount(postId, +1)
+		handlers.DB.AddPostReaction(postId, userId, -1)
+		handlers.DB.UpdatePostDislikeCount(postId, +1)
 
 		sendObject(w, -1)
 
 	case -1: // if already disliked, remove dislike
-		srv.DB.RemovePostReaction(postId, userId)
-		srv.DB.UpdatePostDislikeCount(postId, -1)
+		handlers.DB.RemovePostReaction(postId, userId)
+		handlers.DB.UpdatePostDislikeCount(postId, -1)
 
 		sendObject(w, 0)
 
 	case 1: // if liked, remove like and add dislike
-		srv.DB.RemovePostReaction(postId, userId)
-		srv.DB.UpdatePostLikesCount(postId, -1)
+		handlers.DB.RemovePostReaction(postId, userId)
+		handlers.DB.UpdatePostLikesCount(postId, -1)
 
-		srv.DB.AddPostReaction(postId, userId, -1)
-		srv.DB.UpdatePostDislikeCount(postId, +1)
+		handlers.DB.AddPostReaction(postId, userId, -1)
+		handlers.DB.UpdatePostDislikeCount(postId, +1)
 
 		sendObject(w, -1)
 	}
 }
 
-func (srv *Server) postsIdReactionHandler(w http.ResponseWriter, r *http.Request) {
-	userId := srv.getUserId(w, r)
+func (handlers *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
+	userId := handlers.getUserId(w, r)
 	if userId == -1 {
 		errorResponse(w, http.StatusUnauthorized)
 		return
@@ -158,13 +158,13 @@ func (srv *Server) postsIdReactionHandler(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	post := srv.DB.GetPostById(postId)
+	post := handlers.DB.GetPostById(postId)
 	if post == nil {
 		errorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	reaction := srv.DB.GetPostReaction(postId, userId)
+	reaction := handlers.DB.GetPostReaction(postId, userId)
 	safeReaction := SafeReaction{
 		Reaction:      reaction,
 		LikesCount:    post.LikesCount,

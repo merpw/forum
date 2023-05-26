@@ -1,4 +1,4 @@
-package server
+package handlers
 
 import (
 	"database/sql"
@@ -14,8 +14,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.getUserId(w, r) != -1 {
+func (handlers *Handlers) signup(w http.ResponseWriter, r *http.Request) {
+	if handlers.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -44,7 +44,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
 		return
 	}
-	if srv.DB.IsNameTaken(requestBody.Name) {
+	if handlers.DB.IsNameTaken(requestBody.Name) {
 		http.Error(w, "Username is already in use", http.StatusBadRequest)
 		return
 	}
@@ -98,7 +98,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if srv.DB.IsEmailTaken(requestBody.Email) {
+	if handlers.DB.IsEmailTaken(requestBody.Email) {
 		http.Error(w, "Email is already taken", http.StatusBadRequest)
 		return
 	}
@@ -114,7 +114,7 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := srv.DB.AddUser(
+	id := handlers.DB.AddUser(
 		requestBody.Name,
 		requestBody.Email,
 		string(encryptedPassword),
@@ -130,8 +130,8 @@ func (srv *Server) signupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
-	if srv.getUserId(w, r) != -1 {
+func (handlers *Handlers) login(w http.ResponseWriter, r *http.Request) {
+	if handlers.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -146,7 +146,7 @@ func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := srv.DB.GetUserByLogin(strings.ToLower(requestBody.Login))
+	user := handlers.DB.GetUserByLogin(strings.ToLower(requestBody.Login))
 	if user == nil {
 		http.Error(w, "Invalid login or password", http.StatusBadRequest)
 		return
@@ -163,7 +163,7 @@ func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	expire := time.Now().Add(24 * time.Hour)
 
-	srv.DB.AddSession(token.String(), int(expire.Unix()), user.Id)
+	handlers.DB.AddSession(token.String(), int(expire.Unix()), user.Id)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "forum-token",
@@ -174,13 +174,13 @@ func (srv *Server) loginHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
+func (handlers *Handlers) logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
 		errorResponse(w, http.StatusUnauthorized)
 		return
 	}
-	srv.DB.RemoveSession(cookie.Value)
+	handlers.DB.RemoveSession(cookie.Value)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "forum-token",
@@ -190,12 +190,12 @@ func (srv *Server) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (srv *Server) getUserId(w http.ResponseWriter, r *http.Request) int {
+func (handlers *Handlers) getUserId(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
 		return -1
 	}
-	userId := srv.DB.CheckSession(cookie.Value)
+	userId := handlers.DB.CheckSession(cookie.Value)
 
 	if userId == -1 {
 		http.SetCookie(w, &http.Cookie{

@@ -1,16 +1,16 @@
-package server
+package handlers
 
 import (
 	"net/http"
 	"strings"
 )
 
-// postsCategoriesHandler returns a json list of all categories from the database
-func (srv *Server) postsCategoriesHandler(w http.ResponseWriter, _ *http.Request) {
+// postsCategories returns a json list of all categories from the database
+func (handlers *Handlers) postsCategories(w http.ResponseWriter, _ *http.Request) {
 	sendObject(w, categories)
 }
 
-func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Request) {
+func (handlers *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Request) {
 	categoryName := strings.TrimPrefix(r.URL.Path, "/api/posts/categories/")
 	// /api/posts/categories/name -> name
 
@@ -30,11 +30,11 @@ func (srv *Server) postsCategoriesNameHandler(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	posts := srv.DB.GetCategoryPosts(categoryName)
+	posts := handlers.DB.GetCategoryPosts(categoryName)
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {
-		postAuthor := srv.DB.GetUserById(post.AuthorId)
+		postAuthor := handlers.DB.GetUserById(post.AuthorId)
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,

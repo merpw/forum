@@ -1,7 +1,7 @@
 package server_test
 
 import (
-	"backend/forum/server"
+	"backend/forum/handlers"
 	"database/sql"
 	"log"
 	"net/http/httptest"
@@ -31,11 +31,11 @@ func startServer() *httptest.Server {
 		log.Fatal(err)
 	}
 
-	srv := server.Connect(db)
-	err = srv.DB.InitDatabase()
+	h := handlers.New(db)
+	err = h.DB.InitDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return httptest.NewServer(srv.Start())
+	return httptest.NewServer(h.Handler())
 }

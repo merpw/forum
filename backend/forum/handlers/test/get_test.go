@@ -1,7 +1,7 @@
 package server_test
 
 import (
-	"backend/forum/server"
+	"backend/forum/handlers"
 	"database/sql"
 	"net/http"
 	"net/http/httptest"
@@ -14,13 +14,13 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	srv := server.Connect(db)
-	err = srv.DB.InitDatabase()
+	h := handlers.New(db)
+	err = h.DB.InitDatabase()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	router := srv.Start()
+	router := h.Handler()
 	testServer := httptest.NewServer(router)
 	defer testServer.Close()
 
@@ -31,8 +31,8 @@ func TestGet(t *testing.T) {
 	dob := sql.NullString{String: "2023-04-08", Valid: true}
 	gender := sql.NullString{String: "male", Valid: true}
 
-	userId := srv.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@", firstName, lastName, dob, gender)
-	srv.DB.AddPost("test", "test", "test", userId, "facts")
+	userId := h.DB.AddUser("Steve", "steve@apple.com", "@@@l1sa@@@", firstName, lastName, dob, gender)
+	h.DB.AddPost("test", "test", "test", userId, "facts")
 
 	tests := []struct {
 		url          string

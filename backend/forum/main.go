@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/forum/server"
+	"backend/forum/handlers"
 	"database/sql"
 	"flag"
 	"log"
@@ -30,14 +30,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	srv := server.Connect(db)
-	err = srv.DB.InitDatabase()
+	h := handlers.New(db)
+	err = h.DB.InitDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	httpServer := http.Server{
-		Handler:           srv.Start(),
+		Handler:           h.Handler(),
 		ReadHeaderTimeout: 3 * time.Second,
 	}
 
