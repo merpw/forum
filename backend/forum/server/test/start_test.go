@@ -1,8 +1,8 @@
 package server_test
 
 import (
+	"backend/forum/server"
 	"database/sql"
-	"forum/server"
 	"log"
 	"net/http/httptest"
 	"os"

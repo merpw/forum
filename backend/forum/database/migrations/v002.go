@@ -1,9 +1,12 @@
 package migrations
 
-import "database/sql"
+import (
+	"backend/migrate"
+	"database/sql"
+)
 
 // v002 makes all fields in all tables NOT NULL
-var v002 = Migration{
+var v002 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
 		PRAGMA writable_schema = 1;

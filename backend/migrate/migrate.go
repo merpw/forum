@@ -5,20 +5,29 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	. "forum/database/migrate/migrations"
 	"io"
 	"log"
 	"os"
 	"strings"
 )
 
-// LATEST is latest available revision
-var LATEST = len(Migrations)
+// Migration defines operations that should be done to move Up or Down between revisions
+type Migration struct {
+	Up   func(db *sql.DB) error
+	Down func(db *sql.DB) error
+}
+
+type Migrations []Migration
+
+// Latest is latest available revision
+func (migrations Migrations) Latest() int {
+	return len(migrations)
+}
 
 // Migrate migrates the database to the specified revision
 //
 // If the database is empty, it will create the initial schema
-func Migrate(db *sql.DB, toRevision int) error {
+func (migrations Migrations) Migrate(db *sql.DB, toRevision int) error {
 	err := Check(db)
 	if err != nil {
 		return fmt.Errorf("database precheck failed: %w", err)
@@ -33,13 +42,13 @@ func Migrate(db *sql.DB, toRevision int) error {
 		return nil
 	}
 
-	if toRevision > LATEST || toRevision < 1 {
-		return fmt.Errorf("invalid revision %d, availible revisions 1..%d", toRevision, LATEST)
+	if toRevision > migrations.Latest() || toRevision < 1 {
+		return fmt.Errorf("invalid revision %d, availible revisions 1..%d", toRevision, migrations.Latest())
 	}
 
-	if dbRevision > LATEST || dbRevision < 0 {
+	if dbRevision > migrations.Latest() || dbRevision < 0 {
 		return fmt.Errorf("database revision %d is not supported, supported revisions 1..%d",
-			dbRevision, LATEST)
+			dbRevision, migrations.Latest())
 	}
 
 	if dbRevision == 0 {
@@ -60,7 +69,7 @@ If you still want to continue, type YES, otherwise press Ctrl+C to abort.
 			return fmt.Errorf("aborted by user")
 		}
 		for i := dbRevision; i > toRevision; i-- {
-			err := Migrations[i-1].Down(db)
+			err := migrations[i-1].Down(db)
 			if err != nil {
 				return err
 			}
@@ -72,7 +81,7 @@ If you still want to continue, type YES, otherwise press Ctrl+C to abort.
 	} else {
 		log.Printf("Migrating database up from revision %d to %d", dbRevision, toRevision)
 		for i := dbRevision; i < toRevision; i++ {
-			err := Migrations[i].Up(db)
+			err := migrations[i].Up(db)
 			if err != nil {
 				return err
 			}

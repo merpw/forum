@@ -1,6 +1,7 @@
-package main
+package cli
 
 import (
+	"backend/migrate"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -35,7 +36,8 @@ Availible parameters:
 	}
 }
 
-func main() {
+// Main can be used to run specified migrate.Migrations from CLI
+func Main(migrations migrate.Migrations) {
 	dbFile := flag.String("db", "", "specify database file to work with")
 	flag.Parse()
 
@@ -79,5 +81,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	actions[actionNum].action(db)
+	actions[actionNum].action(db, migrations)
 }

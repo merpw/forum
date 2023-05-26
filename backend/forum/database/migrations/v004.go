@@ -1,10 +1,12 @@
 package migrations
 
 import (
+	"backend/migrate"
 	"database/sql"
 )
 
-var v004 = Migration{
+// v004 adds first_name, last_name, dob and gender to the users table
+var v004 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
 		ALTER TABLE users ADD COLUMN first_name TEXT;

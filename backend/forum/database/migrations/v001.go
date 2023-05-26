@@ -1,12 +1,13 @@
 package migrations
 
 import (
+	"backend/migrate"
 	"database/sql"
 	"fmt"
 )
 
-// V001 is the initial revision. It creates the tables users, posts, comments, sessions and reactions.
-var v001 = Migration{
+// v001 is the initial revision. It creates the tables users, posts, comments, sessions and reactions.
+var v001 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (

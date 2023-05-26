@@ -1,9 +1,9 @@
 package main
 
 import (
+	"backend/forum/server"
 	"database/sql"
 	"flag"
-	"forum/server"
 	"log"
 	"net"
 	"net/http"

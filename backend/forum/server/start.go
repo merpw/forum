@@ -1,8 +1,8 @@
 package server
 
 import (
+	"backend/forum/database"
 	"database/sql"
-	"forum/database"
 	"log"
 	"net/http"
 	"strings"

@@ -37,7 +37,7 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 Server supports database migrations. The database will be automatically migrated to the latest version on server start.
 
 If you want to migrate database manually, you can use `cli`, more info
-in [database/migrate](database/migrate/README.md).
+in [database/migrate](../migrate/README.md).
 
 ## Endpoints
 

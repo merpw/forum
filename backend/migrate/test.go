@@ -1,9 +1,8 @@
-package migrate_test
+package migrate
 
 import (
 	"database/sql"
 	"fmt"
-	"forum/database/migrate"
 	"log"
 	"os"
 	"testing"
@@ -11,13 +10,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var db *sql.DB
-
-func TestMain(m *testing.M) {
+// initDatabase creates a temporary database for testing and returns a clean function
+func initDatabase() (db *sql.DB, clean func()) {
 	tmpDB, err := os.CreateTemp(".", "test.db")
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	db, err = sql.Open("sqlite3", tmpDB.Name()+"?_foreign_keys=true")
 	if err != nil {
 		log.Fatal(err)
@@ -34,24 +33,25 @@ func TestMain(m *testing.M) {
 		log.Fatal(err)
 	}
 
-	code := m.Run()
-	if code != 0 {
-		os.Exit(code)
+	clean = func() {
+		// Clean only if all tests are successful (code=0)
+		db.Close()
+		tmpDB.Close()
+		os.Remove(tmpDB.Name())
+
+		dummyStdin.Close()
+		os.Remove(dummyStdin.Name())
 	}
 
-	// Clean only if all tests are successful (code=0)
-	db.Close()
-	tmpDB.Close()
-	os.Remove(tmpDB.Name())
-
-	dummyStdin.Close()
-	os.Remove(dummyStdin.Name())
+	return db, clean
 }
 
-func TestMigrate(t *testing.T) {
-
+// Test initializes an empty temporary database
+// and runs all migrations in order and then in reverse order
+func (migrations Migrations) Test(t *testing.T) {
+	db, clean := initDatabase()
 	t.Run("Empty database", func(t *testing.T) {
-		err := migrate.Migrate(db, migrate.LATEST)
+		err := migrations.Migrate(db, migrations.Latest())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -60,7 +60,7 @@ func TestMigrate(t *testing.T) {
 	// Mock user input
 
 	t.Run("Down, without YES", func(t *testing.T) {
-		err := migrate.Migrate(db, 1)
+		err := migrations.Migrate(db, 1)
 		if err == nil {
 			t.Fatal("expected error")
 		}
@@ -68,15 +68,15 @@ func TestMigrate(t *testing.T) {
 
 	t.Run("Down, single call", func(t *testing.T) {
 		inputYES()
-		err := migrate.Migrate(db, 1)
+		err := migrations.Migrate(db, 1)
 		if err != nil {
 			t.Fatal(err)
 		}
 	})
 
 	t.Run("Up, call for each revision", func(t *testing.T) {
-		for revision := 1; revision <= migrate.LATEST; revision++ {
-			err := migrate.Migrate(db, revision)
+		for revision := 1; revision <= migrations.Latest(); revision++ {
+			err := migrations.Migrate(db, revision)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -84,9 +84,9 @@ func TestMigrate(t *testing.T) {
 	})
 
 	t.Run("Down, call for each revision", func(t *testing.T) {
-		for i := migrate.LATEST; i > 0; i-- {
+		for i := migrations.Latest(); i > 0; i-- {
 			inputYES()
-			err := migrate.Migrate(db, i)
+			err := migrations.Migrate(db, i)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -94,21 +94,21 @@ func TestMigrate(t *testing.T) {
 	})
 
 	t.Run("Error, revision 0", func(t *testing.T) {
-		err := migrate.Migrate(db, 0)
+		err := migrations.Migrate(db, 0)
 		if err == nil {
 			t.Fatal("expected error")
 		}
 	})
 
 	t.Run("Error, revision -10", func(t *testing.T) {
-		err := migrate.Migrate(db, -10)
+		err := migrations.Migrate(db, -10)
 		if err == nil {
 			t.Fatal("expected error")
 		}
 	})
 
 	t.Run("Error, revision 1000", func(t *testing.T) {
-		err := migrate.Migrate(db, 1000)
+		err := migrations.Migrate(db, 1000)
 		if err == nil {
 			t.Fatal("expected error")
 		}
@@ -119,7 +119,7 @@ func TestMigrate(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		err = migrate.Migrate(db, migrate.LATEST)
+		err = migrations.Migrate(db, migrations.Latest())
 		if err == nil {
 			t.Fatal("expected error")
 		}
@@ -128,6 +128,10 @@ func TestMigrate(t *testing.T) {
 			t.Fatal(err)
 		}
 	})
+
+	if !t.Failed() {
+		clean()
+	}
 }
 
 // inputYES moves cursor of dummyStdin to 0,0 to make it read `YES`

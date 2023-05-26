@@ -1,8 +1,8 @@
 package database
 
 import (
+	. "backend/forum/database/migrations"
 	"database/sql"
-	"forum/database/migrate"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -12,5 +12,5 @@ type DB struct {
 }
 
 func (db DB) InitDatabase() error {
-	return migrate.Migrate(db.DB, migrate.LATEST)
+	return Migrations.Migrate(db.DB, Migrations.Latest())
 }

@@ -1,11 +1,14 @@
 package migrations
 
-import "database/sql"
+import (
+	"backend/migrate"
+	"database/sql"
+)
 
 // v003 adds a description field to the post table
 //
 // For already existing posts, the description is set to the first 200 characters of the content
-var v003 = Migration{
+var v003 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
 		ALTER TABLE posts

@@ -1,9 +1,9 @@
-package main
+package cli
 
 import (
+	"backend/migrate"
 	"database/sql"
 	"flag"
-	"forum/database/migrate"
 	"log"
 	"strconv"
 )
@@ -11,12 +11,12 @@ import (
 var actions = []struct {
 	command     string
 	description string
-	action      func(db *sql.DB)
+	action      func(db *sql.DB, migrations migrate.Migrations)
 }{
 	{
 		"stat",
 		"- check database integrity and show current revision",
-		func(db *sql.DB) {
+		func(db *sql.DB, migrations migrate.Migrations) {
 			err := migrate.Check(db)
 			if err != nil {
 				log.Fatal(err)
@@ -26,20 +26,20 @@ var actions = []struct {
 				log.Fatal(err)
 			}
 			log.Printf("Integrity check passed successfully, current revision is %d, latest is %d\n",
-				version, migrate.LATEST)
+				version, migrations.Latest())
 		},
 	},
 	{
 		"migrate",
 		"[REVISION] - migrate to the specific revision or `latest`",
-		func(db *sql.DB) {
+		func(db *sql.DB, migrations migrate.Migrations) {
 			toRevisionStr := flag.Arg(1)
 			if toRevisionStr == "" {
 				log.Fatal("ERROR: desired revision is not provided")
 			}
 			var toRevision int
 			if toRevisionStr == "latest" {
-				toRevision = migrate.LATEST
+				toRevision = migrations.Latest()
 			} else {
 				toRevision, _ = strconv.Atoi(toRevisionStr)
 				if toRevision <= 0 {
@@ -47,7 +47,7 @@ var actions = []struct {
 				}
 			}
 
-			err := migrate.Migrate(db, toRevision)
+			err := migrations.Migrate(db, toRevision)
 			if err != nil {
 				log.Fatalf("ERROR: migration failed, %s\n", err)
 			}
@@ -57,8 +57,8 @@ var actions = []struct {
 	{
 		"create",
 		"- create new database file and migrate it to the latest revision",
-		func(db *sql.DB) {
-			err := migrate.Migrate(db, migrate.LATEST)
+		func(db *sql.DB, migrations migrate.Migrations) {
+			err := migrations.Migrate(db, migrations.Latest())
 			if err != nil {
 				log.Fatal(err)
 			}
