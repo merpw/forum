@@ -20,6 +20,8 @@ func Connect(db *sql.DB) *Server {
 // Start returns http.Handler with all routes
 func (srv *Server) Start() http.Handler {
 	router := http.NewServeMux()
+	fs := http.FileServer(http.Dir("../vanilla-frontend/public"))
+	router.Handle("/", fs)
 
 	// Master-handler for:
 	// /api/posts/{id}, /api/posts/{id}/like, /api/posts/{id}/dislike
@@ -50,22 +52,24 @@ func (srv *Server) Start() http.Handler {
 				errorResponse(w, http.StatusInternalServerError) // 500 ERROR
 			}
 		}()
-		r.URL.Path = strings.TrimSpace(r.URL.Path)
-		switch {
-		case GetRegexp.MatchString(r.URL.Path):
-			if r.Method != http.MethodGet {
-				errorResponse(w, http.StatusMethodNotAllowed)
-				return
-			}
-		case PostRegexp.MatchString(r.URL.Path):
-			if r.Method != http.MethodPost {
-				errorResponse(w, http.StatusMethodNotAllowed)
-				return
-			}
-		default:
-			errorResponse(w, http.StatusNotFound)
-			return
-		}
-		router.ServeHTTP(w, r)
-	})
+    if strings.HasPrefix(r.URL.Path, "/api/") {
+      r.URL.Path = strings.TrimSpace(r.URL.Path)
+      switch {
+      case GetRegexp.MatchString(r.URL.Path):
+        if r.Method != http.MethodGet {
+          errorResponse(w, http.StatusMethodNotAllowed)
+          return
+        }
+      case PostRegexp.MatchString(r.URL.Path):
+        if r.Method != http.MethodPost {
+          errorResponse(w, http.StatusMethodNotAllowed)
+          return
+        }
+      default:
+        errorResponse(w, http.StatusNotFound)
+        return
+      }
+    }
+    router.ServeHTTP(w, r)
+    })
 }

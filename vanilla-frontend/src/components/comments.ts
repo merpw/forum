@@ -1,9 +1,9 @@
 import { commentForm } from "../pages.js"
 import { updatePostValues } from "./posts.js"
-
+import { backendUrl } from "../main.js"
 export const displayCommentSection = (id: string) => {
   // Opens and closes comment section if you press the comment section button
-  fetch(`/api/posts/${id}/comments`)
+  fetch(`${backendUrl}/api/posts/${id}/comments`)
     .then((resp) => resp.json())
     .then((comments) => {
       if (!comments) return
@@ -80,7 +80,7 @@ export class CommentCreator {
     const formData: { content: string } = this.getFormData()
     const postID = this.form.id.slice(13)
 
-    fetch(`/api/posts/${postID}/comment`, {
+    fetch(`${backendUrl}/api/posts/${postID}/comment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -5,12 +5,18 @@ import { categoriesSelector } from "./categories.js"
 import { loginController } from "./login.js"
 import { displayPosts } from "./posts.js"
 import { displayChatUsers } from "./chat.js"
+import { ws, wsHandler } from "./ws.js"
 
-export const Auth = (session: boolean) => {
+export const Auth = async (session: boolean) => {
   if (session) {
+    console.log("ws session:", ws)
+    if (!ws) {
+      await wsHandler()
+    }
     // Adding the HTML and changing style
     superDivision.innerHTML = Index()
     superDivision.classList.replace("login-style", "index-style")
+
     topnavController() // Adds event listeners to the top-navigation bar
     categoriesSelector() // TODO: Actual functionality for this
     displayChatUsers()
@@ -18,6 +24,10 @@ export const Auth = (session: boolean) => {
     return
   }
   if (!session) {
+    console.log("ws !session:", ws)
+    if (ws) {
+      ws.close(1000, "User logging out. Closing connection.")
+    }
     // Adding the HTML and changing style
     superDivision.innerHTML = LoginSignup()
     superDivision.classList.replace("index-style", "login-style")

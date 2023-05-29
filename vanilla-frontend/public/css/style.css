@@ -227,7 +227,7 @@ body {
 }
 
 .topnav a i {
-  font-size: 20px; 
+  font-size: 20px;
   margin-right: 5px;
 }
 
@@ -254,10 +254,10 @@ body {
   width: 0;
   position: fixed;
   z-index: 999; /* Stay on top */
-  top: 0; 
+  top: 0;
   left: 0;
   background-color: whitesmoke;
-  overflow-x: hidden; 
+  overflow-x: hidden;
   padding-top: 70px;
   transition: 0.5s ease;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
@@ -279,7 +279,7 @@ body {
 
 /* When you mouse over the navigation links, change their color */
 .chatlist a:hover {
-  color: black;;
+  color: black;
 }
 
 /* Position and style the close button (top right corner) */
@@ -487,7 +487,7 @@ body {
 }
 
 .post-footer i {
-  font-size: 20px; 
+  font-size: 20px;
   margin-right: 5px;
 }
 
@@ -647,4 +647,11 @@ body {
   /*   width: 80%; */
   /*   padding: 6px; */
   /* } */
+}
+
+#chat-test {
+  width: 200px;
+  height: 100px;
+  background-color: whitesmoke;
+  border-radius: 5px;
 }

@@ -1,12 +1,12 @@
 import { CreatePostBody } from "./types"
 import { openCloseCreatePost } from "./topnav.js"
 import { displayCommentSection } from "./comments.js"
-
+import { backendUrl } from "../main.js"
 export const displayPosts = (endpoint: string) => {
   const postsDisplay = document.getElementById("posts-display") as HTMLElement
   postsDisplay.replaceChildren()
   const postList: Array<HTMLDivElement> = []
-  fetch(endpoint)
+  fetch(backendUrl + endpoint)
     .then((response) => response.json())
     .then((posts) => {
       // Posts is the array of objects sent by the server
@@ -39,7 +39,7 @@ export const displayPosts = (endpoint: string) => {
 }
 
 export const updatePostValues = (postId: string) => {
-  fetch(`/api/posts/${postId}`, {
+  fetch(`${backendUrl}/api/posts/${postId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -76,7 +76,7 @@ export class PostCreator {
     event.preventDefault()
     const formData: CreatePostBody = this.getFormData()
 
-    fetch("/api/posts/create/", {
+    fetch(`${backendUrl}/api/posts/create/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -88,7 +88,6 @@ export class PostCreator {
           openCloseCreatePost()
           displayPosts("/api/posts/")
           return
-          // TODO: Something after post is created. Maybe close post window?
         } else {
           response.text().then((error) => {
             console.log(`Error: ${error}`)
@@ -191,7 +190,7 @@ const formattedPost = (
   postLikes.id = `L${id}`
   postLikes.innerHTML = `<i class="bx bx-like" style="font-size: 20px; margin-right: 5px;"></i>  ${likeCount}`
   postLikes.addEventListener("click", () => {
-    fetch(`/api/posts/${id}/like`, {
+    fetch(`${backendUrl}/api/posts/${id}/like`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -213,7 +212,7 @@ const formattedPost = (
   postDislikes.id = `D${id}`
   postDislikes.innerHTML = `<i class="bx bx-dislike" style="font-size: 20px; margin-right: 5px;"></i>  ${dislikeCount}`
   postDislikes.addEventListener("click", () => {
-    fetch(`/api/posts/${id}/dislike`, {
+    fetch(`${backendUrl}/api/posts/${id}/dislike`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

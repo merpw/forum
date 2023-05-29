@@ -1,8 +1,8 @@
 import { superDivision } from "../main.js"
 import { errorPage, postForm } from "../pages.js"
 import { Auth } from "./auth.js"
+import { sendMessage } from "./chat.js"
 import { PostCreator, displayPosts } from "./posts.js"
-import { ws } from "./ws.js"
 
 export const postBtn = document.getElementById(
   "topnav-post"
@@ -51,7 +51,6 @@ const logout = () => {
     },
   }).then((response) => {
     if (response.ok) {
-      ws.close(1000, "User logging out. Closing connection.")
       Auth(false)
     } else {
       superDivision.innerHTML = errorPage(response.status)
@@ -70,18 +69,22 @@ export const topnavController = () => {
     ) as HTMLAnchorElement,
     topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
     chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
-    chatList = document.getElementById("chatlist") as HTMLDivElement
+    chatList = document.getElementById("chatlist") as HTMLDivElement,
+    chatButton = document.getElementById("chat-send") as HTMLElement
 
   if (
     topNavPost &&
     topNavHome &&
     topNavLogout &&
     topNavChat &&
-    HTMLDivElement
+    chatClose &&
+    chatList &&
+    chatButton
   ) {
     topNavPost.addEventListener("click", openCloseCreatePost)
     topNavHome.addEventListener("click", goHome)
     topNavLogout.addEventListener("click", logout)
+    chatButton.addEventListener("click", sendMessage)
     topNavChat.addEventListener("click", () => {
       chatList.classList.add("chat-list-open")
       chatList.style.width = "200px"

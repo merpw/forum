@@ -133,7 +133,14 @@ export const Index = (): string => {
         <h2 id="offline-title" style="color: black; margin: 10px 0px 0px 20px;">Offline <i id="offline-toggle" class='bx bx-chevron-right'></i></h2>
         <ul id="offline-users" class="chat-users" style="display: none;"></ul>
     </div>
+
 <main id="main">
+  <div id="chat-test">
+  <form id="chat-form">
+  <input type="text" id="chat-text">
+  <input type="submit" id="chat-send">
+  </form>
+</div>
   <section id="create-post" class="close"></section>
   <section id="feed">
           <div class="categories">
