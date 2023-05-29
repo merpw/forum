@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/server"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,7 +13,7 @@ import (
 func (handlers *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 	userId := handlers.getUserId(w, r)
 	if userId == -1 {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 
@@ -82,7 +83,7 @@ func (handlers *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 
 	id := handlers.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
 		userId, strings.Join(requestBody.Categories, ","))
-	sendObject(w, id)
+	server.SendObject(w, id)
 
 	err = revalidateURL(fmt.Sprintf("/post/%v", id))
 	if err != nil {

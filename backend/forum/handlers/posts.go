@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/server"
 	"net/http"
 )
 
@@ -26,5 +27,5 @@ func (handlers *Handlers) posts(w http.ResponseWriter, _ *http.Request) {
 		})
 	}
 
-	sendObject(w, response)
+	server.SendObject(w, response)
 }

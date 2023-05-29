@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/server"
 	"net/http"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ import (
 func (handlers *Handlers) me(w http.ResponseWriter, r *http.Request) {
 	userId := handlers.getUserId(w, r)
 	if userId == -1 {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 
@@ -36,7 +37,7 @@ func (handlers *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		Gender:    user.Gender.String,
 	}
 
-	sendObject(w, response)
+	server.SendObject(w, response)
 }
 
 // mePosts returns the posts of the currently logged in user.
@@ -45,7 +46,7 @@ func (handlers *Handlers) me(w http.ResponseWriter, r *http.Request) {
 func (handlers *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 	userId := handlers.getUserId(w, r)
 	if userId == -1 {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 	user := handlers.DB.GetUserById(userId)
@@ -72,7 +73,7 @@ func (handlers *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	sendObject(w, response)
+	server.SendObject(w, response)
 }
 
 // mePostsLiked
@@ -82,7 +83,7 @@ func (handlers *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 func (handlers *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 	userId := handlers.getUserId(w, r)
 	if userId == -1 {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 	posts := handlers.DB.GetUserPostsLiked(userId)
@@ -110,7 +111,7 @@ func (handlers *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	sendObject(w, response)
+	server.SendObject(w, response)
 }
 
 // mePosts Returns the info of the user with the given id. The requester does not need to be logged in.
@@ -122,17 +123,17 @@ func (handlers *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
 	user := handlers.DB.GetUserById(userId)
 	if user == nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	sendObject(w, SafeUser{Id: user.Id, Name: user.Name})
+	server.SendObject(w, SafeUser{Id: user.Id, Name: user.Name})
 }
 
 // mePosts Returns the posts of the user with the given id.
@@ -146,13 +147,13 @@ func (handlers *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
 	user := handlers.DB.GetUserById(userId)
 	if user == nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
@@ -173,5 +174,5 @@ func (handlers *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	sendObject(w, response)
+	server.SendObject(w, response)
 }

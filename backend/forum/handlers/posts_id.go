@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/server"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,14 +16,14 @@ func (handlers *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
 	// Get the post from the database
 	post := handlers.DB.GetPostById(id)
 	if post == nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
@@ -40,7 +41,7 @@ func (handlers *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 		Categories:    post.Categories,
 	}
 
-	sendObject(w, safePost)
+	server.SendObject(w, safePost)
 }
 
 // postsIdLike likes a post in the database
@@ -48,7 +49,7 @@ func (handlers *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 
 	userId := handlers.getUserId(w, r)
 	if userId == -1 {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 
@@ -58,12 +59,12 @@ func (handlers *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 
 	postId, err := strconv.Atoi(postIdStr)
 	if err != nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 	}
 
 	post := handlers.DB.GetPostById(postId)
 	if post == nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
@@ -74,13 +75,13 @@ func (handlers *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 		handlers.DB.AddPostReaction(postId, userId, 1)
 		handlers.DB.UpdatePostLikesCount(postId, +1)
 
-		sendObject(w, +1)
+		server.SendObject(w, +1)
 
 	case 1: // if already liked, unlike
 		handlers.DB.RemovePostReaction(postId, userId)
 		handlers.DB.UpdatePostLikesCount(postId, -1)
 
-		sendObject(w, 0)
+		server.SendObject(w, 0)
 
 	case -1: // if disliked, remove dislike and add like
 		handlers.DB.RemovePostReaction(postId, userId)
@@ -89,7 +90,7 @@ func (handlers *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 		handlers.DB.AddPostReaction(postId, userId, 1)
 		handlers.DB.UpdatePostLikesCount(postId, +1)
 
-		sendObject(w, 1)
+		server.SendObject(w, 1)
 	}
 }
 
@@ -97,7 +98,7 @@ func (handlers *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 func (handlers *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 	userId := handlers.getUserId(w, r)
 	if userId == -1 {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
@@ -106,12 +107,12 @@ func (handlers *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request)
 
 	postId, err := strconv.Atoi(postIdStr)
 	if err != nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 	}
 
 	post := handlers.DB.GetPostById(postId)
 	if post == nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
@@ -122,13 +123,13 @@ func (handlers *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request)
 		handlers.DB.AddPostReaction(postId, userId, -1)
 		handlers.DB.UpdatePostDislikeCount(postId, +1)
 
-		sendObject(w, -1)
+		server.SendObject(w, -1)
 
 	case -1: // if already disliked, remove dislike
 		handlers.DB.RemovePostReaction(postId, userId)
 		handlers.DB.UpdatePostDislikeCount(postId, -1)
 
-		sendObject(w, 0)
+		server.SendObject(w, 0)
 
 	case 1: // if liked, remove like and add dislike
 		handlers.DB.RemovePostReaction(postId, userId)
@@ -137,14 +138,14 @@ func (handlers *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request)
 		handlers.DB.AddPostReaction(postId, userId, -1)
 		handlers.DB.UpdatePostDislikeCount(postId, +1)
 
-		sendObject(w, -1)
+		server.SendObject(w, -1)
 	}
 }
 
 func (handlers *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
 	userId := handlers.getUserId(w, r)
 	if userId == -1 {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 
@@ -154,13 +155,13 @@ func (handlers *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request
 
 	postId, err := strconv.Atoi(postIdStr)
 	if err != nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
 	post := handlers.DB.GetPostById(postId)
 	if post == nil {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
@@ -172,11 +173,11 @@ func (handlers *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request
 	}
 
 	if userId != post.AuthorId {
-		sendObject(w, safeReaction)
+		server.SendObject(w, safeReaction)
 		return
 	}
 
-	sendObject(w, struct {
+	server.SendObject(w, struct {
 		SafeReaction
 		DislikesCount int `json:"dislikes_count"`
 	}{

@@ -1,10 +1,8 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 )
@@ -40,28 +38,6 @@ type SafeReaction struct {
 	Reaction      int `json:"reaction"`
 	LikesCount    int `json:"likes_count"`
 	DislikesCount int `json:"dislikes_count"`
-}
-
-// errorResponse responses with specified error code in format "404 Not Found"
-func errorResponse(w http.ResponseWriter, code int) {
-	http.Error(w, fmt.Sprintf("%v %v", code, http.StatusText(code)), code)
-}
-
-// sendObject sends object to http.ResponseWriter
-//
-// panics if error occurs
-func sendObject(w http.ResponseWriter, object any) {
-	w.Header().Set("Content-Type", "application/json")
-	objJson, err := json.Marshal(object)
-	if err != nil {
-		log.Panic(err)
-		return
-	}
-	_, err = w.Write(objJson)
-	if err != nil {
-		log.Panic(err)
-		return
-	}
 }
 
 // shortenContent shortens content to 200 characters, adds "..." at the end

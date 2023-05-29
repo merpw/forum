@@ -1,13 +1,14 @@
 package handlers
 
 import (
+	"backend/common/server"
 	"net/http"
 	"strings"
 )
 
 // postsCategories returns a json list of all categories from the database
 func (handlers *Handlers) postsCategories(w http.ResponseWriter, _ *http.Request) {
-	sendObject(w, categories)
+	server.SendObject(w, categories)
 }
 
 func (handlers *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +27,7 @@ func (handlers *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Req
 	}
 
 	if !isValid {
-		errorResponse(w, http.StatusNotFound)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
@@ -48,5 +49,5 @@ func (handlers *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Req
 		})
 	}
 
-	sendObject(w, response)
+	server.SendObject(w, response)
 }

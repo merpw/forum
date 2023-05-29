@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/server"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -177,7 +178,7 @@ func (handlers *Handlers) login(w http.ResponseWriter, r *http.Request) {
 func (handlers *Handlers) logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
-		errorResponse(w, http.StatusUnauthorized)
+		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 	handlers.DB.RemoveSession(cookie.Value)
