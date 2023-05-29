@@ -1,6 +1,6 @@
 import { LoginForm, SignupForm } from "./types"
 import { Auth } from "./auth.js"
-import { wsHandler } from "./ws.js"
+import { backendUrl } from "../main.js"
 
 class Login {
   private readonly form: HTMLFormElement
@@ -25,7 +25,7 @@ class Login {
         rememberMe: rememberMeInput.checked,
       }
 
-      fetch("/api/login", {
+      fetch(`${backendUrl}/api/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -33,7 +33,6 @@ class Login {
         body: JSON.stringify(formData),
       }).then((response) => {
         if (response.ok) {
-          wsHandler()
           Auth(true)
         } else {
           // TODO: Fix this error handling. It is super bad.
@@ -59,7 +58,7 @@ class Signup {
     const formData: SignupForm = this.getFormData()
     console.log(formData)
 
-    fetch("/api/signup", {
+    fetch(`${backendUrl}/api/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

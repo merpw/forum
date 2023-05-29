@@ -1,5 +1,5 @@
 import { ActiveUser, InactiveUser } from "./types"
-
+import { ws } from "./ws.js"
 // This file is dedicated to sorting and displaying chat users in the sidebar.
 
 const chatUsers = {
@@ -10,6 +10,9 @@ const chatUsers = {
 }
 
 function getChatUsers() {
+  /* Reset the state of the chatUsers upon relogging */
+  Object.assign(chatUsers, { active: [], inactive: [] })
+
   const testUserList: ActiveUser[] = []
   const testUserListInactive: InactiveUser[] = []
   const activeUser1: ActiveUser = {
@@ -18,12 +21,14 @@ function getChatUsers() {
     Online: true,
     UnreadMSG: true,
   }
+
   const activeUser2: ActiveUser = {
     Name: "Test2",
     ID: 2,
     Online: false,
     UnreadMSG: false,
   }
+
   const inactiveUser1: InactiveUser = {
     Name: "InactiveTest",
     ID: 1,
@@ -35,11 +40,14 @@ function getChatUsers() {
     ID: 2,
     Online: false,
   }
+
   testUserList.push(activeUser1, activeUser2)
   testUserListInactive.push(inactiveUser1, inactiveUser2)
+
   for (const user of testUserList) {
     chatUsers.active.push(user)
   }
+
   for (const user of testUserListInactive) {
     chatUsers.inactive.push(user)
   }
@@ -128,4 +136,11 @@ const toggleOffline = () => {
     offlineToggle.className = "bx bx-chevron-down"
     offlineUsers.style.display = "block"
   }
+}
+
+export const sendMessage = () => {
+  const chatMsg = document.getElementById("chat-text") as HTMLInputElement
+  ws.send(JSON.stringify(chatMsg.value))
+  chatMsg.value = ""
+  return
 }
