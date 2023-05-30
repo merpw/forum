@@ -1,6 +1,6 @@
-# FORUM-BACKEND
+# backend/forum
 
-RESTful API server to manage data about users, posts
+RESTful API server to manage data about users, posts, comments and reactions.
 
 ---
 
@@ -15,9 +15,9 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ## Usage
 
-### Run `go run . [PARAMS]` to start API server
+### Run `go run backend/forum [PARAMS]` to start API server
 
-#### Example: `go run .` to run on default port 8080
+#### Example: `go run backend/forum` to run on default port 8080
 
 ### Params:
 
@@ -30,16 +30,18 @@ Solved during studying in Gritlab coding school on Åland, January 2023
   example, `http://localhost:3000/api/revalidate`
 - `FRONTEND_REVALIDATE_TOKEN` - optional, token to revalidate Next.js pages in ISR mode if frontend `/api/` is public
 
-### Testing: `go test forum/server/test -cover -coverpkg=./...`
+### Testing: `go test backend/forum/... -cover -coverpkg=./...`
 
 ### Database migrations
 
 Server supports database migrations. The database will be automatically migrated to the latest version on server start.
 
 If you want to migrate database manually, you can use `cli`, more info
-in [database/migrate](../migrate/README.md).
+in [backend/migrate](../migrate/README.md) package.
 
 ## Endpoints
+
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/16966820-56131bec-397d-4e40-ad9c-ce1e9b6ec575?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D16966820-56131bec-397d-4e40-ad9c-ce1e9b6ec575%26entityType%3Dcollection%26workspaceId%3D8e6f6f99-c3c2-4738-b609-a958ed3a626a#?env%5BDEV%5D=W3sia2V5IjoiSE9TVCIsInZhbHVlIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwIiwiZW5hYmxlZCI6dHJ1ZSwidHlwZSI6ImRlZmF1bHQifV0=)
 
 - GET `/api/me` - get current user info
 - GET `/api/me/posts` - get current user posts

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// postsIdCommentIdLike likes a comment on a post in the database
+// postsIdCommentIdLike likes a comment on a specific post
 func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) {
 
 	userId := h.getUserId(w, r)
@@ -56,7 +56,7 @@ func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// postsIdCommentIdDislike dislikes a comment on a post in the database
+// postsIdCommentIdDislike dislikes a specific comment on a specific post
 func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 	if userId == -1 {
@@ -101,6 +101,7 @@ func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Reques
 	}
 }
 
+// postsIdCommentIdReactions returns SafeReaction with data about the reactions of a specific comment
 func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 	if userId == -1 {
@@ -129,7 +130,7 @@ func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Reque
 		})
 }
 
-// postsIdCommentCreate Add comments on a post in the database
+// postsIdCommentCreate adds a comment on a specific post
 func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 	if userId == -1 {
@@ -175,7 +176,7 @@ func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) 
 	server.SendObject(w, id)
 }
 
-// postsIdComments returns all comments on a post in the database
+// postsIdComments returns all comments on a specific post
 func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
 	// /api/posts/1/comments -> 1

@@ -11,6 +11,7 @@ func (h *Handlers) postsCategories(w http.ResponseWriter, _ *http.Request) {
 	server.SendObject(w, categories)
 }
 
+// postsCategoriesName returns a json list of all posts from the database
 func (h *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Request) {
 	categoryName := strings.TrimPrefix(r.URL.Path, "/api/posts/categories/")
 	// /api/posts/categories/name -> name

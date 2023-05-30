@@ -5,6 +5,9 @@ import (
 	"net/http"
 )
 
+// checkSession checks if the session token is valid
+//
+// GET /api/internal/check-session?token=<token>
 func (h *Handlers) checkSession(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 	if token == "" {

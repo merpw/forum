@@ -114,7 +114,7 @@ func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, response)
 }
 
-// mePosts Returns the info of the user with the given id. The requester does not need to be logged in.
+// userId Returns the info of the user with the given id. The requester does not need to be logged in.
 //
 //	GET /api/user/:id
 func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
@@ -136,7 +136,7 @@ func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, SafeUser{Id: user.Id, Name: user.Name})
 }
 
-// mePosts Returns the posts of the user with the given id.
+// userIdPosts Returns the posts of the user with the given id.
 // The requester does not need to be logged in.
 //
 //	GET /api/user/:id/posts

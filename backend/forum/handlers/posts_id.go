@@ -7,9 +7,7 @@ import (
 	"strings"
 )
 
-// postsId returns a single post from the database that matches the incoming id of the post in the url
-//
-// Example: /api/posts/1
+// postsId returns the post with the given id
 func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	// /api/posts/1 -> 1
@@ -44,7 +42,9 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, safePost)
 }
 
-// postsIdLike likes a post in the database
+// postsIdLike handles the like of the post with the given id
+//
+// returns current reaction
 func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 
 	userId := h.getUserId(w, r)
@@ -94,7 +94,9 @@ func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// postsPostsIdDislikeHandler dislikes a post in the database
+// postsIdDislike handles the dislike of a post.
+//
+// returns current reaction
 func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 	if userId == -1 {
@@ -142,6 +144,7 @@ func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// postsIdReaction returns the current reaction of the user to the post
 func (h *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 	if userId == -1 {
