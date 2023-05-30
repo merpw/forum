@@ -1,5 +1,8 @@
 FROM golang:alpine AS builder
 
+# TODO: add universal Dockerfile for all services
+# https://github.com/irahardianto/monorepo-microservices/blob/master/Dockerfile
+
 # install gcc, required by sqlite3 driver
 RUN apk add build-base
 
@@ -15,7 +18,7 @@ COPY . .
 RUN --mount=type=cache,target=/root/.cache/go-build go test ./...
 
 # Build with cache
-RUN --mount=type=cache,target=/root/.cache/go-build go build -o /bin/server .
+RUN --mount=type=cache,target=/root/.cache/go-build go build -o /bin/server backend/forum
 
 FROM alpine
 

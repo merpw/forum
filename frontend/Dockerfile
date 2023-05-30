@@ -41,4 +41,8 @@ EXPOSE 3000
 
 ENV PORT 3000
 
+RUN mkdir -p /app/.next/cache && chown nextjs:nodejs /app/.next/cache
+
+VOLUME /app/.next/cache
+
 CMD node server.js
