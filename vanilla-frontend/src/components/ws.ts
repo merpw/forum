@@ -2,10 +2,10 @@ import { WebSocketResponse } from "./types"
 
 const WS_URL = "ws://localhost:6969"
 export let ws: WebSocket
+let opened = false
 
 export const wsHandler = () => {
   ws = new WebSocket(WS_URL)
-
   ws.onopen = () => {
     console.log("ws connected")
     const token = document.cookie.match(/forum-token=(.*?)(;|$)/)?.[1]
@@ -13,7 +13,10 @@ export const wsHandler = () => {
       console.error("Not logged in")
       return
     }
-    ws.send(JSON.stringify({ type: "handshake", item: { token } }))
+    if (!opened){
+      opened = true
+      ws.send(JSON.stringify({ type: "handshake", item: { token } }))
+    }
   }
 
   ws.onmessage = (event) => {

@@ -136,10 +136,16 @@ export const Index = (): string => {
 
 <main id="main">
   <div id="chat-test">
-  <form id="chat-form">
-  <input type="text" id="chat-text">
-  <input type="submit" id="chat-send">
-  </form>
+    <div id="chat-messages">
+      <div class="message send">TEST TEST TEST 123</div>
+      <div class="message recieve"></div>
+    </div>
+    <div class="chat-form-container">
+      <form id="chat-form">
+      <input type="text" id="chat-text">
+      <input type="submit" id="chat-send" value="Send">
+      </form>
+    </div>
 </div>
   <section id="create-post" class="close"></section>
   <section id="feed">
