@@ -7,11 +7,11 @@ import (
 )
 
 // postsCategories returns a json list of all categories from the database
-func (handlers *Handlers) postsCategories(w http.ResponseWriter, _ *http.Request) {
+func (h *Handlers) postsCategories(w http.ResponseWriter, _ *http.Request) {
 	server.SendObject(w, categories)
 }
 
-func (handlers *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Request) {
 	categoryName := strings.TrimPrefix(r.URL.Path, "/api/posts/categories/")
 	// /api/posts/categories/name -> name
 
@@ -31,11 +31,11 @@ func (handlers *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	posts := handlers.DB.GetCategoryPosts(categoryName)
+	posts := h.DB.GetCategoryPosts(categoryName)
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {
-		postAuthor := handlers.DB.GetUserById(post.AuthorId)
+		postAuthor := h.DB.GetUserById(post.AuthorId)
 		response = append(response, SafePost{
 			Id:            post.Id,
 			Title:         post.Title,

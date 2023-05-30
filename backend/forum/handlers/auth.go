@@ -15,8 +15,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (handlers *Handlers) signup(w http.ResponseWriter, r *http.Request) {
-	if handlers.getUserId(w, r) != -1 {
+func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
+	if h.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -45,7 +45,7 @@ func (handlers *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
 		return
 	}
-	if handlers.DB.IsNameTaken(requestBody.Name) {
+	if h.DB.IsNameTaken(requestBody.Name) {
 		http.Error(w, "Username is already in use", http.StatusBadRequest)
 		return
 	}
@@ -99,7 +99,7 @@ func (handlers *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if handlers.DB.IsEmailTaken(requestBody.Email) {
+	if h.DB.IsEmailTaken(requestBody.Email) {
 		http.Error(w, "Email is already taken", http.StatusBadRequest)
 		return
 	}
@@ -115,7 +115,7 @@ func (handlers *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := handlers.DB.AddUser(
+	id := h.DB.AddUser(
 		requestBody.Name,
 		requestBody.Email,
 		string(encryptedPassword),
@@ -131,8 +131,8 @@ func (handlers *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (handlers *Handlers) login(w http.ResponseWriter, r *http.Request) {
-	if handlers.getUserId(w, r) != -1 {
+func (h *Handlers) login(w http.ResponseWriter, r *http.Request) {
+	if h.getUserId(w, r) != -1 {
 		http.Error(w, "You are already logged in", http.StatusBadRequest)
 		return
 	}
@@ -147,7 +147,7 @@ func (handlers *Handlers) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := handlers.DB.GetUserByLogin(strings.ToLower(requestBody.Login))
+	user := h.DB.GetUserByLogin(strings.ToLower(requestBody.Login))
 	if user == nil {
 		http.Error(w, "Invalid login or password", http.StatusBadRequest)
 		return
@@ -164,7 +164,7 @@ func (handlers *Handlers) login(w http.ResponseWriter, r *http.Request) {
 	}
 	expire := time.Now().Add(24 * time.Hour)
 
-	handlers.DB.AddSession(token.String(), int(expire.Unix()), user.Id)
+	h.DB.AddSession(token.String(), int(expire.Unix()), user.Id)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "forum-token",
@@ -175,13 +175,13 @@ func (handlers *Handlers) login(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (handlers *Handlers) logout(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
-	handlers.DB.RemoveSession(cookie.Value)
+	h.DB.RemoveSession(cookie.Value)
 
 	http.SetCookie(w, &http.Cookie{
 		Name:    "forum-token",
@@ -191,12 +191,12 @@ func (handlers *Handlers) logout(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func (handlers *Handlers) getUserId(w http.ResponseWriter, r *http.Request) int {
+func (h *Handlers) getUserId(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
 		return -1
 	}
-	userId := handlers.DB.CheckSession(cookie.Value)
+	userId := h.DB.CheckSession(cookie.Value)
 
 	if userId == -1 {
 		http.SetCookie(w, &http.Cookie{

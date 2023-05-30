@@ -10,8 +10,8 @@ import (
 )
 
 // postsCreate creates a new post in the database
-func (handlers *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
-	userId := handlers.getUserId(w, r)
+func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
@@ -81,7 +81,7 @@ func (handlers *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := handlers.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
+	id := h.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
 		userId, strings.Join(requestBody.Categories, ","))
 	server.SendObject(w, id)
 

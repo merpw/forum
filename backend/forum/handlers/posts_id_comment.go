@@ -9,9 +9,9 @@ import (
 )
 
 // postsIdCommentIdLike likes a comment on a post in the database
-func (handlers *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) {
 
-	userId := handlers.getUserId(w, r)
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
@@ -24,41 +24,41 @@ func (handlers *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Re
 		server.ErrorResponse(w, http.StatusNotFound)
 	}
 
-	comment := handlers.DB.GetCommentById(commentId)
+	comment := h.DB.GetCommentById(commentId)
 	if comment == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	reaction := handlers.DB.GetCommentReaction(commentId, userId)
+	reaction := h.DB.GetCommentReaction(commentId, userId)
 
 	switch reaction {
 	case 0: // if not reacted, add like
-		handlers.DB.AddCommentReaction(commentId, userId, 1)
-		handlers.DB.UpdateCommentLikesCount(commentId, +1)
+		h.DB.AddCommentReaction(commentId, userId, 1)
+		h.DB.UpdateCommentLikesCount(commentId, +1)
 
 		server.SendObject(w, +1)
 
 	case 1: // if already liked, unlike
-		handlers.DB.RemoveCommentReaction(commentId, userId)
-		handlers.DB.UpdateCommentLikesCount(commentId, -1)
+		h.DB.RemoveCommentReaction(commentId, userId)
+		h.DB.UpdateCommentLikesCount(commentId, -1)
 
 		server.SendObject(w, 0)
 
 	case -1: // if disliked, remove dislike and add like
-		handlers.DB.RemoveCommentReaction(commentId, userId)
-		handlers.DB.UpdateCommentDislikeCount(commentId, -1)
+		h.DB.RemoveCommentReaction(commentId, userId)
+		h.DB.UpdateCommentDislikeCount(commentId, -1)
 
-		handlers.DB.AddCommentReaction(commentId, userId, 1)
-		handlers.DB.UpdateCommentLikesCount(commentId, +1)
+		h.DB.AddCommentReaction(commentId, userId, 1)
+		h.DB.UpdateCommentLikesCount(commentId, +1)
 
 		server.SendObject(w, 1)
 	}
 }
 
 // postsIdCommentIdDislike dislikes a comment on a post in the database
-func (handlers *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Request) {
-	userId := handlers.getUserId(w, r)
+func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
@@ -69,40 +69,40 @@ func (handlers *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http
 		server.ErrorResponse(w, http.StatusNotFound)
 	}
 
-	comment := handlers.DB.GetCommentById(commentId)
+	comment := h.DB.GetCommentById(commentId)
 	if comment == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	reaction := handlers.DB.GetCommentReaction(commentId, userId)
+	reaction := h.DB.GetCommentReaction(commentId, userId)
 
 	switch reaction {
 	case 0: // if not reacted, add dislike
-		handlers.DB.AddCommentReaction(commentId, userId, -1)
-		handlers.DB.UpdateCommentDislikeCount(commentId, +1)
+		h.DB.AddCommentReaction(commentId, userId, -1)
+		h.DB.UpdateCommentDislikeCount(commentId, +1)
 
 		server.SendObject(w, -1)
 
 	case -1: // if already disliked, remove dislike
-		handlers.DB.RemoveCommentReaction(commentId, userId)
-		handlers.DB.UpdateCommentDislikeCount(commentId, -1)
+		h.DB.RemoveCommentReaction(commentId, userId)
+		h.DB.UpdateCommentDislikeCount(commentId, -1)
 
 		server.SendObject(w, 0)
 
 	case 1: // if liked, remove like and add dislike
-		handlers.DB.RemoveCommentReaction(commentId, userId)
-		handlers.DB.UpdateCommentLikesCount(commentId, -1)
+		h.DB.RemoveCommentReaction(commentId, userId)
+		h.DB.UpdateCommentLikesCount(commentId, -1)
 
-		handlers.DB.AddCommentReaction(commentId, userId, -1)
-		handlers.DB.UpdateCommentDislikeCount(commentId, +1)
+		h.DB.AddCommentReaction(commentId, userId, -1)
+		h.DB.UpdateCommentDislikeCount(commentId, +1)
 
 		server.SendObject(w, -1)
 	}
 }
 
-func (handlers *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Request) {
-	userId := handlers.getUserId(w, r)
+func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
@@ -114,13 +114,13 @@ func (handlers *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *htt
 		return
 	}
 
-	comment := handlers.DB.GetCommentById(commentId)
+	comment := h.DB.GetCommentById(commentId)
 	if comment == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	reaction := handlers.DB.GetCommentReaction(commentId, userId)
+	reaction := h.DB.GetCommentReaction(commentId, userId)
 	server.SendObject(w,
 		SafeReaction{
 			Reaction:      reaction,
@@ -130,8 +130,8 @@ func (handlers *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *htt
 }
 
 // postsIdCommentCreate Add comments on a post in the database
-func (handlers *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) {
-	userId := handlers.getUserId(w, r)
+func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
@@ -146,7 +146,7 @@ func (handlers *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Re
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
-	post := handlers.DB.GetPostById(postId)
+	post := h.DB.GetPostById(postId)
 	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
@@ -169,14 +169,14 @@ func (handlers *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	id := handlers.DB.AddComment(requestBody.Content, postId, userId)
-	handlers.DB.UpdatePostsCommentsCount(postId, +1)
+	id := h.DB.AddComment(requestBody.Content, postId, userId)
+	h.DB.UpdatePostsCommentsCount(postId, +1)
 
 	server.SendObject(w, id)
 }
 
 // postsIdComments returns all comments on a post in the database
-func (handlers *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
 	// /api/posts/1/comments -> 1
 
@@ -185,18 +185,18 @@ func (handlers *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	post := handlers.DB.GetPostById(postId)
+	post := h.DB.GetPostById(postId)
 	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
 	// posts := srv.DB.GetUserPosts(userId)
-	comments := handlers.DB.GetPostComments(postId)
+	comments := h.DB.GetPostComments(postId)
 
 	response := make([]SafeComment, 0)
 	for _, comment := range comments {
-		user := handlers.DB.GetUserById(comment.AuthorId)
+		user := h.DB.GetUserById(comment.AuthorId)
 		response = append(response, SafeComment{
 			Id:            comment.Id,
 			Content:       comment.Content,

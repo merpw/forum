@@ -12,14 +12,14 @@ import (
 // (id, name, email, first name, last name, date of birth, gender)
 //
 //	GET /api/me
-func (handlers *Handlers) me(w http.ResponseWriter, r *http.Request) {
-	userId := handlers.getUserId(w, r)
+func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
 
-	user := handlers.DB.GetUserById(userId)
+	user := h.DB.GetUserById(userId)
 
 	response := struct {
 		SafeUser
@@ -43,14 +43,14 @@ func (handlers *Handlers) me(w http.ResponseWriter, r *http.Request) {
 // mePosts returns the posts of the currently logged in user.
 //
 //	GET /api/me/posts
-func (handlers *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
-	userId := handlers.getUserId(w, r)
+func (h *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
-	user := handlers.DB.GetUserById(userId)
-	posts := handlers.DB.GetUserPosts(userId)
+	user := h.DB.GetUserById(userId)
+	posts := h.DB.GetUserPosts(userId)
 
 	type Response struct {
 		SafePost
@@ -80,13 +80,13 @@ func (handlers *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 // returns liked posts of the currently logged in user.
 //
 //	GET /api/me/posts/liked
-func (handlers *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
-	userId := handlers.getUserId(w, r)
+func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return
 	}
-	posts := handlers.DB.GetUserPostsLiked(userId)
+	posts := h.DB.GetUserPostsLiked(userId)
 
 	type Response struct {
 		SafePost
@@ -95,7 +95,7 @@ func (handlers *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 
 	response := make([]Response, 0)
 	for _, post := range posts {
-		author := handlers.DB.GetUserById(post.AuthorId)
+		author := h.DB.GetUserById(post.AuthorId)
 		response = append(response, Response{
 			SafePost: SafePost{
 				Id:            post.Id,
@@ -117,7 +117,7 @@ func (handlers *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 // mePosts Returns the info of the user with the given id. The requester does not need to be logged in.
 //
 //	GET /api/user/:id
-func (handlers *Handlers) userId(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
 	// /api/user/1 -> 1
 
@@ -127,7 +127,7 @@ func (handlers *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := handlers.DB.GetUserById(userId)
+	user := h.DB.GetUserById(userId)
 	if user == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
@@ -140,7 +140,7 @@ func (handlers *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 // The requester does not need to be logged in.
 //
 //	GET /api/user/:id/posts
-func (handlers *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
 	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
 	// /api/user/1/posts -> 1
@@ -151,13 +151,13 @@ func (handlers *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := handlers.DB.GetUserById(userId)
+	user := h.DB.GetUserById(userId)
 	if user == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	posts := handlers.DB.GetUserPosts(userId)
+	posts := h.DB.GetUserPosts(userId)
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {

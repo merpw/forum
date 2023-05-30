@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-func (handlers *Handlers) checkSession(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) checkSession(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 	if token == "" {
 		server.ErrorResponse(w, http.StatusBadRequest)
 		return
 	}
-	userId := handlers.DB.CheckSession(token)
+	userId := h.DB.CheckSession(token)
 	if userId == -1 {
 		server.SendObject(w, struct {
 			Error string `json:"error"`
