@@ -1,6 +1,8 @@
+"use client"
+
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { FC, useEffect } from "react"
 
 import { useMe } from "@/api/auth"
@@ -111,8 +113,8 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
   )
 }
 
-export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
-  post,
+export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> = ({
+  postId,
   comment,
 }) => {
   const { isLoggedIn } = useMe()
@@ -123,7 +125,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
     likes_count,
     dislikes_count,
     mutate: mutateCommentReactions,
-  } = useCommentReactions(post.id, comment.id)
+  } = useCommentReactions(postId, comment.id)
 
   return (
     <span className={"mx-2 my-auto flex"}>
@@ -144,7 +146,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
             router.push("/login")
             return
           }
-          likeComment(post.id, comment.id).then(() => mutateCommentReactions())
+          likeComment(postId, comment.id).then(() => mutateCommentReactions())
         }}
       >
         <motion.svg
@@ -184,7 +186,7 @@ export const ReactionsCommentButtons: FC<{ post: Post; comment: Comment }> = ({
             router.push("/login")
             return
           }
-          dislikeComment(post.id, comment.id).then(() => mutateCommentReactions())
+          dislikeComment(postId, comment.id).then(() => mutateCommentReactions())
         }}
       >
         <motion.svg
