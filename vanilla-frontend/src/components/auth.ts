@@ -9,9 +9,8 @@ import { ws, wsHandler } from "./ws.js"
 
 export const Auth = async (session: boolean) => {
   if (session) {
-    console.log("ws session:", ws)
     if (!ws) {
-      await wsHandler()
+     wsHandler()
     }
     // Adding the HTML and changing style
     superDivision.innerHTML = Index()
@@ -24,7 +23,6 @@ export const Auth = async (session: boolean) => {
     return
   }
   if (!session) {
-    console.log("ws !session:", ws)
     if (ws) {
       ws.close(1000, "User logging out. Closing connection.")
     }

@@ -144,3 +144,27 @@ export const sendMessage = () => {
   chatMsg.value = ""
   return
 }
+
+export const displayMessage = () => {
+  const messageDisplay = document.getElementById("chat-messages") as HTMLDivElement
+  const message = [] as HTMLDivElement []
+  for (const message of messages) {
+    
+  }
+}
+
+
+const createMessage = async (author: string, userId: number, content: string, sender: boolean,): Promise<HTMLDivElement> => {
+  const message = document.createElement("div")
+  if(sender) {
+    message.className = "message sender"
+  } else {
+    message.className = "message reciever"
+  }
+  const info = document.createElement("div")
+  info.id = `MUID${userId.toString()}` // Message User Id
+  info.textContent = `${author}`
+  const contentElement = `${content}`
+  message.append(info, contentElement)
+  return message
+}
