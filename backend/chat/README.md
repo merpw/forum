@@ -17,6 +17,9 @@ Real-time chat service using WebSockets.
 
 - `AUTH_BASE_URL` - optional, default http://localhost:8080 - base url to the auth service
 
+- `FORUM_BACKEND_SECRET` - optional, secret header `Internal-Auth` value to access `/internal/` routes of the Auth
+  service
+
 ### Testing: `go test backend/chat/... -cover -coverpkg=./backend/chat/...`
 
 ### Database migrations

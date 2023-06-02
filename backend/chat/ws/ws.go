@@ -4,6 +4,7 @@
 package ws
 
 import (
+	"backend/chat/external"
 	"log"
 	"net/http"
 	"sync"
@@ -22,9 +23,21 @@ type MessageHandler func(p []byte, client *Client)
 
 // NewHub creates new Hub
 func NewHub(messageHandler MessageHandler) *Hub {
-	return &Hub{
+	h := &Hub{
 		MessageHandler: messageHandler,
 	}
+
+	go func() {
+		for token := range external.RevokedSessions() {
+			for _, c := range h.Clients {
+				if c.Token == token {
+					_ = c.Conn.Close()
+				}
+			}
+		}
+	}()
+
+	return h
 }
 
 var wsUpgrader = websocket.Upgrader{
