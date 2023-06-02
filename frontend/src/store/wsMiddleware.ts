@@ -6,9 +6,6 @@ import { wsConnectionActions } from "@/store/ws"
 import { chatHandlers } from "@/store/chats/chats"
 import { WebSocketResponse } from "@/ws"
 
-// TODO: use FORUM_BACKEND_URL
-const WebSocketUrl = "ws://localhost:8081/ws"
-
 const wsConnectionMiddleware: Middleware = (store) => {
   let ws: WebSocket
 
@@ -26,7 +23,8 @@ const wsConnectionMiddleware: Middleware = (store) => {
       }
 
       store.dispatch(wsConnectionActions.connectionStarted())
-      ws = new WebSocket(WebSocketUrl)
+
+      ws = new WebSocket(`${location.protocol.replace("http", "ws")}//${location.host}/ws`)
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data) as WebSocketResponse<never>
