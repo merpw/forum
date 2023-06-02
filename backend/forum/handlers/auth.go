@@ -233,6 +233,9 @@ func (h *Handlers) logout(w http.ResponseWriter, r *http.Request) {
 		Expires: time.Now(),
 		Path:    "/",
 	})
+	go func() {
+		h.revokeSession <- cookie.Value
+	}()
 }
 
 // getUserId checks if the user's token is valid and returns the user's id
@@ -252,6 +255,9 @@ func (h *Handlers) getUserId(w http.ResponseWriter, r *http.Request) int {
 			Expires: time.Now(),
 			Path:    "/",
 		})
+		go func() {
+			h.revokeSession <- cookie.Value
+		}()
 		return -1
 	}
 

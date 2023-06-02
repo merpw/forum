@@ -9,6 +9,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strings"
+	"sync"
 )
 
 type ctxKey int
@@ -19,11 +20,31 @@ const (
 
 type Handlers struct {
 	DB *database.DB
+
+	revokeSession            chan string
+	revokeSessionSubscribers []*chan string
+
+	lock sync.Mutex
 }
 
 // New connects database to Handlers
 func New(db *sql.DB) *Handlers {
-	return &Handlers{DB: database.New(db)}
+
+	h := &Handlers{DB: database.New(db)}
+
+	h.revokeSession = make(chan string)
+	h.revokeSessionSubscribers = make([]*chan string, 0)
+
+	go func() {
+		for token := range h.revokeSession {
+			log.Printf("Revoked session: %s %v", token, len(h.revokeSessionSubscribers))
+			for _, subscriber := range h.revokeSessionSubscribers {
+				*subscriber <- token
+			}
+		}
+	}()
+
+	return h
 }
 
 // Handler returns http.Handler with all routes registered
@@ -76,6 +97,7 @@ func (h *Handlers) Handler() http.Handler {
 
 	var internalRoutes = []server.Route{
 		server.NewRoute(http.MethodGet, `/api/internal/check-session`, h.checkSession),
+		server.NewRoute(http.MethodGet, `/api/internal/revoked-sessions`, h.revokedSessions),
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
