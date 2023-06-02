@@ -8,12 +8,14 @@ import { Chat, Message, WSGetResponse, WSPostResponse } from "@/ws"
 type ObjectMap<K extends number | string | symbol, T> = Partial<Record<K, T>>
 
 const initialState: {
+  activeChatId: number | null
   chatIds: number[] | undefined
   chats: ObjectMap<number, Chat | null>
   chatMessages: ObjectMap<number, number[]>
   messages: ObjectMap<number, Message | null>
   userChats: ObjectMap<number, number | null>
 } = {
+  activeChatId: null,
   chatIds: undefined,
   chats: {},
   chatMessages: {},
@@ -25,6 +27,10 @@ const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
+    setActiveChatId(state, action: PayloadAction<number | null>) {
+      state.activeChatId = action.payload
+    },
+
     handleChatAll: {
       reducer: (state, action: PayloadAction<number[]>) => {
         state.chatIds = action.payload

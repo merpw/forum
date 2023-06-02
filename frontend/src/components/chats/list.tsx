@@ -2,7 +2,6 @@
 
 import { FC, useContext, useEffect, useRef } from "react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
 import dayjs from "dayjs"
 
 import { useChat } from "@/api/chats/chats"
@@ -12,17 +11,16 @@ import { useMe } from "@/api/auth"
 import { MarkdownToPlain } from "@/components/markdown/render"
 import { ChatSectionCollapsedContext } from "@/components/layout"
 import { Message } from "@/ws"
+import { useAppSelector } from "@/store/hooks"
 
 const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
-  const { id } = useParams()
-
   return (
     <div>
       <h1 className={"text-xl mb-3"}>Total: {chatIds.length} chats</h1>
       <ul className={"flex flex-col gap-2"}>
         {chatIds.map((chatId) => (
           <li key={chatId} className={"w-full"}>
-            <ChatCard id={chatId} isActive={Number(id) === chatId} />
+            <ChatCard chatId={chatId} />
           </li>
         ))}
       </ul>
@@ -30,12 +28,14 @@ const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
   )
 }
 
-const ChatCard: FC<{ id: number; isActive?: boolean }> = ({ id, isActive = false }) => {
-  const { chat } = useChat(id)
+const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
+  const { chat } = useChat(chatId)
 
   const { user: lastMessageUser } = useUser(chat?.companionId)
 
   const { isCollapsed, setIsCollapsed } = useContext(ChatSectionCollapsedContext)
+
+  const activeChatId = useAppSelector((state) => state.chats.activeChatId)
 
   if (chat === undefined) {
     return <div>loading...</div>
@@ -43,9 +43,10 @@ const ChatCard: FC<{ id: number; isActive?: boolean }> = ({ id, isActive = false
   if (chat === null) {
     return null
   }
+
   return (
     <Link
-      href={`/chat/${id}`}
+      href={`/chat/${chatId}`}
       className={"w-full"}
       onClick={() => {
         if (!isCollapsed && window.innerWidth < 640) {
@@ -53,7 +54,7 @@ const ChatCard: FC<{ id: number; isActive?: boolean }> = ({ id, isActive = false
         }
       }}
     >
-      <div className={"border p-4 rounded" + " " + (isActive && "border-blue-900")}>
+      <div className={"border p-4 rounded" + " " + (chatId === activeChatId && "border-blue-900")}>
         <div className={"text-xl"}>{lastMessageUser?.name}</div>
         <MessageInfo id={chat.lastMessageId} />
       </div>

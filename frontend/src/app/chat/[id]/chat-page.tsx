@@ -5,25 +5,33 @@ import ReactTextAreaAutosize from "react-textarea-autosize"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import dayjs from "dayjs"
+import { useDispatch } from "react-redux"
 
-import * as auth from "@/api/auth"
 import Markdown from "@/components/markdown/markdown"
 import { useChatMessages, useMessage, useSendMessage } from "@/api/chats/messages"
 import { useUser } from "@/api/users/hooks"
 import { useChat } from "@/api/chats/chats"
+import { chatActions } from "@/store/chats/chats"
+import { useMe } from "@/api/auth"
 
 const ChatPage = () => {
   const params = useParams()
   const chatId = Number(params?.id || NaN)
 
   const router = useRouter()
+  const dispatch = useDispatch()
 
   useEffect(() => {
     if (chatId && isNaN(chatId)) {
       router.push("/chat")
       return
     }
-  }, [chatId, router])
+    dispatch(chatActions.setActiveChatId(chatId))
+
+    return () => {
+      dispatch(chatActions.setActiveChatId(null))
+    }
+  }, [chatId, dispatch, router])
 
   if (chatId === null || isNaN(chatId)) {
     return null
@@ -164,7 +172,7 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
 }
 
 const MessageComponent: FC<{ id: number }> = ({ id }) => {
-  const { user } = auth.useMe()
+  const { user } = useMe()
   const { message } = useMessage(id)
 
   const ref = useRef<HTMLDivElement>(null)
