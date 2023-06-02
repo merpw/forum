@@ -10,7 +10,7 @@ export type Message = {
 export type Chat = {
   id: number
   lastMessageId: number
-  userId: number
+  companionId: number
 }
 
 export type WSBase = {

@@ -33,7 +33,7 @@ const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
 const ChatCard: FC<{ id: number; isActive?: boolean }> = ({ id, isActive = false }) => {
   const { chat } = useChat(id)
 
-  const { user: lastMessageUser } = useUser(chat?.userId)
+  const { user: lastMessageUser } = useUser(chat?.companionId)
 
   const { isCollapsed, setIsCollapsed } = useContext(ChatSectionCollapsedContext)
 

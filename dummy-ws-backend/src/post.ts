@@ -14,9 +14,7 @@ type SendMessageRequestData = {
 }
 
 // response data type for /chat/1/message
-type SendMessageResponseData = {
-  messageId: number
-}
+type SendMessageResponseData = number
 
 const postHandler = ({
   url,
@@ -93,9 +91,7 @@ const postHandler = ({
       type: "post",
       item: {
         url,
-        data: {
-          messageId,
-        },
+        data: messageId,
       },
     }
 

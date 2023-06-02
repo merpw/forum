@@ -48,7 +48,7 @@ const Chat: FC<{ id: number }> = ({ id }) => {
 
   return (
     <div className={"flex flex-col h-full"}>
-      <ChatInfo userId={chat.userId} />
+      <ChatInfo userId={chat.companionId} />
       <ChatMessages chatId={chat.id} />
       <WriteMessageForm chatId={chat.id} />
     </div>

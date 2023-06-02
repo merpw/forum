@@ -36,7 +36,7 @@ const chatSlice = createSlice({
       reducer: (state, action: PayloadAction<{ chatId: number; data: Chat | null }>) => {
         state.chats[action.payload.chatId] = action.payload.data
         if (action.payload.data) {
-          state.userChats[action.payload.data.userId] = action.payload.chatId
+          state.userChats[action.payload.data.companionId] = action.payload.chatId
         }
       },
       prepare: (response: WSGetResponse<Chat | null>) => {
@@ -72,9 +72,9 @@ const chatSlice = createSlice({
           return chatB.lastMessageId - chatA.lastMessageId
         })
       },
-      prepare: (response: WSPostResponse<{ messageId: number }>) => {
+      prepare: (response: WSPostResponse<number>) => {
         const chatId = +response.item.url.split("/")[2]
-        return { payload: { chatId, messageId: response.item.data.messageId } }
+        return { payload: { chatId, messageId: response.item.data } }
       },
     },
 
@@ -97,6 +97,15 @@ const chatSlice = createSlice({
       prepare: (response: WSGetResponse<number | null>) => {
         const userId = +response.item.url.split("/")[2]
         return { payload: { userId, chatId: response.item.data } }
+      },
+    },
+
+    handleChatCreate: {
+      reducer: (state, action: PayloadAction<{ chatId: number }>) => {
+        state.chatIds?.unshift(action.payload.chatId)
+      },
+      prepare: (response: WSPostResponse<number>) => {
+        return { payload: { chatId: response.item.data } }
       },
     },
   },
@@ -128,6 +137,10 @@ export const chatHandlers = [
   {
     regex: /^\/users\/\d+\/chat$/,
     handler: chatActions.handleUserChat,
+  },
+  {
+    regex: /^\/chat\/create$/,
+    handler: chatActions.handleChatCreate,
   },
 ]
 
