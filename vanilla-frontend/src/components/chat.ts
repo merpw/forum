@@ -1,3 +1,4 @@
+import { backendUrl } from "../main.js"
 import { ActiveUser, InactiveUser } from "./types"
 import { ws } from "./ws.js"
 // This file is dedicated to sorting and displaying chat users in the sidebar.
@@ -141,20 +142,98 @@ const toggleOffline = () => {
 let msgId = 1 
 let created = false
 
+const createChat = () => {
+  fetch(`${backendUrl}/api/me`)
+  .then((resp) => resp.json())
+  .then((data) => {
+      ws.send(
+        JSON.stringify({
+          type: `post`,
+          item: {
+            url: `/chat/create`,
+            data: {
+              userId: data.id,
+            },
+          },
+        })
+      )
+    })
+}
+
+const sendMsg = (chatId: number, message: string) => {
+  ws.send(
+    JSON.stringify({
+      type: "post",
+      item: {
+        url: `/chat/${chatId}/message`,
+        data: {
+          content: message,
+        }
+      }
+    })
+  )
+}
+
+const getAllChats = () => {
+ws.send(
+  JSON.stringify({
+    type: "get",
+    item: {
+      url: "/chat/all"
+    }
+  })
+)
+}
+
+const getChat = (chatId: number) => {
+  ws.send(
+    JSON.stringify({
+      type: "get",
+      item: {
+        url: `/chat/${chatId}`
+      }
+    })
+  )
+}
+
+const getChatMessages = (chatId: number) => {
+  ws.send(
+    JSON.stringify({
+      type: "get",
+      item: {
+        url: `/chat/${chatId}/messages`
+      }
+    })
+  )
+}
+const getChatMessage = (chatId: number) => {
+  ws.send(
+    JSON.stringify({
+      type: "get",
+      item: {
+        url: `/message/${chatId}`
+      }
+    })
+  )
+}
+
+// Everything in this function is for development testing only
 export const sendMessage = () => {
   const chatMsg = document.getElementById("chat-text") as HTMLInputElement
   if (chatMsg.value.length === 0) {
     return
   }
-
-  if (!created) {
+  fetch(`${backendUrl}/api/me`)
+  .then((resp) => resp.json())
+  .then((data) => {
+   if (!created) {
     ws.send(
       JSON.stringify({
         type: `post`,
         item: {
           url: `/chat/create`,
           data: {
-            userId: 1,
+            userId: data.id,
           },
         },
       })
@@ -166,8 +245,17 @@ export const sendMessage = () => {
     JSON.stringify({
       type: "get",
       item: {
-        url: `/message/${msgId++}`,
-      },
+        url: `/chat/${data.id}/messages`
+      }
+    })
+  )
+
+  ws.send(
+    JSON.stringify({
+      type: "get",
+      item: {
+        url: `/chat/${data.id}`
+      }
     })
   )
 
@@ -175,13 +263,35 @@ export const sendMessage = () => {
     JSON.stringify({
       type: `post`,
       item: {
-        url: `/chat/1/message`,
+        url: `/chat/${data.id}/messages`,
         data: {
           content: `${chatMsg.value.toString()}`,
         },
       },
     })
   )
+
+  })
+
+  ws.send(
+    JSON.stringify({
+      type: `get`,
+      item: {
+        url: `/chat/all`
+      }
+    })
+  )
+
+  ws.send(
+    JSON.stringify({
+      type: "get",
+      item: {
+        url: `/message/${msgId++}`,
+      },
+    })
+  )
+
+
   chatMsg.value = ""
   return
 }
