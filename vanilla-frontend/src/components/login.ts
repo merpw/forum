@@ -154,13 +154,17 @@ export const loginController = () => {
     })
   })
 
+  const signupElement = document.querySelector(".signup") as HTMLDivElement
+
   signUpLink?.addEventListener("click", () => {
     loginSignupForm.classList.add("active")
+    signupElement.style.display = "block"
   })
 
   // To go from sign in to login.
   loginLink?.addEventListener("click", () => {
     loginSignupForm.classList.remove("active")
+    signupElement.style.display = "none"
   })
 
   const signupForm = document.querySelector<HTMLFormElement>("#signup-form")

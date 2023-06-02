@@ -138,33 +138,88 @@ const toggleOffline = () => {
   }
 }
 
+let msgId = 1 
+let created = false
+
 export const sendMessage = () => {
   const chatMsg = document.getElementById("chat-text") as HTMLInputElement
-  ws.send(JSON.stringify(chatMsg.value))
+  if (chatMsg.value.length === 0) {
+    return
+  }
+
+  if (!created) {
+    ws.send(
+      JSON.stringify({
+        type: `post`,
+        item: {
+          url: `/chat/create`,
+          data: {
+            userId: 1,
+          },
+        },
+      })
+    )
+    created = true
+  }
+
+  ws.send(
+    JSON.stringify({
+      type: "get",
+      item: {
+        url: `/message/${msgId++}`,
+      },
+    })
+  )
+
+  ws.send(
+    JSON.stringify({
+      type: `post`,
+      item: {
+        url: `/chat/1/message`,
+        data: {
+          content: `${chatMsg.value.toString()}`,
+        },
+      },
+    })
+  )
   chatMsg.value = ""
   return
 }
 
-export const displayMessage = () => {
-  const messageDisplay = document.getElementById("chat-messages") as HTMLDivElement
-  const message = [] as HTMLDivElement []
-  for (const message of messages) {
-    
-  }
-}
+// export const getMessages = () => {
+//   console.log(ws.send(JSON.))
+// }
 
+// export const displayMessage = () => {
+//   const messageDisplay = document.getElementById(`chat-messages`) as HTMLDivElement
+//   const messages = [] as HTMLDivElement []
+//   const request = JSON.stringify({
+//     type: `get`,
+//     item: {
+//       url: `/chat/1/messages`
+//     }
+//   })
 
-const createMessage = async (author: string, userId: number, content: string, sender: boolean,): Promise<HTMLDivElement> => {
-  const message = document.createElement("div")
-  if(sender) {
-    message.className = "message sender"
-  } else {
-    message.className = "message reciever"
-  }
-  const info = document.createElement("div")
-  info.id = `MUID${userId.toString()}` // Message User Id
-  info.textContent = `${author}`
-  const contentElement = `${content}`
-  message.append(info, contentElement)
-  return message
-}
+//   // ws.send(request, function(response){
+//   //   console.log(response)
+//   // })
+
+//   for (const message of messages) {
+//    messageDisplay.appendChild(message)
+//   }
+// }
+
+// const createMessage = async (author: string, userId: number, content: string, sender: boolean,): Promise<HTMLDivElement> => {
+//   const message = document.createElement("div")
+//   if(sender) {
+//     message.className = "message sender"
+//   } else {
+//     message.className = "message reciever"
+//   }
+//   const info = document.createElement("div")
+//   info.id = `MUID${userId.toString()}` // Message User Id
+//   info.textContent = `${author}`
+//   const contentElement = `${content}`
+//   message.append(info, contentElement)
+//   return message
+// }
