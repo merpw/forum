@@ -7,7 +7,7 @@ import { chatHandlers } from "@/store/chats/chats"
 import { WebSocketResponse } from "@/ws"
 
 // TODO: use FORUM_BACKEND_URL
-const WebSocketUrl = "ws://localhost:6969"
+const WebSocketUrl = "ws://localhost:8081/ws"
 
 const wsConnectionMiddleware: Middleware = (store) => {
   let ws: WebSocket
@@ -19,6 +19,12 @@ const wsConnectionMiddleware: Middleware = (store) => {
       state.wsConnection.status === "disconnected" &&
       action.type !== wsConnectionActions.connectionStarted.type
     ) {
+      const token = document.cookie.match(/forum-token=(.*?)(;|$)/)?.[1]
+      if (!token) {
+        console.error("no token")
+        return
+      }
+
       store.dispatch(wsConnectionActions.connectionStarted())
       ws = new WebSocket(WebSocketUrl)
       ws.onmessage = (event) => {
@@ -57,11 +63,6 @@ const wsConnectionMiddleware: Middleware = (store) => {
       }
       ws.onopen = () => {
         console.log("ws connected")
-        const token = document.cookie.match(/forum-token=(.*?)(;|$)/)?.[1]
-        if (!token) {
-          console.error("Not logged in")
-          return
-        }
         ws.send(JSON.stringify({ type: "handshake", item: { token } }))
       }
       ws.onclose = () => {
@@ -70,7 +71,7 @@ const wsConnectionMiddleware: Middleware = (store) => {
       }
     }
 
-    if (action.type === "ws/send") {
+    if (sendGet.match(action) || sendPost.match(action)) {
       const type = action.payload.type
       const url = action.payload.item.url
 
@@ -98,7 +99,7 @@ const wsConnectionMiddleware: Middleware = (store) => {
   }
 }
 
-export const sendWSGet = createAction("ws/send", (url: string) => {
+const sendGet = createAction("ws/send", (url: string) => {
   return {
     payload: {
       type: "get",
@@ -110,7 +111,7 @@ export const sendWSGet = createAction("ws/send", (url: string) => {
 })
 
 // TODO: improve types, maybe even infer data type by url
-export const sendWSPost = createAction("ws/send", <T>(url: string, data: T) => {
+const sendPost = createAction("ws/send", <T>(url: string, data: T) => {
   return {
     payload: {
       type: "post",
@@ -121,5 +122,12 @@ export const sendWSPost = createAction("ws/send", <T>(url: string, data: T) => {
     },
   }
 })
+
+const closeConnection = createAction("ws/close")
+
+export const wsActions = {
+  sendWSGet: sendGet,
+  sendWSPost: sendPost,
+}
 
 export default wsConnectionMiddleware
