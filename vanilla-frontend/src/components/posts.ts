@@ -75,7 +75,7 @@ export class PostCreator {
   private onSubmit(event: Event) {
     event.preventDefault()
     const formData: CreatePostBody = this.getFormData()
-
+    console.log(formData)
     fetch(`${backendUrl}/api/posts/create/`, {
       method: "POST",
       headers: {

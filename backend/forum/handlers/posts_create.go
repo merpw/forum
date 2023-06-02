@@ -29,7 +29,7 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
-
+  log.Println(requestBody)
 	requestBody.Title = strings.TrimSpace(requestBody.Title)
 	requestBody.Content = strings.TrimSpace(requestBody.Content)
 	requestBody.Description = strings.TrimSpace(requestBody.Description)
@@ -42,6 +42,8 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Title is too long, maximum length is 25", http.StatusBadRequest)
 		return
 	}
+
+  log.Println(requestBody.Content)
 
 	if requestBody.Content == "" {
 		http.Error(w, "Content is too short", http.StatusBadRequest)

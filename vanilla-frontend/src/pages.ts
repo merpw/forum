@@ -37,7 +37,7 @@ export const LoginSignup = (): string => {
 			</form>
 		</div>
 
-		<div class="form signup">
+		<div class="form signup" style="display: none;">
 			<span class="title">Registration</span>
 
 			<form (submit)="onSubmit()" id="signup-form">

@@ -10,7 +10,7 @@ import { ws, wsHandler } from "./ws.js"
 export const Auth = async (session: boolean) => {
   if (session) {
     if (!ws) {
-     wsHandler()
+      wsHandler()
     }
     // Adding the HTML and changing style
     superDivision.innerHTML = Index()

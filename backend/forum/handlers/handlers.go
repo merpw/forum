@@ -13,17 +13,25 @@ type Handlers struct {
 	DB *database.DB
 }
 
+const FRONTEND_DIR = "../../vanilla-frontend/public"
+
 // New connects database to Handlers
 func New(db *sql.DB) *Handlers {
 	return &Handlers{DB: database.New(db)}
 }
 
+func (h *Handlers) serveContent (w http.ResponseWriter, r *http.Request) {
+}
+
 // Handler returns http.Handler with all routes registered
 func (h *Handlers) Handler() http.Handler {
+  router := http.NewServeMux()
+  fs := http.FileServer(http.Dir(FRONTEND_DIR))
+  router.Handle("/", fs)
 
 	var routes = []server.Route{
 		// method GET endpoints
-		server.NewRoute(http.MethodGet, `/api/me`, h.me),
+    server.NewRoute(http.MethodGet, `/api/me`, h.me),
 
 		server.NewRoute(http.MethodGet, `/api/me/posts`, h.mePosts),
 		server.NewRoute(http.MethodGet, `/api/me/posts/liked`, h.mePostsLiked),
@@ -66,27 +74,31 @@ func (h *Handlers) Handler() http.Handler {
 				server.ErrorResponse(w, http.StatusInternalServerError) // 500 ERROR
 			}
 		}()
-		r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
 
-		var requestRoute server.Route
+    if strings.HasPrefix(r.URL.Path, "/api/") {
+      r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
 
-		for _, route := range routes {
-			if route.Pattern.MatchString(r.URL.Path) {
-				requestRoute = route
-				break
-			}
-		}
+      var requestRoute server.Route
 
-		if requestRoute.Handler == nil {
-			server.ErrorResponse(w, http.StatusNotFound)
-			return
-		}
+      for _, route := range routes {
+        if route.Pattern.MatchString(r.URL.Path) {
+          requestRoute = route
+          break
+        }
+      }
 
-		if r.Method != requestRoute.Method {
-			server.ErrorResponse(w, http.StatusMethodNotAllowed)
-			return
-		}
+      if requestRoute.Handler == nil {
+        server.ErrorResponse(w, http.StatusNotFound)
+        return
+      }
 
-		requestRoute.Handler(w, r)
-	})
+      if r.Method != requestRoute.Method {
+        server.ErrorResponse(w, http.StatusMethodNotAllowed)
+        return
+      }
+      requestRoute.Handler(w, r)
+    } else {
+      router.ServeHTTP(w, r)
+    }
+    })
 }
