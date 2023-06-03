@@ -21,14 +21,18 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ## Docker compose: `docker compose up`
 
+> Note: in production, it's highly recommended to use `FORUM_BACKEND_SECRET` to secure private API endpoints.
+>
+> You can generate it using the following command:
+
+### Docker production: `FORUM_BACKEND_SECRET=$(uuidgen) docker compose up`
+
 ### Natively (dev)
 
 requirements: Node.js, Golang, GCC
 
-#### Script: `sh dev.sh`
-
 #### Commands:
 
-#### Backend: `cd backend && go run .`
+#### Backend: `cd backend && go run backend/forum`
 
 #### Frontend: `cd frontend && npm run dev`
