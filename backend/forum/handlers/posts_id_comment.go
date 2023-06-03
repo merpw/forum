@@ -17,11 +17,7 @@ const (
 // postsIdCommentIdLike likes a comment on a specific post
 func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) {
 
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	// /api/posts/1/comment/2/like ->2
@@ -64,11 +60,7 @@ func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) 
 
 // postsIdCommentIdDislike dislikes a specific comment on a specific post
 func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	if err != nil {
@@ -109,11 +101,7 @@ func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Reques
 
 // postsIdCommentIdReactions returns SafeReaction with data about the reactions of a specific comment
 func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	if err != nil {
@@ -138,11 +126,7 @@ func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Reque
 
 // postsIdCommentCreate adds a comment on a specific post
 func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	postIdStr = strings.TrimSuffix(postIdStr, "/comment")

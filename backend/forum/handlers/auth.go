@@ -235,6 +235,9 @@ func (h *Handlers) logout(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// getUserId checks if the user's token is valid and returns the user's id
+//
+// If the token is not valid, it will return -1 and add an empty cookie to the response
 func (h *Handlers) getUserId(w http.ResponseWriter, r *http.Request) int {
 	cookie, err := r.Cookie("forum-token")
 	if err != nil {
