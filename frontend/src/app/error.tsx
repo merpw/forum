@@ -14,29 +14,29 @@ export default function Custom500({ reset }: { error: Error; reset: () => void }
   return (
     <>
       <title>Oops... Error 500 - Forum</title>
-      <div className={"text-center"}>
-        <h1 className={"text-5xl m-auto"}>500 Internal Server Error</h1>
-        <p className={"text-2xl my-5 font-light"}>
-          {"Please, try again later or go to the Home page"}
-        </p>
-        <div className={"flex gap-3 justify-center"}>
-          <button className={"text-2xl button"} onClick={reset}>
-            Try again
-          </button>
-          <Link href={"/"}>
-            <button className={"text-2xl button"}>To the home page</button>
-          </Link>
-        </div>
+      <div className={"text-center my-20"}>
+        <h1 className={"text-8xl text-base-100 font-Alatsi"}>500</h1>
+        <h2 className={"text-2xl font-extralight"}>Internal Server Error</h2>
+        <div className={"my-16 font-light flex flex-col gap-3"}>
+          <p className={"font-thin flex flex-col gap-1"}>
+            {"Please, try to update page or visit "}
+            <span className={"my-1"}>
+              <Link href={"/"} className={"button"}>
+                Back to homepage
+              </Link>
+            </span>
+          </p>
+          <p className={"font-thin"}>
+            {"If error persists, please, "}
 
-        <p className={"text-2xl my-5 font-light"}>
-          {"If error persists, please, "}
-          <Link
-            href={`mailto:dev@mer.pw?subject=${devMessage}`}
-            className={"font-normal hover:underline text-bo"}
-          >
-            contact site administrator
-          </Link>
-        </p>
+            <Link
+              href={`mailto:dev@mer.pw?subject=${devMessage}`}
+              className={"clickable text-lg font-normal"}
+            >
+              contact site administrator
+            </Link>
+          </p>
+        </div>
       </div>
     </>
   )
