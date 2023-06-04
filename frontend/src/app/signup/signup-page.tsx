@@ -80,119 +80,160 @@ const SignupPage = () => {
             .catch((err) => setFormError(err.message))
         }}
       >
-        <label className={"mb-4 block"}>
-          <p className={"inputbox-title"}>Username</p>
-          <input
-            type={"text"}
-            className={"inputbox-singlerow"}
-            name={"name"}
-            minLength={3}
-            maxLength={15}
-            placeholder={"Username"}
-            value={formFields.name}
-            onChange={() => void 0 /* handled by Form */}
-            required
-          />
-        </label>
-
-        <div className={"mb-4 flex flex-wrap gap-3"}>
-          <label className={"grow basis-1/3"}>
-            <p className={"inputbox-title"}>First Name </p>
-            <input
-              type={"text"}
-              className={"inputbox-singlerow"}
-              name={"first_name"}
-              placeholder={"First Name"}
-              value={formFields.first_name}
-              onChange={() => void 0 /* handled by Form */}
-              maxLength={15}
-              required
-            />
-          </label>
-          <label className={"grow basis-1/3"}>
-            <p className={"inputbox-title"}>Last Name</p>
-            <input
-              type={"text"}
-              className={"inputbox-singlerow"}
-              name={"last_name"}
-              placeholder={"Last Name"}
-              value={formFields.last_name}
-              onChange={() => void 0 /* handled by Form */}
-              maxLength={15}
-              required
-            />
-          </label>
-        </div>
-        <div className={"mb-4 flex flex-wrap gap-3"}>
-          <label className={"grow basis-1/3"}>
-            <p className={"inputbox-title"}>Date of Birth </p>
-            <input
-              type={"date"}
-              min={"1900-01-01"}
-              max={new Date().toISOString().split("T")[0]}
-              className={"inputbox-singlerow"}
-              name={"dob"}
-              placeholder={"Date of Birth"}
-              required
-            />
-          </label>
-          <label className={"grow basis-1/3 block"}>
-            <span className={"inputbox-title m-0"}>Gender </span>
-            <div>
-              <select
-                className={"inputbox-singlerow my-1 py-1"}
-                name={"gender"}
-                placeholder={"Gender"}
-                required
-              >
-                <option value={""}>Select</option>
-                <option value={"male"}>Male</option>
-                <option value={"female"}>Female</option>
-                <option value={"other"}>Other</option>
-              </select>
+        <div className={"py-1 bg-base-200"}>
+          <div className={"hero-content flex-col py-7"}>
+            <div className={"text-center"}>
+              <h1 className={"text-6xl gradient-text font-Yesteryear"}>Welcome</h1>
+              <div className={"opacity-50 font-thin"}>
+                to the place <span className={"font-Alatsi text-primary text-xl"}>FOR</span>{" "}
+                <span className={"font-Alatsi text-primary text-xl"}>U</span>nleashing{" "}
+                <span className={"font-Alatsi text-primary text-xl"}> M</span>inds!
+              </div>
             </div>
-          </label>
+
+            <div className={"card flex-shrink-0 w-full max-w-2xl shadow-xl bg-base-100 mb-10"}>
+              <div className={"card-body"}>
+                <div className={"form-control"}>
+                  <label className={"label pt-0"}>
+                    <span className={"label-text"}>Username</span>
+                  </label>
+                  <input
+                    type={"text"}
+                    className={"input input-bordered"}
+                    name={"name"}
+                    minLength={3}
+                    maxLength={15}
+                    placeholder={"username"}
+                    value={formFields.name}
+                    onChange={() => void 0 /* handled by Form */}
+                    required
+                  />
+                </div>
+
+                <div className={"flex flex-wrap flex-row gap-3"}>
+                  <div className={"grow basis-1/3"}>
+                    <label className={"label"}>
+                      <span className={"label-text"}>First Name </span>
+                    </label>
+                    <input
+                      type={"text"}
+                      className={"input input-bordered w-full"}
+                      name={"first_name"}
+                      placeholder={"first name"}
+                      value={formFields.first_name}
+                      onChange={() => void 0 /* handled by Form */}
+                      maxLength={15}
+                      required
+                    />
+                  </div>
+                  <div className={"grow basis-1/3"}>
+                    <label className={"label "}>
+                      <span className={"label-text"}>Last Name </span>
+                    </label>
+                    <input
+                      type={"text"}
+                      className={"input input-bordered w-full"}
+                      name={"last_name"}
+                      placeholder={"last name"}
+                      value={formFields.last_name}
+                      onChange={() => void 0 /* handled by Form */}
+                      maxLength={15}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className={"flex flex-wrap flex-row gap-3"}>
+                  <div className={"grow basis-1/3"}>
+                    <label className={"label"}>
+                      <span className={"label-text"}>Date of Birth</span>
+                    </label>
+                    <input
+                      type={"date"}
+                      min={"1900-01-01"}
+                      max={new Date().toISOString().split("T")[0]}
+                      className={"input input-bordered w-full text-sm"}
+                      name={"dob"}
+                      placeholder={"Date of Birth"}
+                      required
+                    />
+                  </div>
+                  <div className={"grow basis-1/3"}>
+                    <label className={"label"}>
+                      <span className={"label-text"}>Gender</span>
+                    </label>
+                    <div>
+                      <select
+                        title={"Your gender"}
+                        className={"input input-bordered w-full text-sm"}
+                        name={"gender"}
+                        placeholder={"Gender"}
+                        required
+                      >
+                        <option value={""}>Select</option>
+                        <option value={"male"}>Male</option>
+                        <option value={"female"}>Female</option>
+                        <option value={"other"}>Other</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={"form-control"}>
+                  <label className={"label"}>
+                    <span className={"label-text"}>Email</span>
+                  </label>
+                  <input
+                    type={"email"}
+                    className={"input input-bordered"}
+                    name={"email"}
+                    placeholder={"email"}
+                    value={formFields.email}
+                    onChange={() => void 0 /* handled by Form */}
+                    required
+                  />
+                </div>
+
+                <div className={"form-control"}>
+                  <label className={"label"}>
+                    <span className={"label-text"}>Create password </span>
+                  </label>
+                  <input
+                    type={"password"}
+                    className={"input input-bordered"}
+                    name={"password"}
+                    placeholder={"password"}
+                    required
+                    minLength={8}
+                  />
+                </div>
+
+                <div className={"form-control"}>
+                  <label className={"label"}>
+                    <span className={"label-text"}>Repeat password </span>
+                  </label>
+                  <input
+                    title={"Repeat password"}
+                    type={"password"}
+                    id={"repeat-password"}
+                    className={"input input-bordered"}
+                    name={"passwordConfirm"}
+                    placeholder={"repeat password"}
+                    required
+                  />
+                </div>
+                <FormError error={formError} />
+                <div className={"form-control inline mt-5 mx-auto"}>
+                  <span className={"font-black mr-3 text-neutral"}>• •</span>
+                  <button type={"submit"} className={"button"}>
+                    Signup
+                  </button>
+                  <span className={"font-black ml-3 text-neutral"}>• •</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <label className={"mb-4 block"}>
-          <p className={"inputbox-title"}>Your email</p>
-          <input
-            type={"email"}
-            className={"inputbox-singlerow"}
-            name={"email"}
-            placeholder={"Email"}
-            value={formFields.email}
-            onChange={() => void 0 /* handled by Form */}
-            required
-          />
-        </label>
-
-        <label className={"mb-4 block"}>
-          <p className={"inputbox-title"}>Create password </p>
-          <input
-            type={"password"}
-            className={"inputbox-singlerow"}
-            name={"password"}
-            required
-            minLength={8}
-          />
-        </label>
-
-        <label className={"mb-6 block"}>
-          <p className={"inputbox-title"}>Repeat password </p>
-          <input
-            type={"password"}
-            id={"repeat-password"}
-            className={"inputbox-singlerow"}
-            name={"passwordConfirm"}
-            required
-          />
-        </label>
-
-        <FormError error={formError} />
-        <button type={"submit"} className={"button"}>
-          Submit
-        </button>
       </form>
     </>
   )
