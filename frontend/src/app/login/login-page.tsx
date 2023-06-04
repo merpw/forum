@@ -46,47 +46,54 @@ const LoginPage = () => {
             .catch((err) => setFormError(err.message))
         }}
       >
-        <div className={"mb-6"}>
-          <label className={"label"}>
-            <p className={"inputbox-title"}>Your email or username</p>
-            <input
-              type={login.match("@") ? "email" : "text"}
-              className={"inputbox-singlerow"}
-              value={login}
-              onChange={(e) => setLogin(e.currentTarget.value.trim())}
-              placeholder={"Email or username"}
-              required
-            />
-          </label>
+        <div className={"pt-12 pb-56 md:py-52 bg-base-200"}>
+          <div className={"hero-content flex-col md:flex-row-reverse min-h-full"}>
+            <div className={"text-center md:text-left"}>
+              <h1 className={"text-6xl mb-5 font-Yesteryear gradient-text"}>Welcome!</h1>
+              <div className={"font-thin"}>
+                <p>{"Don't have an account yet?"}</p>
+                <Link className={"clickable text-xl font-normal"} href={"/signup"}>
+                  Sign Up!
+                </Link>
+              </div>
+            </div>
+            <div className={"card flex-shrink-0 w-full max-w-sm shadow-xl bg-base-100"}>
+              <div className={"card-body"}>
+                <div className={"form-control"}>
+                  <label className={"label"}>
+                    <span className={"label-text"}>Email or Username</span>
+                  </label>
+                  <input
+                    type={login.match("@") ? "email" : "text"}
+                    placeholder={"email or username"}
+                    className={"input input-bordered"}
+                    value={login}
+                    onChange={(e) => setLogin(e.currentTarget.value.trim())}
+                    required
+                  />
+                </div>
+                <div className={"form-control"}>
+                  <label className={"label"}>
+                    <span className={"label-text"}>Password</span>
+                  </label>
+                  <input
+                    onChange={(e) => setPassword(e.currentTarget.value)}
+                    type={"password"}
+                    placeholder={"password"}
+                    className={"input input-bordered"}
+                    required
+                  />
+                </div>
+                <FormError error={formError} />
+                <div className={"form-control mt-6"}>
+                  <button type={"submit"} className={"btn button m-auto"}>
+                    Login
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className={"mb-6"}>
-          <label className={"label"}>
-            <p className={"inputbox-title"}>Your password</p>
-            <input
-              onChange={(e) => setPassword(e.currentTarget.value)}
-              type={"password"}
-              id={"password"}
-              className={"inputbox-singlerow"}
-              required
-            />
-          </label>
-        </div>
-
-        <FormError error={formError} />
-        <span className={"flex flex-wrap gap-2"}>
-          <span>
-            <button type={"submit"} className={"button mb-2"}>
-              Submit
-            </button>
-          </span>
-
-          <span className={"ml-auto text-right"}>
-            <div className={"font-light"}>{"Don't have an account yet?"}</div>
-            <Link className={"clickable text-2xl"} href={"/signup"}>
-              Sign Up!
-            </Link>
-          </span>
-        </span>
       </form>
     </>
   )
