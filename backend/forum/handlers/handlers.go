@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
 	"runtime/debug"
 	"strings"
 )
@@ -41,7 +42,9 @@ func (h *Handlers) Handler() http.Handler {
 
 		server.NewRoute(http.MethodGet, `/api/posts/categories`, h.postsCategories),
 		server.NewRoute(http.MethodGet, `/api/posts/categories/([[:alnum:]]+)`, h.postsCategoriesName),
+	}
 
+	var publicRoutes = []server.Route{
 		// method POST endpoints
 		server.NewRoute(http.MethodPost, `/api/login`, h.login),
 		server.NewRoute(http.MethodPost, `/api/signup`, h.signup),
@@ -87,6 +90,23 @@ func (h *Handlers) Handler() http.Handler {
 		r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
 
 		for _, route := range routes {
+			if route.Pattern.MatchString(r.URL.Path) {
+				if r.Method != route.Method {
+					server.ErrorResponse(w, http.StatusMethodNotAllowed)
+					return
+				}
+
+				if os.Getenv("FORUM_IS_PRIVATE") == "true" {
+					h.withAuth(route.Handler)(w, r)
+					return
+				}
+
+				route.Handler(w, r)
+				return
+			}
+		}
+
+		for _, route := range publicRoutes {
 			if route.Pattern.MatchString(r.URL.Path) {
 				if r.Method != route.Method {
 					server.ErrorResponse(w, http.StatusMethodNotAllowed)

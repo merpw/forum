@@ -36,3 +36,16 @@ requirements: Node.js, Golang, GCC
 #### Backend: `cd backend && go run backend/forum`
 
 #### Frontend: `cd frontend && npm run dev`
+
+## Environment variables
+
+Frontend and backend have their own environment variables. Check their READMEs for more information.
+
+Here's the list of environment variables used by both:
+
+- `FORUM_BACKEND_SECRET` - optional, secret `Internal-Auth` header value to bypass authentication for private API
+  endpoints. If not set, private API endpoints will be available to anyone with `Internal-Auth` header set to any value.
+
+- `FORUM_IS_PRIVATE` - optional, default: `true`.
+  Makes all endpoints private by default. If set to `false`, some endpoints will be available to anyone (
+  like `/api/posts`).

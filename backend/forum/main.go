@@ -18,6 +18,14 @@ func main() {
 		log.Println("WARNING: FORUM_BACKEND_SECRET is not set, any request with Internal-Auth header will be accepted")
 	}
 
+	if os.Getenv("FORUM_IS_PRIVATE") == "" {
+		err := os.Setenv("FORUM_IS_PRIVATE", "true")
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Println("INFO: FORUM_IS_PRIVATE is not set, defaulting to true")
+	}
+
 	port := flag.String("port", "8080", "specify server port")
 	dbFile := flag.String("db", "database.db", "specify custom database file path")
 

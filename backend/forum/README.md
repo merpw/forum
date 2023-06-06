@@ -32,6 +32,9 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 > Note: you can easily generate secret with `uuidgen` command, like this: `FORUM_BACKEND_SECRET=$(uuidgen)`.
 > Make sure that this secret is shared with frontend.
 
+- `FORUM_IS_PRIVATE` - optional, default `true`. If `true`, all endpoints will require authentication (except
+  `/api/login` and `/api/signup`).
+
 - `FRONTEND_REVALIDATE_URL` - optional, url to revalidate Next.js pages in ISR mode. For
   example, `http://localhost:3000/api/revalidate`
 - `FRONTEND_REVALIDATE_TOKEN` - optional, token to revalidate Next.js pages in ISR mode if frontend `/api/` is public
