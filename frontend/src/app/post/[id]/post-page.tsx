@@ -32,7 +32,7 @@ const PostPage: FC<{ post: Post; comments: Comment[] }> = ({ post, comments }) =
               {" by "}
             </span>
             <span className={"clickable text-lg font-Alatsi self-center"}>
-              <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
+              <Link href={`/user/${post.author.id}`}>{post.author.username}</Link>
             </span>
           </span>
         </div>

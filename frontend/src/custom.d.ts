@@ -13,7 +13,7 @@ export type Post = {
 }
 
 export type User = {
-  name: string
+  username: string
   id: number
   email: string
   first_name?: string
