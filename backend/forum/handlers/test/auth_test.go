@@ -34,19 +34,19 @@ func TestSignUp(t *testing.T) {
 			}, http.StatusBadRequest)
 		})
 
-		t.Run("Name", func(t *testing.T) {
+		t.Run("Username", func(t *testing.T) {
 			badClientData := NewClientData()
 
-			badClientData.Name = ""
+			badClientData.Username = ""
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 
-			badClientData.Name = "E"
+			badClientData.Username = "E"
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 
-			badClientData.Name = "THISUSERNAMEISTOOLONG"
+			badClientData.Username = "THISUSERNAMEISTOOLONG"
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 
-			badClientData.Name = "with spaces"
+			badClientData.Username = "with spaces"
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 
 		})
@@ -131,9 +131,9 @@ func TestSignUp(t *testing.T) {
 
 			cli.TestPost(t, "/api/signup", clientData, http.StatusBadRequest)
 
-			clientData.Name = "not" + clientData.Name
+			clientData.Username = "not" + clientData.Username
 			cli.TestPost(t, "/api/signup", clientData, http.StatusBadRequest)
-			clientData.Name = clientData.Name[3:]
+			clientData.Username = clientData.Username[3:]
 
 			clientData.Email = "not" + clientData.Email
 			cli.TestPost(t, "/api/signup", clientData, http.StatusBadRequest)
@@ -187,7 +187,7 @@ func TestLogin(t *testing.T) {
 			}, http.StatusBadRequest)
 
 			cli.TestPost(t, "/api/login", LoginRequest{
-				Login: clientData.Name,
+				Login: clientData.Username,
 			}, http.StatusBadRequest)
 
 			cli.TestPost(t, "/api/login", LoginRequest{

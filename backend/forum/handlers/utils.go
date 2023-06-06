@@ -1,8 +1,8 @@
 package handlers
 
 type SafeUser struct {
-	Id   int    `json:"id"`
-	Name string `json:"name"`
+	Id       int    `json:"id"`
+	Username string `json:"username"`
 }
 
 type SafePost struct {

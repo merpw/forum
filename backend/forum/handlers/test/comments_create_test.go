@@ -62,8 +62,8 @@ type CommentData struct {
 	Id      int    `json:"id"`
 	Content string `json:"content"`
 	Author  struct {
-		Id   int    `json:"id"`
-		Name string `json:"name"`
+		Id       int    `json:"id"`
+		Username string `json:"username"`
 	} `json:"author"`
 	Date          string `json:"date"`
 	LikesCount    int    `json:"likes_count"`

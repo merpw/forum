@@ -23,8 +23,8 @@ func TestUser(t *testing.T) {
 
 	t.Run("Valid", func(t *testing.T) {
 		var responseData struct {
-			Id   int    `json:"id"`
-			Name string `json:"name"`
+			Id       int    `json:"id"`
+			Username string `json:"username"`
 		}
 
 		_, respBody := cli1.TestGet(t, "/api/users/1", http.StatusOK)
@@ -39,8 +39,8 @@ func TestUser(t *testing.T) {
 				t.Fatalf("invalid id, expected 1, got %d", responseData.Id)
 			}
 
-			if responseData.Name != cli1.Name {
-				t.Fatalf("invalid name, expected %s, got %s", cli1.Name, responseData.Name)
+			if responseData.Username != cli1.Username {
+				t.Fatalf("invalid username, expected %s, got %s", cli1.Username, responseData.Username)
 			}
 		}
 
@@ -115,8 +115,8 @@ func TestUsers(t *testing.T) {
 	}
 
 	type User struct {
-		Id   int    `json:"id"`
-		Name string `json:"name"`
+		Id       int    `json:"id"`
+		Username string `json:"username"`
 	}
 	var users []User
 
@@ -139,9 +139,9 @@ func TestUsers(t *testing.T) {
 
 	for i := 0; i < len(users); i++ {
 		for j := i + 1; j < len(users); j++ {
-			// should be sorted by name
-			if users[i].Name > users[j].Name {
-				t.Fatalf("users are not sorted by name, expected %s > %s", users[i].Name, users[j].Name)
+			// should be sorted by username
+			if users[i].Username > users[j].Username {
+				t.Fatalf("users are not sorted by username, expected %s > %s", users[i].Username, users[j].Username)
 			}
 		}
 	}
