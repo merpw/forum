@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sync"
 	"testing"
 )
 
@@ -35,31 +34,12 @@ func TestPosts(t *testing.T) {
 		})
 	})
 
-	var posts []PostData
-	var lock sync.Mutex
+	cli := testServer.TestClient()
+	cli.TestAuth(t)
 
-	var wg sync.WaitGroup
-
-	for i := 0; i < 10; i++ {
-		wg.Add(1)
-		t.Run(fmt.Sprintf("create_10_posts/%d", i), func(t *testing.T) {
-			t.Parallel()
-
-			cli := testServer.TestClient()
-			cli.TestAuth(t)
-
-			lock.Lock()
-			posts = append(posts, createPosts(t, cli, 10)...)
-			lock.Unlock()
-
-			wg.Done()
-		})
-	}
+	posts := createPosts(t, cli, 10)
 
 	t.Run("[GET]/api/posts", func(t *testing.T) {
-		t.Parallel()
-		wg.Wait()
-
 		cli := testServer.TestClient()
 		_, respBody := cli.TestGet(t, "/api/posts", http.StatusOK)
 		var respData []PostData
@@ -86,9 +66,6 @@ func TestPosts(t *testing.T) {
 	})
 
 	t.Run("[GET]/api/posts/{id}", func(t *testing.T) {
-		t.Parallel()
-		wg.Wait()
-
 		cli := testServer.TestClient()
 
 		for _, postData := range posts {
