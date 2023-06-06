@@ -11,47 +11,55 @@ import (
 func TestMe(t *testing.T) {
 	testServer := NewTestServer(t)
 
-	cli := testServer.TestClient()
-
 	t.Run("Unauthorized", func(t *testing.T) {
+		cli := testServer.TestClient()
+
 		cli.TestGet(t, "/api/me", http.StatusUnauthorized)
+
+		cli.TestAuth(t)
+		cli2 := testServer.TestClient()
+		cli2.Cookies = cli.Cookies
+
+		cli.TestPost(t, "/api/logout", nil, http.StatusOK)
+
+		// logged out using another client
+		cli2.TestGet(t, "/api/me", http.StatusUnauthorized)
 	})
 
-	cli.TestAuth(t)
+	t.Run("Valid", func(t *testing.T) {
+		cli := testServer.TestClient()
+		cli.TestAuth(t)
 
-	_, respBody := cli.TestGet(t, "/api/me", http.StatusOK)
+		_, respBody := cli.TestGet(t, "/api/me", http.StatusOK)
 
-	var respData struct {
-		Id        int    `json:"id"`
-		Name      string `json:"name"`
-		Email     string `json:"email"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-	}
-	err := json.Unmarshal(respBody, &respData)
-	if err != nil {
-		t.Fatal(err)
-	}
+		var respData struct {
+			Id        int    `json:"id"`
+			Name      string `json:"name"`
+			Email     string `json:"email"`
+			FirstName string `json:"first_name"`
+			LastName  string `json:"last_name"`
+		}
+		err := json.Unmarshal(respBody, &respData)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if respData.Id != 1 {
-		t.Fatalf("invalid id, expected 1, got %d", respData.Id)
-	}
+		if respData.Name != cli.Name {
+			t.Fatalf("invalid name, expected %s, got %s", cli.Name, respData.Name)
+		}
 
-	if respData.Name != cli.Name {
-		t.Fatalf("invalid name, expected %s, got %s", cli.Name, respData.Name)
-	}
+		if respData.Email != cli.Email {
+			t.Fatalf("invalid email, expected %s, got %s", cli.Email, respData.Email)
+		}
 
-	if respData.Email != cli.Email {
-		t.Fatalf("invalid email, expected %s, got %s", cli.Email, respData.Email)
-	}
+		if respData.FirstName != cli.FirstName {
+			t.Fatalf("invalid first name, expected %s, got %s", cli.FirstName, respData.FirstName)
+		}
 
-	if respData.FirstName != cli.FirstName {
-		t.Fatalf("invalid first name, expected %s, got %s", cli.FirstName, respData.FirstName)
-	}
-
-	if respData.LastName != cli.LastName {
-		t.Fatalf("invalid last name, expected %s, got %s", cli.LastName, respData.LastName)
-	}
+		if respData.LastName != cli.LastName {
+			t.Fatalf("invalid last name, expected %s, got %s", cli.LastName, respData.LastName)
+		}
+	})
 }
 
 func TestMePosts(t *testing.T) {
