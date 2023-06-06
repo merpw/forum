@@ -85,18 +85,11 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		userId, strings.Join(requestBody.Categories, ","))
 	server.SendObject(w, id)
 
-	err = revalidateURL(fmt.Sprintf("/post/%v", id))
-	if err != nil {
-		log.Printf("Error while revalidating `/post/%v`: %v", id, err)
-	}
-	err = revalidateURL("/")
-	if err != nil {
-		log.Printf("Error while revalidating '/': %v", err)
-	}
+	external.RevalidateURL(fmt.Sprintf("/post/%v", id))
+
+	external.RevalidateURL("/")
+
 	for _, category := range categories {
-		err = revalidateURL(fmt.Sprintf("/category/%v", category))
-		if err != nil {
-			log.Printf("Error while revalidating `/category/%v`: %v", category, err)
-		}
+		external.RevalidateURL(fmt.Sprintf("/category/%v", category))
 	}
 }

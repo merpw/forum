@@ -125,10 +125,7 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		sql.NullString{String: requestBody.Gender, Valid: true},
 	)
 
-	err = revalidateURL(fmt.Sprintf("/user/%d", id))
-	if err != nil {
-		log.Printf("Error while revalidating `/user/%d`: %v", id, err)
-	}
+	external.RevalidateURL(fmt.Sprintf("/user/%d", id))
 }
 
 func (h *Handlers) login(w http.ResponseWriter, r *http.Request) {
