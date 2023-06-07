@@ -65,13 +65,14 @@ const UserInfo = () => {
         <ul
           tabIndex={0}
           className={
-            "mt-3 p-2 shadow menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
+            "mt-3 p-2 shadow z-50 menu menu-compact dropdown-content bg-base-100 rounded-box w-52"
           }
         >
+          <li className={"menu-title inline"}>
+            <span className={"font-light"}>Hello,</span> {user?.name}
+          </li>
           <li>
-            <Link href={"/me"}>
-              <span>Profile</span>
-            </Link>
+            <Link href={"/me"}>Profile</Link>
           </li>
           <li>
             <button
