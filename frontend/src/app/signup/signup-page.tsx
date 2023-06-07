@@ -84,7 +84,7 @@ const SignupPage = () => {
           <div className={"hero-content flex-col py-7"}>
             <div className={"text-center"}>
               <h1 className={"text-6xl gradient-text font-Yesteryear"}>Welcome</h1>
-              <div className={"opacity-50 font-thin"}>
+              <div className={"opacity-50 font-light"}>
                 to the place <span className={"font-Alatsi text-primary text-xl"}>FOR</span>{" "}
                 <span className={"font-Alatsi text-primary text-xl"}>U</span>nleashing{" "}
                 <span className={"font-Alatsi text-primary text-xl"}> M</span>inds!

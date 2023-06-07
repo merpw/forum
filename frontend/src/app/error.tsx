@@ -16,9 +16,9 @@ export default function Custom500({ reset }: { error: Error; reset: () => void }
       <title>Oops... Error 500 - Forum</title>
       <div className={"text-center my-20"}>
         <h1 className={"text-8xl text-base-100 font-Alatsi"}>500</h1>
-        <h2 className={"text-2xl font-extralight"}>Internal Server Error</h2>
+        <h2 className={"text-2xl font-light"}>Internal Server Error</h2>
         <div className={"my-16 font-light flex flex-col gap-3"}>
-          <p className={"font-thin flex flex-col gap-1"}>
+          <p className={"font-light flex flex-col gap-1"}>
             {"Please, try to update page or visit "}
             <span className={"my-1"}>
               <Link href={"/"} className={"button"}>
@@ -26,7 +26,7 @@ export default function Custom500({ reset }: { error: Error; reset: () => void }
               </Link>
             </span>
           </p>
-          <p className={"font-thin"}>
+          <p className={"font-light"}>
             {"If error persists, please, "}
 
             <Link

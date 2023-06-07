@@ -67,7 +67,7 @@ const CommentCard: FC<{ comment: Comment; postId: number }> = ({ comment, postId
 
         <AutoDate
           date={comment.date}
-          className={"self-center ml-auto text-sm font-thin text-info"}
+          className={"self-center ml-auto text-sm font-light text-info"}
         />
       </div>
     </div>
