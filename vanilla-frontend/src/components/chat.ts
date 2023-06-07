@@ -1,119 +1,176 @@
 import { backendUrl } from "../main.js"
-import { ActiveUser, InactiveUser } from "./types"
-import { ws } from "./ws.js"
+import { ChatUser } from "../types"
+import { sendObject } from "./ws.js"
+import { userInfo } from "./auth.js"
 // This file is dedicated to sorting and displaying chat users in the sidebar.
-
-const chatUsers = {
-  active:
-    [] as ActiveUser[] /* Active users are users you have a chat history with */,
-  inactive:
-    [] as InactiveUser[] /* Inactive users are users you don't have a chat history with */,
+export const chatList = {
+  ids: [] as number[],
+  chatIds: new Map<number, number>, //userId, chatId
+  users: [] as ChatUser[]
 }
 
-function getChatUsers() {
-  /* Reset the state of the chatUsers upon relogging */
-  Object.assign(chatUsers, { active: [], inactive: [] })
-
-  const testUserList: ActiveUser[] = []
-  const testUserListInactive: InactiveUser[] = []
-  const activeUser1: ActiveUser = {
-    Name: "Test",
-    ID: 1,
-    Online: true,
-    UnreadMSG: true,
-  }
-
-  const activeUser2: ActiveUser = {
-    Name: "Test2",
-    ID: 2,
-    Online: false,
-    UnreadMSG: false,
-  }
-
-  const inactiveUser1: InactiveUser = {
-    Name: "InactiveTest",
-    ID: 1,
-    Online: true,
-  }
-
-  const inactiveUser2: InactiveUser = {
-    Name: "InactiveTest2",
-    ID: 2,
-    Online: false,
-  }
-
-  testUserList.push(activeUser1, activeUser2)
-  testUserListInactive.push(inactiveUser1, inactiveUser2)
-
-  for (const user of testUserList) {
-    chatUsers.active.push(user)
-  }
-
-  for (const user of testUserListInactive) {
-    chatUsers.inactive.push(user)
-  }
+export const messages = {
+  list: [] as unknown[]
 }
 
-export const displayChatUsers = () => {
-  const onlineList = document.getElementById("online-users") as HTMLUListElement
-  const offlineList = document.getElementById(
-    "offline-users"
-  ) as HTMLUListElement
-  const onlineTitle = document.getElementById("online-title") as HTMLElement
-  const offlineTitle = document.getElementById("offline-title") as HTMLElement
-  if (!onlineList || !offlineList || !onlineTitle || !offlineTitle) return
+async function getUserIds() {
+  await fetch(`${backendUrl}/api/users`)
+  .then((r) => r.json())
+  .then((data) => {
+    for (const id of data) {
+      chatList.ids.push(id)
+      } 
+  })
+}
+
+async function getChatUsers() {
+  Object.assign(chatList, {users: [], ids: []})
+  await getUserIds()
+
+  for (const id of chatList.ids){
+    sendObject({
+        type: "post",
+        item: {
+          url: "/chat/create",
+          data: {
+            userId: id
+          }
+        }
+      })
+
+    await fetch(`${backendUrl}/api/user/${id}`)
+    .then((r) => r.json())
+    .then((data) => {
+      if (data.id !== userInfo.Id){
+        const user: ChatUser = {
+          Id: data.id,
+          Name: data.name,
+          UnreadMsg: false,
+          Online: false
+        }
+        chatList.users.push(user)
+      }
+    }
+    )
+  }
+
+  //   ws.send(JSON.stringify({
+  //       type: "get",
+  //       item: {
+  //         url: `/users/online`,
+  //         data: {
+  //           content: message,
+  //         }
+  //       }
+  //     })
+  // ) TODO: Fix so that online users and UnreadMsg are updated in chatList
+}
+
+const showChat = async (id: number) => {
+  const chatId = chatList.chatIds.get(id) as number
+  const chatArea = document.createElement("div")
+
+  const chat = document.createElement("div")
+  chat.className = "chat show-chat"
+
+  const chatMessages = document.createElement("div")
+  chatMessages.className = "chat-messages"
+  chatMessages.id = `Chat${chatId}`
+  getMessages(chatId)
+
+  const chatFormContainer = document.createElement("div")
+  chatFormContainer.className = "chat-form-container"
+
+  const chatForm = document.createElement("form")
+  chatForm.className ="chat-form"
+  
+  chatArea.replaceChildren(chat)
+}
+//   <div id="chat-test">
+//     <div id="chat-messages">
+//       <div class="message send">TEST TEST TEST 123</div>
+//       <div class="message recieve"></div>
+//     </div>
+//     <div class="chat-form-container">
+//       <form id="chat-form">
+//       <input type="text" id="chat-text">
+//       <input type="submit" id="chat-send" value="Send">
+//       </form>
+//     </div>
+// </div>
+
+const getMessages = async (chatId: number) => {
+  sendObject(
+    {
+      type: "get",
+      item: {
+        url: `/chat/${chatId}/messages`
+      }
+    })
+}
+
+export const displayChatUsers = async () => {
+  const onlineList = document.getElementById("online-users") as HTMLUListElement,
+  offlineList = document.getElementById("offline-users") as HTMLUListElement,
+  onlineTitle = document.getElementById("online-title") as HTMLElement,
+  offlineTitle = document.getElementById("offline-title") as HTMLElement
+
   /* Add eventlisteners to show/hide users in chat list */
   onlineTitle.addEventListener("click", toggleOnline)
   offlineTitle.addEventListener("click", toggleOffline)
-  getChatUsers()
 
-  /* This loop gets all the ACTIVE users and appends them to chatlist */
-  for (const user of chatUsers.active) {
-    const newElement = document.createElement("li")
-    const userName = document.createElement("p")
-    userName.id = user.ID.toString()
-    userName.textContent = `${user.Name} `
-    newElement.appendChild(userName)
+  await getChatUsers()
 
-    if (user.UnreadMSG) {
-      const unreadElement = document.createElement("i")
-      unreadElement.className = "bx bx-message-dots"
-      newElement.appendChild(unreadElement)
+  chatList.users.sort((a, b) => {
+    const name1 = a.Name.toLowerCase()
+    const name2 = b.Name.toLowerCase()
+    if (name1 < name2) {
+      return -1
+    }
+    if (name1 > name2) {
+      return 1
+    }
+    return 0
+  })
+
+  for (const u of chatList.users) {
+    const user = document.createElement("li")
+    const name = document.createElement("p")
+    name.textContent = `${u.Name} `
+
+    user.appendChild(name)
+
+    if (u.UnreadMsg) {
+      const unread = document.createElement("i")
+      unread.className = "bx bx-message-dots"
+      user.appendChild(unread)
     }
 
-    if (user.Online) {
-      newElement.className = "online"
-      onlineList.appendChild(newElement)
+    user.addEventListener("click", () => {
+      showChat(u.Id)
+    })
+
+    if (u.Online) {
+      user.className = "online"
+      onlineList.appendChild(user)
     } else {
-      newElement.className = "offline"
-      offlineList.appendChild(newElement)
+      user.className = "offline"
+      offlineList.appendChild(user)
     }
   }
-
-  /* This loop gets all the INACTIVE users and appends them to chatlist */
-  for (const user of chatUsers.inactive) {
-    const newElement = document.createElement("li")
-    const userName = document.createElement("p")
-    userName.id = user.ID.toString()
-    userName.textContent = `${user.Name} `
-    newElement.appendChild(userName)
-    if (user.Online) {
-      newElement.className = "online"
-      onlineList.appendChild(newElement)
-    } else {
-      newElement.className = "offline"
-      offlineList.appendChild(newElement)
+  sendObject(
+    {
+      type: "get",
+      item: {
+        url: "/chat/all"
+      }
     }
-  }
+  )
 }
 
 const toggleOnline = () => {
-  const onlineToggle = document.getElementById("online-toggle") as HTMLElement
-  const onlineUsers = document.getElementById(
-    "online-users"
-  ) as HTMLUListElement
-  if (!onlineToggle || !onlineUsers) return
-
+  const onlineToggle = document.getElementById("online-toggle") as HTMLElement,
+  onlineUsers = document.getElementById("online-users") as HTMLUListElement
   if (onlineToggle.className === "bx bx-chevron-down") {
     onlineToggle.className = "bx bx-chevron-right"
     onlineUsers.style.display = "none"
@@ -125,9 +182,7 @@ const toggleOnline = () => {
 
 const toggleOffline = () => {
   const offlineToggle = document.getElementById("offline-toggle") as HTMLElement
-  const offlineUsers = document.getElementById(
-    "offline-users"
-  ) as HTMLUListElement
+  const offlineUsers = document.getElementById("offline-users") as HTMLUListElement
   if (!offlineToggle) return
 
   if (offlineToggle.className === "bx bx-chevron-down") {
@@ -138,198 +193,3 @@ const toggleOffline = () => {
     offlineUsers.style.display = "block"
   }
 }
-
-let msgId = 1 
-let created = false
-
-const createChat = () => {
-  fetch(`${backendUrl}/api/me`)
-  .then((resp) => resp.json())
-  .then((data) => {
-      ws.send(
-        JSON.stringify({
-          type: `post`,
-          item: {
-            url: `/chat/create`,
-            data: {
-              userId: data.id,
-            },
-          },
-        })
-      )
-    })
-}
-
-const sendMsg = (chatId: number, message: string) => {
-  ws.send(
-    JSON.stringify({
-      type: "post",
-      item: {
-        url: `/chat/${chatId}/message`,
-        data: {
-          content: message,
-        }
-      }
-    })
-  )
-}
-
-const getAllChats = () => {
-ws.send(
-  JSON.stringify({
-    type: "get",
-    item: {
-      url: "/chat/all"
-    }
-  })
-)
-}
-
-const getChat = (chatId: number) => {
-  ws.send(
-    JSON.stringify({
-      type: "get",
-      item: {
-        url: `/chat/${chatId}`
-      }
-    })
-  )
-}
-
-const getChatMessages = (chatId: number) => {
-  ws.send(
-    JSON.stringify({
-      type: "get",
-      item: {
-        url: `/chat/${chatId}/messages`
-      }
-    })
-  )
-}
-const getChatMessage = (chatId: number) => {
-  ws.send(
-    JSON.stringify({
-      type: "get",
-      item: {
-        url: `/message/${chatId}`
-      }
-    })
-  )
-}
-
-// Everything in this function is for development testing only
-export const sendMessage = () => {
-  const chatMsg = document.getElementById("chat-text") as HTMLInputElement
-  if (chatMsg.value.length === 0) {
-    return
-  }
-  fetch(`${backendUrl}/api/me`)
-  .then((resp) => resp.json())
-  .then((data) => {
-   if (!created) {
-    ws.send(
-      JSON.stringify({
-        type: `post`,
-        item: {
-          url: `/chat/create`,
-          data: {
-            userId: data.id,
-          },
-        },
-      })
-    )
-    created = true
-  }
-
-  ws.send(
-    JSON.stringify({
-      type: "get",
-      item: {
-        url: `/chat/${data.id}/messages`
-      }
-    })
-  )
-
-  ws.send(
-    JSON.stringify({
-      type: "get",
-      item: {
-        url: `/chat/${data.id}`
-      }
-    })
-  )
-
-  ws.send(
-    JSON.stringify({
-      type: `post`,
-      item: {
-        url: `/chat/${data.id}/messages`,
-        data: {
-          content: `${chatMsg.value.toString()}`,
-        },
-      },
-    })
-  )
-
-  })
-
-  ws.send(
-    JSON.stringify({
-      type: `get`,
-      item: {
-        url: `/chat/all`
-      }
-    })
-  )
-
-  ws.send(
-    JSON.stringify({
-      type: "get",
-      item: {
-        url: `/message/${msgId++}`,
-      },
-    })
-  )
-
-
-  chatMsg.value = ""
-  return
-}
-
-// export const getMessages = () => {
-//   console.log(ws.send(JSON.))
-// }
-
-// export const displayMessage = () => {
-//   const messageDisplay = document.getElementById(`chat-messages`) as HTMLDivElement
-//   const messages = [] as HTMLDivElement []
-//   const request = JSON.stringify({
-//     type: `get`,
-//     item: {
-//       url: `/chat/1/messages`
-//     }
-//   })
-
-//   // ws.send(request, function(response){
-//   //   console.log(response)
-//   // })
-
-//   for (const message of messages) {
-//    messageDisplay.appendChild(message)
-//   }
-// }
-
-// const createMessage = async (author: string, userId: number, content: string, sender: boolean,): Promise<HTMLDivElement> => {
-//   const message = document.createElement("div")
-//   if(sender) {
-//     message.className = "message sender"
-//   } else {
-//     message.className = "message reciever"
-//   }
-//   const info = document.createElement("div")
-//   info.id = `MUID${userId.toString()}` // Message User Id
-//   info.textContent = `${author}`
-//   const contentElement = `${content}`
-//   message.append(info, contentElement)
-//   return message
-// }

@@ -1,8 +1,6 @@
-import { superDivision } from "../main.js"
-import { errorPage, postForm } from "../pages.js"
-import { Auth } from "./auth.js"
-import { sendMessage } from "./chat.js"
+import { postForm } from "../pages.js"
 import { PostCreator, displayPosts } from "./posts.js"
+import { logout } from "../api/post.js"
 
 export const postBtn = document.getElementById(
   "topnav-post"
@@ -15,7 +13,7 @@ export const homeBtn = document.getElementById(
 ) as HTMLAnchorElement
 
 // Opens the create post section of the feed
-export const openCloseCreatePost = () => {
+export const openCloseCreatePost = async () => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
   if (!postFormElement) return
   if (postFormElement.classList.contains("close")) {
@@ -42,22 +40,7 @@ export const goHome = () => {
   displayPosts("/api/posts")
 }
 
-// Logs out the user, deletes the cookie from backend.
-const logout = () => {
-  fetch("/api/logout", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  }).then((response) => {
-    if (response.ok) {
-      Auth(false)
-    } else {
-      superDivision.innerHTML = errorPage(response.status)
-      return
-    }
-  })
-}
+
 // Adds event listener to the topNav
 export const topnavController = () => {
   const topNavPost = document.getElementById(
@@ -69,22 +52,13 @@ export const topnavController = () => {
     ) as HTMLAnchorElement,
     topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
     chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
-    chatList = document.getElementById("chatlist") as HTMLDivElement,
-    chatButton = document.getElementById("chat-send") as HTMLElement
+    chatList = document.getElementById("chatlist") as HTMLDivElement
+    // chatButton = document.getElementById("chat-send") as HTMLElement
 
-  if (
-    topNavPost &&
-    topNavHome &&
-    topNavLogout &&
-    topNavChat &&
-    chatClose &&
-    chatList &&
-    chatButton
-  ) {
+
     topNavPost.addEventListener("click", openCloseCreatePost)
     topNavHome.addEventListener("click", goHome)
     topNavLogout.addEventListener("click", logout)
-    chatButton.addEventListener("click", sendMessage)
     topNavChat.addEventListener("click", () => {
       chatList.classList.add("chat-list-open")
       chatList.style.width = "200px"
@@ -94,4 +68,3 @@ export const topnavController = () => {
       chatList.style.width = "0"
     })
   }
-}
