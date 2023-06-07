@@ -13,8 +13,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        Alatsi: ["Alatsi", "sans-serif"],
-        Yesteryear: ["Yesteryear", "cursive"],
+        Alatsi: "var(--font-alatsi)",
+        Yesteryear: "var(--font-yesteryear)",
       },
       typography: {
         DEFAULT: {
