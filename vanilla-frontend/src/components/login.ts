@@ -1,6 +1,6 @@
-import { LoginForm, SignupForm } from "./types"
-import { Auth } from "./auth.js"
-import { backendUrl } from "../main.js"
+import { LoginForm, SignupForm } from "../types"
+import { login, signup } from "../api/post.js"
+
 
 class Login {
   private readonly form: HTMLFormElement
@@ -12,36 +12,16 @@ class Login {
 
   private async onSubmit(event: Event) {
     event.preventDefault()
-    const usernameInput =
-        this.form.querySelector<HTMLInputElement>("#username-login"),
-      passwordInput =
-        this.form.querySelector<HTMLInputElement>("#password-login"),
-      rememberMeInput = this.form.querySelector<HTMLInputElement>("#logCheck")
+    const usernameInput = this.form.querySelector("#username-login") as HTMLInputElement,
+    passwordInput = this.form.querySelector("#password-login") as HTMLInputElement,
+    rememberMeInput = this.form.querySelector("#logCheck") as HTMLInputElement
 
-    if (usernameInput && passwordInput && rememberMeInput) {
-      const formData: LoginForm = {
-        login: usernameInput.value,
-        password: passwordInput.value,
-        rememberMe: rememberMeInput.checked,
-      }
-
-      fetch(`${backendUrl}/api/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      }).then((response) => {
-        if (response.ok) {
-          Auth(true)
-        } else {
-          // TODO: Fix this error handling. It is super bad.
-          response.text().then((error) => {
-            console.log(`Error: ${error}`)
-          })
-        }
-      })
+    const formData: LoginForm = {
+      login: usernameInput.value,
+      password: passwordInput.value,
+      rememberMe: rememberMeInput.checked,
     }
+    await login(formData)
   }
 }
 
@@ -53,90 +33,48 @@ class Signup {
     this.form.addEventListener("submit", this.onSubmit.bind(this))
   }
 
-  private onSubmit(event: Event) {
+  private async onSubmit(event: Event) {
     event.preventDefault()
-    const formData: SignupForm = this.getFormData()
-    console.log(formData)
-
-    fetch(`${backendUrl}/api/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          loginController()
-        } else {
-          response.text().then((error) => {
-            console.log(`Error: ${error}`)
-            // TODO: Displaying error message to user.
-          })
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
+    // const formData: SignupForm = this.getFormData()
+    await signup(this.getFormData() as SignupForm)
   }
 
   private getFormData(): SignupForm {
-    // Form inputs
-    const usernameInput =
-        this.form.querySelector<HTMLInputElement>("#username-register"),
-      emailInput = this.form.querySelector<HTMLInputElement>("#email"),
-      passwordInput =
-        this.form.querySelector<HTMLInputElement>("#password-register"),
-      firstNameInput = this.form.querySelector<HTMLInputElement>("#first-name"),
-      lastNameInput = this.form.querySelector<HTMLInputElement>("#last-name"),
-      ageInput = this.form.querySelector<HTMLInputElement>("#age"),
-      genderInput = this.form.querySelector<HTMLInputElement>("#gender"),
-      passwordRepeatInput = this.form.querySelector<HTMLInputElement>(
-        "#password-register-repeat"
-      )
+    const usernameInput = this.form.querySelector("#username-register") as HTMLInputElement,
+    emailInput = this.form.querySelector("#email") as HTMLInputElement,
+    passwordInput = this.form.querySelector("#password-register") as HTMLInputElement,
+    firstNameInput = this.form.querySelector("#first-name") as HTMLInputElement,
+    lastNameInput = this.form.querySelector("#last-name") as HTMLInputElement,
+    ageInput = this.form.querySelector("#age") as HTMLInputElement,
+    genderInput = this.form.querySelector("#gender") as HTMLInputElement,
+    passwordRepeatInput = this.form.querySelector("#password-register-repeat") as HTMLInputElement
 
-    if (
-      firstNameInput &&
-      lastNameInput &&
-      usernameInput &&
-      emailInput &&
-      passwordInput &&
-      ageInput &&
-      genderInput &&
-      passwordInput &&
-      passwordRepeatInput
-    ) {
-      if (passwordInput.value != passwordRepeatInput.value) {
-        //TODO: Display error message to user.
-        console.log("password != repeat")
-        throw new Error("Kek")
-      }
-      const formData: SignupForm = {
-        name: usernameInput.value,
-        email: emailInput.value,
-        password: passwordInput.value,
-        first_name: firstNameInput.value,
-        last_name: lastNameInput.value,
-        dob: ageInput.value,
-        gender: genderInput.value,
-      }
-      return formData
+    if (passwordInput.value != passwordRepeatInput.value) {
+      //TODO: Display error message to user.
+      console.log("password != repeat")
+      throw new Error("Kek")
     }
-    throw new Error("Could not find form input fields.")
+    const formData: SignupForm = {
+      name: usernameInput.value,
+      email: emailInput.value,
+      password: passwordInput.value,
+      first_name: firstNameInput.value,
+      last_name: lastNameInput.value,
+      dob: ageInput.value,
+      gender: genderInput.value,
+    }
+    return formData
+
   }
 }
 
 // All functionality for the login/signup form
-export const loginController = () => {
+export const loginController = async () => {
   const loginSignupForm = document.querySelector(".container") as HTMLElement,
-    pwShowHide = document.querySelectorAll(
-      ".showHidePw"
-    ) as NodeListOf<HTMLElement>,
-    pwFields = document.querySelectorAll(
-      ".password"
-    ) as NodeListOf<HTMLInputElement>,
-    signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
-    loginLink = document.querySelector(".login-link") as HTMLInputElement
+  pwShowHide = document.querySelectorAll(".showHidePw") as NodeListOf<HTMLElement>,
+  pwFields = document.querySelectorAll(".password") as NodeListOf<HTMLInputElement>,
+  signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
+  loginLink = document.querySelector(".login-link") as HTMLInputElement
 
   if (loginSignupForm.classList.contains("active")) {
     loginSignupForm.classList.remove("active")
@@ -156,24 +94,17 @@ export const loginController = () => {
 
   const signupElement = document.querySelector(".signup") as HTMLDivElement
 
-  signUpLink?.addEventListener("click", () => {
+  signUpLink.addEventListener("click", () => {
     loginSignupForm.classList.add("active")
     signupElement.style.display = "block"
   })
 
   // To go from sign in to login.
-  loginLink?.addEventListener("click", () => {
+  loginLink.addEventListener("click", () => {
     loginSignupForm.classList.remove("active")
     signupElement.style.display = "none"
   })
 
-  const signupForm = document.querySelector<HTMLFormElement>("#signup-form")
-  const loginForm = document.querySelector<HTMLFormElement>("#login-form")
-  if (signupForm && loginForm) {
-    new Signup(signupForm)
-    new Login(loginForm)
-  } else {
-    console.error("Something went wrong.")
-    // TODO: error handling here
-  }
+  new Login(document.querySelector("#login-form") as HTMLFormElement)
+  new Signup(document.querySelector("#signup-form") as HTMLFormElement)
 }

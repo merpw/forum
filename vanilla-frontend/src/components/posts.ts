@@ -1,67 +1,62 @@
-import { CreatePostBody } from "./types"
-import { openCloseCreatePost } from "./topnav.js"
+import { CreatePostBody } from "../types" 
+
 import { displayCommentSection } from "./comments.js"
 import { backendUrl } from "../main.js"
-export const displayPosts = (endpoint: string) => {
+import { iterator } from "./utils.js"
+
+import {getPosts, getPostValues} from "../api/get.js"
+import { postCreatePost } from "../api/post.js"
+
+
+export const displayPosts = async (endpoint: string) => {
   const postsDisplay = document.getElementById("posts-display") as HTMLElement
   postsDisplay.replaceChildren()
   const postList: Array<HTMLDivElement> = []
-  fetch(backendUrl + endpoint)
-    .then((response) => response.json())
-    .then((posts) => {
-      // Posts is the array of objects sent by the server
-      for (const post of posts) {
-        const date = new Date(post.date)
-        const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
+  const posts: iterator = await getPosts(endpoint)
 
-        const postDiv = formattedPost(
-          post.id.toString(),
-          post.title,
-          post.author.name,
-          post.author.id.toString(),
-          formatDate,
-          post.categories,
-          post.content,
-          post.comments_count.toString(),
-          post.likes_count.toString(),
-          post.dislikes_count.toString()
-        )
-        postList.push(postDiv)
-      }
-      postList.reverse()
-      // TODO: some kind of buffer for the posts. Can and will be reused for chat.
-      // for (const post of postList) {
-      // }
-      for (const post of postList) {
-        postsDisplay.appendChild(post)
-      }
-    })
+  // Posts is the array of objects sent by the server
+  for (const post of Object.values(posts)) {
+    const date = new Date(post.date)
+    const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
+
+    const postDiv = formattedPost(
+      post.id.toString(),
+      post.title,
+      post.author.name,
+      post.author.id.toString(),
+      formatDate,
+      post.categories,
+      post.content,
+      post.comments_count.toString(),
+      post.likes_count.toString(),
+      post.dislikes_count.toString()
+    )
+    postList.push(postDiv)
+  }
+
+  postList.reverse()
+  // TODO: some kind of buffer for the posts. Can and will be reused for chat.
+  // for (const post of postList) {
+  // }
+  for (const post of postList) {
+    postsDisplay.appendChild(post)
+  }
+
 }
 
-export const updatePostValues = (postId: string) => {
-  fetch(`${backendUrl}/api/posts/${postId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      // Update the post UI elements with the new values
+export const updatePostValues = async (postId: string) => {
+      const post: iterator = await getPostValues(postId)
+      console.log("updatePostValues:", post)
       const postCommentsElement = document.getElementById(`C${postId}`)
       const postLikesElement = document.getElementById(`L${postId}`)
       const postDislikesElement = document.getElementById(`D${postId}`)
 
       if (postCommentsElement && postLikesElement && postDislikesElement) {
-        postCommentsElement.innerHTML = `<i class='bx bx-comment'></i> ${data.comments_count}`
-        postLikesElement.innerHTML = `<i class='bx bx-like'></i> ${data.likes_count}`
-        postDislikesElement.innerHTML = `<i class='bx bx-dislike'></i> ${data.dislikes_count}`
+        postCommentsElement.innerHTML = `<i class='bx bx-comment'></i> ${post.comments_count}`
+        postLikesElement.innerHTML = `<i class='bx bx-like'></i> ${post.likes_count}`
+        postDislikesElement.innerHTML = `<i class='bx bx-dislike'></i> ${post.dislikes_count}`
       }
-    })
-    .catch((error) => {
-      console.error(error)
-      // Handle the error if the request fails
-    })
+    
 }
 
 export class PostCreator {
@@ -75,30 +70,8 @@ export class PostCreator {
   private onSubmit(event: Event) {
     event.preventDefault()
     const formData: CreatePostBody = this.getFormData()
-    console.log(formData)
-    fetch(`${backendUrl}/api/posts/create/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          openCloseCreatePost()
-          displayPosts("/api/posts/")
-          return
-        } else {
-          response.text().then((error) => {
-            console.log(`Error: ${error}`)
-            // TODO: Displaying error message to user.
-          })
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-  }
+    postCreatePost(formData)
+    }
 
   // Gets all values from the form, and puts it in CreatePostBody type.
   private getFormData(): CreatePostBody {

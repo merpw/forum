@@ -627,8 +627,16 @@ body {
   /* } */
 }
 
-#chat-test {
+
+.hide-chat {
+  display: none;
+}
+
+.show-chat {
   display: flex;
+}
+
+.chat {
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -640,7 +648,7 @@ body {
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
 }
 
-#chat-messages {
+.chat-messages {
   display: flex;
   flex-direction: column-reverse;
   height: 100%;

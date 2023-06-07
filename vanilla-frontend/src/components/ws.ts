@@ -1,15 +1,14 @@
-import { WSGetResponse, WSPostResponse, WebSocketResponse } from "./types"
+import { chatList, messages } from "./chat.js"
+import { WSGetResponse, WSPostResponse, WebSocketResponse } from "../types"
 
 const WS_URL = "ws://localhost:6969"
 export let ws: WebSocket
-let opened = false
 
-export const wsHandler = () => {
+export const wsHandler = async () => {
   ws = new WebSocket(WS_URL)
 
   ws.onmessage = (event) => {
     try {
-      // const request = JSON.parse(event.data)
       const data = JSON.parse(event.data) as WebSocketResponse<never>
       if (data.type === "handshake") {
         console.log("ws handshake success")
@@ -45,11 +44,7 @@ export const wsHandler = () => {
       console.error("Not logged in")
       return
     }
-
-    if (!opened) {
-      opened = true
-      ws.send(JSON.stringify({ type: "handshake", item: { token } }))
-    }
+    ws.send(JSON.stringify({ type: "handshake", item: { token } }))
   }
 
   ws.onclose = () => {
@@ -58,13 +53,67 @@ export const wsHandler = () => {
 }
 
 const postHandler = (resp: WSPostResponse<WebSocketResponse<never>>) => {
-  const respData = resp as Object
-  console.log(respData)
-
+  console.log(resp.item.data)
 }
 
-const getHandler = (resp: WSGetResponse<WebSocketResponse<never>>) => {
-  const respData = resp as Object
-  console.log(respData)
+const getHandler = (resp: WSGetResponse<any>) => {
 
+  const chatIds = new RegExp(/^\/chat\/\d{1,}$/)
+  const messageList = new RegExp(/^\/chat\/\d{1,}\/messages$/)
+  const message = new RegExp(/^\/message\/\d{1,}$/)
+  if (resp.item.url.match(chatIds)){
+    chatList.chatIds.set(resp.item.data.userId, resp.item.data.id,)
+    return
+  }
+
+  if (resp.item.url.match(messageList)) {
+    console.log("resp.item.url:", resp.item.url)
+    getMessageList(resp.item.data)
+    console.log(messages)
+  }
+
+  if (resp.item.url.match(message)) {
+    console.log("resp.item.url:", resp.item.url)
+    messages.list.push(resp.item.data) 
+    console.log("msg list:", messages.list)
+  }
+
+  if (resp.item.url === "/chat/all") {
+    getChatIds(resp) 
+    return
+  }
+}
+
+const getChatIds = (resp: WSGetResponse<any>) => {
+  for (const user of resp.item.data) {
+    sendObject(
+      {
+        type: "get",
+        item: {
+          url: `/chat/${user}`
+        }
+      }
+    )
+  }
+  return
+}
+
+const getMessageList = (ids: any[]) => {
+  for (const id of ids) {
+    console.log(id)
+    sendObject(
+      {
+        type: "get",
+        item: {
+          url: `/message/${id}`
+        }
+      }
+    )
+  }
+  return
+}
+
+export async function sendObject(obj: unknown) {
+  if (ws.readyState === 1)
+  ws.send(JSON.stringify(obj))
 }

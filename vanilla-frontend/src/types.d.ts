@@ -32,8 +32,13 @@ export type User = {
   Name: string
 }
 
+export type ChatUser = User & {
+  Online: boolean
+  UnreadMsg: boolean
+}
+
 export type Post = {
-  Id: number
+  Id: number 
   Title: string
   Content: string
   Description: string
@@ -60,17 +65,16 @@ export type Reaction = {
   Dislikes: number
 }
 
-export type ActiveUser = {
+export type OfflineUser = {
   Name: string
-  ID: number
-  Online: boolean
-  UnreadMSG: boolean
+  Id: number
+  UnreadMsg: boolean
 }
 
-export type InactiveUser = {
+export type OnlineUser = {
   Name: string
-  ID: number
-  Online: boolean
+  Id: number
+  UnreadMsg: boolean
 }
 
 export type Message = {

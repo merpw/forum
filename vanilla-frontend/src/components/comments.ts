@@ -1,75 +1,48 @@
 import { commentForm } from "../pages.js"
-import { updatePostValues } from "./posts.js"
-import { backendUrl } from "../main.js"
-export const displayCommentSection = (id: string) => {
+import { getComments } from "../api/get.js"
+import { postComment } from "../api/post.js"
+import { createElement, iterator } from "./utils.js"
+
+export const displayCommentSection = async (id: string) => {
+  const comments: iterator = await getComments(id)
+  if (!comments) return
+
   // Opens and closes comment section if you press the comment section button
-  fetch(`${backendUrl}/api/posts/${id}/comments`)
-    .then((resp) => resp.json())
-    .then((comments) => {
-      if (!comments) return
-      const commentSection = document.getElementById(`CS${id}`) as HTMLElement
-      if (!commentSection) {
-        return // Add error handling here
-      }
-      // If statement for opening the comment section
-      if (commentSection.classList.contains("close")) {
-        // Appends the form to the commentSection
-        const commentFormElement = document.createElement("div")
-        commentFormElement.className = "comment-form"
-        commentFormElement.innerHTML = commentForm(id)
-        commentSection.appendChild(commentFormElement)
+  const commentSection = document.getElementById(`CS${id}`) as HTMLElement
 
-        commentSection.classList.replace("close", "open")
-        const createPostForm = document.querySelector<HTMLFormElement>(
-          `#comment-form-${id}`
-        )
-        if (createPostForm) {
-          new CommentCreator(createPostForm)
-        }
-        // This loops through all the comments and creates them in the DOM.
-        comments.reverse()
-        for (let i = 0; i < comments.length; i++) {
-          // Parent element
-          const comment = document.createElement("div")
-          comment.className = "comment"
-          comment.id = `CommentID${comments[i].id}`
-          // Comment-info Child
-          const commentInfo = document.createElement("div")
-          commentInfo.className = "comment-info"
-          const date = new Date(comments[i].date)
-          const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
-          commentInfo.textContent = `${comments[i].author.name}\n\tat ${formatDate}`
+  // If statement for opening the comment section
+  if (commentSection.classList.contains("close")) {
+    // Appends the form to the commentSection
+    const commentFormElement = createElement("div", "comment-form", null, null, commentForm(id)) as HTMLDivElement
+    commentSection.appendChild(commentFormElement)
+    commentSection.classList.replace("close", "open")
 
-          // Comment content Child
-          const commentContent = document.createElement("div")
-          commentContent.className = "comment-content"
-          commentContent.textContent = `${comments[i].content}`
+    const createPostForm = document.querySelector(`#comment-form-${id}`) as HTMLFormElement
+    new CommentCreator(createPostForm)
 
-          comment.append(commentInfo, commentContent)
-          commentSection.appendChild(comment)
-        }
-        // Else statement for closing the comment section
-      } else {
-        commentSection.replaceChildren()
-        commentSection.classList.replace("open", "close")
-      }
-      return
-    })
-    .catch((error) => {
-      console.error(error)
-    })
+    // Loop through all the comments and creates them in the DOM.
+    for (const c of Object.values(comments)) {
+      const date = new Date(c.date)
+      const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
+      // Parent element
+      const comment = createElement("div", "comment", `CommentID${c.id}`) as HTMLDivElement
+      // Comment info 
+      const commentInfo = createElement("div", "comment-info", null, `${c.author.name}\n\tat ${formatDate}`) 
+      // Comment content 
+      const commentContent = createElement("div", "comment-content", null, `${c.content}`)
+      comment.append(commentInfo, commentContent)
+      commentSection.appendChild(comment)
+    }
+    // Else statement for closing the comment section
+  } else {
+    commentSection.replaceChildren()
+    commentSection.classList.replace("open", "close")
+  }
+  return
 }
 
-//   <div id="CommentID${commentID}" class="comment">
-//      <div class="comment-info">
-//        <h4>Author</h4>
-//      </div>
-//      <div class="comment-content"></div>
-//   </div>
-// `
 export class CommentCreator {
   private readonly form: HTMLFormElement
-
   constructor(form: HTMLFormElement) {
     this.form = form
     this.form.addEventListener("submit", this.onSubmit.bind(this))
@@ -77,46 +50,13 @@ export class CommentCreator {
 
   private onSubmit(event: Event) {
     event.preventDefault()
+    const postId = this.form.id.slice(13)
     const formData: { content: string } = this.getFormData()
-    const postID = this.form.id.slice(13)
-
-    fetch(`${backendUrl}/api/posts/${postID}/comment`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          console.log("PostID in CommentCreator", postID)
-          const commentSection = document.getElementById(
-            `CS${postID}`
-          ) as HTMLElement
-          commentSection.replaceChildren()
-          commentSection.classList.replace("open", "close")
-          updatePostValues(postID)
-          displayCommentSection(postID)
-          return
-          // TODO: Something after post is created. Maybe close post window?
-        } else {
-          response.text().then((error) => {
-            console.log(`Error: ${error}`)
-            // TODO: Displaying error message to user.
-          })
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
+    postComment(postId, formData)
   }
 
   private getFormData(): { content: string } {
-    const content =
-      this.form.querySelector<HTMLInputElement>("#comment-content")
-    if (content) {
-      return { content: content.value }
-    }
-    throw new Error("Could not find form input fields.")
+    const content = this.form.querySelector("#comment-content") as HTMLInputElement
+    return { content: content.value }
   }
 }
