@@ -1,10 +1,26 @@
 import { ReactNode } from "react"
 import { Metadata } from "next"
+import { Alatsi, Yesteryear } from "next/font/google"
 
-import "@/styles/font.css"
 import "@/styles/globals.css"
 
 import Layout from "@/components/layout"
+
+const alatsi = Alatsi({
+  subsets: ["latin"],
+  variable: "--font-alatsi",
+  display: "block",
+  weight: "400",
+  fallback: ["sans-serif"],
+})
+
+const yesteryear = Yesteryear({
+  subsets: ["latin"],
+  variable: "--font-yesteryear",
+  display: "block",
+  weight: "400",
+  fallback: ["cursive"],
+})
 
 export const metadata: Metadata = {
   title: {
@@ -27,7 +43,7 @@ export const runtime = "edge"
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang={"en"}>
+    <html lang={"en"} className={alatsi.variable + " " + yesteryear.variable}>
       <body>
         <Layout>{children}</Layout>
       </body>
