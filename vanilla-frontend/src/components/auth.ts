@@ -4,8 +4,9 @@ import { superDivision } from "../main.js"
 import { categoriesSelector } from "./categories.js"
 import { loginController } from "./login.js"
 import { displayPosts } from "./posts.js"
-import { displayChatUsers } from "./chat.js"
 import { ws, wsHandler } from "./ws.js"
+import { displayChatUsers } from "./chat.js"
+
 import { getMe } from "../api/get.js"
 
 export const userInfo = {
@@ -15,18 +16,18 @@ export const userInfo = {
 
 export const Auth = async (session: boolean) => {
   if (session) {
-    if (!ws) {
-      wsHandler()
-    }
-    // Adding the HTML and changing style
-    superDivision.innerHTML = Index()
-    superDivision.classList.replace("login-style", "index-style")
-
-    Object.assign(userInfo, await getMe()) // Sets the userInfo (Id, Name)
-    topnavController() // Adds event listeners to the top-navigation bar
-    categoriesSelector() 
-    displayChatUsers()
-    displayPosts("/api/posts")
+    wsHandler()
+    setTimeout(async ()=> {
+      // Adding the HTML and changing style
+      superDivision.innerHTML = Index()
+      superDivision.classList.replace("login-style", "index-style")
+      Object.assign(userInfo, await getMe()) // Sets the userInfo (Id, Name)
+      console.log(userInfo)
+      topnavController() // Adds event listeners to the top-navigation bar
+      categoriesSelector() 
+      displayChatUsers()
+      displayPosts("/api/posts")
+    }, 50)
     return
   }
   if (!session) {
@@ -34,9 +35,10 @@ export const Auth = async (session: boolean) => {
       ws.close()
     }
     // Adding the HTML and changing style
-    superDivision.innerHTML = LoginSignup()
-    superDivision.classList.replace("index-style", "login-style")
-    loginController()
+    setTimeout(() => {
+      superDivision.innerHTML = LoginSignup()
+      superDivision.classList.replace("index-style", "login-style")
+      loginController()}, 200)
     return
   }
 }

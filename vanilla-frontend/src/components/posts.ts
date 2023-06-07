@@ -1,11 +1,10 @@
 import { CreatePostBody } from "../types" 
 
 import { displayCommentSection } from "./comments.js"
-import { backendUrl } from "../main.js"
-import { iterator } from "./utils.js"
+import { iterator, createElement } from "./utils.js"
 
-import {getPosts, getPostValues} from "../api/get.js"
-import { postCreatePost } from "../api/post.js"
+import { getPosts, getPostValues } from "../api/get.js"
+import { dislikePost, likePost, postCreatePost } from "../api/post.js"
 
 
 export const displayPosts = async (endpoint: string) => {
@@ -33,30 +32,22 @@ export const displayPosts = async (endpoint: string) => {
     )
     postList.push(postDiv)
   }
-
   postList.reverse()
-  // TODO: some kind of buffer for the posts. Can and will be reused for chat.
-  // for (const post of postList) {
-  // }
+  // TODO: Lazy loading
   for (const post of postList) {
     postsDisplay.appendChild(post)
   }
-
 }
 
 export const updatePostValues = async (postId: string) => {
-      const post: iterator = await getPostValues(postId)
-      console.log("updatePostValues:", post)
-      const postCommentsElement = document.getElementById(`C${postId}`)
-      const postLikesElement = document.getElementById(`L${postId}`)
-      const postDislikesElement = document.getElementById(`D${postId}`)
+  const post: iterator = await getPostValues(postId),
+  postCommentsElement = document.getElementById(`C${postId}`) as HTMLElement,
+  postLikesElement = document.getElementById(`L${postId}`) as HTMLElement,
+  postDislikesElement = document.getElementById(`D${postId}`) as HTMLElement
 
-      if (postCommentsElement && postLikesElement && postDislikesElement) {
-        postCommentsElement.innerHTML = `<i class='bx bx-comment'></i> ${post.comments_count}`
-        postLikesElement.innerHTML = `<i class='bx bx-like'></i> ${post.likes_count}`
-        postDislikesElement.innerHTML = `<i class='bx bx-dislike'></i> ${post.dislikes_count}`
-      }
-    
+  postCommentsElement.innerHTML = `<i class='bx bx-comment'></i> ${post.comments_count}`
+  postLikesElement.innerHTML = `<i class='bx bx-like'></i> ${post.likes_count}`
+  postDislikesElement.innerHTML = `<i class='bx bx-dislike'></i> ${post.dislikes_count}`
 }
 
 export class PostCreator {
@@ -71,16 +62,14 @@ export class PostCreator {
     event.preventDefault()
     const formData: CreatePostBody = this.getFormData()
     postCreatePost(formData)
-    }
+  }
 
   // Gets all values from the form, and puts it in CreatePostBody type.
   private getFormData(): CreatePostBody {
-    // Form inputs
-    const title = this.form.querySelector<HTMLInputElement>("#post-title"),
-      content = this.form.querySelector<HTMLInputElement>("#post-content"),
-      category = this.form.querySelector<HTMLInputElement>("#post-category")
+    const title = this.form.querySelector("#post-title") as HTMLInputElement,
+    content = this.form.querySelector("#post-content") as HTMLInputElement,
+    category = this.form.querySelector("#post-category") as HTMLInputElement
 
-    if (title && content && category) {
       const formData: CreatePostBody = {
         Title: title.value,
         Content: content.value,
@@ -88,8 +77,6 @@ export class PostCreator {
         Categories: [category.value],
       }
       return formData
-    }
-    throw new Error("Could not find form input fields.")
   }
 }
 
@@ -98,137 +85,59 @@ const formattedPost = (
   title: string,
   author: string,
   authorId: string,
-  dateAndTime: string,
+  date: string,
   category: string,
   content: string,
   commentCount: string,
   likeCount: string,
   dislikeCount: string
 ): HTMLDivElement => {
-  const newPost = document.createElement("div")
-  newPost.className = "post"
-  newPost.id = `${id}`
+  const newPost = createElement("div", "post", id) as HTMLDivElement
 
   // Creates the post information div
-  const postInformation = document.createElement("div")
-  postInformation.classList.add("post-information")
+  const postInformation = createElement("div", "post-information")
 
   // Creates the post title
-  const postTitle = document.createElement("div")
-  postTitle.className = "post-title"
-  const titleContent = document.createElement("h4")
-  titleContent.textContent = `${title}`
+  const postTitle = createElement("div", "post-title")
+  const titleContent = createElement("h4", null, null, title)
   postTitle.appendChild(titleContent)
-
   // Creates the author and time div
-  const postAuthor = document.createElement("div")
-  postAuthor.className = "post-author"
-  postAuthor.id = `${authorId}`
-  postAuthor.textContent = `by ${author} at ${dateAndTime}`
+  const postAuthor = createElement("div", "post-author", authorId, `by ${author} at ${date}`)
 
   // Creates the category div
-  const postCategories = document.createElement("div")
-  postCategories.className = "post-categories"
-  postCategories.textContent = `#${category}`
+  const postCategories = createElement("div", "post-categories", null, `#${category}`)
 
   postInformation.append(
     postTitle,
     postAuthor,
     postCategories,
-    document.createElement("hr")
+    createElement("hr")
   )
 
-  // Creates post-content
-  const postContent = document.createElement("div")
-  postContent.className = "post-content"
-  postContent.textContent = `${content}`
-
-  // Creates postFooter
-  const postFooter = document.createElement("div")
-  postFooter.className = "post-footer"
-  postFooter.id = `${id}`
-
-  // Creates comments count div
-  const postComments = document.createElement("div")
-  postComments.className = "post-comments post-icon"
-  postComments.id = `C${id}`
-  postComments.innerHTML = `<i class="bx bx-comment" style="font-size: 20px; margin-right: 5px;"></i>  ${commentCount}`
+  const postContent = createElement("div", "post-content", null, content)
+  const postFooter = createElement("div", "post-footer", id)
+  const postComments = createElement("div", "post-comments post-icon", `C${id}`, null,
+    `<i class="bx bx-comment" style="font-size: 20px; margin-right: 5px;"></i>  ${commentCount}`)
   postComments.addEventListener("click", () => {
     displayCommentSection(id)
     updatePostValues(id)
   })
 
-  const postLikes = document.createElement("div")
-  postLikes.className = "post-likes post-icon"
-  postLikes.id = `L${id}`
-  postLikes.innerHTML = `<i class="bx bx-like" style="font-size: 20px; margin-right: 5px;"></i>  ${likeCount}`
-  postLikes.addEventListener("click", () => {
-    fetch(`${backendUrl}/api/posts/${id}/like`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error()
-        // Call the function to update the post values after liking
-        updatePostValues(id)
-      })
-      .catch((error) => {
-        console.error(error)
-        // Handle the error if the request fails
-      })
-  })
+  const postLikes = createElement("div", "post-likes post-icon", `L${id}`, null, 
+    `<i class="bx bx-like" style="font-size: 20px; margin-right: 5px;"></i>  ${likeCount}`
+  )
 
-  const postDislikes = document.createElement("div")
-  postDislikes.className = "post-dislikes post-icon"
-  postDislikes.id = `D${id}`
-  postDislikes.innerHTML = `<i class="bx bx-dislike" style="font-size: 20px; margin-right: 5px;"></i>  ${dislikeCount}`
-  postDislikes.addEventListener("click", () => {
-    fetch(`${backendUrl}/api/posts/${id}/dislike`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error()
-        // Call the function to update the post values after liking
-        updatePostValues(id)
-      })
-      .catch((error) => {
-        console.error(error)
-        // Handle the error if the request fails
-      })
-  })
+  const postDislikes = createElement("div", "post-dislikes post-icon", `D${id}`, null, 
+    `<i class="bx bx-dislike" style="font-size: 20px; margin-right: 5px;"></i>  ${dislikeCount}`
+  )
+
+  postLikes.addEventListener("click", () => likePost(id))
+  postDislikes.addEventListener("click", () => dislikePost(id))
   postFooter.append(postComments, postLikes, postDislikes)
 
-  const commentSection = document.createElement("section")
-  commentSection.className = "comments-section close"
-  commentSection.id = `CS${id}`
+  const commentSection = createElement("section", "comments-section close", `CS${id}`)
 
   newPost.append(postInformation, postContent, postFooter, commentSection)
 
   return newPost
-  //  return `
-  //  <div class="post" id="${id}">
-  //    <div class="post-information">
-  //      <div class="post-title"><h4>${title}</h4></div>
-  //      <div class="post-author" id="${authorId}">by ${author} at ${date}</div>
-  //      <div class="post-categories">#${category}</div>
-  //      <hr>
-  //  	</div>
-
-  // <div class="post-content">
-
-  // </div>
-
-  // <div class="post-footer" id="${id}">
-  // 	<div class="post-comments post-icon" id="C${id}"><i class='bx bx-comment'></i> ${commentCount}</div>
-  // 	<div class="post-likes post-icon" id="L${id}"><i class='bx bx-like' ></i> ${likeCount}</div>
-  // 	<div class="post-dislikes post-icon" id="D${id}"><i class='bx bx-dislike' ></i> ${dislikeCount}</div>
-  // </div>
-  //  <section class="comments-section close" id=CS${id}></section>
-  //  </div>
-  // `
 }

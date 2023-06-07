@@ -1,7 +1,8 @@
-import { backendUrl } from "../main.js"
 import { ChatUser } from "../types"
-import { sendObject } from "./ws.js"
+import { sendWsObject } from "./ws.js"
 import { userInfo } from "./auth.js"
+import { createElement, iterator } from "./utils.js"
+import { getUserById, getUserIds } from "../api/get.js"
 // This file is dedicated to sorting and displaying chat users in the sidebar.
 export const chatList = {
   ids: [] as number[],
@@ -10,25 +11,21 @@ export const chatList = {
 }
 
 export const messages = {
-  list: [] as unknown[]
-}
-
-async function getUserIds() {
-  await fetch(`${backendUrl}/api/users`)
-  .then((r) => r.json())
-  .then((data) => {
-    for (const id of data) {
-      chatList.ids.push(id)
-      } 
-  })
+  list: [] as object[]
 }
 
 async function getChatUsers() {
-  Object.assign(chatList, {users: [], ids: []})
-  await getUserIds()
-
-  for (const id of chatList.ids){
-    sendObject({
+  const userIds: iterator = await getUserIds()
+  console.log("before:", userIds, chatList.chatIds)
+  if (userIds.length - 1 == chatList.chatIds.size && chatList.chatIds.size != 0){
+    return
+  }
+  console.log("after:", userIds, chatList.chatIds)
+  for (const id of Object.values(userIds)){
+    if (id !== userInfo.Id){
+      chatList.users.push(await getUserById(id))
+      sendWsObject(
+      {
         type: "post",
         item: {
           url: "/chat/create",
@@ -36,24 +33,10 @@ async function getChatUsers() {
             userId: id
           }
         }
-      })
-
-    await fetch(`${backendUrl}/api/user/${id}`)
-    .then((r) => r.json())
-    .then((data) => {
-      if (data.id !== userInfo.Id){
-        const user: ChatUser = {
-          Id: data.id,
-          Name: data.name,
-          UnreadMsg: false,
-          Online: false
-        }
-        chatList.users.push(user)
       }
-    }
     )
   }
-
+}
   //   ws.send(JSON.stringify({
   //       type: "get",
   //       item: {
@@ -66,41 +49,20 @@ async function getChatUsers() {
   // ) TODO: Fix so that online users and UnreadMsg are updated in chatList
 }
 
+// Display the current chat based on chatId
 const showChat = async (id: number) => {
   const chatId = chatList.chatIds.get(id) as number
-  const chatArea = document.createElement("div")
-
-  const chat = document.createElement("div")
-  chat.className = "chat show-chat"
-
-  const chatMessages = document.createElement("div")
-  chatMessages.className = "chat-messages"
-  chatMessages.id = `Chat${chatId}`
-  getMessages(chatId)
-
-  const chatFormContainer = document.createElement("div")
-  chatFormContainer.className = "chat-form-container"
-
-  const chatForm = document.createElement("form")
-  chatForm.className ="chat-form"
-  
+  const chatArea = createElement("div")
+  const chat = createElement("div", "chat show-chat")
+  const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
+  await getMessages(chatId)
+  const chatFormContainer = createElement("div", "chat-form-container")
+  const chatForm = createElement("form", "chat-form")
   chatArea.replaceChildren(chat)
 }
-//   <div id="chat-test">
-//     <div id="chat-messages">
-//       <div class="message send">TEST TEST TEST 123</div>
-//       <div class="message recieve"></div>
-//     </div>
-//     <div class="chat-form-container">
-//       <form id="chat-form">
-//       <input type="text" id="chat-text">
-//       <input type="submit" id="chat-send" value="Send">
-//       </form>
-//     </div>
-// </div>
 
 const getMessages = async (chatId: number) => {
-  sendObject(
+  sendWsObject(
     {
       type: "get",
       item: {
@@ -119,7 +81,7 @@ export const displayChatUsers = async () => {
   onlineTitle.addEventListener("click", toggleOnline)
   offlineTitle.addEventListener("click", toggleOffline)
 
-  await getChatUsers()
+  
 
   chatList.users.sort((a, b) => {
     const name1 = a.Name.toLowerCase()
@@ -132,17 +94,13 @@ export const displayChatUsers = async () => {
     }
     return 0
   })
-
   for (const u of chatList.users) {
-    const user = document.createElement("li")
-    const name = document.createElement("p")
-    name.textContent = `${u.Name} `
-
+    const user = createElement("li")
+    const name = createElement("p", null, null, u.Name)
     user.appendChild(name)
 
     if (u.UnreadMsg) {
-      const unread = document.createElement("i")
-      unread.className = "bx bx-message-dots"
+      const unread = createElement("i", "bx bx-message-dots")
       user.appendChild(unread)
     }
 
@@ -158,14 +116,16 @@ export const displayChatUsers = async () => {
       offlineList.appendChild(user)
     }
   }
-  sendObject(
-    {
-      type: "get",
-      item: {
-        url: "/chat/all"
+  await getChatUsers()
+    sendWsObject(
+      {
+        type: "get",
+        item: {
+          url: "/chat/all"
+        }
       }
-    }
-  )
+    )
+ 
 }
 
 const toggleOnline = () => {
