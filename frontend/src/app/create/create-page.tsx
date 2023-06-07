@@ -100,7 +100,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         <div className={"card flex-shrink-0 bg-neutral shadow-md"}>
           <div className={"card-body"}>
             <div className={"my-2 font-Yesteryear text-3xl text-primary opacity-50 text-center"}>
-              <span className={"text-base-100"}> {"What's on your mind?"}</span>
+              <span className={"text-neutral-content"}> {"What's on your mind?"}</span>
             </div>
             <div className={"form-control"}>
               <input
