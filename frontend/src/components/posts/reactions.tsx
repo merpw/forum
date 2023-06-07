@@ -31,7 +31,7 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
 
   return (
     <span className={"my-auto flex"}>
-      <span className={"text-sm font-light px-1 self-center"}>
+      <span className={"font-light px-1 self-center"}>
         {likes_count != undefined
           ? likes_count > 0
             ? likes_count
@@ -102,7 +102,7 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
         </motion.svg>
       </button>
 
-      <span className={"text-sm self-center font-light px-1"}>
+      <span className={"self-center font-light px-1"}>
         {dislikes_count != undefined
           ? dislikes_count > 0
             ? dislikes_count
@@ -131,7 +131,7 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
 
   return (
     <span className={"my-auto flex"}>
-      <span className={"text-sm font-light px-1 self-center"}>
+      <span className={"font-light px-1 self-center"}>
         {likes_count != undefined
           ? likes_count > 0
             ? likes_count
@@ -200,7 +200,7 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
         </motion.svg>
       </button>
 
-      <span className={"text-sm self-center font-light px-1"}>
+      <span className={"self-center font-light px-1"}>
         {dislikes_count != undefined
           ? dislikes_count > 0
             ? dislikes_count
@@ -216,7 +216,7 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
 export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
   <span className={"flex"}>
     <Link title={"Comments"} href={`/post/${post.id}`} className={"clickable flex"}>
-      <span className={"text-sm font-light p-1 self-center"}>
+      <span className={"font-light p-1 self-center"}>
         {post.comments_count > 0 && post.comments_count}
       </span>
       <span className={"self-center text-info"}>
@@ -253,11 +253,7 @@ export const Category: FC<{ post: Post }> = ({ post }) => {
           href={`/category/${category}`}
           className={"clickable flex"}
         >
-          <span
-            className={
-              "text-sm font-light self-center capitalize btn btn-outline btn-xs opacity-50"
-            }
-          >
+          <span className={"font-light self-center capitalize btn btn-outline btn-xs opacity-50"}>
             {category}
           </span>
         </Link>
