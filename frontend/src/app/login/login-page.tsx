@@ -53,7 +53,7 @@ const LoginPage = () => {
           <div className={"hero-content flex-col md:flex-row-reverse min-h-full"}>
             <div className={"text-center md:text-left"}>
               <h1 className={"text-6xl mb-5 font-Yesteryear gradient-text"}>Welcome!</h1>
-              <div className={"font-thin"}>
+              <div className={"font-light"}>
                 <p>{"Don't have an account yet?"}</p>
                 <Link className={"clickable text-xl font-normal"} href={"/signup"}>
                   Sign Up!

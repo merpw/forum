@@ -13,7 +13,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       <footer>
         <div
           className={
-            "text-center text-sm font-thin text-neutral border-t border-base-100 pt-3 mt-3"
+            "text-center text-sm font-light text-neutral border-t border-base-100 pt-3 mt-3"
           }
         >
           <p>
