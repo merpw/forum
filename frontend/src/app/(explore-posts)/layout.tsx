@@ -11,7 +11,7 @@ const Layout = async ({ children }: { children: ReactNode }) => {
     <>
       <div className={"flex flex-wrap justify-center flex-col text-center"}>
         <div className={"my-2 font-Yesteryear text-3xl text-primary opacity-50"}>
-          <span className={"text-neutral"}> Welcome aboard!</span>
+          <span className={"text-neutral-content"}> Welcome aboard!</span>
           {/* TODO: add User's name */}
         </div>
         <CreatePostButton />
