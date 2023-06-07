@@ -1,5 +1,7 @@
 import { LoginForm, SignupForm } from "../types"
 import { login, signup } from "../api/post.js"
+import { Auth } from "./auth.js"
+import { wsHandler } from "./ws.js"
 
 
 class Login {
@@ -22,6 +24,8 @@ class Login {
       rememberMe: rememberMeInput.checked,
     }
     await login(formData)
+    wsHandler()
+    setTimeout(() => Auth(true), 500)
   }
 }
 

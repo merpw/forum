@@ -15,7 +15,6 @@ export const homeBtn = document.getElementById(
 // Opens the create post section of the feed
 export const openCloseCreatePost = async () => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
-  if (!postFormElement) return
   if (postFormElement.classList.contains("close")) {
     postFormElement.innerHTML = postForm()
     postFormElement.classList.replace("close", "open")
@@ -53,8 +52,6 @@ export const topnavController = () => {
     topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
     chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
     chatList = document.getElementById("chatlist") as HTMLDivElement
-    // chatButton = document.getElementById("chat-send") as HTMLElement
-
 
     topNavPost.addEventListener("click", openCloseCreatePost)
     topNavHome.addEventListener("click", goHome)

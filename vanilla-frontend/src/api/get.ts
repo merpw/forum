@@ -1,4 +1,6 @@
+import { userInfo } from "../components/auth.js"
 import { backendUrl } from "../main.js"
+import { ChatUser } from "../types"
 
 const getPosts = async (endpoint: string): Promise<object[]> => {
   return fetch(backendUrl + endpoint)
@@ -30,5 +32,31 @@ const getMe = async (): Promise<object> => {
     })
 }
 
+const getUserById = async (id: string): Promise<ChatUser> => {
+  return await fetch(`${backendUrl}/api/user/${id}`)
+  .then((r) => r.json())
+  .then((data) => {
+        return <ChatUser>{
+          Id: data.id,
+          Name: data.name,
+          UnreadMsg: false,
+          Online: false
+        }
+    })
+}
 
-export { getPosts, getPostValues, getComments, getMe }
+const getUserIds = async (): Promise<number[]> => {
+  const ids: number[] = []
+  return await fetch(`${backendUrl}/api/users`)
+  .then((r) => r.json())
+  .then((data) => {
+    for (const id of data) {
+      ids.push(id)
+    } 
+    return ids
+  })
+}
+
+
+
+export { getPosts, getPostValues, getComments, getMe, getUserIds, getUserById }

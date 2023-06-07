@@ -33,7 +33,7 @@ const login = async (formData: LoginForm) => {
     body: JSON.stringify(formData),
   }).then((response) => {
     if (response.ok) {
-      Auth(true)
+      return
     } else {
       response.text().then((error) => {
         console.log(`Error: ${error}`)
@@ -120,5 +120,40 @@ const postComment = (postId: string, formData: unknown) => {
       console.error(error)
     })
 }
+const likePost = (id: string) => {
+    fetch(`${backendUrl}/api/posts/${id}/like`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error()
+        // Call the function to update the post values after liking
+        updatePostValues(id)
+      })
+      .catch((error) => {
+        console.error(error)
+        // Handle the error if the request fails
+      })
+  }
 
-export { login, signup, logout, postComment, postCreatePost }
+const dislikePost = (id: string) => {
+    fetch(`${backendUrl}/api/posts/${id}/dislike`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error()
+        // Call the function to update the post values after liking
+        updatePostValues(id)
+      })
+      .catch((error) => {
+        console.error(error)
+        // Handle the error if the request fails
+      })
+  }
+
+export { login, signup, logout, postComment, postCreatePost, likePost, dislikePost }
