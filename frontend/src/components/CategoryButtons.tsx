@@ -12,7 +12,7 @@ const CategoryButtons: FC<{ categories: string[] }> = ({ categories }) => {
   return (
     <div className={"mb-5"}>
       <div className={"text-center space-x-1"}>
-        <div className={"text-sm font-light mb-1 text-center text-info"}>Categories:</div>
+        <div className={"font-light mb-1 text-center text-info"}>Categories:</div>
         <span className={"font-black gradient-text"}>{"•"}</span>
         {categories.map((category, key) => (
           <span key={key} className={""}>

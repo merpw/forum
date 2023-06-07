@@ -11,11 +11,7 @@ export default function Layout({ children }: { children: ReactNode }) {
       </header>
       <main>{children}</main>
       <footer>
-        <div
-          className={
-            "text-center text-sm font-light text-neutral border-t border-base-100 pt-3 mt-3"
-          }
-        >
+        <div className={"text-center font-light text-neutral border-t border-base-100 pt-3 mt-3"}>
           <p>
             {"Made with "}
             <Link href={"https://github.com/merpw/forum"} className={"gradient-text clickable"}>
