@@ -19,16 +19,18 @@ export default function Custom500({ reset }: { error: Error; reset: () => void }
         <h2 className={"text-2xl font-extralight"}>Internal Server Error</h2>
         <div className={"my-16 font-light flex flex-col gap-3"}>
           <p className={"font-thin flex flex-col gap-1"}>
-            {"Please, try to update page or visit "}
-            <span className={"my-1"}>
+            {"Please, try to update page or go back to Homepage"}
+            <div className={"flex flex-col sm:flex-row gap-3 self-center"}>
+              <button className={"button"} onClick={reset}>
+                Try again
+              </button>
               <Link href={"/"} className={"button"}>
                 Back to homepage
               </Link>
-            </span>
+            </div>
           </p>
           <p className={"font-thin"}>
             {"If error persists, please, "}
-
             <Link
               href={`mailto:dev@mer.pw?subject=${devMessage}`}
               className={"clickable text-lg font-normal"}
