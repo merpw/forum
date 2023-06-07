@@ -19,11 +19,11 @@ const CategoryButtons: FC<{ categories: string[] }> = ({ categories }) => {
             <Link
               href={`/category/${category}`}
               className={
-                "btn btn-xs btn-neutral font-light" +
+                "btn btn-xs font-light" +
                 " " +
                 (activeCategory.toLowerCase() === category.toLowerCase()
-                  ? "btn-disabled bg-secondary font-normal text-black dark:text-white opacity-70"
-                  : "")
+                  ? "btn-secondary font-normal"
+                  : "btn-neutral")
               }
             >
               {category}
