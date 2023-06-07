@@ -2,18 +2,46 @@ package handlers
 
 import (
 	"backend/common/server"
+	"backend/forum/external"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"log"
+	"math"
 	"net/http"
 	"net/mail"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
+
+const (
+	MinNameLength = 3
+	MaxNameLength = 15
+
+	MinFirstNameLength = 1
+	MaxFirstNameLength = MaxNameLength
+
+	MinLastNameLength = 1
+	MaxLastNameLength = MaxNameLength
+
+	MinPasswordLength = 8
+	MaxPasswordLength = 128
+
+	MinEmailLength = 3
+	MaxEmailLength = 254
+)
+
+var (
+	UsernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+
+	MinLoginLength = int(math.Min(MinNameLength, MinEmailLength))
+	MaxLoginLength = int(math.Max(MaxNameLength, MaxEmailLength))
+)
+
+var Genders = []string{"male", "female", "other"}
 
 func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	if h.getUserId(w, r) != -1 {
@@ -37,33 +65,40 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody.Name = strings.TrimSpace(requestBody.Name)
-	if len(requestBody.Name) < 3 {
+	if len(requestBody.Name) < MinNameLength {
 		http.Error(w, "Username is too short", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.Name) > 15 {
+	if len(requestBody.Name) > MaxNameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
 		return
 	}
+
+	if !UsernameRegex.MatchString(requestBody.Name) {
+		http.Error(w, "Username is not valid, only letters, numbers and underscores are allowed",
+			http.StatusBadRequest)
+		return
+	}
+
 	if h.DB.IsNameTaken(requestBody.Name) {
 		http.Error(w, "Username is already in use", http.StatusBadRequest)
 		return
 	}
 	requestBody.FirstName = strings.TrimSpace(requestBody.FirstName)
-	if requestBody.FirstName == "" {
+	if len(requestBody.FirstName) < MinFirstNameLength {
 		http.Error(w, "First name is not valid", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.FirstName) > 15 {
+	if len(requestBody.FirstName) > MaxFirstNameLength {
 		http.Error(w, "First name is too long", http.StatusBadRequest)
 		return
 	}
 	requestBody.LastName = strings.TrimSpace(requestBody.LastName)
-	if requestBody.LastName == "" {
+	if len(requestBody.LastName) < MinLastNameLength {
 		http.Error(w, "Last name is not valid", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.LastName) > 15 {
+	if len(requestBody.LastName) > MaxLastNameLength {
 		http.Error(w, "Last name is too long", http.StatusBadRequest)
 		return
 	}
@@ -86,7 +121,7 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if requestBody.Gender != "male" && requestBody.Gender != "female" && requestBody.Gender != "other" {
+	if !isPresent(Genders, requestBody.Gender) {
 		http.Error(w, "Gender is not valid", http.StatusBadRequest)
 		return
 	}
@@ -104,8 +139,13 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(requestBody.Password) < 8 {
+	if len(requestBody.Password) < MinPasswordLength {
 		http.Error(w, "Password is too short", http.StatusBadRequest)
+		return
+	}
+
+	if len(requestBody.Password) > MaxPasswordLength {
+		http.Error(w, "Password is too long", http.StatusBadRequest)
 		return
 	}
 
@@ -125,10 +165,7 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		sql.NullString{String: requestBody.Gender, Valid: true},
 	)
 
-	err = revalidateURL(fmt.Sprintf("/user/%d", id))
-	if err != nil {
-		log.Printf("Error while revalidating `/user/%d`: %v", id, err)
-	}
+	external.RevalidateURL(fmt.Sprintf("/user/%d", id))
 }
 
 func (h *Handlers) login(w http.ResponseWriter, r *http.Request) {
@@ -141,9 +178,16 @@ func (h *Handlers) login(w http.ResponseWriter, r *http.Request) {
 		Login    string `json:"login"`
 		Password string `json:"password"`
 	}{}
+
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
+		return
+	}
+
+	if len(requestBody.Login) < MinLoginLength || len(requestBody.Login) > MaxLoginLength ||
+		len(requestBody.Password) < MinPasswordLength || len(requestBody.Password) > MaxPasswordLength {
+		http.Error(w, "Invalid login or password", http.StatusBadRequest)
 		return
 	}
 
