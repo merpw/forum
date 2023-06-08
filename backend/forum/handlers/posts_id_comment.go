@@ -205,7 +205,7 @@ func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// posts := srv.DB.GetUserPosts(userId)
+	// posts := srv.DB.GetUserPosts(usersId)
 	comments := h.DB.GetPostComments(postId)
 
 	response := make([]SafeComment, 0)

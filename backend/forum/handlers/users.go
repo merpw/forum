@@ -7,19 +7,19 @@ import (
 	"strings"
 )
 
-// userAll returns all userIds in alphabetical order.
+// usersAll returns all userIds in alphabetical order.
 //
 // GET /api/users
-func (h *Handlers) userAll(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) usersAll(w http.ResponseWriter, r *http.Request) {
 	userIds := h.DB.GetAllUserIds()
 
 	server.SendObject(w, userIds)
 }
 
-// userId Returns the info of the user with the given id. The requester does not need to be logged in.
+// usersId returns the info of the user with the given id
 //
 //	GET /api/users/:id
-func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	// /api/users/1 -> 1
 
@@ -38,11 +38,10 @@ func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, SafeUser{Id: user.Id, Name: user.Name})
 }
 
-// userIdPosts Returns the posts of the user with the given id.
-// The requester does not need to be logged in.
+// usersIdPosts Returns the posts of the user with the given id.
 //
 //	GET /api/users/:id/posts
-func (h *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
 	// /api/users/1/posts -> 1
