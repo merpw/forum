@@ -22,6 +22,7 @@ export const Auth = async (session: boolean) => {
       superDivision.innerHTML = Index()
       superDivision.classList.replace("login-style", "index-style")
       Object.assign(userInfo, await getMe()) // Sets the userInfo (Id, Name)
+      console.log(userInfo)
       topnavController() // Adds event listeners to the top-navigation bar
       categoriesSelector() 
       displayChatUsers()

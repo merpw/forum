@@ -5,7 +5,7 @@ import { createElement, iterator } from "./utils.js"
 import { getUserById, getUserIds } from "../api/get.js"
 // This file is dedicated to sorting and displaying chat users in the sidebar.
 export const chatList = {
-  Ids: new Map<number, number>, // userId, chatId
+  Ids: new Map<number, number>, //userId, chatId
   Users: [] as ChatUser[]
 }
 
@@ -16,15 +16,18 @@ export const messages = {
 async function getChatUsers() {
   const userIds: iterator = await getUserIds()
   console.log(userIds)
+  if (userIds.length - 1 == chatList.Ids.size && chatList.Ids.size != 0){
+    return
+  }
   for (const id of Object.values(userIds)){
     if (id !== userInfo.Id){
       chatList.Users.push(await getUserById(id))
+
     }
   }
-  console.log ("chatList before loop:", chatList)
-  for (const user of Object.values(chatList.Users)){
-    console.log(user)
+  for (const user of chatList.Users){
     if (!chatList.Ids.has(user.Id)) {
+
       sendWsObject(
         {
           type: "post",
@@ -34,10 +37,10 @@ async function getChatUsers() {
               userId: user.Id
             }
           }
-        })
+        }
+      )
     }
   }
-
   //   ws.send(JSON.stringify({
   //       type: "get",
   //       item: {
@@ -52,7 +55,6 @@ async function getChatUsers() {
 
 // Display the current chat based on chatId
 const showChat = async (id: number) => {
-  
   const chatId = chatList.Ids.get(id) as number
   const chatArea = createElement("div")
   const chat = createElement("div", "chat show-chat")
@@ -72,20 +74,6 @@ const getMessages = async (chatId: number) => {
       }
     })
 }
-
-// const createChat = async (userId: number) => {
-//   sendWsObject(
-// {
-//     type: "post",
-//     item: {
-//         url: "/chat/create",
-//         data: {
-//             userId: userId
-//         }
-//     }
-// }
-//   )
-// }
 
 export const displayChatUsers = async () => {
   const onlineList = document.getElementById("online-users") as HTMLUListElement,
@@ -132,15 +120,16 @@ export const displayChatUsers = async () => {
       offlineList.appendChild(user)
     }
   }
-  getChatUsers()
-  sendWsObject(
-    {
-      type: "get",
-      item: {
-        url: "/chat/all"
+  await getChatUsers()
+    sendWsObject(
+      {
+        type: "get",
+        item: {
+          url: "/chat/all"
+        }
       }
-    }
-  )
+    )
+ 
 }
 
 const toggleOnline = () => {
