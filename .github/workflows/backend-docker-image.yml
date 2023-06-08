@@ -1,4 +1,4 @@
-name: Backend Docker Image CI
+name: Build Backend Docker Images
 
 on:
   push:
@@ -14,8 +14,11 @@ env:
 
 jobs:
   build:
-    name: Build the backend Docker image
+    name: Build `backend-${{ matrix.service }}`
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ["forum", "chat"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -31,7 +34,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.service }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
