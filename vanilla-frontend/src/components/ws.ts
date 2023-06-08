@@ -1,9 +1,9 @@
 import { chatList, messages } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse } from "../types"
+import { getUserIds } from "../api/get.js"
 
 const WS_URL = "ws://localhost:6969"
 export let ws: WebSocket
-
 
 export const wsHandler = async () => {
   ws = new WebSocket(WS_URL)
@@ -76,15 +76,13 @@ const getHandler = async (resp: WSGetResponse<any>) => {
   }
 
   if (resp.item.url === "/chat/all") {
-    getChatIds(resp) 
+    await getChatIds(resp) 
     return
   }
 }
 
 const getChatIds = async (resp: WSGetResponse<any>) => {
-
   for (const user of resp.item.data) {
-    console.log(user)
     sendWsObject(
       {
         type: "get",
