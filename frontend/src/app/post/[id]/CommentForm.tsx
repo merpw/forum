@@ -47,7 +47,7 @@ const CommentForm: FC<{ postId: number }> = ({ postId }) => {
         className={"mb-5"}
       >
         <div className={"mb-3"}>
-          <label htmlFor={"comment-text"} className={"block mb-2 text-sm font-light"}>
+          <label htmlFor={"comment-text"} className={"block mb-2 font-light"}>
             Write a comment:
           </label>
 

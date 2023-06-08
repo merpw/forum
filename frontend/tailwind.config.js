@@ -13,8 +13,8 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        Alatsi: ["Alatsi", "sans-serif"],
-        Yesteryear: ["Yesteryear", "cursive"],
+        Alatsi: "var(--font-alatsi)",
+        Yesteryear: "var(--font-yesteryear)",
       },
       typography: {
         DEFAULT: {
@@ -37,17 +37,17 @@ module.exports = {
       {
         // TODO: choose colors
         light_theme: {
-          "base-100": "#e0e0ea", // text
+          "base-100": "#e3e3e8", // text
           primary: "#6176cb", // username
-          secondary: "#ffac8d", // user's reaction
+          secondary: "#825ff4", // user's reaction
           accent: "#69f19f", // online status
           neutral: "#bebbc7", // break lines, background etc.
           info: "#757575", // reactions, comments button etc.
         },
         dark_theme: {
           "base-100": "#2c2c2c",
-          primary: "#505bdc",
-          secondary: "#ffa874",
+          primary: "#2668be",
+          secondary: "#7d44c3",
           accent: "#00e16a",
           neutral: "#444444",
           info: "#797979",

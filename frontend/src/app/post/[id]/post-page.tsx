@@ -30,7 +30,7 @@ const PostPage: FC<{ post: Post; comments: Comment[] }> = ({ post, comments }) =
             <ReactionsButtons post={post} />
           </span>
           <Category post={post} />
-          <span className={"ml-auto text-sm font-thin"}>
+          <span className={"ml-auto font-light"}>
             <span className={"text-info"}>
               <AutoDate date={post.date} />
               {" by "}
