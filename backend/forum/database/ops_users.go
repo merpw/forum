@@ -5,21 +5,20 @@ import (
 	"log"
 )
 
-// GetAllUsers returns all users in database in ascending alphabetical order.
-func (db DB) GetAllUsers() (users []User) {
-	query, err := db.Query("SELECT * FROM users ORDER BY name ASC")
+// GetAllUserIds returns slice of all users ids
+func (db DB) GetAllUserIds() (userIds []int) {
+	query, err := db.Query("SELECT id FROM users ORDER BY name ASC")
 	if err != nil {
 		log.Panic(err)
 	}
 
 	for query.Next() {
-		var user User
-		err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password,
-			&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+		var userId int
+		err = query.Scan(&userId)
 		if err != nil {
 			log.Panic(err)
 		}
-		users = append(users, user)
+		userIds = append(userIds, userId)
 	}
 	query.Close()
 

@@ -11,12 +11,7 @@ import (
 //
 // GET /api/users
 func (h *Handlers) userAll(w http.ResponseWriter, r *http.Request) {
-	users := h.DB.GetAllUsers()
-
-	userIds := []int{}
-	for _, user := range users {
-		userIds = append(userIds, user.Id)
-	}
+	userIds := h.DB.GetAllUserIds()
 
 	server.SendObject(w, userIds)
 }
