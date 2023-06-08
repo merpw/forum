@@ -24,5 +24,5 @@ func (h *Handlers) chatCreate(message Message, client *ws.Client) {
 
 	responseMessage := BuildResponseMessage(message, chatId)
 
-	h.Broadcast(responseMessage, client.UserId, data.UserId)
+	h.Hub.Broadcast(responseMessage, client.UserId, data.UserId)
 }

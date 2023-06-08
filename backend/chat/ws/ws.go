@@ -116,3 +116,19 @@ func (h *Hub) Broadcast(data interface{}, clients ...int) {
 		}
 	}
 }
+
+func (h *Hub) GetOnlineUsers() []int {
+	var onlineUsers []int
+
+nextClient:
+	for _, c := range h.Clients {
+		for _, id := range onlineUsers {
+			if id == c.UserId {
+				continue nextClient
+			}
+		}
+		// append only unique users
+		onlineUsers = append(onlineUsers, c.UserId)
+	}
+	return onlineUsers
+}
