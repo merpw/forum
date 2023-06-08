@@ -3,9 +3,15 @@ package handlers
 import (
 	"backend/common/server"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+)
+
+const (
+	MinCommentLength = 1
+	MaxCommentLength = 1000
 )
 
 // postsIdCommentIdLike likes a comment on a specific post
@@ -165,8 +171,15 @@ func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) 
 
 	requestBody.Content = strings.TrimSpace(requestBody.Content)
 
-	if len(requestBody.Content) < 1 {
+	if len(requestBody.Content) < MinCommentLength {
 		http.Error(w, "Content is too short", http.StatusBadRequest)
+		return
+	}
+
+	if len(requestBody.Content) > MaxCommentLength {
+		http.Error(w,
+			fmt.Sprintf("Content is too long (max %d characters)", MaxContentLength),
+			http.StatusBadRequest)
 		return
 	}
 
