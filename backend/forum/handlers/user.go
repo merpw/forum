@@ -26,7 +26,7 @@ func (h *Handlers) userAll(w http.ResponseWriter, r *http.Request) {
 //	GET /api/users/:id
 func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
-	// /api/user/1 -> 1
+	// /api/users/1 -> 1
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
@@ -50,7 +50,7 @@ func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
-	// /api/user/1/posts -> 1
+	// /api/users/1/posts -> 1
 
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {

@@ -26,7 +26,7 @@ func TestUser(t *testing.T) {
 			Name string `json:"name"`
 		}
 
-		_, respBody := cli1.TestGet(t, "/api/user/1", http.StatusOK)
+		_, respBody := cli1.TestGet(t, "/api/users/1", http.StatusOK)
 
 		checkRespBody := func() {
 			err := json.Unmarshal(respBody, &responseData)
@@ -45,7 +45,7 @@ func TestUser(t *testing.T) {
 
 		checkRespBody()
 
-		_, respBody = cliAnon.TestGet(t, "/api/user/1", http.StatusOK)
+		_, respBody = cliAnon.TestGet(t, "/api/users/1", http.StatusOK)
 
 		checkRespBody()
 	})
