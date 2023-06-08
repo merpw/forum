@@ -7,6 +7,22 @@ import (
 	"strings"
 )
 
+
+
+// userAll returns all userIds in alphabetical order.
+//
+// GET /api/users
+func (h *Handlers) userAll(w http.ResponseWriter, r *http.Request) {
+	users := h.DB.GetAllUsers()
+
+	userIds := []int{}
+	for _, user := range users {
+		userIds = append(userIds, user.Id)
+	}
+
+	server.SendObject(w, userIds)
+}
+
 // me returns the currently logged in user's information.
 //
 // (id, name, email, first name, last name, date of birth, gender)
@@ -118,7 +134,7 @@ func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 //
 //	GET /api/user/:id
 func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
-	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	// /api/user/1 -> 1
 
 	userId, err := strconv.Atoi(userIdStr)
@@ -141,7 +157,7 @@ func (h *Handlers) userId(w http.ResponseWriter, r *http.Request) {
 //
 //	GET /api/user/:id/posts
 func (h *Handlers) userIdPosts(w http.ResponseWriter, r *http.Request) {
-	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/user/")
+	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
 	// /api/user/1/posts -> 1
 

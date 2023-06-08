@@ -32,7 +32,7 @@ const getMe = async (): Promise<object> => {
 }
 
 const getUserById = async (id: string): Promise<ChatUser> => {
-  return await fetch(`${backendUrl}/api/user/${id}`)
+  return await fetch(`${backendUrl}/api/users/${id}`)
   .then((r) => r.json())
   .then((data) => {
         return <ChatUser>{
