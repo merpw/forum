@@ -1,11 +1,9 @@
 import { chatList, messages } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse } from "../types"
-import { getUserIds } from "../api/get.js"
 
 const WS_URL = "ws://localhost:6969"
 export let ws: WebSocket
 
-const chatUsers: object[] = []
 
 export const wsHandler = async () => {
   ws = new WebSocket(WS_URL)
@@ -65,7 +63,7 @@ const getHandler = async (resp: WSGetResponse<any>) => {
   const message = new RegExp(/^\/message\/\d{1,}$/)
 
   if (resp.item.url.match(chatIds)) {
-    chatList.chatIds.set(resp.item.data.userId, resp.item.data.id,)
+    chatList.Ids.set(resp.item.data.userId, resp.item.data.id,)
     return
   }
 
@@ -78,18 +76,15 @@ const getHandler = async (resp: WSGetResponse<any>) => {
   }
 
   if (resp.item.url === "/chat/all") {
-    await getChatIds(resp) 
+    getChatIds(resp) 
     return
   }
 }
 
 const getChatIds = async (resp: WSGetResponse<any>) => {
-  const userIds = await getUserIds()
-  console.log(userIds, chatList.chatIds.size)
-  if (chatList.chatIds.size >= userIds.length) {
-    return
-  }
+
   for (const user of resp.item.data) {
+    console.log(user)
     sendWsObject(
       {
         type: "get",

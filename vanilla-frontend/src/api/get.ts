@@ -1,4 +1,3 @@
-import { userInfo } from "../components/auth.js"
 import { backendUrl } from "../main.js"
 import { ChatUser } from "../types"
 

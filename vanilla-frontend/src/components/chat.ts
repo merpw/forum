@@ -5,9 +5,8 @@ import { createElement, iterator } from "./utils.js"
 import { getUserById, getUserIds } from "../api/get.js"
 // This file is dedicated to sorting and displaying chat users in the sidebar.
 export const chatList = {
-  ids: [] as number[],
-  chatIds: new Map<number, number>, //userId, chatId
-  users: [] as ChatUser[]
+  Ids: new Map<number, number>, // userId, chatId
+  Users: [] as ChatUser[]
 }
 
 export const messages = {
@@ -16,27 +15,29 @@ export const messages = {
 
 async function getChatUsers() {
   const userIds: iterator = await getUserIds()
-  console.log("before:", userIds, chatList.chatIds)
-  if (userIds.length - 1 == chatList.chatIds.size && chatList.chatIds.size != 0){
-    return
-  }
-  console.log("after:", userIds, chatList.chatIds)
+  console.log(userIds)
   for (const id of Object.values(userIds)){
     if (id !== userInfo.Id){
-      chatList.users.push(await getUserById(id))
-      sendWsObject(
-      {
-        type: "post",
-        item: {
-          url: "/chat/create",
-          data: {
-            userId: id
-          }
-        }
-      }
-    )
+      chatList.Users.push(await getUserById(id))
+    }
   }
-}
+  console.log ("chatList before loop:", chatList)
+  for (const user of Object.values(chatList.Users)){
+    console.log(user)
+    if (!chatList.Ids.has(user.Id)) {
+      sendWsObject(
+        {
+          type: "post",
+          item: {
+            url: "/chat/create",
+            data: {
+              userId: user.Id
+            }
+          }
+        })
+    }
+  }
+
   //   ws.send(JSON.stringify({
   //       type: "get",
   //       item: {
@@ -51,7 +52,8 @@ async function getChatUsers() {
 
 // Display the current chat based on chatId
 const showChat = async (id: number) => {
-  const chatId = chatList.chatIds.get(id) as number
+  
+  const chatId = chatList.Ids.get(id) as number
   const chatArea = createElement("div")
   const chat = createElement("div", "chat show-chat")
   const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
@@ -71,6 +73,20 @@ const getMessages = async (chatId: number) => {
     })
 }
 
+// const createChat = async (userId: number) => {
+//   sendWsObject(
+// {
+//     type: "post",
+//     item: {
+//         url: "/chat/create",
+//         data: {
+//             userId: userId
+//         }
+//     }
+// }
+//   )
+// }
+
 export const displayChatUsers = async () => {
   const onlineList = document.getElementById("online-users") as HTMLUListElement,
   offlineList = document.getElementById("offline-users") as HTMLUListElement,
@@ -83,7 +99,7 @@ export const displayChatUsers = async () => {
 
   
 
-  chatList.users.sort((a, b) => {
+  chatList.Users.sort((a, b) => {
     const name1 = a.Name.toLowerCase()
     const name2 = b.Name.toLowerCase()
     if (name1 < name2) {
@@ -94,7 +110,7 @@ export const displayChatUsers = async () => {
     }
     return 0
   })
-  for (const u of chatList.users) {
+  for (const u of chatList.Users) {
     const user = createElement("li")
     const name = createElement("p", null, null, u.Name)
     user.appendChild(name)
@@ -116,16 +132,15 @@ export const displayChatUsers = async () => {
       offlineList.appendChild(user)
     }
   }
-  await getChatUsers()
-    sendWsObject(
-      {
-        type: "get",
-        item: {
-          url: "/chat/all"
-        }
+  getChatUsers()
+  sendWsObject(
+    {
+      type: "get",
+      item: {
+        url: "/chat/all"
       }
-    )
- 
+    }
+  )
 }
 
 const toggleOnline = () => {
