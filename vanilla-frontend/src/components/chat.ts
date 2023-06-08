@@ -15,7 +15,6 @@ export const messages = {
 
 async function getChatUsers() {
   const userIds: iterator = await getUserIds()
-  console.log(userIds)
   if (userIds.length - 1 == chatList.Ids.size && chatList.Ids.size != 0){
     return
   }
@@ -25,22 +24,25 @@ async function getChatUsers() {
 
     }
   }
-  for (const user of chatList.Users){
-    if (!chatList.Ids.has(user.Id)) {
-
-      sendWsObject(
-        {
-          type: "post",
-          item: {
-            url: "/chat/create",
-            data: {
-              userId: user.Id
+  setTimeout(() => {
+    for (const user of chatList.Users){
+      if (!chatList.Ids.has(user.Id)) {
+        sendWsObject(
+          {
+            type: "post",
+            item: {
+              url: "/chat/create",
+              data: {
+                userId: user.Id
+              }
             }
           }
-        }
-      )
+        )
+      }
     }
-  }
+
+  }, 50)
+}
   //   ws.send(JSON.stringify({
   //       type: "get",
   //       item: {
@@ -51,11 +53,11 @@ async function getChatUsers() {
   //       }
   //     })
   // ) TODO: Fix so that online users and UnreadMsg are updated in chatList
-}
 
 // Display the current chat based on chatId
 const showChat = async (id: number) => {
   const chatId = chatList.Ids.get(id) as number
+  console.log("ehm")
   const chatArea = createElement("div")
   const chat = createElement("div", "chat show-chat")
   const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
@@ -84,8 +86,7 @@ export const displayChatUsers = async () => {
   /* Add eventlisteners to show/hide users in chat list */
   onlineTitle.addEventListener("click", toggleOnline)
   offlineTitle.addEventListener("click", toggleOffline)
-
-  
+  await getChatUsers()
 
   chatList.Users.sort((a, b) => {
     const name1 = a.Name.toLowerCase()
@@ -120,7 +121,7 @@ export const displayChatUsers = async () => {
       offlineList.appendChild(user)
     }
   }
-  await getChatUsers()
+  setTimeout(() => {
     sendWsObject(
       {
         type: "get",
@@ -129,7 +130,9 @@ export const displayChatUsers = async () => {
         }
       }
     )
- 
+
+  }, 100)
+
 }
 
 const toggleOnline = () => {
