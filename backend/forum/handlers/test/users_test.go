@@ -3,6 +3,7 @@ package server_test
 import (
 	. "backend/forum/handlers/test/server"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
 )
@@ -86,4 +87,62 @@ func TestUserPosts(t *testing.T) {
 			t.Fatalf("responses mismatch, expected %s, got %s", string(respBody), string(resp2Body))
 		}
 	})
+}
+
+const UsersCount = 5
+
+func TestUsers(t *testing.T) {
+	testServer := NewTestServer(t)
+
+	for i := 0; i < UsersCount; i++ {
+		// create users with random names
+		cli := testServer.TestClient()
+		cli.TestAuth(t)
+	}
+
+	cliAnon := testServer.TestClient()
+
+	_, respBody := cliAnon.TestGet(t, "/api/users", http.StatusOK)
+
+	var userIds []int
+	err := json.Unmarshal(respBody, &userIds)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(userIds) != UsersCount {
+		t.Fatalf("invalid users count, expected %d, got %d", UsersCount, len(userIds))
+	}
+
+	type User struct {
+		Id   int    `json:"id"`
+		Name string `json:"name"`
+	}
+	var users []User
+
+	for _, id := range userIds {
+		_, respBody := cliAnon.TestGet(t, fmt.Sprintf("/api/users/%d", id), http.StatusOK)
+
+		var responseData User
+
+		err := json.Unmarshal(respBody, &responseData)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if responseData.Id != id {
+			t.Fatalf("invalid id, expected %d, got %d", id, responseData.Id)
+		}
+
+		users = append(users, responseData)
+	}
+
+	for i := 0; i < len(users); i++ {
+		for j := i + 1; j < len(users); j++ {
+			// should be sorted by name
+			if users[i].Name > users[j].Name {
+				t.Fatalf("users are not sorted by name, expected %s > %s", users[i].Name, users[j].Name)
+			}
+		}
+	}
 }
