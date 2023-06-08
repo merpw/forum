@@ -5,6 +5,27 @@ import (
 	"log"
 )
 
+// GetAllUsers returns all users in database
+func (db DB) GetAllUsers() (users []User) {
+  query, err := db.Query("SELECT * FROM users ORDER BY name ASC")
+  if err != nil {
+    log.Panic(err)
+  }
+
+  for query.Next() {
+    var user User
+    err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password,
+      &user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+    if err != nil {
+      log.Panic(err)
+    }
+    users = append(users, user)
+  }
+  query.Close()
+
+  return
+}
+
 // GetUserById returns user with specified id
 //
 // returns nil if user not found

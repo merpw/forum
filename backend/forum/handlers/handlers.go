@@ -28,8 +28,10 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodGet, `/api/me/posts`, h.mePosts),
 		server.NewRoute(http.MethodGet, `/api/me/posts/liked`, h.mePostsLiked),
 
-		server.NewRoute(http.MethodGet, `/api/user/(\d+)`, h.userId),
-		server.NewRoute(http.MethodGet, `/api/user/(\d+)/posts`, h.userIdPosts),
+
+		server.NewRoute(http.MethodGet, `/api/users`, h.userAll),
+		server.NewRoute(http.MethodGet, `/api/users/(\d+)`, h.userId),
+		server.NewRoute(http.MethodGet, `/api/users/(\d+)/posts`, h.userIdPosts),
 
 		server.NewRoute(http.MethodGet, `/api/posts`, h.posts),
 		server.NewRoute(http.MethodGet, `/api/posts/(\d+)`, h.postsId),
