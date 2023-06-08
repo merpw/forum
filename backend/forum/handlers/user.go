@@ -118,14 +118,14 @@ func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 //
 // GET /api/users
 func (h *Handlers) userAll(w http.ResponseWriter, r *http.Request) {
-  users := h.DB.GetAllUsers()
+	users := h.DB.GetAllUsers()
 
-  userIds := []int{} 
-  for _, user := range users {
-    userIds = append(userIds, user.Id)
-  }
+	userIds := []int{}
+	for _, user := range users {
+		userIds = append(userIds, user.Id)
+	}
 
-  server.SendObject(w, userIds)
+	server.SendObject(w, userIds)
 }
 
 // userId Returns the info of the user with the given id. The requester does not need to be logged in.
