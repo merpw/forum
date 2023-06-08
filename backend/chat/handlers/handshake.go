@@ -45,4 +45,6 @@ func (h *Handlers) handshake(messageBody []byte, client *ws.Client) {
 	if err != nil {
 		log.Println(err)
 	}
+
+	h.Hub.BroadcastOnlineStatus()
 }
