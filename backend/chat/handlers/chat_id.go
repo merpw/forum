@@ -13,7 +13,7 @@ type chatIdResponseData struct {
 	LastMessageId int `json:"lastMessageId"`
 }
 
-func (h *Handlers) chatId(message Message, client *ws.Client) {
+func (h *Handlers) chatId(message ws.Message, client *ws.Client) {
 	chatIdStr := strings.Split(message.Item.URL, "/")[2]
 	// "/chat/1" -> "1"
 
@@ -25,7 +25,7 @@ func (h *Handlers) chatId(message Message, client *ws.Client) {
 
 	isMember := h.DB.IsChatMember(chatId, client.UserId)
 	if !isMember {
-		_ = client.Conn.WriteJSON(BuildResponseMessage(message, nil))
+		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
 		return
 	}
 
@@ -36,7 +36,7 @@ func (h *Handlers) chatId(message Message, client *ws.Client) {
 		LastMessageId: data.LastMessageId,
 		CompanionId:   data.CompanionId,
 	}
-	responseMessage := BuildResponseMessage(message, responseData)
+	responseMessage := ws.BuildResponseMessage(message, responseData)
 
 	err = client.Conn.WriteJSON(responseMessage)
 	if err != nil {
@@ -46,7 +46,7 @@ func (h *Handlers) chatId(message Message, client *ws.Client) {
 }
 
 // chatIdMessages responds with all messages from a chat
-func (h *Handlers) chatIdMessages(message Message, client *ws.Client) {
+func (h *Handlers) chatIdMessages(message ws.Message, client *ws.Client) {
 	chatIdStr := strings.Split(message.Item.URL, "/")[2]
 	// "/chat/1/messages" -> "1"
 
@@ -58,12 +58,12 @@ func (h *Handlers) chatIdMessages(message Message, client *ws.Client) {
 
 	isMember := h.DB.IsChatMember(chatId, client.UserId)
 	if !isMember {
-		_ = client.Conn.WriteJSON(BuildResponseMessage(message, nil))
+		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
 		return
 	}
 
 	chats := h.DB.GetChatMessages(chatId)
-	responseMessage := BuildResponseMessage(message, chats)
+	responseMessage := ws.BuildResponseMessage(message, chats)
 	err = client.Conn.WriteJSON(responseMessage)
 	if err != nil {
 		log.Println(err)
