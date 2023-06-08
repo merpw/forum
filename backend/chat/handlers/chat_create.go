@@ -10,7 +10,7 @@ type createChatRequestData struct {
 	UserId int `json:"userId"`
 }
 
-func (h *Handlers) chatCreate(message Message, client *ws.Client) {
+func (h *Handlers) chatCreate(message ws.Message, client *ws.Client) {
 	var data createChatRequestData
 	err := json.Unmarshal(message.Item.Data, &data)
 	if err != nil {
@@ -22,7 +22,7 @@ func (h *Handlers) chatCreate(message Message, client *ws.Client) {
 
 	chatId := h.DB.CreateChat(client.UserId, data.UserId)
 
-	responseMessage := BuildResponseMessage(message, chatId)
+	responseMessage := ws.BuildResponseMessage(message, chatId)
 
 	h.Hub.Broadcast(responseMessage, client.UserId, data.UserId)
 }

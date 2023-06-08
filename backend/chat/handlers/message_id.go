@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (h *Handlers) messageId(message Message, client *ws.Client) {
+func (h *Handlers) messageId(message ws.Message, client *ws.Client) {
 	messageIdStr := strings.Split(message.Item.URL, "/")[2]
 	// "/message/1" -> "1"
 
@@ -20,7 +20,7 @@ func (h *Handlers) messageId(message Message, client *ws.Client) {
 	msg := h.DB.GetMessage(messageId)
 
 	if !h.DB.IsChatMember(msg.ChatId, client.UserId) {
-		_ = client.Conn.WriteJSON(BuildResponseMessage(message, nil))
+		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
 		return
 	}
 
@@ -32,7 +32,7 @@ func (h *Handlers) messageId(message Message, client *ws.Client) {
 		Timestamp string `json:"timestamp"`
 	}
 
-	responseMessage := BuildResponseMessage(message, ResponseData{
+	responseMessage := ws.BuildResponseMessage(message, ResponseData{
 		Id:        msg.Id,
 		ChatId:    msg.ChatId,
 		Content:   msg.Content,

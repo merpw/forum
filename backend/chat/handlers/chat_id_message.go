@@ -12,7 +12,7 @@ type messageRequestData struct {
 	Content string `json:"content"`
 }
 
-func (h *Handlers) chatIdMessage(message Message, client *ws.Client) {
+func (h *Handlers) chatIdMessage(message ws.Message, client *ws.Client) {
 	chatIdStr := strings.Split(message.Item.URL, "/")[2]
 	// "/chat/1/message" -> "1"
 
@@ -24,7 +24,7 @@ func (h *Handlers) chatIdMessage(message Message, client *ws.Client) {
 
 	isMember := h.DB.IsChatMember(chatId, client.UserId)
 	if !isMember {
-		_ = client.Conn.WriteJSON(BuildResponseMessage(message, nil))
+		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
 		return
 	}
 
@@ -36,7 +36,7 @@ func (h *Handlers) chatIdMessage(message Message, client *ws.Client) {
 	}
 
 	messageId := h.DB.CreateMessage(chatId, client.UserId, data.Content)
-	responseMessage := BuildResponseMessage(message, messageId)
+	responseMessage := ws.BuildResponseMessage(message, messageId)
 
 	chatMembers := h.DB.GetChatMembers(chatId)
 	h.Hub.Broadcast(responseMessage, chatMembers...)

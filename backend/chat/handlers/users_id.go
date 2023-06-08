@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (h *Handlers) usersIdChat(message Message, client *ws.Client) {
+func (h *Handlers) usersIdChat(message ws.Message, client *ws.Client) {
 	companionIdStr := strings.Split(message.Item.URL, "/")[2]
 	// "/users/1/chat" -> "1"
 
@@ -25,7 +25,7 @@ func (h *Handlers) usersIdChat(message Message, client *ws.Client) {
 		data = nil
 	}
 
-	responseMessage := BuildResponseMessage(message, data)
+	responseMessage := ws.BuildResponseMessage(message, data)
 
 	err = client.Conn.WriteJSON(responseMessage)
 	if err != nil {

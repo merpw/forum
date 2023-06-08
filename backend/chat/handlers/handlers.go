@@ -53,7 +53,7 @@ func (h *Handlers) PrimaryHandler() ws.MessageHandler {
 			return
 		}
 
-		var message Message
+		var message ws.Message
 		err := json.Unmarshal(messageBody, &message)
 		if err != nil {
 			log.Println(err)
@@ -81,23 +81,14 @@ func New(db *sql.DB) *Handlers {
 	return &Handlers{DB: database.New(db)}
 }
 
-// Message is a basic websocket message
-type Message struct {
-	Type string `json:"type"`
-	Item struct {
-		URL  string          `json:"url"`
-		Data json.RawMessage `json:"data"`
-	} `json:"item"`
-}
-
 // Event is a websocket event (server.Route analog)
 type Event struct {
 	Type    string
 	Path    *regexp.Regexp
-	Handler func(message Message, client *ws.Client)
+	Handler func(message ws.Message, client *ws.Client)
 }
 
-func newEvent(method, path string, handler func(message Message, client *ws.Client)) Event {
+func newEvent(method, path string, handler func(message ws.Message, client *ws.Client)) Event {
 	return Event{
 		Type:    method,
 		Path:    regexp.MustCompile(`^` + path + `$`),
