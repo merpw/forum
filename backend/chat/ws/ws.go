@@ -5,6 +5,7 @@ package ws
 
 import (
 	"backend/chat/external"
+	"encoding/json"
 	"log"
 	"net/http"
 	"sync"
@@ -79,6 +80,9 @@ func (h *Hub) Register(client *Client) {
 
 func (h *Hub) Unregister(client *Client) {
 	h.mu.Lock()
+	if client.Token != "" {
+		defer h.BroadcastOnlineStatus()
+	}
 	for i, c := range h.Clients {
 		if c == client {
 			h.Clients = append(h.Clients[:i], h.Clients[i+1:]...)
@@ -97,6 +101,9 @@ func (h *Hub) Broadcast(data interface{}, clients ...int) {
 	if clients == nil {
 		// not specified, send to all
 		for _, c := range h.Clients {
+			if c.Token == "" {
+				continue
+			}
 			err := c.Conn.WriteJSON(data)
 			if err != nil {
 				log.Println(err)
@@ -115,6 +122,21 @@ func (h *Hub) Broadcast(data interface{}, clients ...int) {
 			}
 		}
 	}
+}
+
+// BroadcastOnlineStatus Broadcast shortcut for sending online status to all clients
+func (h *Hub) BroadcastOnlineStatus(clients ...int) {
+	message := BuildResponseMessage(Message{
+		Type: "get",
+		Item: struct {
+			URL  string          `json:"url"`
+			Data json.RawMessage `json:"data"`
+		}{
+			URL: "/users/online",
+		},
+	}, h.GetOnlineUsers())
+
+	h.Broadcast(message, clients...)
 }
 
 func (h *Hub) GetOnlineUsers() []int {
