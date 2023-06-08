@@ -24,6 +24,7 @@ func (h *Handlers) PrimaryHandler() ws.MessageHandler {
 		newEvent("get", `/message/\d+`, h.messageId),
 
 		newEvent("get", `/users/\d+/chat`, h.usersIdChat),
+		newEvent("get", `/users/online`, h.usersOnline),
 
 		// method POST endpoints
 		newEvent("post", `/chat/create`, h.chatCreate),
@@ -72,7 +73,7 @@ func (h *Handlers) PrimaryHandler() ws.MessageHandler {
 type Handlers struct {
 	DB *database.DB
 
-	Broadcast ws.BroadcastFunc
+	Hub *ws.Hub
 }
 
 // New connects database to Handlers

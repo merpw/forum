@@ -41,7 +41,7 @@ func main() {
 	}
 
 	hub := ws.NewHub(h.PrimaryHandler())
-	h.Broadcast = hub.Broadcast
+	h.Hub = hub
 
 	http.HandleFunc("/ws", hub.UpgradeHandler)
 

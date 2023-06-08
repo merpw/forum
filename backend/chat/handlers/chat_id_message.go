@@ -39,5 +39,5 @@ func (h *Handlers) chatIdMessage(message Message, client *ws.Client) {
 	responseMessage := BuildResponseMessage(message, messageId)
 
 	chatMembers := h.DB.GetChatMembers(chatId)
-	h.Broadcast(responseMessage, chatMembers...)
+	h.Hub.Broadcast(responseMessage, chatMembers...)
 }
