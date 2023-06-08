@@ -5,6 +5,26 @@ import (
 	"log"
 )
 
+// GetAllUserIds returns slice of all users ids
+func (db DB) GetAllUserIds() (userIds []int) {
+	query, err := db.Query("SELECT id FROM users ORDER BY name ASC")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	for query.Next() {
+		var userId int
+		err = query.Scan(&userId)
+		if err != nil {
+			log.Panic(err)
+		}
+		userIds = append(userIds, userId)
+	}
+	query.Close()
+
+	return
+}
+
 // GetUserById returns user with specified id
 //
 // returns nil if user not found
