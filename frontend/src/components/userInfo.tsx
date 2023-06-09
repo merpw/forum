@@ -52,7 +52,7 @@ const UserInfo = () => {
         onClick={() =>
           logOut()
             .then(() => {
-              router.push("/login")
+              router.refresh()
               mutate()
             })
             .catch(null)
