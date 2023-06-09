@@ -5,6 +5,7 @@ services:
       context: backend
     environment:
       - FRONTEND_REVALIDATE_URL=http://frontend:3000/api/revalidate
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     volumes:
       - db:/app/db
   frontend:
@@ -13,6 +14,7 @@ services:
     environment:
       - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     depends_on:
       - backend
     volumes:

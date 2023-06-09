@@ -7,11 +7,7 @@ import (
 
 // me returns the currently logged-in user's information.
 func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	user := h.DB.GetUserById(userId)
 
@@ -36,11 +32,7 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 
 // mePosts returns the posts of the logged-in user.
 func (h *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	user := h.DB.GetUserById(userId)
 	posts := h.DB.GetUserPosts(userId)
@@ -71,11 +63,7 @@ func (h *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 
 // mePostsLiked returns the posts liked by the logged-in user.
 func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	posts := h.DB.GetUserPostsLiked(userId)
 

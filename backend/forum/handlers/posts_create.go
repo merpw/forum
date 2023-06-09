@@ -23,11 +23,7 @@ const (
 
 // postsCreate creates a new post
 func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	requestBody := struct {
 		Title       string   `json:"title"`

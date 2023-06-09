@@ -11,6 +11,11 @@ import (
 func TestPosts(t *testing.T) {
 	testServer := NewTestServer(t)
 
+	t.Run("Invalid method", func(t *testing.T) {
+		cli := testServer.TestClient()
+		cli.TestPost(t, "/api/posts", nil, http.StatusMethodNotAllowed)
+	})
+
 	t.Run("Initial", func(t *testing.T) {
 		cli := testServer.TestClient()
 

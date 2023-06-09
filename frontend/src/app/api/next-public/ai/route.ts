@@ -27,9 +27,17 @@ export const POST = async (req: Request) => {
   const response = await fetch(
     `${process.env.FORUM_BACKEND_PRIVATE_URL}/api/internal/check-session?token=${tokenCookie.value}`,
     {
+      headers: {
+        "Internal-Auth": process.env.FORUM_BACKEND_SECRET || "secret",
+      },
       cache: "no-cache",
     }
   )
+
+  if (!response.ok) {
+    return new Response("Temporarily unavailable", { status: 503 })
+  }
+
   const body = await response.json()
   if (body.error) {
     const cookie = serialize("forum-token", "", {

@@ -13,6 +13,9 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ### Environment variables
 
+- `FORUM_IS_PRIVATE` - optional, default: `true`.
+  Enables authentication middleware, redirects to login page if a user is not logged in.
+
 - `FORUM_BACKEND_PRIVATE_URL` - default for `dev`: `http://localhost:8080`.
   URL to [backend](../backend) instance to use for server-side rendering. Optional for building (to pre-render pages),
   but required for running.
