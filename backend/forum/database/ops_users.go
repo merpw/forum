@@ -6,16 +6,16 @@ import (
 )
 
 // GetAllUsers returns all users in database in ascending alphabetical order.
-func (db DB) GetAllUsers() (users []User) {
+func (db DB) GetAllUsers() (users []int) {
 	query, err := db.Query("SELECT * FROM users ORDER BY name ASC")
 	if err != nil {
 		log.Panic(err)
 	}
 
 	for query.Next() {
-		var user User
-		err = query.Scan(&user.Id, &user.Name, &user.Email, &user.Password,
-			&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+		var user int
+		err = query.Scan(&user.Id)
+
 		if err != nil {
 			log.Panic(err)
 		}
