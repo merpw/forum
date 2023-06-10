@@ -6,10 +6,9 @@ import { useRouter } from "next/navigation"
 import { logOut, useMe } from "@/api/auth"
 
 const UserInfo = () => {
-  const { isError, isLoading, isLoggedIn, user, mutate } = useMe()
+  const { user, isError, isLoading, isLoggedIn, mutate } = useMe()
 
   const router = useRouter()
-
   if (isError || isLoading) {
     return null
   }
