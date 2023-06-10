@@ -5,7 +5,7 @@ import Link from "next/link"
 import dayjs from "dayjs"
 
 import { useChat } from "@/api/chats/chats"
-import { useUser } from "@/api/users/hooks"
+import { useIsUserOnline, useUser } from "@/api/users/hooks"
 import { useMessage } from "@/api/chats/messages"
 import { useMe } from "@/api/auth"
 import { MarkdownToPlain } from "@/components/markdown/render"
@@ -31,8 +31,6 @@ const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
 const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   const { chat } = useChat(chatId)
 
-  const { user: lastMessageUser } = useUser(chat?.companionId)
-
   const { isCollapsed, setIsCollapsed } = useContext(ChatSectionCollapsedContext)
 
   const activeChatId = useAppSelector((state) => state.chats.activeChatId)
@@ -55,10 +53,30 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
       }}
     >
       <div className={"border p-4 rounded" + " " + (chatId === activeChatId && "border-blue-900")}>
-        <div className={"text-xl"}>{lastMessageUser?.name}</div>
+        <CompanionData userId={chat.companionId} />
         <MessageInfo id={chat.lastMessageId} />
       </div>
     </Link>
+  )
+}
+
+const CompanionData: FC<{ userId: number }> = ({ userId }) => {
+  const { user } = useUser(userId)
+  const isOnline = useIsUserOnline(userId)
+
+  if (user === undefined) {
+    return <div>loading...</div>
+  }
+  if (user === null) {
+    return <div>User not found</div>
+  }
+
+  return (
+    <div>
+      <div className={"text-xl"}>
+        {user.name} {isOnline ? "🟢" : "🔴"}
+      </div>
+    </div>
   )
 }
 

@@ -14,6 +14,7 @@ const initialState: {
   chatMessages: ObjectMap<number, number[]>
   messages: ObjectMap<number, Message | null>
   userChats: ObjectMap<number, number | null>
+  usersOnline: number[] | undefined
 } = {
   activeChatId: null,
   chatIds: undefined,
@@ -21,6 +22,7 @@ const initialState: {
   chatMessages: {},
   messages: {},
   userChats: {},
+  usersOnline: undefined,
 }
 
 const chatSlice = createSlice({
@@ -114,6 +116,15 @@ const chatSlice = createSlice({
         return { payload: { chatId: response.item.data } }
       },
     },
+
+    handleUsersOnline: {
+      reducer: (state, action: PayloadAction<number[]>) => {
+        state.usersOnline = action.payload
+      },
+      prepare: (response: WSGetResponse<number[]>) => {
+        return { payload: response.item.data }
+      },
+    },
   },
 })
 
@@ -147,6 +158,10 @@ export const chatHandlers = [
   {
     regex: /^\/chat\/create$/,
     handler: chatActions.handleChatCreate,
+  },
+  {
+    regex: /^\/users\/online$/,
+    handler: chatActions.handleUsersOnline,
   },
 ]
 

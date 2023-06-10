@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux"
 
 import Markdown from "@/components/markdown/markdown"
 import { useChatMessages, useMessage, useSendMessage } from "@/api/chats/messages"
-import { useUser } from "@/api/users/hooks"
+import { useIsUserOnline, useUser } from "@/api/users/hooks"
 import { useChat } from "@/api/chats/chats"
 import { chatActions } from "@/store/chats/chats"
 import { useMe } from "@/api/auth"
@@ -114,6 +114,7 @@ const WriteMessageForm: FC<{ chatId: number }> = ({ chatId }) => {
 
 const ChatInfo: FC<{ userId: number }> = ({ userId }) => {
   const { user } = useUser(userId)
+  const isOnline = useIsUserOnline(userId)
 
   if (!user) {
     return <div>loading...</div>
@@ -122,7 +123,7 @@ const ChatInfo: FC<{ userId: number }> = ({ userId }) => {
     <h1 className={"text-2xl mb-auto pb-2 border-b"}>
       Chat with{" "}
       <Link href={`/user/${userId}`}>
-        <span className={"font-bold clickable"}>{user?.name}</span>
+        <span className={"font-bold clickable"}>{user?.name}</span> {isOnline ? "🟢" : "🔴"}
       </Link>
     </h1>
   )
