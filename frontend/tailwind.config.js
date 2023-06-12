@@ -37,20 +37,24 @@ module.exports = {
       {
         // TODO: choose colors
         light_theme: {
-          "base-100": "#e3e3e8", // text
+          "base-100": "#ededf1", // element footer background, react-select background
           primary: "#6176cb", // username
-          secondary: "#825ff4", // user's reaction
+          secondary: "#d37ffc", // user's reaction
           accent: "#69f19f", // online status
           neutral: "#bebbc7", // break lines, background etc.
-          info: "#757575", // reactions, comments button etc.
+          info: "#656565", // reactions, comments button etc.
+          error: "#ffc3cd", // error message
+          "error-content": "#b73945", // error message content
         },
         dark_theme: {
-          "base-100": "#2c2c2c",
-          primary: "#2668be",
-          secondary: "#7d44c3",
+          "base-100": "#232323",
+          primary: "#538bff",
+          secondary: "#b869d7",
           accent: "#00e16a",
           neutral: "#444444",
-          info: "#797979",
+          info: "#969696",
+          error: "#7a3d43",
+          "error-content": "#fdc9c9",
         },
       },
     ],
