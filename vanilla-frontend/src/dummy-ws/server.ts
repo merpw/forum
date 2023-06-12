@@ -3,7 +3,7 @@ import { WebSocketRequest, WSErrorResponse } from "./types"
 import getHandler from "./get"
 import postHandler from "./post"
 
-const backendUrl = process.env.FORUM_BACKEND_URL || "http://localhost:8080"
+const backendUrl =  "http://localhost:8080"
 
 /** Check if session is valid
  * @returns The id of the user
@@ -11,7 +11,12 @@ const backendUrl = process.env.FORUM_BACKEND_URL || "http://localhost:8080"
  * */
 const checkSession = async (token: string) => {
   const resp = await fetch(
-    `${backendUrl}/api/internal/check-session?token=${token}`
+    `${backendUrl}/api/internal/check-session?token=${token}`, {
+      method: "GET",
+      headers: {
+        "Internal-Auth": "application/json",
+      },
+    }
   )
 
   if (resp.status !== 200) {
@@ -39,9 +44,10 @@ export const connections = new Map<
     userId: number
     token: string
   }
->()
+  >()
 
 wss.on("connection", async (ws) => {
+  console.log(connections)
   // to show hidden properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   console.log("New connection from", (ws as any)._socket.localAddress)
