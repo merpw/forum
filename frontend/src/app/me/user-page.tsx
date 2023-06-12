@@ -137,14 +137,14 @@ const UserInfo: FC<{ user: User }> = ({ user }) => {
   const age = user.dob ? calculateAge(user.dob) : null
   return (
     <>
-      <div className={"flex flex-col self-center text-md font-light mb-5 text-center sm:text-left"}>
+      <div className={"flex flex-col self-center font-light mb-5 text-center sm:text-left"}>
         {"Hey, "}
         <span className={"text-3xl sm:text-4xl font-bold text-primary font-Yesteryear mx-1"}>
           {user.name}
         </span>
         {"Forgot who you are?"}
       </div>
-      <div className={"text-md font-light"}>
+      <div className={"font-light"}>
         {user.first_name || user.last_name ? (
           <p>
             {"Full name"}

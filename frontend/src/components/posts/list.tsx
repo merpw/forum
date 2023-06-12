@@ -48,7 +48,7 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
             <AutoDate date={post.date} />
             {" by "}
           </span>
-          <span className={"clickable text-md font-Alatsi align-middle"}>
+          <span className={"clickable font-Alatsi align-middle"}>
             <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
           </span>
         </span>

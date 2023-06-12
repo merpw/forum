@@ -50,7 +50,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
                   {/* TODO: add Avatar */}
                 </div>
               </div>
-              <div className={"self-center sm:text-md font-light text-center sm:text-left"}>
+              <div className={"self-center font-light text-center sm:text-left"}>
                 {/* TODO: add user info if they follows you */}
                 {"Hey! I'm "}
                 <p className={"text-4xl font-bold text-primary font-Yesteryear mx-1"}>
