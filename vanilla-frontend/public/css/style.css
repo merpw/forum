@@ -666,25 +666,36 @@ body {
   overflow: scroll;
   border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
-  padding: 12px;
+  padding: 1px 8px 12px;
 }
 
 .message {
-  background-color: #4672ea;
-  width: 60%;
-  height: 20%;
+  background-color: whitesmoke;
+  max-width: 75%;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: pre-line;
   margin-top: 10px;
   border-radius: 5px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  padding: 4px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  padding: 6px;
 }
 
 .send {
+  background-color: #4672ea;
   align-self: flex-start;
 }
 
 .recieve {
+  
   align-self: flex-end;
+}
+
+.status {
+  max-width: 100%;
+  width: 80%;
+  text-align: center;
+  align-self: center;
 }
 
 .chat-form-container {
