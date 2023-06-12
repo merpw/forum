@@ -27,6 +27,7 @@ async function getChatUsers() {
   setTimeout(() => {
     for (const user of chatList.Users){
       if (!chatList.Ids.has(user.Id)) {
+        console.log("here")
         sendWsObject(
           {
             type: "post",
@@ -86,6 +87,17 @@ export const displayChatUsers = async () => {
   /* Add eventlisteners to show/hide users in chat list */
   onlineTitle.addEventListener("click", toggleOnline)
   offlineTitle.addEventListener("click", toggleOffline)
+  setTimeout(() => {
+    sendWsObject(
+      {
+        type: "get",
+        item: {
+          url: "/chat/all"
+        }
+      }
+    )
+
+  }, 10)
   await getChatUsers()
 
   chatList.Users.sort((a, b) => {
@@ -121,17 +133,7 @@ export const displayChatUsers = async () => {
       offlineList.appendChild(user)
     }
   }
-  setTimeout(() => {
-    sendWsObject(
-      {
-        type: "get",
-        item: {
-          url: "/chat/all"
-        }
-      }
-    )
 
-  }, 100)
 
 }
 

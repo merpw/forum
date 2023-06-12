@@ -56,9 +56,10 @@ export const wsHandler = async () => {
 const postHandler = (resp: WSPostResponse<any>) => {
   const data: iterator = resp.item.data
   const createChat = new RegExp(/^\/chat\/create$/)
+  console.log(data)
 }
 
-const getHandler = async (resp: WSGetResponse<object | any>) => {
+const getHandler = async (resp: WSGetResponse< object | any >) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
   const chatIds = new RegExp(/^\/chat\/\d{1,}$/)
