@@ -14,11 +14,7 @@ const PostPage: FC<{ post: Post; comments: Comment[] }> = ({ post, comments }) =
     <div className={"max-w-3xl mx-auto"}>
       <div className={"rounded-lg border border-primary shadow-base-100 shadow-sm my-7"}>
         <div className={"mx-5"}>
-          <h1 className={"flex flex-wrap text-2xl my-3"}>
-            <span className={"gradient-text font-black mx-1"}>•</span>
-            <span>{post.title}</span>
-            <span className={"gradient-text font-black mx-1"}>•</span>
-          </h1>
+          <h1 className={"start-dot end-dot flex flex-wrap text-2xl my-3"}>{post.title}</h1>
           <div
             className={"prose dark:prose-invert m-3 mb-5 text-lg font-light"}
             dangerouslySetInnerHTML={{ __html: post.content }}

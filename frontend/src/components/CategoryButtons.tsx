@@ -11,26 +11,26 @@ const CategoryButtons: FC<{ categories: string[] }> = ({ categories }) => {
 
   return (
     <div className={"mb-5"}>
-      <div className={"text-center space-x-1"}>
+      <div className={"text-center"}>
         <div className={"font-light mb-1 text-center text-info"}>Categories:</div>
-        <span className={"font-black gradient-text"}>{"•"}</span>
-        {categories.map((category, key) => (
-          <span key={key} className={""}>
-            <Link
-              href={`/category/${category}`}
-              className={
-                "btn btn-xs font-light" +
-                " " +
-                (activeCategory.toLowerCase() === category.toLowerCase()
-                  ? "btn-secondary font-normal"
-                  : "btn-neutral")
-              }
-            >
-              {category}
-            </Link>
-          </span>
-        ))}
-        <span className={"font-black gradient-text"}>{"•"}</span>
+        <span className={"start-dot end-dot space-x-1"}>
+          {categories.map((category, key) => (
+            <span key={key} className={""}>
+              <Link
+                href={`/category/${category}`}
+                className={
+                  "btn btn-xs font-light" +
+                  " " +
+                  (activeCategory.toLowerCase() === category.toLowerCase()
+                    ? "btn-secondary font-normal"
+                    : "btn-neutral")
+                }
+              >
+                {category}
+              </Link>
+            </span>
+          ))}
+        </span>
       </div>
     </div>
   )

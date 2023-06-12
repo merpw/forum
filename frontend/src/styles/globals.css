@@ -4,7 +4,7 @@
 
 html,
 body {
-  background: linear-gradient(170deg, #ffffff, #ffffff, #ffede8);
+  background: linear-gradient(170deg, #ffffff, #ffffff, #fff4fc);
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
@@ -17,7 +17,7 @@ body {
   }
 
   body {
-    color: #fff1f7;
+    color: #f5f5f5;
     background: linear-gradient(170deg, #000000, #000000, #181715);
   }
 }
@@ -80,6 +80,16 @@ body {
 
     .clickable {
       @apply hover:opacity-70;
+    }
+
+    .start-dot::before {
+      content: " • ";
+      @apply gradient-text font-black mx-1;
+    }
+
+    .end-dot::after {
+      content: " • ";
+      @apply gradient-text font-black mx-1;
     }
 
     /* buttons, text */
