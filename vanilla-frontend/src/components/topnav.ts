@@ -1,6 +1,7 @@
 import { postForm } from "../pages.js"
 import { PostCreator, displayPosts } from "./posts.js"
 import { logout } from "../api/post.js"
+import { chatList, displayChatUsers } from "./chat.js"
 
 export const postBtn = document.getElementById(
   "topnav-post"
@@ -43,25 +44,31 @@ export const goHome = () => {
 // Adds event listener to the topNav
 export const topnavController = () => {
   const topNavPost = document.getElementById(
-      "topnav-post"
-    ) as HTMLAnchorElement,
-    topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
-    topNavLogout = document.getElementById(
-      "topnav-logout"
-    ) as HTMLAnchorElement,
-    topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
-    chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
-    chatList = document.getElementById("chatlist") as HTMLDivElement
+    "topnav-post"
+  ) as HTMLAnchorElement,
+  topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
+  topNavLogout = document.getElementById(
+    "topnav-logout"
+  ) as HTMLAnchorElement,
+  topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
+  chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
+  chatDisplay = document.getElementById("chatlist") as HTMLDivElement,
+  chat = document.getElementById("chat-area") as HTMLDivElement
 
-    topNavPost.addEventListener("click", openCloseCreatePost)
-    topNavHome.addEventListener("click", goHome)
-    topNavLogout.addEventListener("click", logout)
-    topNavChat.addEventListener("click", () => {
-      chatList.classList.add("chat-list-open")
-      chatList.style.width = "200px"
-    })
-    chatClose.addEventListener("click", () => {
-      chatList.classList.remove("chat-list-open")
-      chatList.style.width = "0"
-    })
-  }
+  topNavPost.addEventListener("click", openCloseCreatePost)
+  topNavHome.addEventListener("click", goHome)
+  topNavLogout.addEventListener("click", logout)
+  topNavChat.addEventListener("click", () => {
+    displayChatUsers()
+    setTimeout(() => {
+      chatDisplay.classList.add("chat-list-open")
+      chatDisplay.style.width = "200px"
+      chat.style.left = "210px"
+    }, 50)
+  })
+  chatClose.addEventListener("click", () => {
+    chatDisplay.classList.remove("chat-list-open")
+    chatDisplay.style.width = "0"
+    chat.style.left = "10px"
+  })
+}

@@ -5,7 +5,6 @@ import { categoriesSelector } from "./categories.js"
 import { loginController } from "./login.js"
 import { displayPosts } from "./posts.js"
 import { ws, wsHandler } from "./ws.js"
-import { displayChatUsers } from "./chat.js"
 
 import { getMe } from "../api/get.js"
 
@@ -24,10 +23,8 @@ export const Auth = async (session: boolean) => {
       Object.assign(userInfo, await getMe()) // Sets the userInfo (Id, Name)
       topnavController() // Adds event listeners to the top-navigation bar
       categoriesSelector() 
-      displayChatUsers()
       displayPosts("/api/posts")
-    }, 50)
-    return
+    }, 100)
   }
   if (!session) {
     if (ws){
@@ -38,6 +35,5 @@ export const Auth = async (session: boolean) => {
       superDivision.innerHTML = LoginSignup()
       superDivision.classList.replace("index-style", "login-style")
       loginController()}, 200)
-    return
   }
 }

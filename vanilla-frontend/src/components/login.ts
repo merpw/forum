@@ -1,7 +1,6 @@
 import { LoginForm, SignupForm } from "../types"
 import { login, signup } from "../api/post.js"
 import { Auth } from "./auth.js"
-import { wsHandler } from "./ws.js"
 
 
 class Login {
@@ -23,9 +22,8 @@ class Login {
       password: passwordInput.value,
       rememberMe: rememberMeInput.checked,
     }
-    await login(formData)
-    wsHandler()
-    setTimeout(() => Auth(true), 500)
+    const loginstatus = await login(formData)
+    loginstatus == true ? Auth(true) : Auth(false) 
   }
 }
 

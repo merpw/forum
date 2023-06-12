@@ -338,7 +338,7 @@ body {
   width: 700px;
   height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 }
@@ -636,6 +636,15 @@ body {
   display: flex;
 }
 
+#chat-area {
+  position: fixed;
+  z-index: 999;
+  bottom: 0px;
+  left: 210px;
+  width: 20%;
+  transition: 0.5s ease;
+}
+
 .chat {
   flex-direction: column;
   justify-content: center;
@@ -654,6 +663,7 @@ body {
   height: 100%;
   width: 100%;
   background-color: whitesmoke;
+  overflow: scroll;
   border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
   padding: 12px;
