@@ -134,10 +134,12 @@ export const Index = (): string => {
         <ul id="offline-users" class="chat-users" style="display: none;"></ul>
     </div>
 
-<main id="main">
 
-  <section id="create-post" class="close"></section>
+<main id="main">
+<div id="chat-area"></div>
+
   <section id="feed">
+  <section id="create-post" class="close"></section>
       <div class="categories">
       <span class="title">Categories:</span>
         <div class="category-selection">

@@ -1,3 +1,4 @@
+import { Auth } from "../components/auth.js"
 import { backendUrl } from "../main.js"
 import { ChatUser } from "../types"
 
@@ -20,7 +21,7 @@ return fetch(`${backendUrl}/api/posts/${postId}/comments`)
 }
 
 
-const getMe = async (): Promise<object> => {
+const getMe = async (): Promise<object | void> => {
   return fetch(`${backendUrl}/api/me`)
     .then((r) => r.json())
     .then((data) => {
@@ -29,6 +30,9 @@ const getMe = async (): Promise<object> => {
         Name: data.name
       }
     })
+    .catch(() => {
+      return Auth(false)
+    }) 
 }
 
 const getUserById = async (id: string): Promise<ChatUser> => {

@@ -24,19 +24,20 @@ const logout = async () => {
   })
 }
 
-const login = async (formData: LoginForm) => {
-  await fetch(`${backendUrl}/api/login`, {
+const login = async (formData: LoginForm): Promise<boolean | undefined> => {
+  return await fetch(`${backendUrl}/api/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(formData),
   }).then((response) => {
-    if (response.ok) {
-      return
-    } else {
-      response.text().then((error) => {
-        console.log(`Error: ${error}`)
+      if (response.ok) {
+        return true
+      } else {
+        response.text().then((error) => {
+          console.error(error)
+          return false
       })
     }
   })

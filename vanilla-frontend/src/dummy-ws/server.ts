@@ -47,7 +47,6 @@ export const connections = new Map<
   >()
 
 wss.on("connection", async (ws) => {
-  console.log(connections)
   // to show hidden properties
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   console.log("New connection from", (ws as any)._socket.localAddress)

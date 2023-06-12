@@ -1,6 +1,7 @@
 import { chatList, messages } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse } from "../types"
-import { iterator } from "./utils"
+import { iterator } from "./utils.js"
+import { Auth } from "./auth.js"
 
 const WS_URL = "ws://localhost:6969"
 export let ws: WebSocket
@@ -35,6 +36,10 @@ export const wsHandler = async () => {
       }
     } catch (e) {
       console.error("ws error", e)
+      ws.close()
+      setTimeout(() => {
+        Auth(false)
+      }, 50)
     }
   }
 
