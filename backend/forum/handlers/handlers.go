@@ -99,7 +99,9 @@ func (h *Handlers) Handler() http.Handler {
 				server.ErrorResponse(w, http.StatusInternalServerError) // 500 ERROR
 			}
 		}()
-		if strings.HasPrefix(r.URL.Path, "/api/") {
+		if !strings.HasPrefix(r.URL.Path, "/api/") {
+			router.ServeHTTP(w, r) // For dev purposes only.
+		} else {
 			r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
 
 			for _, route := range routes {
@@ -155,8 +157,6 @@ func (h *Handlers) Handler() http.Handler {
 				}
 			}
 
-		} else {
-			router.ServeHTTP(w, r)
 		}
 	})
 }
