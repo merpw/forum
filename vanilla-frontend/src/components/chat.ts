@@ -14,6 +14,7 @@ export const messages = {
   list: [] as Message[]
 }
 
+export let currentChat = -1
 
 async function getChatUsers() {
   Object.assign(chatList, {
@@ -31,7 +32,7 @@ async function getChatUsers() {
       }
     )
   }, 100)
-  console.log(chatList)
+
   const userIds: iterator = await getUserIds()
   // if (userIds.length - 1 == chatList.Ids.size && chatList.Ids.size != 0){
   //   return
@@ -84,47 +85,124 @@ const showChat = async (id: number) => {
   const chat = createElement("div", "chat show-chat")
 
   const chatId = chatList.Ids.get(id) as number
-  console.log(chatId)
+  currentChat = chatId
 
   const user = await getUserById(id.toString())
 
   const chatName = createElement("div", "chat-name", null, user.Name) as HTMLDivElement
-  chatName.style.paddingBottom = "10px;"
+  chatName.style.paddingBottom = "10px"
 
   const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
-  await getMessages(chatId)
 
-
-  setTimeout(() => {
-    console.log(chatId)
-    for (const msg of Object.values(messages.list)) {
-      console.log(msg)
-      const msgElement = createElement("div", "message", null, msg.content) as HTMLDivElement 
-      chatMessages.appendChild(msgElement)
-    }
-  }, 100)
   const chatFormContainer = createElement("div", "chat-form-container")
   const chatForm = createElement("form", "chat-form")
+  const messageField = createElement("input", null, "chat-text")
+  messageField.setAttribute("maxlength", "150")
+  chatMessages.addEventListener("messageEvent", () => {
+    updateChat(chatId)
+  })
+
+  const messageSend = createElement("button", null, "chat-send", "Send")
+  messageSend.addEventListener("click", () => {
+    sendMessage(chatId)
+  })
+  await getMessages(chatId)
+
+  setTimeout(() => {
+    messages.list.sort((a, b) => {
+      return a.id - b.id
+    }) 
+  }, 220)
+
+  chatForm.append(messageField, messageSend)
   chatFormContainer.appendChild(chatForm)
+
+  setTimeout(() => {
+    if (messages.list.length === 0) {
+      return
+    }
+    for (const message of Object.values(messages.list.reverse())) {
+      const msgElement = createElement("div", "message") as HTMLDivElement
+      const date = new Date(message.timestamp)
+      const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" }).slice(0, 10)
+      if (message.authorId === userInfo.Id){
+        msgElement.classList.add("send")
+        msgElement.textContent = message.content + '\n' + formatDate
+      } else if (message.authorId === -1){
+        msgElement.classList.add("status")
+        msgElement.textContent = message.content + '\n'  + formatDate
+      } else {
+        msgElement.classList.add("recieve")
+        msgElement.textContent = message.content + '\n' + formatDate
+      }
+      chatMessages.appendChild(msgElement)
+    }
+  }, 250)
   chat.append(chatName, chatMessages, chatFormContainer)
   chatArea.replaceChildren(chat)
 }
 
 const sendMessage = async (chatId: number) => {
-
+  const content = document.getElementById("chat-text") as HTMLInputElement
+  let message = content.value.toString().trim()
+  if (message.length > 0) {
+    content.value = ""
+    if (message.length > 150) {
+      message = message.slice(0, 150)
+    }
+    sendWsObject(
+      {
+        type: "post",
+        item: {
+          url: `/chat/${chatId}/message`,
+          data: {
+            content: message        }
+        }
+      }
+    )
+      getMessages(chatId)
+  }
 }
+
+export const updateChat = (chatId: number) => {
+  const message = messages.list.reverse()[0]
+  const chatMessages = document.getElementById(`Chat${chatId}`) as HTMLDivElement
+  const msgElement = createElement("div", "message", null, message.content) as HTMLDivElement
+  console.log(message, messages.list[0].id)
+  if (message.id < messages.list[messages.list.length - 1].id || message.authorId == -1) {
+    return
+  }
+      const date = new Date(message.timestamp)
+      const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" }).slice(0, 10)
+      if (message.authorId === userInfo.Id){
+        msgElement.classList.add("send")
+        msgElement.textContent = message.content + "\n" + formatDate
+      } else if (message.authorId === -1){
+        msgElement.classList.add("status")
+        msgElement.textContent = message.content + "\n"  + formatDate
+      } else {
+        msgElement.textContent = message.content + "\n" + formatDate
+        msgElement.classList.add("recieve")
+      }
+  if (chatId === currentChat) {
+    chatMessages.prepend(msgElement)
+  }
+}
+
 
 const getMessages = async (chatId: number) => {
-  sendWsObject(
-    {
-      type: "get",
-      item: {
-        url: `/chat/${chatId}/messages`
-      }
-    })
+  Object.assign(messages, {list: []})
+  setTimeout(() => {
+    sendWsObject(
+      {
+        type: "get",
+        item: {
+          url: `/chat/${chatId}/messages`
+        }
+      })
+  }, 150)
 }
 
-let parsedUsers = false
 export const displayChatUsers = async () => {
 
   const onlineList = document.getElementById("online-users") as HTMLUListElement,
@@ -150,7 +228,6 @@ export const displayChatUsers = async () => {
 
   setTimeout(() => {
     // TODO: Remove this sort when sorted in backend.
-    console.log(chatList)
     chatList.Users.sort((a, b) => {
       const name1 = a.Name.toLowerCase()
       const name2 = b.Name.toLowerCase()

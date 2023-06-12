@@ -1,8 +1,9 @@
-import { chatList, messages } from "./chat.js"
+import { chatList, currentChat, messages } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse } from "../types"
 import { iterator } from "./utils.js"
 import { Auth } from "./auth.js"
 
+export const messageEvent = new Event("messageEvent")
 const WS_URL = "ws://localhost:6969"
 export let ws: WebSocket
 
@@ -58,10 +59,14 @@ export const wsHandler = async () => {
   }
 }
 
-const postHandler = (resp: WSPostResponse<any>) => {
+const postHandler = async (resp: WSPostResponse<object | any>) => {
   const data: iterator = resp.item.data
-  const createChat = new RegExp(/^\/chat\/create$/)
-  console.log(data)
+  const url = resp.item.url
+  // const createChat = new RegExp(/^\/chat\/create$/)
+  const sendMessage = new RegExp(/^\/chat\/\d{1,}\/message$/)
+  if (url.match(sendMessage)){
+    getMessage(data.messageId)    
+  }
 }
 
 const getHandler = async (resp: WSGetResponse< object | any >) => {
@@ -75,7 +80,6 @@ const getHandler = async (resp: WSGetResponse< object | any >) => {
     if (!chatList.Ids.has(data.userId)){
     return chatList.Ids.set(data.userId, data.id)
     }
-    
   }
 
   if (url.match(messageList)) {
@@ -83,7 +87,11 @@ const getHandler = async (resp: WSGetResponse< object | any >) => {
   }
 
   if (url.match(message)) {
-    return messages.list.push(resp.item.data) 
+    console.log(resp.item.data)
+    if (resp.item.data.chatId === currentChat) {
+      messages.list.push(resp.item.data)
+    }
+    return
   }
 
   if (url === "/chat/all") {
@@ -108,16 +116,30 @@ const getChatIds = async (resp: iterator) => {
   return
 }
 
+const getMessage = async (id: number) => {
+  sendWsObject(
+    {
+      type: "get",
+      item: {
+        url: `/message/${id}`
+      }
+    }
+  )
+  setTimeout(() => {
+       document.getElementById(`Chat${currentChat}`)?.dispatchEvent(messageEvent)
+  }, 100)
+}
+
 const getMessageList = async (ids: number[]) => {
   for (const id of ids) {
-    sendWsObject(
-      {
-        type: "get",
-        item: {
-          url: `/message/${id}`
+      sendWsObject(
+        {
+          type: "get",
+          item: {
+            url: `/message/${id}`
+          }
         }
-      }
-    )
+      )
   }
   return
 }
