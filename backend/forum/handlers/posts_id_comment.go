@@ -3,19 +3,21 @@ package handlers
 import (
 	"backend/common/server"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 )
 
+const (
+	MinCommentLength = 1
+	MaxCommentLength = 1000
+)
+
 // postsIdCommentIdLike likes a comment on a specific post
 func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) {
 
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	// /api/posts/1/comment/2/like ->2
@@ -58,11 +60,7 @@ func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) 
 
 // postsIdCommentIdDislike dislikes a specific comment on a specific post
 func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	if err != nil {
@@ -103,11 +101,7 @@ func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Reques
 
 // postsIdCommentIdReactions returns SafeReaction with data about the reactions of a specific comment
 func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	if err != nil {
@@ -132,11 +126,7 @@ func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Reque
 
 // postsIdCommentCreate adds a comment on a specific post
 func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	postIdStr = strings.TrimSuffix(postIdStr, "/comment")
@@ -165,8 +155,15 @@ func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) 
 
 	requestBody.Content = strings.TrimSpace(requestBody.Content)
 
-	if len(requestBody.Content) < 1 {
+	if len(requestBody.Content) < MinCommentLength {
 		http.Error(w, "Content is too short", http.StatusBadRequest)
+		return
+	}
+
+	if len(requestBody.Content) > MaxCommentLength {
+		http.Error(w,
+			fmt.Sprintf("Content is too long (max %d characters)", MaxContentLength),
+			http.StatusBadRequest)
 		return
 	}
 
@@ -192,7 +189,7 @@ func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// posts := srv.DB.GetUserPosts(userId)
+	// posts := srv.DB.GetUserPosts(usersId)
 	comments := h.DB.GetPostComments(postId)
 
 	response := make([]SafeComment, 0)

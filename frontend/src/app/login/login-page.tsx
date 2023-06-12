@@ -42,7 +42,10 @@ const LoginPage = () => {
           setIsSame(true)
 
           logIn(login, password)
-            .then(() => mutate())
+            .then(() => {
+              router.refresh()
+              mutate()
+            })
             .catch((err) => setFormError(err.message))
         }}
       >

@@ -47,11 +47,7 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 // returns current reaction
 func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	postIdStr = strings.TrimSuffix(postIdStr, "/like")
@@ -98,11 +94,7 @@ func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 //
 // returns current reaction
 func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	postIdStr = strings.TrimSuffix(postIdStr, "/dislike")
 	// /api/posts/1/dislike -> 1
@@ -146,11 +138,7 @@ func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 
 // postsIdReaction returns the current reaction of the user to the post
 func (h *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
 	postIdStr = strings.TrimSuffix(postIdStr, "/reaction")

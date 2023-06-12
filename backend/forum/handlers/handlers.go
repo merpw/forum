@@ -6,7 +6,15 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"os"
+	"runtime/debug"
 	"strings"
+)
+
+type ctxKey int
+
+const (
+	userIdCtxKey ctxKey = iota
 )
 
 type Handlers struct {
@@ -20,47 +28,59 @@ func New(db *sql.DB) *Handlers {
 	return &Handlers{DB: database.New(db)}
 }
 
-func (h *Handlers) serveContent (w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) serveContent(w http.ResponseWriter, r *http.Request) {
 }
 
 // Handler returns http.Handler with all routes registered
 func (h *Handlers) Handler() http.Handler {
-  router := http.NewServeMux()
-  fs := http.FileServer(http.Dir(FRONTEND_DIR))
-  router.Handle("/", fs)
+	router := http.NewServeMux()
+	fs := http.FileServer(http.Dir(FRONTEND_DIR))
+	router.Handle("/", fs)
 
 	var routes = []server.Route{
 		// method GET endpoints
-    server.NewRoute(http.MethodGet, `/api/me`, h.me),
+		server.NewRoute(http.MethodGet, `/api/users/(\d+)`, h.usersId),
+		server.NewRoute(http.MethodGet, `/api/users/(\d+)/posts`, h.usersIdPosts),
+		server.NewRoute(http.MethodGet, `/api/users`, h.usersAll),
+
+		server.NewRoute(http.MethodGet, `/api/posts`, h.posts),
+		server.NewRoute(http.MethodGet, `/api/posts/(\d+)`, h.postsId),
+
+		server.NewRoute(http.MethodGet, `/api/posts/(\d+)/comments`, h.postsIdComments),
+
+		server.NewRoute(http.MethodGet, `/api/posts/categories`, h.postsCategories),
+		server.NewRoute(http.MethodGet, `/api/posts/categories/([[:alnum:]]+)`, h.postsCategoriesName),
+	}
+
+	var publicRoutes = []server.Route{
+		// method POST endpoints
+		server.NewRoute(http.MethodPost, `/api/login`, h.login),
+		server.NewRoute(http.MethodPost, `/api/signup`, h.signup),
+	}
+
+	var authRoutes = []server.Route{
+		// method GET endpoints
+		server.NewRoute(http.MethodGet, `/api/me`, h.me),
 
 		server.NewRoute(http.MethodGet, `/api/me/posts`, h.mePosts),
 		server.NewRoute(http.MethodGet, `/api/me/posts/liked`, h.mePostsLiked),
 
-    server.NewRoute(http.MethodGet, `/api/users`, h.userAll),
-		server.NewRoute(http.MethodGet, `/api/users/(\d+)`, h.userId),
-		server.NewRoute(http.MethodGet, `/api/users/(\d+)/posts`, h.userIdPosts),
+		server.NewRoute(http.MethodGet, `/api/user/(\d+)`, h.userId),
+		server.NewRoute(http.MethodGet, `/api/user/(\d+)/posts`, h.userIdPosts),
 
 		server.NewRoute(http.MethodGet, `/api/posts`, h.posts),
 		server.NewRoute(http.MethodGet, `/api/posts/(\d+)`, h.postsId),
 
 		server.NewRoute(http.MethodGet, `/api/posts/(\d+)/reaction`, h.postsIdReaction),
-		server.NewRoute(http.MethodGet, `/api/posts/(\d+)/comments`, h.postsIdComments),
 
 		server.NewRoute(http.MethodGet, `/api/posts/(\d+)/comment/(\d+)/reaction`, h.postsIdCommentIdReaction),
 
-		server.NewRoute(http.MethodGet, `/api/posts/categories`, h.postsCategories),
-		server.NewRoute(http.MethodGet, `/api/posts/categories/([[:alnum:]]+)`, h.postsCategoriesName),
-
-		server.NewRoute(http.MethodGet, `/api/internal/check-session`, h.checkSession),
-
 		// method POST endpoints
+		server.NewRoute(http.MethodPost, `/api/logout`, h.logout),
+
 		server.NewRoute(http.MethodPost, `/api/posts/create`, h.postsCreate),
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/like`, h.postsIdLike),
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/dislike`, h.postsIdDislike),
-
-		server.NewRoute(http.MethodPost, `/api/login`, h.login),
-		server.NewRoute(http.MethodPost, `/api/signup`, h.signup),
-		server.NewRoute(http.MethodPost, `/api/logout`, h.logout),
 
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/comment`, h.postsIdCommentCreate),
 
@@ -68,38 +88,75 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/comment/(\d+)/dislike`, h.postsIdCommentIdDislike),
 	}
 
+	var internalRoutes = []server.Route{
+		server.NewRoute(http.MethodGet, `/api/internal/check-session`, h.checkSession),
+	}
+
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
-				log.Printf("ERROR %d. %v\n", http.StatusInternalServerError, err)
+				log.Printf("ERROR %d. %v\n%s", http.StatusInternalServerError, err, debug.Stack())
 				server.ErrorResponse(w, http.StatusInternalServerError) // 500 ERROR
 			}
 		}()
+		if strings.HasPrefix(r.URL.Path, "/api/") {
+			r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
 
-    if strings.HasPrefix(r.URL.Path, "/api/") {
-      r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+			for _, route := range routes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
 
-      var requestRoute server.Route
+					if os.Getenv("FORUM_IS_PRIVATE") == "true" {
+						h.withAuth(route.Handler)(w, r)
+						return
+					}
 
-      for _, route := range routes {
-        if route.Pattern.MatchString(r.URL.Path) {
-          requestRoute = route
-          break
-        }
-      }
+					route.Handler(w, r)
+					return
+				}
+			}
 
-      if requestRoute.Handler == nil {
-        server.ErrorResponse(w, http.StatusNotFound)
-        return
-      }
+			for _, route := range publicRoutes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
 
-      if r.Method != requestRoute.Method {
-        server.ErrorResponse(w, http.StatusMethodNotAllowed)
-        return
-      }
-      requestRoute.Handler(w, r)
-    } else {
-      router.ServeHTTP(w, r)
-    }
-    })
+					route.Handler(w, r)
+					return
+				}
+			}
+
+			for _, route := range authRoutes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
+
+					h.withAuth(route.Handler)(w, r)
+					return
+				}
+			}
+
+			for _, route := range internalRoutes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
+
+					h.withInternal(route.Handler)(w, r)
+					return
+				}
+			}
+
+		} else {
+			router.ServeHTTP(w, r)
+		}
+	})
 }

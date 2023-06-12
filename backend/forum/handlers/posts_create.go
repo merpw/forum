@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
+	"backend/forum/external"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,12 +11,20 @@ import (
 )
 
 // postsCreate creates a new post in the database
+const (
+	MinTitleLength = 1
+	MaxTitleLength = 100
+
+	MinContentLength = 1
+	MaxContentLength = 10000
+
+	MinDescriptionLength = 1
+	MaxDescriptionLength = 200
+)
+
+// postsCreate creates a new post
 func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
+	userId := r.Context().Value(userIdCtxKey).(int)
 
 	requestBody := struct {
 		Title       string   `json:"title"`
@@ -29,36 +38,41 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
-  log.Println(requestBody)
+	log.Println(requestBody)
 	requestBody.Title = strings.TrimSpace(requestBody.Title)
 	requestBody.Content = strings.TrimSpace(requestBody.Content)
 	requestBody.Description = strings.TrimSpace(requestBody.Description)
 
-	if requestBody.Title == "" {
+	if len(requestBody.Title) < MinTitleLength {
 		http.Error(w, "Title is too short", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.Title) > 25 {
-		http.Error(w, "Title is too long, maximum length is 25", http.StatusBadRequest)
+	if len(requestBody.Title) > MaxTitleLength {
+		http.Error(w, fmt.Sprintf("Title is too long, maximum length is %v", MaxTitleLength),
+			http.StatusBadRequest)
 		return
 	}
 
-  log.Println(requestBody.Content)
-
-	if requestBody.Content == "" {
+	if len(requestBody.Content) < MinContentLength {
 		http.Error(w, "Content is too short", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.Content) > 10000 {
-		http.Error(w, "Content is too long, maximum length is 10000", http.StatusBadRequest)
+	if len(requestBody.Content) > MaxContentLength {
+		http.Error(w, fmt.Sprintf("Content is too long, maximum length is %v", MaxContentLength),
+			http.StatusBadRequest)
 		return
 	}
 
-	if requestBody.Description == "" {
-		requestBody.Description = shortenContent(requestBody.Content)
+	if len(requestBody.Description) < MinDescriptionLength {
+		if len(requestBody.Content) < MaxDescriptionLength {
+			requestBody.Description = requestBody.Content
+		} else {
+			requestBody.Description = requestBody.Content[:MaxDescriptionLength]
+		}
 	}
-	if len(requestBody.Description) > 200 {
-		requestBody.Description = shortenContent(requestBody.Description)
+
+	if len(requestBody.Description) > MaxDescriptionLength {
+		requestBody.Description = requestBody.Description[:MaxDescriptionLength]
 	}
 
 	for i, cat := range requestBody.Categories {
@@ -87,18 +101,11 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		userId, strings.Join(requestBody.Categories, ","))
 	server.SendObject(w, id)
 
-	err = revalidateURL(fmt.Sprintf("/post/%v", id))
-	if err != nil {
-		log.Printf("Error while revalidating `/post/%v`: %v", id, err)
-	}
-	err = revalidateURL("/")
-	if err != nil {
-		log.Printf("Error while revalidating '/': %v", err)
-	}
+	external.RevalidateURL(fmt.Sprintf("/post/%v", id))
+
+	external.RevalidateURL("/")
+
 	for _, category := range categories {
-		err = revalidateURL(fmt.Sprintf("/category/%v", category))
-		if err != nil {
-			log.Printf("Error while revalidating `/category/%v`: %v", category, err)
-		}
+		external.RevalidateURL(fmt.Sprintf("/category/%v", category))
 	}
 }
