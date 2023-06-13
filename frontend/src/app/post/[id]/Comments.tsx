@@ -65,7 +65,10 @@ const CommentCard: FC<{ comment: Comment; postId: number }> = ({ comment, postId
           <ReactionsCommentButtons postId={postId} comment={comment} />
         </span>
 
-        <AutoDate date={comment.date} className={"self-center ml-auto font-light text-info"} />
+        <AutoDate
+          date={comment.date}
+          className={"self-center ml-auto font-light text-sm text-info"}
+        />
       </div>
     </div>
   )

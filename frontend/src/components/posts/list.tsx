@@ -43,8 +43,8 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
         <span className={"flex flex-wrap mx-auto sm:m-0 gap-1"}>
           <Category post={post} />
         </span>
-        <span className={"ml-auto font-light"}>
-          <span className={"text-info align-middle"}>
+        <span className={"ml-auto font-normal"}>
+          <span className={"text-info text-sm align-middle"}>
             <AutoDate date={post.date} />
             {" by "}
           </span>

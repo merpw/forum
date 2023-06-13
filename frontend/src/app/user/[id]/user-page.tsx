@@ -53,9 +53,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
               <div className={"self-center font-light text-center sm:text-left"}>
                 {/* TODO: add user info if they follows you */}
                 {"Hey! I'm "}
-                <p className={"text-4xl font-bold text-primary font-Yesteryear mx-1"}>
-                  {user.name}
-                </p>
+                <p className={"text-4xl text-primary font-Yesteryear mx-1"}>{user.name}</p>
               </div>
             </div>
           </div>
