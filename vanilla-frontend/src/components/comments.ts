@@ -13,11 +13,19 @@ export const displayCommentSection = async (id: string) => {
   // If statement for opening the comment section
   if (commentSection.classList.contains("close")) {
     // Appends the form to the commentSection
-    const commentFormElement = createElement("div", "comment-form", null, null, commentForm(id)) as HTMLDivElement
+    const commentFormElement = createElement(
+      "div",
+      "comment-form",
+      null,
+      null,
+      commentForm(id)
+    ) as HTMLDivElement
     commentSection.appendChild(commentFormElement)
     commentSection.classList.replace("close", "open")
 
-    const createPostForm = document.querySelector(`#comment-form-${id}`) as HTMLFormElement
+    const createPostForm = document.querySelector(
+      `#comment-form-${id}`
+    ) as HTMLFormElement
     new CommentCreator(createPostForm)
 
     // Loop through all the comments and creates them in the DOM.
@@ -25,11 +33,25 @@ export const displayCommentSection = async (id: string) => {
       const date = new Date(c.date)
       const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
       // Parent element
-      const comment = createElement("div", "comment", `CommentID${c.id}`) as HTMLDivElement
-      // Comment info 
-      const commentInfo = createElement("div", "comment-info", null, `${c.author.name}\n\tat ${formatDate}`) 
-      // Comment content 
-      const commentContent = createElement("div", "comment-content", null, `${c.content}`)
+      const comment = createElement(
+        "div",
+        "comment",
+        `CommentID${c.id}`
+      ) as HTMLDivElement
+      // Comment info
+      const commentInfo = createElement(
+        "div",
+        "comment-info",
+        null,
+        `${c.author.name}\n\tat ${formatDate}`
+      )
+      // Comment content
+      const commentContent = createElement(
+        "div",
+        "comment-content",
+        null,
+        `${c.content}`
+      )
       comment.append(commentInfo, commentContent)
       commentSection.appendChild(comment)
     }
@@ -56,7 +78,9 @@ export class CommentCreator {
   }
 
   private getFormData(): { content: string } {
-    const content = this.form.querySelector("#comment-content") as HTMLInputElement
+    const content = this.form.querySelector(
+      "#comment-content"
+    ) as HTMLInputElement
     return { content: content.value }
   }
 }

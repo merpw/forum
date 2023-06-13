@@ -7,7 +7,9 @@ export const category = {
 
 // Helper function to select functions. It affects the category state
 export const categoriesSelector = async () => {
-  const categories = document.querySelectorAll(".category-title") as NodeListOf<Element>
+  const categories = document.querySelectorAll(
+    ".category-title"
+  ) as NodeListOf<Element>
 
   categories.forEach((categoryElement) => {
     categoryElement.addEventListener("click", () => {

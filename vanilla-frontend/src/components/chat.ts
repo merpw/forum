@@ -6,66 +6,57 @@ import { getUserById, getUserIds } from "../api/get.js"
 
 // This file is dedicated to sorting and displaying chat users in the sidebar.
 export const chatList = {
-  Ids: new Map<number, number>, //userId, chatId
-  Users: [] as ChatUser[]
+  Ids: new Map<number, number>(), //companionId, chatId
+  Users: [] as ChatUser[],
 }
 
 export const messages = {
-  list: [] as Message[]
+  list: [] as Message[],
+}
+
+const test = {
+  list: [1, 2, 3, 4 ,5]
 }
 
 export let currentChat = -1
 
-async function getChatUsers() {
-  Object.assign(chatList, {
-    Ids: new Map<number, number>,
-    Users: [],
-  })
+const getChatUsers = async (): Promise<void> => {
+  return new Promise<void>(async (resolve) => {
+    Object.assign(chatList, {
+      Ids: new Map<number, number>(),
+      Users: [],
+    })
 
-  setTimeout(() => {
-    sendWsObject(
-      {
-        type: "get",
-        item: {
-          url: "/chat/all"
-        }
-      }
-    )
-  }, 100)
+    await sendWsObject({
+      type: "get",
+      item: {
+        url: "/chat/all",
+      },
+    })
 
-  const userIds: iterator = await getUserIds()
-  // if (userIds.length - 1 == chatList.Ids.size && chatList.Ids.size != 0){
-  //   return
-  // }
+    const userIds: iterator = await getUserIds()
 
-  setTimeout(async () => {
-    for (const id of Object.values(userIds)){
-      if (id !== userInfo.Id){
+    for (const id of Object.values(userIds)) {
+      if (id !== userInfo.Id) {
         chatList.Users.push(await getUserById(id))
-
       }
     }
-  }, 100)
 
-  setTimeout(() => {
-    for (const user of chatList.Users){
+    for (const user of chatList.Users) {
       if (!chatList.Ids.has(user.Id)) {
-        sendWsObject(
-          {
-            type: "post",
-            item: {
-              url: "/chat/create",
-              data: {
-                userId: user.Id
-              }
-            }
-          }
-        )
+        await sendWsObject({
+          type: "post",
+          item: {
+            url: "/chat/create",
+            data: {
+              userId: user.Id,
+            },
+          },
+        })
       }
     }
-  }, 150)
-
-
+    resolve()
+  })
 }
 //   ws.send(JSON.stringify({
 //       type: "get",
@@ -79,70 +70,89 @@ async function getChatUsers() {
 // ) TODO: Fix so that online users and UnreadMsg are updated in chatList
 
 // Display the current chat based on chatId
-const showChat = async (id: number) => {
-  Object.assign(messages, {list: []})
-  const chatArea = document.getElementById("chat-area") as HTMLDivElement
-  const chat = createElement("div", "chat show-chat")
+const showChat = async (id: number): Promise<void> => {
+  return new Promise<void>(async (resolve, reject) => {
+    Object.assign(messages, { list: [] })
+    const chatArea = document.getElementById("chat-area") as HTMLDivElement
+    const chat = createElement("div", "chat show-chat")
 
-  const chatId = chatList.Ids.get(id) as number
-  currentChat = chatId
+    const chatId = chatList.Ids.get(id) as number
+    currentChat = chatId
 
-  const user = await getUserById(id.toString())
+    const user = await getUserById(id.toString())
 
-  const chatName = createElement("div", "chat-name", null, user.Name) as HTMLDivElement
-  chatName.style.paddingBottom = "10px"
+    const chatName = createElement(
+      "div",
+      "chat-name",
+      null,
+      user.Name
+    ) as HTMLDivElement
 
-  const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
+    chatName.style.paddingBottom = "10px"
 
-  const chatFormContainer = createElement("div", "chat-form-container")
-  const chatForm = createElement("form", "chat-form")
-  const messageField = createElement("input", null, "chat-text")
-  messageField.setAttribute("maxlength", "150")
-  chatMessages.addEventListener("messageEvent", () => {
-    updateChat(chatId)
-  })
+    const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
 
-  const messageSend = createElement("button", null, "chat-send", "Send")
-  messageSend.addEventListener("click", () => {
-    sendMessage(chatId)
-  })
-  await getMessages(chatId)
+    const chatFormContainer = createElement("div", "chat-form-container")
+    const chatForm = createElement("form", "chat-form")
+    const messageField = createElement("input", null, "chat-text")
+    messageField.setAttribute("maxlength", "150")
+    chatMessages.addEventListener("messageEvent", () => {
+      updateChat(chatId)
+    })
 
-  setTimeout(() => {
-    messages.list.sort((a, b) => {
-      return a.id - b.id
-    }) 
-  }, 220)
+    const messageSend = createElement("button", null, "chat-send", "Send")
+    messageSend.addEventListener("click", () => {
+      sendMessage(chatId)
+    })
+  
+    await getMessages(chatId)
+    // Check if messages.list is an array
+    console.log(Array.isArray(messages.list)); // true
 
-  chatForm.append(messageField, messageSend)
-  chatFormContainer.appendChild(chatForm)
+    // Reverse the order of messages.list
+    const reversedList = [...messages.list].reverse();
+    console.log(reversedList); // Displays the reversed order
 
-  setTimeout(() => {
-    if (messages.list.length === 0) {
-      return
-    }
-    for (const message of Object.values(messages.list.reverse())) {
+    // Log messages.list again (original order)
+    console.log(messages.list); // Displays the original order
+
+    // messages.list.sort((a, b) => {
+    //   return a.id - b.id
+    // })
+
+    chatForm.append(messageField, messageSend)
+    chatFormContainer.appendChild(chatForm)
+    // if (messages.list.length === 0) {
+    //   reject()
+    // }
+    
+    for (const message of Object.values(messages.list)) {
+      console.log(message)
       const msgElement = createElement("div", "message") as HTMLDivElement
       const date = new Date(message.timestamp)
-      const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" }).slice(0, 10)
-      if (message.authorId === userInfo.Id){
+      const formatDate = date
+        .toLocaleString("en-GB", { timeZone: "EET" })
+        .slice(0, 10)
+      if (message.authorId === userInfo.Id) {
         msgElement.classList.add("send")
-        msgElement.textContent = message.content + '\n' + formatDate
-      } else if (message.authorId === -1){
+        msgElement.textContent = message.content + "\n" + formatDate
+      } else if (message.authorId === -1) {
         msgElement.classList.add("status")
-        msgElement.textContent = message.content + '\n'  + formatDate
+        msgElement.textContent = message.content + "\n" + formatDate
       } else {
         msgElement.classList.add("recieve")
-        msgElement.textContent = message.content + '\n' + formatDate
+        msgElement.textContent = message.content + "\n" + formatDate
       }
       chatMessages.appendChild(msgElement)
     }
-  }, 250)
-  chat.append(chatName, chatMessages, chatFormContainer)
-  chatArea.replaceChildren(chat)
+
+    chat.append(chatName, chatMessages, chatFormContainer)
+    chatArea.replaceChildren(chat)
+    return resolve()
+  })
 }
 
-const sendMessage = async (chatId: number) => {
+const sendMessage = async (chatId: number): Promise<void> => {
   const content = document.getElementById("chat-text") as HTMLInputElement
   let message = content.value.toString().trim()
   if (message.length > 0) {
@@ -150,129 +160,138 @@ const sendMessage = async (chatId: number) => {
     if (message.length > 150) {
       message = message.slice(0, 150)
     }
-    sendWsObject(
-      {
-        type: "post",
-        item: {
-          url: `/chat/${chatId}/message`,
-          data: {
-            content: message        }
-        }
-      }
-    )
-      getMessages(chatId)
+    await sendWsObject({
+      type: "post",
+      item: {
+        url: `/chat/${chatId}/message`,
+        data: {
+          content: message,
+        },
+      },
+    })
+    await getMessages(chatId)
   }
 }
 
-export const updateChat = (chatId: number) => {
-  const message = messages.list.reverse()[0]
-  const chatMessages = document.getElementById(`Chat${chatId}`) as HTMLDivElement
-  const msgElement = createElement("div", "message", null, message.content) as HTMLDivElement
-  console.log(message, messages.list[0].id)
-  if (message.id < messages.list[messages.list.length - 1].id || message.authorId == -1) {
-    return
-  }
-      const date = new Date(message.timestamp)
-      const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" }).slice(0, 10)
-      if (message.authorId === userInfo.Id){
-        msgElement.classList.add("send")
-        msgElement.textContent = message.content + "\n" + formatDate
-      } else if (message.authorId === -1){
-        msgElement.classList.add("status")
-        msgElement.textContent = message.content + "\n"  + formatDate
-      } else {
-        msgElement.textContent = message.content + "\n" + formatDate
-        msgElement.classList.add("recieve")
-      }
-  if (chatId === currentChat) {
-    chatMessages.prepend(msgElement)
-  }
+export const updateChat = (chatId: number): Promise<void> => {
+  return new Promise<void>((resolve, reject) => {
+    const message = messages.list.reverse()[0]
+    console.log(messages.list)
+    const chatMessages = document.getElementById(
+      `Chat${chatId}`
+    ) as HTMLDivElement
+    const msgElement = createElement(
+      "div",
+      "message",
+      null,
+      message.content
+    ) as HTMLDivElement
+    console.log(message, messages.list[0].id)
+    if (
+      message.id < messages.list[messages.list.length - 1].id ||
+      message.authorId == -1
+    ) {
+      return
+    }
+    const date = new Date(message.timestamp)
+    const formatDate = date
+      .toLocaleString("en-GB", { timeZone: "EET" })
+      .slice(0, 10)
+    if (message.authorId === userInfo.Id) {
+      msgElement.classList.add("send")
+      msgElement.textContent = message.content + "\n" + formatDate
+    } else if (message.authorId === -1) {
+      msgElement.classList.add("status")
+      msgElement.textContent = message.content + "\n" + formatDate
+    } else {
+      msgElement.textContent = message.content + "\n" + formatDate
+      msgElement.classList.add("recieve")
+    }
+    if (chatId === currentChat) {
+      chatMessages.prepend(msgElement)
+      resolve()
+    } else {
+      reject()
+    }
+  })
 }
 
-
-const getMessages = async (chatId: number) => {
-  Object.assign(messages, {list: []})
-  setTimeout(() => {
-    sendWsObject(
-      {
-        type: "get",
-        item: {
-          url: `/chat/${chatId}/messages`
-        }
-      })
-  }, 150)
+const getMessages = async (chatId: number): Promise<void> => {
+  Object.assign(messages, { list: [] })
+  await sendWsObject({
+    type: "get",
+    item: {
+      url: `/chat/${chatId}/messages`,
+    },
+  })
 }
 
 export const displayChatUsers = async () => {
-
-  const onlineList = document.getElementById("online-users") as HTMLUListElement,
-  offlineList = document.getElementById("offline-users") as HTMLUListElement,
-  onlineTitle = document.getElementById("online-title") as HTMLElement,
-  offlineTitle = document.getElementById("offline-title") as HTMLElement
+  const onlineList = document.getElementById(
+      "online-users"
+    ) as HTMLUListElement,
+    offlineList = document.getElementById("offline-users") as HTMLUListElement,
+    onlineTitle = document.getElementById("online-title") as HTMLElement,
+    offlineTitle = document.getElementById("offline-title") as HTMLElement
 
   /* Add eventlisteners to show/hide users in chat list */
   onlineTitle.addEventListener("click", toggleOnline)
   offlineTitle.addEventListener("click", toggleOffline)
 
   await getChatUsers()
-  setTimeout(() => {
-    sendWsObject(
-      {
-        type: "get",
-        item: {
-          url: "/chat/all"
-        }
+
+  await sendWsObject({
+    type: "get",
+    item: {
+      url: "/chat/all",
+    },
+  })
+
+  // TODO: Remove this sort when sorted in backend.
+  chatList.Users.sort((a, b) => {
+    const name1 = a.Name.toLowerCase()
+    const name2 = b.Name.toLowerCase()
+    if (name1 < name2) {
+      return -1
+    }
+    if (name1 > name2) {
+      return 1
+    }
+    return 0
+  })
+
+  const chatUsers = document.querySelectorAll(
+    ".chat-user"
+  ) as NodeListOf<HTMLElement>
+  if (chatUsers.length < chatList.Users.length) {
+    for (const u of chatList.Users) {
+      const user = createElement("li", "chat-user", u.Name)
+      const name = createElement("p", null, null, u.Name)
+      user.appendChild(name)
+
+      if (u.UnreadMsg) {
+        const unread = createElement("i", "bx bx-message-dots")
+        user.appendChild(unread)
       }
-    )
-  }, 600)
 
-  setTimeout(() => {
-    // TODO: Remove this sort when sorted in backend.
-    chatList.Users.sort((a, b) => {
-      const name1 = a.Name.toLowerCase()
-      const name2 = b.Name.toLowerCase()
-      if (name1 < name2) {
-        return -1
-      }
-      if (name1 > name2) {
-        return 1
-      }
-      return 0
-    })
+      user.addEventListener("click", async () => {
+        await showChat(u.Id)
+      })
 
-    const chatUsers = document.querySelectorAll(".chat-user") as NodeListOf<HTMLElement>
-    if (chatUsers.length < chatList.Users.length) {
-      for (const u of chatList.Users) {
-        const user = createElement("li", "chat-user", u.Name)
-        const name = createElement("p", null, null, u.Name)
-        user.appendChild(name)
-
-        if (u.UnreadMsg) {
-          const unread = createElement("i", "bx bx-message-dots")
-          user.appendChild(unread)
-        }
-
-        user.addEventListener("click", () => {
-          showChat(u.Id)
-        })
-
-        if (u.Online) {
-          user.classList.add("online")
-          onlineList.appendChild(user)
-        } else {
-          user.classList.add("offline")
-          offlineList.appendChild(user)
-        }
+      if (u.Online) {
+        user.classList.add("online")
+        onlineList.appendChild(user)
+      } else {
+        user.classList.add("offline")
+        offlineList.appendChild(user)
       }
     }
-
-  }, 200)
-
+  }
 }
 
 const toggleOnline = () => {
   const onlineToggle = document.getElementById("online-toggle") as HTMLElement,
-  onlineUsers = document.getElementById("online-users") as HTMLUListElement
+    onlineUsers = document.getElementById("online-users") as HTMLUListElement
   if (onlineToggle.className === "bx bx-chevron-down") {
     onlineToggle.className = "bx bx-chevron-right"
     onlineUsers.style.display = "none"
@@ -284,7 +303,9 @@ const toggleOnline = () => {
 
 const toggleOffline = () => {
   const offlineToggle = document.getElementById("offline-toggle") as HTMLElement
-  const offlineUsers = document.getElementById("offline-users") as HTMLUListElement
+  const offlineUsers = document.getElementById(
+    "offline-users"
+  ) as HTMLUListElement
   if (!offlineToggle) return
 
   if (offlineToggle.className === "bx bx-chevron-down") {

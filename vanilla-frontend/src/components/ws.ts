@@ -4,7 +4,7 @@ import { iterator } from "./utils.js"
 import { Auth } from "./auth.js"
 
 export const messageEvent = new Event("messageEvent")
-const WS_URL = "ws://localhost:6969"
+const WS_URL = "ws://localhost:8081/ws"
 export let ws: WebSocket
 
 export const wsHandler = async () => {
@@ -64,12 +64,12 @@ const postHandler = async (resp: WSPostResponse<object | any>) => {
   const url = resp.item.url
   // const createChat = new RegExp(/^\/chat\/create$/)
   const sendMessage = new RegExp(/^\/chat\/\d{1,}\/message$/)
-  if (url.match(sendMessage)){
-    getMessage(data.messageId)    
+  if (url.match(sendMessage)) {
+    getMessage(data.messageId)
   }
 }
 
-const getHandler = async (resp: WSGetResponse< object | any >) => {
+const getHandler = async (resp: WSGetResponse<object | any>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
   const chatIds = new RegExp(/^\/chat\/\d{1,}$/)
@@ -77,8 +77,8 @@ const getHandler = async (resp: WSGetResponse< object | any >) => {
   const message = new RegExp(/^\/message\/\d{1,}$/)
 
   if (url.match(chatIds)) {
-    if (!chatList.Ids.has(data.userId)){
-    return chatList.Ids.set(data.userId, data.id)
+    if (!chatList.Ids.has(data.companionId)) {
+      return chatList.Ids.set(data.companionId, data.id)
     }
   }
 
@@ -87,7 +87,6 @@ const getHandler = async (resp: WSGetResponse< object | any >) => {
   }
 
   if (url.match(message)) {
-    console.log(resp.item.data)
     if (resp.item.data.chatId === currentChat) {
       messages.list.push(resp.item.data)
     }
@@ -95,58 +94,54 @@ const getHandler = async (resp: WSGetResponse< object | any >) => {
   }
 
   if (url === "/chat/all") {
-    return await getChatIds(resp) 
+    return await getChatIds(resp)
   }
 }
 
-const getChatIds = async (resp: iterator) => {
-  for (const user of resp.item.data) {
-    if (!chatList.Ids.has(user)){
-    sendWsObject(
-      {
+const getChatIds = async (resp: iterator): Promise<void> => {
+  for (const chat of resp.item.data) {
+    if (!chatList.Ids.has(chat)) {
+      await sendWsObject({
         type: "get",
         item: {
-          url: `/chat/${user}`
-        }
-      }
-    )
-
+          url: `/chat/${chat}`,
+        },
+      })
     }
   }
   return
 }
 
-const getMessage = async (id: number) => {
-  sendWsObject(
-    {
+const getMessage = async (id: number): Promise<void> => {
+  await sendWsObject({
+    type: "get",
+    item: {
+      url: `/message/${id}`,
+    },
+  }).then(() => {
+    document.getElementById(`Chat${currentChat}`)?.dispatchEvent(messageEvent)
+  })
+}
+
+const getMessageList = async (ids: number[]): Promise<void> => {
+  for (const id of ids) {
+    await sendWsObject({
       type: "get",
       item: {
-        url: `/message/${id}`
-      }
+        url: `/message/${id}`,
+      },
+    })
+  }
+  return
+}
+
+export function sendWsObject(obj: object): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (ws.readyState === 1) {
+      ws.send(JSON.stringify(obj))
+      resolve()
+    } else {
+      reject(new Error("WebSocket connection is not open."))
     }
-  )
-  setTimeout(() => {
-       document.getElementById(`Chat${currentChat}`)?.dispatchEvent(messageEvent)
-  }, 100)
-}
-
-const getMessageList = async (ids: number[]) => {
-  for (const id of ids) {
-      sendWsObject(
-        {
-          type: "get",
-          item: {
-            url: `/message/${id}`
-          }
-        }
-      )
-  }
-  return
-}
-
-export async function sendWsObject(obj: unknown) {
-  if (ws.readyState === 1) {
-    ws.send(JSON.stringify(obj))
-  }
-  return
+  })
 }

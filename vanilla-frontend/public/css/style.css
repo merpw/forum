@@ -627,7 +627,6 @@ body {
   /* } */
 }
 
-
 .hide-chat {
   display: none;
 }
@@ -687,7 +686,6 @@ body {
 }
 
 .recieve {
-  
   align-self: flex-end;
 }
 

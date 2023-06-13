@@ -1,15 +1,15 @@
-export const createElement = 
-( element:     string,
-  className:   string | null = null, 
-  id:          string | null = null, 
+export const createElement = (
+  element: string,
+  className: string | null = null,
+  id: string | null = null,
   textContent: string | null = null,
-  innerHtml:   string | null = null
+  innerHtml: string | null = null
 ): HTMLElement => {
   const newElement = document.createElement(element)
   if (className) {
     newElement.className = className
   }
-  if (id){
+  if (id) {
     newElement.id = id
   }
   if (textContent) {
@@ -20,7 +20,6 @@ export const createElement =
   }
   return newElement
 }
-
 
 export interface iterator {
   [key: string]: any

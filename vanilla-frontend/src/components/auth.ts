@@ -10,30 +10,31 @@ import { getMe } from "../api/get.js"
 
 export const userInfo = {
   Id: -1,
-  Name: ""
+  Name: "",
 }
 
 export const Auth = async (session: boolean) => {
   if (session) {
     wsHandler()
-    setTimeout(async ()=> {
+    setTimeout(async () => {
       // Adding the HTML and changing style
       superDivision.innerHTML = Index()
       superDivision.classList.replace("login-style", "index-style")
       Object.assign(userInfo, await getMe()) // Sets the userInfo (Id, Name)
       topnavController() // Adds event listeners to the top-navigation bar
-      categoriesSelector() 
+      categoriesSelector()
       displayPosts("/api/posts")
     }, 100)
   }
   if (!session) {
-    if (ws){
+    if (ws) {
       ws.close()
     }
     // Adding the HTML and changing style
     setTimeout(() => {
       superDivision.innerHTML = LoginSignup()
       superDivision.classList.replace("index-style", "login-style")
-      loginController()}, 200)
+      loginController()
+    }, 100)
   }
 }

@@ -40,20 +40,19 @@ export const goHome = () => {
   displayPosts("/api/posts")
 }
 
-
 // Adds event listener to the topNav
 export const topnavController = () => {
   const topNavPost = document.getElementById(
-    "topnav-post"
-  ) as HTMLAnchorElement,
-  topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
-  topNavLogout = document.getElementById(
-    "topnav-logout"
-  ) as HTMLAnchorElement,
-  topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
-  chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
-  chatDisplay = document.getElementById("chatlist") as HTMLDivElement,
-  chat = document.getElementById("chat-area") as HTMLDivElement
+      "topnav-post"
+    ) as HTMLAnchorElement,
+    topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
+    topNavLogout = document.getElementById(
+      "topnav-logout"
+    ) as HTMLAnchorElement,
+    topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
+    chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
+    chatDisplay = document.getElementById("chatlist") as HTMLDivElement,
+    chat = document.getElementById("chat-area") as HTMLDivElement
 
   topNavPost.addEventListener("click", openCloseCreatePost)
   topNavHome.addEventListener("click", goHome)
