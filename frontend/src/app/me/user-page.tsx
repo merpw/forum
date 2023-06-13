@@ -137,9 +137,11 @@ const UserInfo: FC<{ user: User }> = ({ user }) => {
   const age = user.dob ? calculateAge(user.dob) : null
   return (
     <>
-      <div className={"flex flex-col self-center font-light mb-5 text-center sm:text-left"}>
+      <div
+        className={"flex flex-col self-center font-light mb-5 text-center sm:text-left text-info"}
+      >
         {"Hey, "}
-        <span className={"text-3xl sm:text-4xl font-bold text-primary font-Yesteryear mx-1"}>
+        <span className={"text-3xl sm:text-4xl text-primary font-Yesteryear mx-1"}>
           {user.name}
         </span>
         {"Forgot who you are?"}
@@ -147,25 +149,27 @@ const UserInfo: FC<{ user: User }> = ({ user }) => {
       <div className={"font-light"}>
         {user.first_name || user.last_name ? (
           <p>
-            {"Full name"}
-            <span className={"font-light"}> • {`${user.first_name} ${user.last_name}`}</span>
+            <span className={"font-light text-info"}>{"Full name"}</span>
+            <span
+              className={"font-normal start-dot"}
+            >{`${user.first_name} ${user.last_name}`}</span>
           </p>
         ) : null}
         {age ? (
           <p>
-            {"Age"}
-            <span className={"font-light"}> • {age}</span>
+            <span className={"font-light text-info"}>{"Age"}</span>
+            <span className={"font-normal start-dot"}>{age}</span>
           </p>
         ) : null}
         {user.gender ? (
           <p>
-            {"Gender"}
-            <span className={"font-light"}> • {user.gender}</span>
+            <span className={"font-light text-info"}>{"Gender"}</span>
+            <span className={"font-normal start-dot"}>{user.gender}</span>
           </p>
         ) : null}
         <p>
-          {"Email"}
-          <span className={"font-light"}> • {user.email}</span>
+          <span className={"font-light text-info"}>{"Email"}</span>
+          <span className={"font-normal start-dot"}>{user.email}</span>
         </p>
       </div>
     </>
