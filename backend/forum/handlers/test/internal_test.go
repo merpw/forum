@@ -2,6 +2,7 @@ package server_test
 
 import (
 	. "backend/forum/handlers/test/server"
+	"bufio"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -103,6 +104,51 @@ func TestBypassAuth(t *testing.T) {
 	}
 
 	cli.TestRequest(t, req, http.StatusUnauthorized)
+}
+
+func TestRevokedSessions(t *testing.T) {
+	testServer := NewTestServer(t)
+	cli := testServer.TestClient()
+
+	err := os.Setenv("FORUM_BACKEND_SECRET", "super secret nobody knows")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tokens := make([]string, 5)
+	go func() {
+		for i := 0; i < 5; i++ {
+			if t.Failed() {
+				return
+			}
+			cli := testServer.TestClient()
+			cli.TestAuth(t)
+			for _, cookie := range cli.Cookies {
+				if cookie.Name == "forum-token" {
+					tokens[i] = cookie.Value
+				}
+			}
+			cli.TestPost(t, "/api/logout", nil, http.StatusOK)
+		}
+	}()
+
+	req := generateInternalRequest(t, testServer, "/api/internal/revoked-sessions")
+	resp, err := cli.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	reader := bufio.NewReader(resp.Body)
+
+	for i := 0; i < 5; i++ {
+		line, err := reader.ReadString('\n')
+		if err != nil {
+			t.Fatal(err)
+		}
+		if line != tokens[i]+"\n" {
+			t.Fatalf("Expected token %s, got %s", tokens[i], line)
+		}
+	}
 }
 
 func generateInternalRequest(t *testing.T, testServer TestServer, path string) *http.Request {
