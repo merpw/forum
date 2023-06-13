@@ -50,14 +50,14 @@ const CommentCard: FC<{ comment: Comment; postId: number }> = ({ comment, postId
   return (
     <div className={"max-w-3xl rounded-lg border border-base-100 shadow-base-100 shadow-sm"}>
       <div className={"mx-5"}>
-        <h1 className={"clickable flex flex-wrap text-xl my-1"}>
+        <div className={"clickable flex flex-wrap text-xl my-1"}>
           <Link href={`/user/${comment.author.id}`}>
             <h3 className={"clickable font-Alatsi text-base"}>
               {comment.author.name}{" "}
               <span className={"font-sans font-bold text-xl gradient-text"}>:</span>
             </h3>
           </Link>
-        </h1>
+        </div>
         <p className={"whitespace-pre-line mb-3 ml-5 font-light"}>{comment.content}</p>
       </div>
       <div className={"bg-base-100 m-1 rounded-lg flex flex-wrap py-1.5 px-3 gap-x-1"}>

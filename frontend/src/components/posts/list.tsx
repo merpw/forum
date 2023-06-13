@@ -27,12 +27,12 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
       }
     >
       <div className={"mx-5"}>
-        <h1 className={"clickable flex flex-wrap text-xl my-3"}>
+        <div className={"clickable flex flex-wrap text-xl my-3"}>
           <Link href={`/post/${post.id}`}>• {post.title} •</Link>
           <span className={"ml-auto self-center"}>
             <CommentsCount post={post} />
           </span>
-        </h1>
+        </div>
         <p className={"mb-5 mx-3 font-light"}>{post.description}</p>
       </div>
 
