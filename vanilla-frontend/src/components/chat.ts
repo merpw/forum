@@ -71,7 +71,7 @@ const getChatUsers = async (): Promise<void> => {
 
 // Display the current chat based on chatId
 const showChat = async (id: number): Promise<void> => {
-  return new Promise<void>(async (resolve, reject) => {
+  return new Promise<void>(async (resolve) => {
     Object.assign(messages, { list: [] })
     const chatArea = document.getElementById("chat-area") as HTMLDivElement
     const chat = createElement("div", "chat show-chat")
@@ -106,16 +106,7 @@ const showChat = async (id: number): Promise<void> => {
     })
   
     await getMessages(chatId)
-    // Check if messages.list is an array
-    console.log(Array.isArray(messages.list)); // true
-
-    // Reverse the order of messages.list
-    const reversedList = [...messages.list].reverse();
-    console.log(reversedList); // Displays the reversed order
-
-    // Log messages.list again (original order)
-    console.log(messages.list); // Displays the original order
-
+    
     // messages.list.sort((a, b) => {
     //   return a.id - b.id
     // })
