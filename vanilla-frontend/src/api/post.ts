@@ -32,12 +32,12 @@ const login = async (formData: LoginForm): Promise<boolean | undefined> => {
     },
     body: JSON.stringify(formData),
   }).then((response) => {
-      if (response.ok) {
-        return true
-      } else {
-        response.text().then((error) => {
-          console.error(error)
-          return false
+    if (response.ok) {
+      return true
+    } else {
+      response.text().then((error) => {
+        console.error(error)
+        return false
       })
     }
   })
@@ -51,45 +51,43 @@ const signup = async (formData: SignupForm) => {
     },
     body: JSON.stringify(formData),
   })
-  .then((response) => {
-    if (response.ok) {
-      loginController()
-    } else {
-      response.text().then((error) => {
-        console.log(`Error: ${error}`)
-      })
-    }
-  })
-  .catch((error) => {
-    console.error(error)
-  })
-
+    .then((response) => {
+      if (response.ok) {
+        loginController()
+      } else {
+        response.text().then((error) => {
+          console.log(`Error: ${error}`)
+        })
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
 }
 
 const postCreatePost = (formData: CreatePostBody) => {
-fetch(`${backendUrl}/api/posts/create/`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+  fetch(`${backendUrl}/api/posts/create/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(formData),
+  })
+    .then((response) => {
+      if (response.ok) {
+        openCloseCreatePost()
+        displayPosts("/api/posts/")
+        return
+      } else {
+        response.text().then((error) => {
+          console.log(`Error: ${error}`)
+          // TODO: Displaying error message to user.
+        })
+      }
     })
-      .then((response) => {
-        if (response.ok) {
-          openCloseCreatePost()
-          displayPosts("/api/posts/")
-          return
-        } else {
-          response.text().then((error) => {
-            console.log(`Error: ${error}`)
-            // TODO: Displaying error message to user.
-          })
-        }
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-
+    .catch((error) => {
+      console.error(error)
+    })
 }
 
 const postComment = (postId: string, formData: unknown) => {
@@ -122,39 +120,47 @@ const postComment = (postId: string, formData: unknown) => {
     })
 }
 const likePost = (id: string) => {
-    fetch(`${backendUrl}/api/posts/${id}/like`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+  fetch(`${backendUrl}/api/posts/${id}/like`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error()
+      // Call the function to update the post values after liking
+      updatePostValues(id)
     })
-      .then((res) => {
-        if (!res.ok) throw new Error()
-        // Call the function to update the post values after liking
-        updatePostValues(id)
-      })
-      .catch((error) => {
-        console.error(error)
-        // Handle the error if the request fails
-      })
-  }
+    .catch((error) => {
+      console.error(error)
+      // Handle the error if the request fails
+    })
+}
 
 const dislikePost = (id: string) => {
-    fetch(`${backendUrl}/api/posts/${id}/dislike`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+  fetch(`${backendUrl}/api/posts/${id}/dislike`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((res) => {
+      if (!res.ok) throw new Error()
+      // Call the function to update the post values after liking
+      updatePostValues(id)
     })
-      .then((res) => {
-        if (!res.ok) throw new Error()
-        // Call the function to update the post values after liking
-        updatePostValues(id)
-      })
-      .catch((error) => {
-        console.error(error)
-        // Handle the error if the request fails
-      })
-  }
+    .catch((error) => {
+      console.error(error)
+      // Handle the error if the request fails
+    })
+}
 
-export { login, signup, logout, postComment, postCreatePost, likePost, dislikePost }
+export {
+  login,
+  signup,
+  logout,
+  postComment,
+  postCreatePost,
+  likePost,
+  dislikePost,
+}

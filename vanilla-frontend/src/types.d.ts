@@ -38,7 +38,7 @@ export type ChatUser = User & {
 }
 
 export type Post = {
-  Id: number 
+  Id: number
   Title: string
   Content: string
   Description: string

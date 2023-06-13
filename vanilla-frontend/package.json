@@ -1,6 +1,5 @@
 {
   "scripts": {
-    "server": "ts-node src/dummy-ws/server.ts",
     "dev": "tsc -w & serve public",
     "start": "serve public",
     "build": "npx tsc",
