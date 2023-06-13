@@ -14,14 +14,10 @@ export const messages = {
   list: [] as Message[],
 }
 
-const test = {
-  list: [1, 2, 3, 4 ,5]
-}
-
 export let currentChat = -1
 
 const getChatUsers = async (): Promise<void> => {
-  return new Promise<void>(async (resolve) => {
+  
     Object.assign(chatList, {
       Ids: new Map<number, number>(),
       Users: [],
@@ -55,8 +51,6 @@ const getChatUsers = async (): Promise<void> => {
         })
       }
     }
-    resolve()
-  })
 }
 //   ws.send(JSON.stringify({
 //       type: "get",
@@ -71,7 +65,7 @@ const getChatUsers = async (): Promise<void> => {
 
 // Display the current chat based on chatId
 const showChat = async (id: number): Promise<void> => {
-  return new Promise<void>(async (resolve) => {
+ 
     Object.assign(messages, { list: [] })
     const chatArea = document.getElementById("chat-area") as HTMLDivElement
     const chat = createElement("div", "chat show-chat")
@@ -139,8 +133,6 @@ const showChat = async (id: number): Promise<void> => {
 
     chat.append(chatName, chatMessages, chatFormContainer)
     chatArea.replaceChildren(chat)
-    return resolve()
-  })
 }
 
 const sendMessage = async (chatId: number): Promise<void> => {

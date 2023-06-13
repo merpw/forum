@@ -32,7 +32,6 @@ export const wsHandler = async () => {
       }
 
       if (data.type === "post") {
-        console.log(data)
         postHandler(data)
       }
     } catch (e) {

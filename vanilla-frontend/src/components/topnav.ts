@@ -1,7 +1,7 @@
 import { postForm } from "../pages.js"
 import { PostCreator, displayPosts } from "./posts.js"
 import { logout } from "../api/post.js"
-import { chatList, displayChatUsers } from "./chat.js"
+import { displayChatUsers } from "./chat.js"
 
 export const postBtn = document.getElementById(
   "topnav-post"
