@@ -185,7 +185,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
                 }}
                 type={"button"}
                 className={
-                  "btn btn-sm transition-none hover:opacity-100 hover:gradient-text hover:border-primary btn-outline font-light mb-3 self-center font-xs"
+                  "btn btn-sm transition-none hover:opacity-100 hover:gradient-text hover:saturate-200 hover:border-primary btn-outline font-light mb-3 self-center font-xs hover:drop-shadow-2xl outline-8 outline-red-600"
                 }
               >
                 {formFields.isDescriptionLoading ? (
@@ -195,7 +195,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
                     xmlns={"http://www.w3.org/2000/svg"}
                     fill={"none"}
                     viewBox={"0 0 24 24"}
-                    strokeWidth={1.5}
+                    strokeWidth={1}
                     stroke={"currentColor"}
                     className={"w-5 h-5 mr-1 fill-primary"}
                   >
