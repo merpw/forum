@@ -62,7 +62,6 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
       <div className={"text-center m-3"}>
         {/* TODO: add valid endpoint */}
         <Link href={"/chat"} className={"button"}>
-          <span className={"ml-1 text-xs"}>{"Let's chat!"}</span>
           <span className={"my-auto"}>
             <svg
               xmlns={"http://www.w3.org/2000/svg"}
@@ -70,7 +69,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
               viewBox={"0 0 24 24"}
               strokeWidth={1.5}
               stroke={"currentColor"}
-              className={"w-5 h-5"}
+              className={"w-5 h-5 scale-x-[-1]"}
             >
               <path
                 strokeLinecap={"round"}
@@ -81,6 +80,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
               />
             </svg>
           </span>
+          <span className={"text-xs"}>{"Let's chat!"}</span>
         </Link>
       </div>
       <div className={"mt-5"}>
