@@ -13,16 +13,21 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Hub is a WebSocket hub that handles all WebSocket connections.
+//
+// It calls the specified primary MessageHandler on each message from the Client
 type Hub struct {
 	mu      sync.Mutex
 	Clients []*Client
 
+	// MessageHandler is a primary MessageHandler, it is called on each message from the Client
 	MessageHandler MessageHandler
 }
 
+// MessageHandler is a function that handles raw messages from the Client
 type MessageHandler func(p []byte, client *Client)
 
-// NewHub creates new Hub
+// NewHub creates new Hub with specified primary MessageHandler
 func NewHub(messageHandler MessageHandler) *Hub {
 	h := &Hub{
 		MessageHandler: messageHandler,
@@ -68,6 +73,7 @@ func (h *Hub) UpgradeHandler(w http.ResponseWriter, r *http.Request) {
 	}()
 }
 
+// Register registers new Client in the Hub
 func (h *Hub) Register(client *Client) {
 	h.mu.Lock()
 	h.Clients = append(h.Clients, client)
@@ -78,6 +84,7 @@ func (h *Hub) Register(client *Client) {
 	h.mu.Unlock()
 }
 
+// Unregister unregisters Client from the Hub
 func (h *Hub) Unregister(client *Client) {
 	h.mu.Lock()
 	if client.Token != "" {
@@ -91,8 +98,6 @@ func (h *Hub) Unregister(client *Client) {
 	}
 	h.mu.Unlock()
 }
-
-type BroadcastFunc func(data interface{}, clients ...int)
 
 // Broadcast sends data as JSON to all clients
 //
