@@ -1,5 +1,5 @@
 import { chatList, currentChat, messages } from "./chat.js"
-import { WSGetResponse, WSPostResponse, WebSocketResponse } from "../types"
+import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../types"
 import { iterator } from "./utils.js"
 import { Auth } from "./auth.js"
 
@@ -59,12 +59,12 @@ export const wsHandler = async () => {
 }
 
 const postHandler = async (resp: WSPostResponse<object | any>) => {
-  const data: iterator = resp.item.data
+  const data = resp.item.data
   const url = resp.item.url
   // const createChat = new RegExp(/^\/chat\/create$/)
   const sendMessage = new RegExp(/^\/chat\/\d{1,}\/message$/)
   if (url.match(sendMessage)) {
-    getMessage(data.messageId)
+    getMessage(data)
   }
 }
 
@@ -81,13 +81,13 @@ const getHandler = async (resp: WSGetResponse<object | any>) => {
     }
   }
 
-  if (url.match(messageList)) {
+  if (url.match(messageList)) { // chat/{id}/messages
     return await getMessageList(resp.item.data)
   }
 
-  if (url.match(message)) {
-    if (resp.item.data.chatId === currentChat) {
-      messages.list.push(resp.item.data)
+  if (url.match(message)) { // /message/{id}
+    if (resp.item.data.chatId === currentChat.chatId) {
+      messages.list.unshift(resp.item.data)
     }
     return
   }
@@ -111,19 +111,21 @@ const getChatIds = async (resp: iterator): Promise<void> => {
   return
 }
 
-const getMessage = async (id: number): Promise<void> => {
+const getMessage = async (id: number) => {
   await sendWsObject({
     type: "get",
     item: {
       url: `/message/${id}`,
     },
-  }).then(() => {
-    document.getElementById(`Chat${currentChat}`)?.dispatchEvent(messageEvent)
   })
+  setTimeout(() => {
+    document.getElementById(`Chat${currentChat.chatId}`)?.dispatchEvent(messageEvent)
+  }, 150)
 }
 
 const getMessageList = async (ids: number[]): Promise<void> => {
   for (const id of ids) {
+    console.log("gml", id)
     await sendWsObject({
       type: "get",
       item: {
