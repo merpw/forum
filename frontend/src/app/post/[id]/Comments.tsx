@@ -28,7 +28,11 @@ const CommentList: FC<{ postId: number }> = ({ postId }) => {
   if (!comments) return null
 
   if (comments.length == 0) {
-    return <div>There are no comments yet, write one first!</div>
+    return (
+      <div className={"text-info text-center mt-3 mb-7"}>
+        There are no comments yet, be the first!
+      </div>
+    )
   }
 
   return (
@@ -44,17 +48,28 @@ const CommentList: FC<{ postId: number }> = ({ postId }) => {
 
 const CommentCard: FC<{ comment: Comment; postId: number }> = ({ comment, postId }) => {
   return (
-    <div className={"border rounded p-5"}>
-      <Link href={`/user/${comment.author.id}`}>
-        <h3 className={"clickable text-lg"}>{comment.author.name}</h3>
-      </Link>
-      <p className={"whitespace-pre-line"}>{comment.content}</p>
-      <hr className={"mt-4 mb-2"}></hr>
-      <span className={"flex"}>
-        <ReactionsCommentButtons postId={postId} comment={comment} />
+    <div className={"max-w-3xl rounded-lg border border-base-100 shadow-base-100 shadow-sm"}>
+      <div className={"mx-5"}>
+        <div className={"clickable flex flex-wrap text-xl my-1"}>
+          <Link href={`/user/${comment.author.id}`}>
+            <h3 className={"clickable font-Alatsi text-base"}>
+              {comment.author.name}{" "}
+              <span className={"font-sans font-bold text-xl gradient-text"}>:</span>
+            </h3>
+          </Link>
+        </div>
+        <p className={"whitespace-pre-line mb-3 ml-5 font-light"}>{comment.content}</p>
+      </div>
+      <div className={"bg-base-100 m-1 rounded-lg flex flex-wrap py-1.5 px-3 gap-x-1"}>
+        <span className={"self-center mr-3"}>
+          <ReactionsCommentButtons postId={postId} comment={comment} />
+        </span>
 
-        <AutoDate date={comment.date} className={"ml-auto"} />
-      </span>
+        <AutoDate
+          date={comment.date}
+          className={"self-center ml-auto font-light text-sm text-info"}
+        />
+      </div>
     </div>
   )
 }

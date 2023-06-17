@@ -8,10 +8,8 @@ export default function Custom404() {
     <>
       <title>Not Found - Forum</title>
       <div className={"text-center my-20"}>
-        <div className={"text-5xl m-auto"}>
-          <h1 className={"text-8xl opacity-80"}>404</h1>
-          <h2 className={"text-2xl"}>Not Found</h2>
-        </div>
+        <h1 className={"text-8xl text-base-100 font-Alatsi"}>404</h1>
+        <h2 className={"text-2xl font-light"}>Not Found</h2>
         <p className={"text-xl my-16 font-light"}>
           <Link href={"/"} className={"button"}>
             Back to homepage

@@ -30,8 +30,8 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
   }, [mutateReactions, isLoggedIn])
 
   return (
-    <span className={"mx-2 my-auto flex"}>
-      <span className={"mr-1 text-xl"}>
+    <span className={"my-auto flex"}>
+      <span className={"px-1 self-center font-medium text-info"}>
         {likes_count != undefined
           ? likes_count > 0
             ? likes_count
@@ -41,8 +41,9 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
           : ""}
       </span>
       <button
+        type={"button"}
         title={"Like"}
-        className={"clickable mr-1 " + (reaction == 1 ? "text-blue-500" : "")}
+        className={"text-info clickable mr-1 " + (reaction == 1 ? "text-secondary" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -70,19 +71,10 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
         </motion.svg>
       </button>
 
-      <span className={"mr-1 text-xl"}>
-        {dislikes_count != undefined
-          ? dislikes_count > 0
-            ? dislikes_count
-            : ""
-          : post.dislikes_count > 0
-          ? post.dislikes_count
-          : ""}
-      </span>
-
       <button
+        type={"button"}
         title={"Dislike"}
-        className={"clickable mr-1 " + (reaction == -1 ? "text-blue-500" : "")}
+        className={"text-info clickable " + (reaction == -1 ? "text-secondary" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -109,6 +101,16 @@ export const ReactionsButtons: FC<{ post: Post }> = ({ post }) => {
           />
         </motion.svg>
       </button>
+
+      <span className={"self-center px-1 font-medium text-info"}>
+        {dislikes_count != undefined
+          ? dislikes_count > 0
+            ? dislikes_count
+            : ""
+          : post.dislikes_count > 0
+          ? post.dislikes_count
+          : ""}
+      </span>
     </span>
   )
 }
@@ -128,8 +130,8 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
   } = useCommentReactions(postId, comment.id)
 
   return (
-    <span className={"mx-2 my-auto flex"}>
-      <span className={"mr-1"}>
+    <span className={"my-auto flex"}>
+      <span className={"px-1 self-center font-medium text-sm text-info"}>
         {likes_count != undefined
           ? likes_count > 0
             ? likes_count
@@ -140,7 +142,7 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
       </span>
       <button
         title={"Like"}
-        className={"mr-1 " + (reaction == 1 ? "text-blue-500" : "")}
+        className={"text-info clickable mr-1 " + (reaction == 1 ? "text-secondary" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -156,7 +158,7 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
           viewBox={"0 0 24 24"}
           strokeWidth={1.5}
           stroke={"currentColor"}
-          className={comment ? "w-6 h-6" : "w-7 h-7"}
+          className={comment ? "w-5 h-5" : "w-7 h-7"}
         >
           <path
             strokeLinecap={"round"}
@@ -168,19 +170,9 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
         </motion.svg>
       </button>
 
-      <span className={"mr-1"}>
-        {dislikes_count != undefined
-          ? dislikes_count > 0
-            ? dislikes_count
-            : ""
-          : comment.dislikes_count > 0
-          ? comment.dislikes_count
-          : ""}
-      </span>
-
       <button
         title={"Dislike"}
-        className={"mr-1 " + (reaction == -1 ? "text-blue-500" : "")}
+        className={"text-info clickable " + (reaction == -1 ? "text-secondary" : "")}
         onClick={() => {
           if (!isLoggedIn) {
             router.push("/login")
@@ -196,7 +188,7 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
           viewBox={"0 0 24 24"}
           strokeWidth={1.5}
           stroke={"currentColor"}
-          className={comment ? "w-6 h-6" : "w-7 h-7"}
+          className={comment ? "w-5 h-5" : "w-6 h-6"}
         >
           <path
             strokeLinecap={"round"}
@@ -207,22 +199,34 @@ export const ReactionsCommentButtons: FC<{ postId: number; comment: Comment }> =
           />
         </motion.svg>
       </button>
+
+      <span className={"self-center px-1  font-medium text-sm text-info"}>
+        {dislikes_count != undefined
+          ? dislikes_count > 0
+            ? dislikes_count
+            : ""
+          : comment.dislikes_count > 0
+          ? comment.dislikes_count
+          : ""}
+      </span>
     </span>
   )
 }
 
 export const CommentsCount: FC<{ post: Post }> = ({ post }) => (
-  <span className={"my-auto flex mr-2"}>
-    <Link title={"Comments"} href={`/post/${post.id}`} className={"clickable my-auto flex"}>
-      <span className={"mr-1 text-xl"}>{post.comments_count > 0 && post.comments_count}</span>
-      <span className={"pt-1"}>
+  <span className={"flex"}>
+    <Link title={"Comments"} href={`/post/${post.id}`} className={"clickable flex"}>
+      <span className={"p-1 self-center font-medium text-sm text-info"}>
+        {post.comments_count > 0 && post.comments_count}
+      </span>
+      <span className={"self-center text-info"}>
         <svg
           xmlns={"http://www.w3.org/2000/svg"}
           fill={"none"}
           viewBox={"0 0 24 24"}
           strokeWidth={1.5}
           stroke={"currentColor"}
-          className={"w-6 h-6"}
+          className={"w-8 h-8"}
         >
           <path
             strokeLinecap={"round"}
@@ -249,25 +253,8 @@ export const Category: FC<{ post: Post }> = ({ post }) => {
           href={`/category/${category}`}
           className={"clickable flex"}
         >
-          <span className={"text-xl capitalize"}>{category}</span>
-          <span className={"pt-1 mx-1"}>
-            <svg
-              xmlns={"http://www.w3.org/2000/svg"}
-              fill={"none"}
-              viewBox={"0 0 24 24"}
-              strokeWidth={1.5}
-              stroke={"currentColor"}
-              className={"w-6 h-6"}
-            >
-              <path
-                strokeLinecap={"round"}
-                strokeLinejoin={"round"}
-                d={
-                  "M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"
-                }
-              />
-              <path strokeLinecap={"round"} strokeLinejoin={"round"} d={"M6 6h.008v.008H6V6z"} />
-            </svg>
+          <span className={"font-light self-center capitalize btn btn-outline btn-xs text-info"}>
+            {category}
           </span>
         </Link>
       ))}

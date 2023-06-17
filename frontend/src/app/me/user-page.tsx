@@ -40,52 +40,88 @@ const UserPage: NextPage = () => {
 
   return (
     <>
-      <UserInfo user={user} />
-      <Link href={"/create"} className={"clickable text-2xl mb-5 flex gap-1 max-w-fit"}>
-        <span className={"my-auto"}>
-          <svg
-            xmlns={"http://www.w3.org/2000/svg"}
-            fill={"none"}
-            viewBox={"0 0 24 24"}
-            strokeWidth={1.5}
-            stroke={"currentColor"}
-            className={"w-6 h-6 "}
+      <div className={"hero"}>
+        <div className={"hero-content px-0"}>
+          <div
+            className={
+              "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3"
+            }
           >
-            <path
-              strokeLinecap={"round"}
-              strokeLinejoin={"round"}
-              d={
-                "M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-              }
-            />
-          </svg>
-        </span>
-        <span>Create a new post</span>
-      </Link>
+            <div className={"card-body sm:flex-row sm:gap-5"}>
+              <div tabIndex={0} className={"avatar rounded-full my-1 self-center"}>
+                <div className={"w-36 sm:w-48 rounded-full ring-4 ring-accent"}>
+                  {/* TODO: add Online/Offline ring. Online: ring-accent; Offline: ring-neutral */}
+                  <svg
+                    xmlns={"http://www.w3.org/2000/svg"}
+                    viewBox={"0 0 24 24"}
+                    fill={"currentColor"}
+                    className={"opacity-30 w-auto"}
+                  >
+                    <path
+                      d={
+                        "M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                      }
+                    />
+                  </svg>
+                  {/* TODO: add Avatar */}
+                </div>
+              </div>
+              <div className={"self-center text-sm"}>
+                <UserInfo user={user} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <ul className={"text-2xl my-3 flex flex-wrap gap-5"}>
-        {tabs.map(({ title }, key) => (
-          <li key={key}>
-            <button
-              key={key}
-              className={
-                "clickable cursor-pointer p-1 " +
-                (activeTab == key ? "border-b-2 border-b-blue-500" : "")
-              }
-              onClick={() => setActiveTab(key)}
+      <div className={"text-center m-3"}>
+        <Link href={"/create"} className={"button"}>
+          <span className={"my-auto"}>
+            <svg
+              xmlns={"http://www.w3.org/2000/svg"}
+              fill={"none"}
+              viewBox={"0 0 24 24"}
+              strokeWidth={1.5}
+              stroke={"currentColor"}
+              className={"w-5 h-5"}
             >
-              {title}
-            </button>
-          </li>
-        ))}
-      </ul>
-      {tabs[activeTab].component}
+              <path
+                strokeLinecap={"round"}
+                strokeLinejoin={"round"}
+                d={
+                  "M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                }
+              />
+            </svg>
+          </span>
+          <span className={"ml-1 text-xs"}>Create a new post</span>
+        </Link>
+      </div>
+      <div className={"mt-5 space-y-3"}>
+        <div className={"text-center"}>
+          <ul className={"tab tab-lg p-0"}>
+            {tabs.map(({ title }, key) => (
+              <li key={key}>
+                <button
+                  type={"button"}
+                  key={key}
+                  className={"tab tab-bordered space-y-5 " + (activeTab == key ? "tab-active" : "")}
+                  onClick={() => setActiveTab(key)}
+                >
+                  {title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>{tabs[activeTab].component}</div>
+      </div>
     </>
   )
 }
 
 /* "2000-01-24" -> "23 years"
- * "2021-01-24" -> "baby👶"
+ * "2021-01-24" -> "baby 👶"
  */
 const calculateAge = (dob: string): string | null => {
   dayjs.extend(relativeTime)
@@ -94,40 +130,48 @@ const calculateAge = (dob: string): string | null => {
   if (!parsedDob.isValid()) return null
 
   const age = parsedDob.fromNow(true)
-  return age.includes("year") ? age : "baby👶"
+  return age.includes("year") ? age + " old" : "baby 👶"
 }
 
 const UserInfo: FC<{ user: User }> = ({ user }) => {
   const age = user.dob ? calculateAge(user.dob) : null
   return (
     <>
-      <h1 className={"text-2xl font-thin mb-5"}>
-        {"Hello, "}
-        <span className={"text-3xl font-normal"}>{user.name}</span>
-      </h1>
-      {user.first_name || user.last_name ? (
+      <div
+        className={"flex flex-col self-center font-light mb-5 text-center sm:text-left text-info"}
+      >
+        {"Hey, "}
+        <span className={"text-3xl sm:text-4xl text-primary font-Yesteryear mx-1"}>
+          {user.name}
+        </span>
+        {"Forgot who you are?"}
+      </div>
+      <div className={"font-light"}>
+        {user.first_name || user.last_name ? (
+          <p>
+            <span className={"font-light text-info"}>{"Full name"}</span>
+            <span
+              className={"font-normal start-dot"}
+            >{`${user.first_name} ${user.last_name}`}</span>
+          </p>
+        ) : null}
+        {age ? (
+          <p>
+            <span className={"font-light text-info"}>{"Age"}</span>
+            <span className={"font-normal start-dot"}>{age}</span>
+          </p>
+        ) : null}
+        {user.gender ? (
+          <p>
+            <span className={"font-light text-info"}>{"Gender"}</span>
+            <span className={"font-normal start-dot"}>{user.gender}</span>
+          </p>
+        ) : null}
         <p>
-          {"Full name: "}
-          <span className={"text-2xl"}>{`${user.first_name} ${user.last_name}`}</span>
+          <span className={"font-light text-info"}>{"Email"}</span>
+          <span className={"font-normal start-dot"}>{user.email}</span>
         </p>
-      ) : null}
-      {age ? (
-        <p>
-          {"Age: "}
-          <span className={"text-2xl"}>{age}</span>
-        </p>
-      ) : null}
-      {user.gender ? (
-        <p>
-          {"Gender: "}
-          <span className={"text-2xl"}>{user.gender}</span>
-        </p>
-      ) : null}
-      <p>
-        {"Email: "}
-        <span className={"text-2xl"}>{user.email}</span>
-      </p>
-      <hr className={"my-5"} />
+      </div>
     </>
   )
 }
@@ -137,7 +181,10 @@ const UserPosts = () => {
 
   if (posts == undefined) return null
 
-  if (posts.length == 0) return <div>{"You haven't posted yet"}</div>
+  if (posts.length == 0)
+    return (
+      <div className={"text-info text-center mt-5 mb-7"}>{"You haven't posted anything yet"}</div>
+    )
 
   return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
 }
@@ -147,7 +194,10 @@ const UserLikedPosts = () => {
 
   if (posts == undefined) return null
 
-  if (posts.length == 0) return <div>{"You haven't liked any posts yet"}</div>
+  if (posts.length == 0)
+    return (
+      <div className={"text-info text-center mt-5 mb-7"}>{"You haven't liked any posts yet"}</div>
+    )
 
   return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
 }
