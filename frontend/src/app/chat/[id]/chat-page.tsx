@@ -31,7 +31,7 @@ export const ChatPageFirstMessage: FC<{ userId: number }> = ({ userId }) => {
   }, [chatId, createChat, firstMessage, sendMessage, userId])
 
   if (chatId === undefined) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   if (chatId === null) {
@@ -72,7 +72,7 @@ const ChatPage: FC<{ id: number }> = ({ id }) => {
   }, [chat, dispatch, id, router])
 
   if (!chat) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   return (

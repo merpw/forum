@@ -39,8 +39,8 @@ const LoginPage = () => {
             .catch((err) => setFormError(err.message))
         }}
       >
-        <div className={"pt-12 pb-56 md:py-52 bg-base-200"}>
-          <div className={"hero-content flex-col md:flex-row-reverse min-h-full"}>
+        <div className={"min-h-screen pt-12 md:py-52 bg-base-200"}>
+          <div className={"hero-content flex-col md:flex-row-reverse min-h-full min-w-full"}>
             <div className={"text-center md:text-left"}>
               <h1 className={"text-6xl mb-5 font-Yesteryear gradient-text"}>Welcome!</h1>
               <div className={"font-light"}>

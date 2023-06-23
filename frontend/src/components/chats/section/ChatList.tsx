@@ -17,7 +17,7 @@ import Avatar from "@/components/Avatar"
 const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
   return (
     <div>
-      <h1 className={"text-xl mb-3"}>Total: {chatIds.length} chats</h1>
+      <h1 className={"text-info text-sm my-1"}>Total: {chatIds.length} chats</h1>
       <ul className={"flex flex-col gap-2"}>
         {chatIds.map((chatId) => (
           <li key={chatId} className={"w-full"}>
@@ -37,7 +37,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   const activeChatId = useAppSelector((state) => state.chats.activeChatId)
 
   if (chat === undefined) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
   if (chat === null) {
     return null
@@ -106,11 +106,11 @@ const MessageInfo: FC<{ id: number }> = ({ id }) => {
   }, [newMessage])
 
   if (message === undefined) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   if (message === null) {
-    return <div>Message not found</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>Message not found</div>
   }
 
   return (
