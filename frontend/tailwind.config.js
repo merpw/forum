@@ -29,11 +29,11 @@ module.exports = {
     darkTheme: "dark_theme",
     themes: [
       {
-        // TODO: choose colors
         light_theme: {
           "base-100": "#ededf1", // element footer background, react-select background
           primary: "#6176cb", // username
           secondary: "#d37ffc", // user's reaction
+          "secondary-content": "#e6d9f1", // message background
           accent: "#69f19f", // online status
           neutral: "#bebbc7", // break lines, background etc.
           info: "#656565", // reactions, comments button etc.
@@ -41,9 +41,10 @@ module.exports = {
           "error-content": "#b73945", // error message content
         },
         dark_theme: {
-          "base-100": "#232323",
+          "base-100": "#1d1d26",
           primary: "#538bff",
           secondary: "#b869d7",
+          "secondary-content": "#4d3257",
           accent: "#00e16a",
           neutral: "#444444",
           info: "#969696",
