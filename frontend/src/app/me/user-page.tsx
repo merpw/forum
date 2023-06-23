@@ -13,6 +13,7 @@ import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
 import { User } from "@/custom"
+import Avatar from "@/components/Avatar"
 
 /* TODO: add placeholders */
 
@@ -37,23 +38,8 @@ const UserPage: NextPage = () => {
             }
           >
             <div className={"card-body sm:flex-row sm:gap-5"}>
-              <div tabIndex={0} className={"avatar rounded-full my-1 self-center"}>
-                <div className={"w-36 sm:w-48 rounded-full ring-4 ring-accent"}>
-                  {/* TODO: add Online/Offline ring. Online: ring-accent; Offline: ring-neutral */}
-                  <svg
-                    xmlns={"http://www.w3.org/2000/svg"}
-                    viewBox={"0 0 24 24"}
-                    fill={"currentColor"}
-                    className={"opacity-30 w-auto"}
-                  >
-                    <path
-                      d={
-                        "M18.685 19.097A9.723 9.723 0 0021.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 003.065 7.097A9.716 9.716 0 0012 21.75a9.716 9.716 0 006.685-2.653zm-12.54-1.285A7.486 7.486 0 0112 15a7.486 7.486 0 015.855 2.812A8.224 8.224 0 0112 20.25a8.224 8.224 0 01-5.855-2.438zM15.75 9a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
-                      }
-                    />
-                  </svg>
-                  {/* TODO: add Avatar */}
-                </div>
+              <div className={"w-24 sm:w-52"}>
+                <Avatar userId={user.id} />
               </div>
               <div className={"self-center text-sm"}>
                 <UserInfo user={user} />
