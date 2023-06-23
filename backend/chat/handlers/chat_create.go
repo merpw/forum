@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/chat/external"
 	"backend/chat/ws"
 	"encoding/json"
 	"log"
@@ -18,7 +19,22 @@ func (h *Handlers) chatCreate(message ws.Message, client *ws.Client) {
 		return
 	}
 
-	// TODO: maybe check if user exists
+	user := external.GetUser(data.UserId)
+	if user == nil {
+		log.Println("ERROR: user not found")
+		return
+	}
+
+	if h.DB.GetUsersChat(client.UserId, data.UserId) != -1 {
+		log.Println("ERROR: chat already exists")
+		return
+	}
+
+	if data.UserId == client.UserId {
+		// TODO: maybe allow chats with yourself
+		log.Println("ERROR: cannot create chat with yourself")
+		return
+	}
 
 	chatId := h.DB.CreateChat(client.UserId, data.UserId)
 
