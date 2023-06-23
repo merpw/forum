@@ -15,15 +15,15 @@ const ChatsSection = () => {
     return (
       <button
         onClick={() => setIsCollapsed(false)}
-        className={"absolute right-2 backdrop-blur-2xl rounded-2xl"}
+        className={"absolute right-2 backdrop-blur-2xl rounded-2xl p-3"}
       >
         <svg
           xmlns={"http://www.w3.org/2000/svg"}
           fill={"none"}
           viewBox={"0 0 24 24"}
-          strokeWidth={1.5}
+          strokeWidth={3}
           stroke={"currentColor"}
-          className={"w-6 h-6 m-2"}
+          className={"w-6 h-6 m-2 text-primary"}
         >
           <path
             strokeLinecap={"round"}
@@ -36,17 +36,34 @@ const ChatsSection = () => {
   }
 
   return (
-    <div className={"max-h-full relative overflow-auto pr-2 w-full sm:w-1/2 md:w-1/4"}>
-      <div className={"flex"}>
-        <h1 className={"text-2xl"}>Chats</h1>
+    <div className={"bg-base-100 max-h-full relative overflow-auto p-3 w-full sm:w-1/2 md:w-1/4"}>
+      <div className={"flex flex-column mb-2"}>
+        <div className={"space-y-3"}>
+          <div className={""}>
+            {/* TODO: add User list */}
+            <ul className={"tab tab-md p-0 font-bold"}>
+              <li>
+                <button type={"button"} className={"tab tab-bordered space-y-5 tab-active "}>
+                  Chats
+                </button>
+              </li>
+              <li>
+                <button type={"button"} className={"tab tab-bordered space-y-5 tab-disabled"}>
+                  Users
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
         <button className={"ml-auto"} onClick={() => setIsCollapsed(true)}>
           <svg
             xmlns={"http://www.w3.org/2000/svg"}
             fill={"none"}
             viewBox={"0 0 24 24"}
-            strokeWidth={1.5}
+            strokeWidth={3}
             stroke={"currentColor"}
-            className={"w-6 h-6 m-2"}
+            className={"w-6 h-6 m-2 text-primary"}
           >
             <path
               strokeLinecap={"round"}
