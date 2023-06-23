@@ -5,13 +5,14 @@ import Link from "next/link"
 import dayjs from "dayjs"
 
 import { useChat } from "@/api/chats/chats"
-import { useIsUserOnline, useUser } from "@/api/users/hooks"
+import { useUser } from "@/api/users/hooks"
 import { useMessage } from "@/api/chats/messages"
 import { useMe } from "@/api/auth/hooks"
 import { MarkdownToPlain } from "@/components/markdown/render"
 import { ChatSectionCollapsedContext } from "@/components/layout"
 import { Message } from "@/ws"
 import { useAppSelector } from "@/store/hooks"
+import Avatar from "@/components/Avatar"
 
 const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
   return (
@@ -52,9 +53,22 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
         }
       }}
     >
-      <div className={"border p-4 rounded" + " " + (chatId === activeChatId && "border-blue-900")}>
-        <CompanionData userId={chat.companionId} />
-        <MessageInfo id={chat.lastMessageId} />
+      <div
+        className={
+          "border border-base-300 bg-base-200 p-3 pb-1.5 rounded-lg" +
+          " " +
+          (chatId === activeChatId && "border-base-200 gradient-light dark:gradient-dark shadow-lg")
+        }
+      >
+        <div className={"flex gap-1"}>
+          <div className={"mr-2 mt-2 w-14"}>
+            <Avatar userId={chat.companionId} />
+          </div>
+          <div className={"w-full space-y-0.5"}>
+            <CompanionData userId={chat.companionId} />
+            <MessageInfo id={chat.lastMessageId} />
+          </div>
+        </div>
       </div>
     </Link>
   )
@@ -73,9 +87,7 @@ const CompanionData: FC<{ userId: number }> = ({ userId }) => {
 
   return (
     <div>
-      <div className={"text-xl"}>
-        {user.username} {isOnline ? "🟢" : "🔴"}
-      </div>
+      <div className={"font-Alatsi text-lg text-primary"}>{user.username}</div>
     </div>
   )
 }
