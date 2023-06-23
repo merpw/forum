@@ -5,6 +5,11 @@ module.exports = {
     hoverOnlyWhenSupported: true,
   },
   theme: {
+    container: {
+      screens: {
+        xl: "1280px",
+      },
+    },
     extend: {
       fontFamily: {
         Alatsi: "var(--font-alatsi)",
