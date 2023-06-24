@@ -1,6 +1,6 @@
 FROM golang:alpine AS builder
 
-ARG SERVICE_NAME=forum
+ARG SERVICE_NAME
 
 # install gcc, required by sqlite3 driver
 RUN apk add build-base
