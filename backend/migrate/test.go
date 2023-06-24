@@ -50,7 +50,7 @@ func initDatabase() (db *sql.DB, clean func()) {
 // and runs all migrations in order and then in reverse order
 func (migrations Migrations) Test(t *testing.T) {
 	db, clean := initDatabase()
-	t.Run("Empty database", func(t *testing.T) {
+	t.Run("Up empty to latest", func(t *testing.T) {
 		err := migrations.Migrate(db, migrations.Latest())
 		if err != nil {
 			t.Fatal(err)
@@ -58,15 +58,16 @@ func (migrations Migrations) Test(t *testing.T) {
 	})
 
 	// Mock user input
+	if migrations.Latest() > 1 {
+		t.Run("Down to 1, without YES", func(t *testing.T) {
+			err := migrations.Migrate(db, 1)
+			if err == nil {
+				t.Fatal("expected error")
+			}
+		})
+	}
 
-	t.Run("Down, without YES", func(t *testing.T) {
-		err := migrations.Migrate(db, 1)
-		if err == nil {
-			t.Fatal("expected error")
-		}
-	})
-
-	t.Run("Down, single call", func(t *testing.T) {
+	t.Run("Down to first, single call", func(t *testing.T) {
 		inputYES()
 		err := migrations.Migrate(db, 1)
 		if err != nil {
@@ -74,7 +75,7 @@ func (migrations Migrations) Test(t *testing.T) {
 		}
 	})
 
-	t.Run("Up, call for each revision", func(t *testing.T) {
+	t.Run("Up to latest, call for each revision", func(t *testing.T) {
 		for revision := 1; revision <= migrations.Latest(); revision++ {
 			err := migrations.Migrate(db, revision)
 			if err != nil {
@@ -83,7 +84,7 @@ func (migrations Migrations) Test(t *testing.T) {
 		}
 	})
 
-	t.Run("Down, call for each revision", func(t *testing.T) {
+	t.Run("Down to first, call for each revision", func(t *testing.T) {
 		for i := migrations.Latest(); i > 0; i-- {
 			inputYES()
 			err := migrations.Migrate(db, i)

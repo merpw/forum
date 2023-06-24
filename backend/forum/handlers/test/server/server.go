@@ -35,6 +35,7 @@ func NewTestServer(t testing.TB) TestServer {
 	t.Cleanup(func() {
 		_ = db.Close()
 		_ = dbFile.Close()
+		testServer.CloseClientConnections()
 		testServer.Close()
 		if !t.Failed() {
 			_ = os.Remove(dbFile.Name())
