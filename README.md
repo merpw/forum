@@ -21,21 +21,25 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ## Docker compose: `docker compose up`
 
+## Production:
+
 > Note: in production, it's highly recommended to use `FORUM_BACKEND_SECRET` to secure private API endpoints.
 >
-> You can generate it using the following command:
+> This can be done by generating a random string and passing it as an environment variable to docker compose:
+>
+> `FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker compose up`
 
-### Docker production: `FORUM_BACKEND_SECRET=$(uuidgen) docker compose up`
+### To run `main` branch version ([forum-ci.mer.pw](https://forum-ci.mer.pw))
+
+```shell
+FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker compose -f docker-compose.yml -f docker-compose.main.yml up
+```
 
 ### Natively (dev)
 
 requirements: Node.js, Golang, GCC
 
-#### Commands:
-
-#### Backend: `cd backend && go run backend/forum`
-
-#### Frontend: `cd frontend && npm run dev`
+Check frontend and backend READMEs for more information.
 
 ## Environment variables
 
