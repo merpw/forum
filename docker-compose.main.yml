@@ -1,0 +1,8 @@
+version: "3"
+services:
+  backend-forum:
+    image: ghcr.io/merpw/forum/backend-forum:main
+  backend-chat:
+    image: ghcr.io/merpw/forum/backend-chat:main
+  frontend:
+    image: ghcr.io/merpw/forum/frontend:main

@@ -17,6 +17,7 @@ services:
         - SERVICE_NAME=chat
     environment:
       - AUTH_BASE_URL=http://backend-forum:8080
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     volumes:
       - db:/app/db
     depends_on:
