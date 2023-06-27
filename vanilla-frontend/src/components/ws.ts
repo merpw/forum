@@ -62,45 +62,43 @@ const postHandler = async (resp: WSPostResponse<object | any>) => {
   const data = resp.item.data
   const url = resp.item.url
   // const createChat = new RegExp(/^\/chat\/create$/)
-  const sendMessage = new RegExp(/^\/chat\/\d{1,}\/message$/)
-  if (url.match(sendMessage)) {
+  if (url.match(/^\/chat\/\d{1,}\/message$/)) { // /chat/{id}/message
     getMessage(data)
   }
 }
 
-const getHandler = async (resp: WSGetResponse<object | any>) => {
+const getHandler = async (resp: WSGetResponse<object>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
-  const chatIds = new RegExp(/^\/chat\/\d{1,}$/)
-  const messageList = new RegExp(/^\/chat\/\d{1,}\/messages$/)
-  const message = new RegExp(/^\/message\/\d{1,}$/)
 
-  if (url.match(chatIds)) {
+  if (url.match(/^\/chat\/\d{1,}$/)) {
     if (!chatList.Ids.has(data.companionId)) {
       return chatList.Ids.set(data.companionId, data.id)
     }
   }
 
-  if (url.match(messageList)) { // chat/{id}/messages
-    return await getMessageList(resp.item.data)
+  if (url.match(/^\/chat\/\d{1,}\/messages$/)) { // chat/{id}/messages
+    getMessageList(data as number[])
+    return
   }
 
-  if (url.match(message)) { // /message/{id}
-    if (resp.item.data.chatId === currentChat.chatId) {
-      messages.list.unshift(resp.item.data)
+  if (url.match(/^\/message\/\d{1,}$/)) { // /message/{id}
+    if (data.chatId === currentChat.chatId) {
+      messages.list.unshift(data as Message)
     }
     return
   }
 
-  if (url === "/chat/all") {
-    return await getChatIds(resp)
+  if (url.match(/^\/chat\/all$/)) {
+    getChatIds(resp)
+    return
   }
 }
 
-const getChatIds = async (resp: iterator): Promise<void> => {
+const getChatIds = async (resp: iterator) => {
   for (const chat of resp.item.data) {
     if (!chatList.Ids.has(chat)) {
-      await sendWsObject({
+      sendWsObject({
         type: "get",
         item: {
           url: `/chat/${chat}`,
@@ -112,7 +110,7 @@ const getChatIds = async (resp: iterator): Promise<void> => {
 }
 
 const getMessage = async (id: number) => {
-  await sendWsObject({
+  sendWsObject({
     type: "get",
     item: {
       url: `/message/${id}`,
@@ -121,12 +119,13 @@ const getMessage = async (id: number) => {
   setTimeout(() => {
     document.getElementById(`Chat${currentChat.chatId}`)?.dispatchEvent(messageEvent)
   }, 150)
+
+  return
 }
 
 const getMessageList = async (ids: number[]): Promise<void> => {
   for (const id of ids) {
-    console.log("gml", id)
-    await sendWsObject({
+      sendWsObject({
       type: "get",
       item: {
         url: `/message/${id}`,
@@ -136,13 +135,9 @@ const getMessageList = async (ids: number[]): Promise<void> => {
   return
 }
 
-export function sendWsObject(obj: object): Promise<void> {
-  return new Promise((resolve, reject) => {
+export function sendWsObject(obj: object) {
     if (ws.readyState === 1) {
       ws.send(JSON.stringify(obj))
-      resolve()
-    } else {
-      reject(new Error("WebSocket connection is not open."))
     }
-  })
+  return
 }
