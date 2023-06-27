@@ -88,7 +88,7 @@ const WriteMessageForm: FC<{ chatId: number }> = ({ chatId }) => {
     >
       <ReactTextAreaAutosize
         ref={inputRef}
-        className={"inputbox my-3"}
+        className={"textarea w-full my-3"}
         onChange={(e) => setInput(e.currentTarget.value)}
         onBlur={() => setInput(input.trim())}
         value={input}
