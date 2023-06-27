@@ -682,11 +682,11 @@ body {
 
 .send {
   background-color: #4672ea;
-  align-self: flex-start;
+  align-self: flex-end;
 }
 
 .recieve {
-  align-self: flex-end;
+  align-self: flex-start;
 }
 
 .status {
