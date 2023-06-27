@@ -1,12 +1,12 @@
 import { ChatUser, Message } from "../types"
-import { sendWsObject } from "./ws.js"
+import { messageEvent, sendWsObject } from "./ws.js"
 import { userInfo } from "./auth.js"
 import { createElement, iterator } from "./utils.js"
 import { getUserById, getUserIds } from "../api/get.js"
 
 // This file is dedicated to sorting and displaying chat users in the sidebar.
 export const chatList = {
-  Ids: new Map<number, number>(), //companionId, chatId
+  Ids: new Map<number, number>, //companionId, chatId
   Users: [] as ChatUser[],
 }
 
@@ -24,11 +24,11 @@ export const currentChat = {
 
 const getChatUsers = async () => {
   Object.assign(chatList, {
-    Ids: new Map<number, number>(),
+    Ids: new Map<number, number>,
     Users: [],
   })
 
-  await sendWsObject({
+  sendWsObject({
     type: "get",
     item: {
       url: "/chat/all",
@@ -44,7 +44,7 @@ const getChatUsers = async () => {
 
   for (const user of chatList.Users) {
     if (!chatList.Ids.has(user.Id)) {
-      await sendWsObject({
+      sendWsObject({
         type: "post",
         item: {
           url: "/chat/create",
@@ -73,70 +73,67 @@ const showChat = async (id: number) => {
   const chat = createElement("div", "chat show-chat")
 
   const chatId = chatList.Ids.get(id) as number
-  await getMessages(chatId)
-  await getUserById(id.toString())
-  .then((user) => {
-    Object.assign(currentChat, {
-      username: user.Name,
-      userId: user.Id,
-      chatId: chatId,
-    })
-    console.log(currentChat)
+  getMessages(chatId)
+  const user = await getUserById(id.toString())
 
-    const chatName = createElement(
-      "div",
-      "chat-name",
-      null,
-      user.Name
-    ) as HTMLDivElement
-
-    chatName.style.paddingBottom = "10px"
-
-    const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
-
-    const chatFormContainer = createElement("div", "chat-form-container")
-    const chatForm = createElement("form", "chat-form")
-    const messageField = createElement("input", null, "chat-text")
-    messageField.setAttribute("maxlength", "150")
-    chatMessages.addEventListener("messageEvent", () => {
-      updateChat(chatId)
-    })
-
-    const messageSend = createElement("button", null, "chat-send", "Send")
-    messageSend.addEventListener("click", () => {
-      sendMessage(chatId)
-    })
-
-    chatForm.append(messageField, messageSend)
-    chatFormContainer.appendChild(chatForm)
-    // if (messages.list.length === 0) {
-    //   reject()
-    // }
-    setTimeout(() => {
-      for (const message of Object.values(messages.list)) {
-        const msgElement = createElement("div", "message") as HTMLDivElement
-        const date = new Date(message.timestamp)
-        const formatDate = date
-        .toLocaleString("en-GB", { timeZone: "EET" })
-        .slice(0, 10)
-        if (message.authorId === userInfo.Id) {
-          msgElement.classList.add("send")
-          msgElement.textContent = userInfo.Name + ":\n" + message.content + "\n" + formatDate
-        } else if (message.authorId === -1) {
-          msgElement.classList.add("status")
-          msgElement.textContent = message.content + "\n" + formatDate
-        } else {
-          msgElement.classList.add("recieve")
-          msgElement.textContent = currentChat.username + ":\n" + message.content + "\n" + formatDate
-        }
-        chatMessages.appendChild(msgElement)
-      }
-
-      chat.append(chatName, chatMessages, chatFormContainer)
-      chatArea.replaceChildren(chat)
-    }, 100)
-
+  Object.assign(currentChat, {
+    username: user.Name,
+    userId: user.Id,
+    chatId: chatId,
   })
+
+  const chatName = createElement(
+    "div",
+    "chat-name",
+    null,
+    user.Name
+  ) as HTMLDivElement
+
+  chatName.style.paddingBottom = "10px"
+
+  const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
+
+  const chatFormContainer = createElement("div", "chat-form-container")
+  const chatForm = createElement("form", "chat-form")
+  const messageField = createElement("input", null, "chat-text")
+  messageField.setAttribute("maxlength", "150")
+  chatMessages.addEventListener("messageEvent", () => {
+    updateChat(chatId)
+  })
+
+  const messageSend = createElement("button", null, "chat-send", "Send")
+  messageSend.style.marginLeft = "4px"
+  messageSend.addEventListener("click", () => {
+    sendMessage(chatId)
+  })
+
+  chatForm.append(messageField, messageSend)
+  chatFormContainer.appendChild(chatForm)
+
+  setTimeout(() => {
+    for (const message of Object.values(messages.list)) {
+      const msgElement = createElement("div", "message") as HTMLDivElement
+      const date = new Date(message.timestamp)
+      const formatDate = date
+      .toLocaleString("en-GB", { timeZone: "EET" })
+      .slice(0, 10)
+      if (message.authorId === userInfo.Id) {
+        msgElement.classList.add("send")
+        msgElement.textContent = userInfo.Name + ":\n" + message.content + "\n" + formatDate
+      } else if (message.authorId === -1) {
+        msgElement.classList.add("status")
+        msgElement.textContent = message.content + "\n" + formatDate
+      } else {
+        msgElement.classList.add("recieve")
+        msgElement.textContent = currentChat.username + ":\n" + message.content + "\n" + formatDate
+      }
+      chatMessages.appendChild(msgElement)
+    }
+
+    chat.append(chatName, chatMessages, chatFormContainer)
+    chatArea.replaceChildren(chat)
+  }, 300)
+
 }
 
 const sendMessage = async (chatId: number) => {
@@ -147,7 +144,7 @@ const sendMessage = async (chatId: number) => {
     if (message.length > 150) {
       message = message.slice(0, 150)
     }
-    await sendWsObject({
+    sendWsObject({
       type: "post",
       item: {
         url: `/chat/${chatId}/message`,
@@ -157,48 +154,53 @@ const sendMessage = async (chatId: number) => {
       },
     })
   }
+
 }
 
-export const updateChat = async (chatId: number) => {
+export const updateChat = (chatId: number) => {
+  console.log("updateChat", chatId)
   const message = messages.list[0]
-  const chatMessages = document.getElementById(
-    `Chat${chatId}`
-  ) as HTMLDivElement
-  const msgElement = createElement(
-    "div",
-    "message",
-    null,
-    message.content
-  ) as HTMLDivElement
-    console.log(message.id, messages.list[messages.list.length - 1].id)
+  setTimeout(() => {
+    const chatMessages = document.getElementById(
+      `Chat${chatId}`
+    ) as HTMLDivElement
+    const msgElement = createElement(
+      "div",
+      "message",
+      null,
+      message.content
+    ) as HTMLDivElement
+    const date = new Date(message.timestamp)
+    const formatDate = date
+    .toLocaleString("en-GB", { timeZone: "EET" })
+    .slice(0, 10)
+    if (message.authorId === userInfo.Id) {
+      msgElement.classList.add("send")
+      msgElement.textContent = userInfo.Name + ":\n" + message.content + "\n" + formatDate
+    } else if (message.authorId === -1) {
+      msgElement.classList.add("status")
+      msgElement.textContent = message.content + "\n" + formatDate
+    } else {
+      msgElement.textContent = currentChat.username + ":\n" + message.content + "\n" + formatDate
+      msgElement.classList.add("recieve")
+    }
+    if (chatId === currentChat.chatId) {
+      chatMessages.prepend(msgElement)
+    }
 
-  const date = new Date(message.timestamp)
-  const formatDate = date
-  .toLocaleString("en-GB", { timeZone: "EET" })
-  .slice(0, 10)
-  if (message.authorId === userInfo.Id) {
-    msgElement.classList.add("send")
-    msgElement.textContent = userInfo.Name + ":\n" + message.content + "\n" + formatDate
-  } else if (message.authorId === -1) {
-    msgElement.classList.add("status")
-    msgElement.textContent = message.content + "\n" + formatDate
-  } else {
-    msgElement.textContent = currentChat.username + ":\n" + message.content + "\n" + formatDate
-    msgElement.classList.add("recieve")
-  }
-  if (chatId === currentChat.chatId) {
-    chatMessages.prepend(msgElement)
-  }
+  }, 20)
 }
 
 const getMessages = async (chatId: number): Promise<void> => {
   Object.assign(messages, { list: [] })
-  await sendWsObject({
-    type: "get",
-    item: {
-      url: `/chat/${chatId}/messages`,
-    },
-  })
+  setTimeout(() => {
+    sendWsObject({
+      type: "get",
+      item: {
+        url: `/chat/${chatId}/messages`,
+      },
+    })
+  }, 20)
 }
 
 export const displayChatUsers = async () => {
@@ -215,7 +217,7 @@ export const displayChatUsers = async () => {
 
   await getChatUsers()
 
-  await sendWsObject({
+  sendWsObject({
     type: "get",
     item: {
       url: "/chat/all",

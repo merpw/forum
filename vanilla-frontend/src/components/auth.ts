@@ -15,7 +15,9 @@ export const userInfo = {
 
 export const Auth = async (session: boolean) => {
   if (session) {
-    wsHandler()
+    if(!ws) {
+      wsHandler()
+    }
     setTimeout(async () => {
       // Adding the HTML and changing style
       superDivision.innerHTML = Index()
