@@ -11,31 +11,39 @@ import "highlight.js/styles/github-dark.css"
 
 const PostPage: FC<{ post: Post; comments: Comment[] }> = ({ post, comments }) => {
   return (
-    <div className={"m-5"}>
-      <div className={"mb-3"}>
-        <h1 className={"text-3xl mb-2 "}>{post.title}</h1>
-        <hr />
-      </div>
-      <div
-        className={"prose dark:prose-invert"}
-        dangerouslySetInnerHTML={{ __html: post.content }}
-      />
-      <hr className={"mt-4"} />
-      <div className={"border-t py-2 flex flex-wrap"}>
-        <ReactionsButtons post={post} />
-        <Category post={post} />
+    <div className={"max-w-3xl mx-auto"}>
+      <div className={"rounded-lg border border-primary shadow-base-100 shadow-sm my-7"}>
+        <div className={"mx-5"}>
+          <h1 className={"start-dot end-dot flex flex-wrap text-2xl my-3"}>{post.title}</h1>
+          <div
+            className={"prose dark:prose-invert m-3 mb-5 text-lg font-light"}
+            dangerouslySetInnerHTML={{ __html: post.content }}
+          />
+        </div>
 
-        <span className={"ml-auto"}>
-          <AutoDate date={post.date} />
-          {" by "}
-          <span className={"clickable text-xl"}>
-            <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
+        <div className={"bg-base-100 m-1 rounded-lg flex flex-wrap py-2 px-5 gap-x-1"}>
+          <span className={"self-center mr-3"}>
+            <ReactionsButtons post={post} />
           </span>
-        </span>
+          <Category post={post} />
+          <span className={"ml-auto font-light"}>
+            <span className={"text-info"}>
+              <AutoDate date={post.date} />
+              {" by "}
+            </span>
+            <span className={"clickable text-lg font-Alatsi self-center"}>
+              <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
+            </span>
+          </span>
+        </div>
       </div>
       <div>
-        <h2 className={"text-2xl my-4"}>Comments:</h2>
         <CommentForm postId={post.id} />
+        <div className={"text-center mt-5"}>
+          <h2 className={"tab tab-bordered tab-active cursor-default self-center mb-3"}>
+            Comments
+          </h2>
+        </div>
         <Comments postId={post.id} fallback={comments} />
       </div>
     </div>

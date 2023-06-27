@@ -49,9 +49,6 @@ func New(db *sql.DB) *Handlers {
 	return h
 }
 
-func (h *Handlers) serveContent(w http.ResponseWriter, r *http.Request) {
-}
-
 // Handler returns http.Handler with all routes registered
 func (h *Handlers) Handler() http.Handler {
 	router := http.NewServeMux()

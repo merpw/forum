@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { getCategoriesLocal, getCategoryPostsLocal } from "@/api/posts/edge"
-import CategoryPage from "@/app/category/[name]/category-page"
+import CategoryPage from "@/app/(explore-posts)/category/[name]/category-page"
 import { Capitalize } from "@/helpers/text"
 
 type Props = { params: { name: string } }
@@ -32,7 +32,7 @@ export const generateStaticParams = async () => {
 const Page = async ({ params }: Props) => {
   const posts = await getCategoryPostsLocal(params.name).catch(notFound)
 
-  return <CategoryPage categoryName={Capitalize(params.name)} posts={posts} />
+  return <CategoryPage posts={posts} />
 }
 
 export default Page

@@ -4,12 +4,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Client is a WebSocket client, stores connection and user data
 type Client struct {
 	Conn   *websocket.Conn
 	UserId int
 	Token  string
 }
 
+// NewClient creates a new Client
 func NewClient(conn *websocket.Conn) *Client {
 	return &Client{
 		Conn:   conn,
