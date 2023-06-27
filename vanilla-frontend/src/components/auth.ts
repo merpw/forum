@@ -7,6 +7,7 @@ import { displayPosts } from "./posts.js"
 import { ws, wsHandler } from "./ws.js"
 
 import { getMe } from "../api/get.js"
+import { displayChatUsers } from "./chat.js"
 
 export const userInfo = {
   Id: -1,
@@ -24,6 +25,7 @@ export const Auth = async (session: boolean) => {
       topnavController() // Adds event listeners to the top-navigation bar
       categoriesSelector()
       displayPosts("/api/posts")
+      displayChatUsers()
     }, 100)
   }
   if (!session) {

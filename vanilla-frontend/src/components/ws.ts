@@ -1,7 +1,7 @@
 import { chatList, currentChat, displayChatUsers, messages, renderChatList } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../types"
 import { iterator } from "./utils.js"
-import { Auth } from "./auth.js"
+import { Auth, userInfo } from "./auth.js"
 
 export const messageEvent = new Event("messageEvent")
 const WS_URL = "ws://localhost:8081/ws"
@@ -67,31 +67,42 @@ const postHandler = async (resp: WSPostResponse<object | any>) => {
   }
 }
 
-const getHandler = async (resp: WSGetResponse<object>) => {
+const getHandler = (resp: WSGetResponse<object>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
 
   if (url.match(/^\/chat\/\d{1,}$/)) {
-    if (!chatList.Ids.has(data.companionId)) {
-      return chatList.Ids.set(data.companionId, data.id)
-    }
+      for (const user of Object.values(chatList.Users)) {
+        if (user.Id == data.companionId) {
+          Object.assign(user, {LastMessageId: data.lastMessageId})
+          break
+        }
+      }
+      if (!chatList.Ids.has(data.companionId)) {
+        chatList.Ids.set(data.companionId, data.id)
+      }
   }
 
-  if (url.match(/^\/chat\/\d{1,}\/messages$/)) { // chat/{id}/messages
+  if (url.match(/^\/chat\/\d{1,}\/messages$/)) { // /chat/{id}/messages
     getMessageList(data as number[])
     return
   }
 
   if (url.match(/^\/message\/\d{1,}$/)) { // /message/{id}
-    messages.current = data as Message
-    if (data.chatId === currentChat.chatId) {      
-      messages.list.unshift(data as Message)
-    }
+    setTimeout(() => {
+      messages.current = data as Message
+      if (data.chatId === currentChat.chatId) {      
+        messages.list.unshift(data as Message)
+      } else {
+        updateUnreadMessages()
+      }
+    }, 10)
     return
   }
 
   if (url.match(/^\/users\/online$/)) { // /users/online
     updateOnlineUsers(data as number[])
+    return
   }
 
   if (url.match(/^\/chat\/all$/)) {
@@ -108,10 +119,25 @@ function updateOnlineUsers(users: number[]) {
         user.Online = false
       }
     } 
-  setTimeout(renderChatList, 120)
+  renderChatList()
 }
 
-const getChatIds = async (resp: iterator) => {
+function updateUnreadMessages() {
+  for (const [userId, chatId] of chatList.Ids) {
+    if (chatId === messages.current.chatId) {
+      for (const user of Object.values(chatList.Users)) {
+        if (user.Id === userId) {
+          user.UnreadMsg = true
+          break
+        }
+      }
+      break
+    }
+  }
+  renderChatList()
+}
+
+const getChatIds = (resp: iterator) => {
   for (const chat of resp.item.data) {
     if (!chatList.Ids.has(chat)) {
       sendWsObject({
@@ -125,7 +151,7 @@ const getChatIds = async (resp: iterator) => {
   return
 }
 
-const getMessage = async (id: number) => {
+const getMessage = (id: number) => {
   sendWsObject({
     type: "get",
     item: {
@@ -134,27 +160,14 @@ const getMessage = async (id: number) => {
   })
   setTimeout(() => {
     const chat = document.getElementById(`Chat${currentChat.chatId}`) as HTMLDivElement
-    if (!chat) {
-      for (const [uId, cId] of chatList.Ids) {
-        if (cId === currentChat.chatId) {
-          for (const user of Object.values(chatList.Users)) {
-            console.log(user)
-            if (user.Id === uId) {
-              user.UnreadMsg === true
-              break
-            }
-          }
-          setTimeout(renderChatList, 70)
-          break
-        }
-      }
-    } else {
+        if (!chat) {
+          } else {
       chat.dispatchEvent(messageEvent)
     }
-  }, 50)
+  }, 80)
 }
 
-const getMessageList = async (ids: number[]) => {
+const getMessageList = (ids: number[]) => {
   for (const id of ids) {
       sendWsObject({
       type: "get",

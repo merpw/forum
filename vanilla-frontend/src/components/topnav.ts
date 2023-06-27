@@ -58,7 +58,6 @@ export const topnavController = () => {
   topNavHome.addEventListener("click", goHome)
   topNavLogout.addEventListener("click", logout)
   topNavChat.addEventListener("click", () => {
-    displayChatUsers()
     setTimeout(() => {
       chatDisplay.classList.add("chat-list-open")
       chatDisplay.style.width = "200px"

@@ -12,6 +12,7 @@ export const chatList = {
 
 export const messages = {
   list: [] as Message[],
+  buffer: [] as Message[],
   current: {} as Message 
 }
 
@@ -27,13 +28,6 @@ const getChatUsers = async () => {
   Object.assign(chatList, {
     Ids: new Map<number, number>,
     Users: [],
-  })
-
-  sendWsObject({
-    type: "get",
-    item: {
-      url: "/chat/all",
-    },
   })
 
   const userIds: iterator = await getUserIds()
@@ -69,6 +63,14 @@ const getChatUsers = async () => {
 const showChat = async (id: number) => {
   const chatArea = document.getElementById("chat-area") as HTMLDivElement
   const chat = createElement("div", "chat show-chat")
+
+  for (const user of chatList.Users) {
+    if (user.Id === id && user.UnreadMsg) {
+      user.UnreadMsg = false
+      renderChatList()
+      break
+    }
+  }
 
   const chatId = chatList.Ids.get(id) as number
   getMessages(chatId)
@@ -130,7 +132,7 @@ const showChat = async (id: number) => {
 
     chat.append(chatName, chatMessages, chatFormContainer)
     chatArea.replaceChildren(chat)
-  }, 300)
+  }, 200)
 
 }
 
@@ -152,7 +154,6 @@ const sendMessage = async (chatId: number) => {
       },
     })
   }
-
 }
 
 export const updateChat = (chatId: number) => {
@@ -184,7 +185,8 @@ export const updateChat = (chatId: number) => {
     if (currentChat.chatId === messages.current.chatId) {
       chatMessages.prepend(msgElement)
     } 
-  }, 20)
+  }, 5)
+    renderChatList()
 }
 
 const getMessages = async (chatId: number): Promise<void> => {
@@ -208,46 +210,47 @@ export const displayChatUsers = async () => {
   offlineTitle.addEventListener("click", toggleOffline)
 
   await getChatUsers()
+  renderChatList()
+}
 
+export function renderChatList() {
   sendWsObject({
     type: "get",
     item: {
       url: "/chat/all",
     },
-  })
-  setTimeout(renderChatList, 120)
-}
+  }) 
+  setTimeout(() => {
+    const onlineList = document.getElementById("online-users") as HTMLUListElement,
+    offlineList = document.getElementById("offline-users") as HTMLUListElement
 
-export function renderChatList() {
-  const onlineList = document.getElementById("online-users") as HTMLUListElement,
-  offlineList = document.getElementById("offline-users") as HTMLUListElement
+    /* Resets the list if user logging in or out */
+    onlineList.replaceChildren()
+    offlineList.replaceChildren()
 
-  /* Resets the list if user logging in or out */
-  onlineList.replaceChildren()
-  offlineList.replaceChildren()
+    for (const u of chatList.Users) {
+      const user = createElement("li", "chat-user", u.Name)
+      const name = createElement("p", null, null, u.Name)
+      user.appendChild(name)
 
-  for (const u of chatList.Users) {
-    const user = createElement("li", "chat-user", u.Name)
-    const name = createElement("p", null, null, u.Name)
-    user.appendChild(name)
+      if (u.UnreadMsg) {
+        const unread = createElement("i", "bx bx-message-dots")
+        user.appendChild(unread)
+      }
 
-    if (u.UnreadMsg) {
-      const unread = createElement("i", "bx bx-message-dots")
-      user.appendChild(unread)
+      user.addEventListener("click", () => {
+        showChat(u.Id)
+      })
+
+      if (u.Online) {
+        user.classList.add("online")
+        onlineList.appendChild(user)
+      } else {
+        user.classList.add("offline")
+        offlineList.appendChild(user)
+      }
     }
-
-    user.addEventListener("click", () => {
-      showChat(u.Id)
-    })
-
-    if (u.Online) {
-      user.classList.add("online")
-      onlineList.appendChild(user)
-    } else {
-      user.classList.add("offline")
-      offlineList.appendChild(user)
-    }
-  }
+  }, 120)
 }
 
 
