@@ -1,4 +1,4 @@
-import { chatList, currentChat, messages } from "./chat.js"
+import { chatList, currentChat, displayChatUsers, messages, renderChatList } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../types"
 import { iterator } from "./utils.js"
 import { Auth } from "./auth.js"
@@ -83,16 +83,32 @@ const getHandler = async (resp: WSGetResponse<object>) => {
   }
 
   if (url.match(/^\/message\/\d{1,}$/)) { // /message/{id}
-    if (data.chatId === currentChat.chatId) {
+    messages.current = data as Message
+    if (data.chatId === currentChat.chatId) {      
       messages.list.unshift(data as Message)
     }
     return
+  }
+
+  if (url.match(/^\/users\/online$/)) { // /users/online
+    updateOnlineUsers(data as number[])
   }
 
   if (url.match(/^\/chat\/all$/)) {
     getChatIds(resp)
     return
   }
+}
+
+function updateOnlineUsers(users: number[]) {
+    for (const user of Object.values(chatList.Users)) {
+      if (users.includes(user.Id)) {
+        user.Online = true
+      } else {
+        user.Online = false
+      }
+    } 
+  setTimeout(renderChatList, 120)
 }
 
 const getChatIds = async (resp: iterator) => {
@@ -117,13 +133,28 @@ const getMessage = async (id: number) => {
     },
   })
   setTimeout(() => {
-    document.getElementById(`Chat${currentChat.chatId}`)?.dispatchEvent(messageEvent)
-  }, 150)
-
-  return
+    const chat = document.getElementById(`Chat${currentChat.chatId}`) as HTMLDivElement
+    if (!chat) {
+      for (const [uId, cId] of chatList.Ids) {
+        if (cId === currentChat.chatId) {
+          for (const user of Object.values(chatList.Users)) {
+            console.log(user)
+            if (user.Id === uId) {
+              user.UnreadMsg === true
+              break
+            }
+          }
+          setTimeout(renderChatList, 70)
+          break
+        }
+      }
+    } else {
+      chat.dispatchEvent(messageEvent)
+    }
+  }, 50)
 }
 
-const getMessageList = async (ids: number[]): Promise<void> => {
+const getMessageList = async (ids: number[]) => {
   for (const id of ids) {
       sendWsObject({
       type: "get",

@@ -1,5 +1,5 @@
 import { ChatUser, Message } from "../types"
-import { messageEvent, sendWsObject } from "./ws.js"
+import { sendWsObject } from "./ws.js"
 import { userInfo } from "./auth.js"
 import { createElement, iterator } from "./utils.js"
 import { getUserById, getUserIds } from "../api/get.js"
@@ -12,6 +12,7 @@ export const chatList = {
 
 export const messages = {
   list: [] as Message[],
+  current: {} as Message 
 }
 
 
@@ -34,13 +35,20 @@ const getChatUsers = async () => {
       url: "/chat/all",
     },
   })
-  const userIds: iterator = await getUserIds()
 
+  const userIds: iterator = await getUserIds()
   for (const id of Object.values(userIds)) {
     if (id !== userInfo.Id) {
       chatList.Users.push(await getUserById(id))
     }
   }
+
+  sendWsObject({
+    type: "get",
+    item: {
+      url: "/users/online"
+    }
+  })
 
   for (const user of chatList.Users) {
     if (!chatList.Ids.has(user.Id)) {
@@ -56,16 +64,6 @@ const getChatUsers = async () => {
     }
   }
 }
-//   ws.send(JSON.stringify({
-//       type: "get",
-//       item: {
-//         url: `/users/online`,
-//         data: {
-//           content: message,
-//         }
-//       }
-//     })
-// ) TODO: Fix so that online users and UnreadMsg are updated in chatList
 
 // Display the current chat based on chatId
 const showChat = async (id: number) => {
@@ -119,7 +117,7 @@ const showChat = async (id: number) => {
       .slice(0, 10)
       if (message.authorId === userInfo.Id) {
         msgElement.classList.add("send")
-        msgElement.textContent = userInfo.Name + ":\n" + message.content + "\n" + formatDate
+        msgElement.textContent = "You:\n" + message.content + "\n" + formatDate
       } else if (message.authorId === -1) {
         msgElement.classList.add("status")
         msgElement.textContent = message.content + "\n" + formatDate
@@ -158,7 +156,6 @@ const sendMessage = async (chatId: number) => {
 }
 
 export const updateChat = (chatId: number) => {
-  console.log("updateChat", chatId)
   const message = messages.list[0]
   setTimeout(() => {
     const chatMessages = document.getElementById(
@@ -176,7 +173,7 @@ export const updateChat = (chatId: number) => {
     .slice(0, 10)
     if (message.authorId === userInfo.Id) {
       msgElement.classList.add("send")
-      msgElement.textContent = userInfo.Name + ":\n" + message.content + "\n" + formatDate
+      msgElement.textContent = "You:\n" + message.content + "\n" + formatDate
     } else if (message.authorId === -1) {
       msgElement.classList.add("status")
       msgElement.textContent = message.content + "\n" + formatDate
@@ -184,10 +181,9 @@ export const updateChat = (chatId: number) => {
       msgElement.textContent = currentChat.username + ":\n" + message.content + "\n" + formatDate
       msgElement.classList.add("recieve")
     }
-    if (chatId === currentChat.chatId) {
+    if (currentChat.chatId === messages.current.chatId) {
       chatMessages.prepend(msgElement)
-    }
-
+    } 
   }, 20)
 }
 
@@ -200,16 +196,12 @@ const getMessages = async (chatId: number): Promise<void> => {
         url: `/chat/${chatId}/messages`,
       },
     })
-  }, 20)
+  }, 10)
 }
 
 export const displayChatUsers = async () => {
-  const onlineList = document.getElementById(
-    "online-users"
-  ) as HTMLUListElement,
-  offlineList = document.getElementById("offline-users") as HTMLUListElement,
-  onlineTitle = document.getElementById("online-title") as HTMLElement,
-  offlineTitle = document.getElementById("offline-title") as HTMLElement
+  const onlineTitle = document.getElementById("online-title") as HTMLElement
+  const offlineTitle = document.getElementById("offline-title") as HTMLElement
 
   /* Add eventlisteners to show/hide users in chat list */
   onlineTitle.addEventListener("click", toggleOnline)
@@ -223,35 +215,41 @@ export const displayChatUsers = async () => {
       url: "/chat/all",
     },
   })
+  setTimeout(renderChatList, 120)
+}
 
-  const chatUsers = document.querySelectorAll(
-    ".chat-user"
-  ) as NodeListOf<HTMLElement>
-  if (chatUsers.length < chatList.Users.length) {
-    for (const u of chatList.Users) {
-      const user = createElement("li", "chat-user", u.Name)
-      const name = createElement("p", null, null, u.Name)
-      user.appendChild(name)
+export function renderChatList() {
+  const onlineList = document.getElementById("online-users") as HTMLUListElement,
+  offlineList = document.getElementById("offline-users") as HTMLUListElement
 
-      if (u.UnreadMsg) {
-        const unread = createElement("i", "bx bx-message-dots")
-        user.appendChild(unread)
-      }
+  /* Resets the list if user logging in or out */
+  onlineList.replaceChildren()
+  offlineList.replaceChildren()
 
-      user.addEventListener("click", () => {
-        showChat(u.Id)
-      })
+  for (const u of chatList.Users) {
+    const user = createElement("li", "chat-user", u.Name)
+    const name = createElement("p", null, null, u.Name)
+    user.appendChild(name)
 
-      if (u.Online) {
-        user.classList.add("online")
-        onlineList.appendChild(user)
-      } else {
-        user.classList.add("offline")
-        offlineList.appendChild(user)
-      }
+    if (u.UnreadMsg) {
+      const unread = createElement("i", "bx bx-message-dots")
+      user.appendChild(unread)
+    }
+
+    user.addEventListener("click", () => {
+      showChat(u.Id)
+    })
+
+    if (u.Online) {
+      user.classList.add("online")
+      onlineList.appendChild(user)
+    } else {
+      user.classList.add("offline")
+      offlineList.appendChild(user)
     }
   }
 }
+
 
 const toggleOnline = () => {
   const onlineToggle = document.getElementById("online-toggle") as HTMLElement,
