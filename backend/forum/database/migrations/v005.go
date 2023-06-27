@@ -10,6 +10,7 @@ var v005 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
 		ALTER TABLE users RENAME COLUMN name TO username;
+		UPDATE users SET username = REPLACE(username, ' ', '_');
 `)
 		if err != nil {
 			return err
