@@ -8,6 +8,7 @@ import wsActions, { sendGet, sendPost } from "@/store/ws/actions"
 
 const wsConnectionMiddleware: Middleware = (store) => {
   let ws: WebSocket
+  let retryTimeout = 0
 
   return (next) => (action) => {
     if (Object.values(wsConnectionActions).find((a) => a.match(action))) {
@@ -27,17 +28,23 @@ const wsConnectionMiddleware: Middleware = (store) => {
     }
 
     const state = store.getState() as RootState
-    if (state.wsConnection.status === "disconnected") {
+
+    if (wsActions.connect.match(action)) {
       store.dispatch(wsConnectionActions.connectionStarted())
 
       ws = new WebSocket(`${location.protocol.replace("http", "ws")}//${location.host}/ws`)
       ws.onopen = () => {
         console.log("ws connected")
+        retryTimeout = 0
         ws.send(JSON.stringify({ type: "handshake", item: { token } }))
       }
       ws.onclose = () => {
         console.log("ws disconnected")
-        store.dispatch(wsConnectionActions.connectionClosed())
+        setTimeout(() => {
+          retryTimeout += 1000
+          store.dispatch(wsConnectionActions.connectionClosed())
+          store.dispatch(wsActions.connect())
+        }, retryTimeout)
       }
 
       ws.onmessage = (event) => {
@@ -46,9 +53,8 @@ const wsConnectionMiddleware: Middleware = (store) => {
 
           if (data.type === "handshake") {
             // TODO: maybe use userId from the handshake response
-            store.dispatch(wsConnectionActions.connectionEstablished())
             console.log("ws handshake success")
-            return
+            return next(wsConnectionActions.connectionEstablished())
           }
 
           if (data.type === "error") {
@@ -74,6 +80,13 @@ const wsConnectionMiddleware: Middleware = (store) => {
           console.error("ws error", e)
         }
       }
+
+      return next(action)
+    }
+
+    if (state.wsConnection.status === "disconnected") {
+      store.dispatch(wsActions.connect())
+      return next(action)
     }
 
     if (sendGet.match(action) || sendPost.match(action)) {
@@ -81,7 +94,8 @@ const wsConnectionMiddleware: Middleware = (store) => {
       const url = action.payload.item.url
 
       if (type === "get" && state.wsConnection.pendingRequests.includes(url)) {
-        return action
+        // ignore duplicate requests
+        return next(action)
       }
 
       if (state.wsConnection.status === "connected") {
@@ -90,8 +104,8 @@ const wsConnectionMiddleware: Middleware = (store) => {
       } else {
         setTimeout(() => {
           store.dispatch({ type: "ws/send", payload: action.payload })
-        }, 100)
-        return action
+        }, retryTimeout)
+        return next(action)
       }
     }
 

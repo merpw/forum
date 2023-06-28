@@ -26,10 +26,13 @@ export const sendPost = createAction("ws/send", <T>(url: string, data: T) => {
 
 const close = createAction("ws/close")
 
+const connect = createAction("ws/connect")
+
 const wsActions = {
   sendGet,
   sendPost,
   close,
+  connect,
 }
 
 export default wsActions
