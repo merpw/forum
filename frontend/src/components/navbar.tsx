@@ -7,8 +7,12 @@ import UserInfo from "@/components/userInfo"
 
 const Navbar: NextComponentType = () => {
   return (
-    <div className={"border-b border-base-100 pb-3 mb-3"}>
-      <nav className={"flex justify-between flex-wrap"}>
+    <header
+      className={
+        "sticky top-0 z-50 border-b border-base-100 py-2 px-3 bg-base-100 dark:bg-base-300"
+      }
+    >
+      <nav className={"container m-auto flex justify-between flex-wrap"}>
         <div className={"self-center"}>
           <Link href={"/"} className={"clickable text-4xl font-Alatsi"}>
             <span className={"font-black  gradient-text"}>{"{"}</span>
@@ -20,7 +24,7 @@ const Navbar: NextComponentType = () => {
           <UserInfo />
         </div>
       </nav>
-    </div>
+    </header>
   )
 }
 

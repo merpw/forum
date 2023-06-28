@@ -43,7 +43,10 @@ export const runtime = "edge"
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang={"en"} className={alatsi.variable + " " + yesteryear.variable}>
+    <html
+      lang={"en"}
+      className={alatsi.variable + " " + yesteryear.variable + " " + "overflow-y-scroll"}
+    >
       <body>
         <Layout>{children}</Layout>
       </body>

@@ -43,17 +43,13 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <Provider store={store}>
-      <div className={"container m-auto p-5 min-h-screen break-words"}>
-        <header>
-          <Navbar />
-        </header>
-        <div className={"mx-5 flex gap-3 flex-row h-[calc(100vh-10.5rem)] relative"}>
+      <div className={"min-h-screen break-words"}>
+        <Navbar />
+        <div className={"container m-auto p-5 flex gap-3 flex-row relative"}>
           <main
             ref={scrollRef}
             className={
-              "max-h-full overflow-auto grow" +
-              " " +
-              (user && !isCollapsed ? "hidden sm:block w-3/4" : "")
+              "max-h-full grow" + " " + (user && !isCollapsed ? "hidden sm:block w-3/4" : "")
             }
           >
             {children}
