@@ -33,6 +33,8 @@ const chatSlice = createSlice({
       state.activeChatId = action.payload
     },
 
+    reset: () => initialState,
+
     handleChatAll: {
       reducer: (state, action: PayloadAction<number[]>) => {
         state.chatIds = action.payload

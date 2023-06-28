@@ -4,27 +4,42 @@ import { RootState } from "@/store/store"
 import { wsConnectionActions } from "@/store/ws/connection"
 import { chatHandlers } from "@/store/chats"
 import { WebSocketResponse } from "@/ws"
-import { sendGet, sendPost } from "@/store/ws/actions"
+import wsActions, { sendGet, sendPost } from "@/store/ws/actions"
 
 const wsConnectionMiddleware: Middleware = (store) => {
   let ws: WebSocket
 
   return (next) => (action) => {
+    if (Object.values(wsConnectionActions).find((a) => a.match(action))) {
+      // ignore wsConnection actions
+      return next(action)
+    }
+
+    if (wsActions.close.match(action)) {
+      ws.close()
+      store.dispatch(wsConnectionActions.connectionClosed())
+      return next(action)
+    }
+
+    const token = document.cookie.match(/forum-token=(.*?)(;|$)/)?.[1]
+    if (!token) {
+      return next(action)
+    }
+
     const state = store.getState() as RootState
-
-    if (
-      state.wsConnection.status === "disconnected" &&
-      action.type !== wsConnectionActions.connectionStarted.type
-    ) {
-      const token = document.cookie.match(/forum-token=(.*?)(;|$)/)?.[1]
-      if (!token) {
-        console.error("no token")
-        return
-      }
-
+    if (state.wsConnection.status === "disconnected") {
       store.dispatch(wsConnectionActions.connectionStarted())
 
       ws = new WebSocket(`${location.protocol.replace("http", "ws")}//${location.host}/ws`)
+      ws.onopen = () => {
+        console.log("ws connected")
+        ws.send(JSON.stringify({ type: "handshake", item: { token } }))
+      }
+      ws.onclose = () => {
+        console.log("ws disconnected")
+        store.dispatch(wsConnectionActions.connectionClosed())
+      }
+
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data) as WebSocketResponse<never>
@@ -59,14 +74,6 @@ const wsConnectionMiddleware: Middleware = (store) => {
           console.error("ws error", e)
         }
       }
-      ws.onopen = () => {
-        console.log("ws connected")
-        ws.send(JSON.stringify({ type: "handshake", item: { token } }))
-      }
-      ws.onclose = () => {
-        console.log("ws disconnected")
-        store.dispatch(wsConnectionActions.connectionClosed())
-      }
     }
 
     if (sendGet.match(action) || sendPost.match(action)) {
@@ -86,11 +93,6 @@ const wsConnectionMiddleware: Middleware = (store) => {
         }, 100)
         return action
       }
-    }
-
-    if (action.type === "ws/close") {
-      ws.close()
-      store.dispatch(wsConnectionActions.connectionClosed())
     }
 
     return next(action)
