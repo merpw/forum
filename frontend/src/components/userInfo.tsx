@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useLogOut, useMe } from "@/api/auth"
 
 const UserInfo = () => {
-  const { user, isError, isLoading, isLoggedIn, mutate } = useMe()
+  const { user, isError, isLoading, isLoggedIn } = useMe()
   const logOut = useLogOut()
 
   if (isError || isLoading) {

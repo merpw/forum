@@ -1,7 +1,6 @@
 import { useEffect } from "react"
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-
 import wsActions from "@/store/ws/actions"
 
 export const useChatIds = () => {

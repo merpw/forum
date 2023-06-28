@@ -1,6 +1,6 @@
 import { createAction } from "@reduxjs/toolkit"
 
-export const sendGet = createAction("ws/send", (url: string) => {
+const sendGet = createAction("ws/send", (url: string) => {
   return {
     payload: {
       type: "get",
@@ -12,7 +12,7 @@ export const sendGet = createAction("ws/send", (url: string) => {
 })
 
 // TODO: improve types, maybe even infer data type by url
-export const sendPost = createAction("ws/send", <T>(url: string, data: T) => {
+const sendPost = createAction("ws/send", <T>(url: string, data: T) => {
   return {
     payload: {
       type: "post",

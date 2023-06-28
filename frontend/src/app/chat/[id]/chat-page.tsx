@@ -141,12 +141,10 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
   // TODO: add dates between days
 
   useEffect(() => {
-    // TODO: maybe remove this?
-    if (isOnBottom.current) {
-      setTimeout(() => {
-        scrollRef.current?.scrollTo(0, 0)
-      }, 100)
-    }
+    // TODO: improve this
+    setTimeout(() => {
+      scrollRef.current?.scrollTo(0, 0)
+    }, 100)
   }, [chatMessages])
 
   if (!chatMessages) {

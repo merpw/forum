@@ -4,7 +4,7 @@ import { RootState } from "@/store/store"
 import { wsConnectionActions } from "@/store/ws/connection"
 import { chatHandlers } from "@/store/chats"
 import { WebSocketResponse } from "@/ws"
-import wsActions, { sendGet, sendPost } from "@/store/ws/actions"
+import wsActions from "@/store/ws/actions"
 
 const wsConnectionMiddleware: Middleware = (store) => {
   let ws: WebSocket
@@ -89,7 +89,7 @@ const wsConnectionMiddleware: Middleware = (store) => {
       return next(action)
     }
 
-    if (sendGet.match(action) || sendPost.match(action)) {
+    if (wsActions.sendGet.match(action) || wsActions.sendPost.match(action)) {
       const type = action.payload.type
       const url = action.payload.item.url
 
