@@ -1,8 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit"
 
-import chatsReducer from "@/store/chats/chats"
-import wsConnectionMiddleware from "@/store/wsMiddleware"
-import wsConnectionReducer from "@/store/ws"
+import chatsReducer from "@/store/chats"
+import wsConnectionMiddleware from "@/store/ws/middleware"
+import wsConnectionReducer from "@/store/ws/connection"
 
 const store = configureStore({
   reducer: {

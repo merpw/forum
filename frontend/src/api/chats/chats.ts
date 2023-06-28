@@ -1,7 +1,8 @@
 import { useEffect } from "react"
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { wsActions } from "@/store/wsMiddleware"
+
+import wsActions from "@/store/ws/actions"
 
 export const useChatIds = () => {
   const chatIds = useAppSelector((state) => state.chats.chatIds)
@@ -9,7 +10,7 @@ export const useChatIds = () => {
 
   useEffect(() => {
     if (!chatIds) {
-      dispatch(wsActions.sendWSGet("/chat/all"))
+      dispatch(wsActions.sendGet("/chat/all"))
     }
   }, [chatIds, dispatch])
 
@@ -22,7 +23,7 @@ export const useChat = (id: number) => {
 
   useEffect(() => {
     if (!chat) {
-      dispatch(wsActions.sendWSGet(`/chat/${id}`))
+      dispatch(wsActions.sendGet(`/chat/${id}`))
     }
   }, [chat, dispatch, id])
 
@@ -33,7 +34,7 @@ export const useCreateChat = () => {
   const dispatch = useAppDispatch()
 
   return (userId: number) => {
-    dispatch(wsActions.sendWSPost("/chat/create", { userId }))
+    dispatch(wsActions.sendPost("/chat/create", { userId }))
   }
 }
 
@@ -43,7 +44,7 @@ export const useUserChat = (userId: number) => {
 
   useEffect(() => {
     if (!chatId) {
-      dispatch(wsActions.sendWSGet(`/users/${userId}/chat`))
+      dispatch(wsActions.sendGet(`/users/${userId}/chat`))
     }
   }, [chatId, dispatch, userId])
 

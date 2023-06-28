@@ -1,10 +1,10 @@
 import { Middleware } from "redux"
-import { createAction } from "@reduxjs/toolkit"
 
 import { RootState } from "@/store/store"
-import { wsConnectionActions } from "@/store/ws"
-import { chatHandlers } from "@/store/chats/chats"
+import { wsConnectionActions } from "@/store/ws/connection"
+import { chatHandlers } from "@/store/chats"
 import { WebSocketResponse } from "@/ws"
+import { sendGet, sendPost } from "@/store/ws/actions"
 
 const wsConnectionMiddleware: Middleware = (store) => {
   let ws: WebSocket
@@ -95,37 +95,6 @@ const wsConnectionMiddleware: Middleware = (store) => {
 
     return next(action)
   }
-}
-
-const sendGet = createAction("ws/send", (url: string) => {
-  return {
-    payload: {
-      type: "get",
-      item: {
-        url,
-      },
-    },
-  }
-})
-
-// TODO: improve types, maybe even infer data type by url
-const sendPost = createAction("ws/send", <T>(url: string, data: T) => {
-  return {
-    payload: {
-      type: "post",
-      item: {
-        url,
-        data,
-      },
-    },
-  }
-})
-
-const closeConnection = createAction("ws/close")
-
-export const wsActions = {
-  sendWSGet: sendGet,
-  sendWSPost: sendPost,
 }
 
 export default wsConnectionMiddleware

@@ -1,7 +1,8 @@
 import { useEffect } from "react"
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
-import { wsActions } from "@/store/wsMiddleware"
+
+import wsActions from "@/store/ws/actions"
 
 export const useChatMessages = (chatId: number) => {
   const chatMessages = useAppSelector((state) => state.chats.chatMessages?.[chatId])
@@ -9,7 +10,7 @@ export const useChatMessages = (chatId: number) => {
 
   useEffect(() => {
     if (!chatMessages) {
-      dispatch(wsActions.sendWSGet(`/chat/${chatId}/messages`))
+      dispatch(wsActions.sendGet(`/chat/${chatId}/messages`))
     }
   }, [chatId, chatMessages, dispatch])
 
@@ -22,7 +23,7 @@ export const useMessage = (messageId: number) => {
 
   useEffect(() => {
     if (!message) {
-      dispatch(wsActions.sendWSGet(`/message/${messageId}`))
+      dispatch(wsActions.sendGet(`/message/${messageId}`))
     }
   }, [dispatch, message, messageId])
 
@@ -33,6 +34,6 @@ export const useSendMessage = () => {
   const dispatch = useAppDispatch()
 
   return (chatId: number, content: string) => {
-    dispatch(wsActions.sendWSPost(`/chat/${chatId}/message`, { content }))
+    dispatch(wsActions.sendPost(`/chat/${chatId}/message`, { content }))
   }
 }
