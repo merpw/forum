@@ -15,14 +15,13 @@ import { chatActions } from "@/store/chats"
 import { useMe } from "@/api/auth"
 
 const ChatPage = () => {
-  const params = useParams()
-  const chatId = Number(params?.id || NaN)
+  const chatId = Number(useParams().id)
 
   const router = useRouter()
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (chatId && isNaN(chatId)) {
+    if (isNaN(chatId) || chatId < 0) {
       router.push("/chat")
       return
     }
@@ -33,7 +32,7 @@ const ChatPage = () => {
     }
   }, [chatId, dispatch, router])
 
-  if (chatId === null || isNaN(chatId)) {
+  if (isNaN(chatId) || chatId < 0) {
     return null
   }
 
