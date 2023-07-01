@@ -26,7 +26,7 @@ const UserPage: NextPage = () => {
   ]
   const [activeTab, setActiveTab] = useState(0)
 
-  if (isLoading || !user) return <div>Loading...</div>
+  if (isLoading || !user) return <div className={"text-info text-center mt-5 mb-7"}>Loading...</div>
 
   return (
     <>
