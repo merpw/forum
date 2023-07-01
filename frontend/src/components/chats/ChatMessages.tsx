@@ -75,7 +75,7 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
   }, [chatMessages, messagesCount])
 
   if (!chatMessages) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   const messages = chatMessages.slice(-messagesCount)

@@ -69,11 +69,14 @@ const ChatsSection = () => {
   }
 
   return (
-    <div className={"bg-base-100 overscroll-contain relative overflow-auto p-3 w-full sm:9/12 md:w-7/12 lg:w-1/3"}>
+    <div
+      className={
+        "bg-base-100 overscroll-contain relative overflow-auto p-3 w-full sm:9/12 md:w-7/12 lg:w-1/3"
+      }
+    >
       <div className={"flex flex-column mb-2"}>
         <div className={"space-y-3"}>
           <div className={""}>
-            {/* TODO: add User list */}
             <ul className={"tab tab-md p-0 font-bold"}>
               <li>
                 <button

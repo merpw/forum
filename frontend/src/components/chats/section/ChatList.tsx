@@ -79,10 +79,10 @@ const CompanionData: FC<{ userId: number }> = ({ userId }) => {
   const isOnline = useIsUserOnline(userId)
 
   if (user === undefined) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
   if (user === null) {
-    return <div>User not found</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>User not found</div>
   }
 
   return (
