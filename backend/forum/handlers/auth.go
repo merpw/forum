@@ -18,14 +18,14 @@ import (
 )
 
 const (
-	MinNameLength = 3
-	MaxNameLength = 15
+	MinUsernameLength = 3
+	MaxUsernameLength = 15
 
 	MinFirstNameLength = 1
-	MaxFirstNameLength = MaxNameLength
+	MaxFirstNameLength = MaxUsernameLength
 
 	MinLastNameLength = 1
-	MaxLastNameLength = MaxNameLength
+	MaxLastNameLength = MaxUsernameLength
 
 	MinPasswordLength = 8
 	MaxPasswordLength = 128
@@ -37,8 +37,8 @@ const (
 var (
 	UsernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
 
-	MinLoginLength = int(math.Min(MinNameLength, MinEmailLength))
-	MaxLoginLength = int(math.Max(MaxNameLength, MaxEmailLength))
+	MinLoginLength = int(math.Min(MinUsernameLength, MinEmailLength))
+	MaxLoginLength = int(math.Max(MaxUsernameLength, MaxEmailLength))
 )
 
 var Genders = []string{"male", "female", "other"}
@@ -50,7 +50,7 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody := struct {
-		Name      string `json:"name"`
+		Username  string `json:"username"`
 		Email     string `json:"email"`
 		Password  string `json:"password"`
 		FirstName string `json:"first_name"`
@@ -64,23 +64,23 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestBody.Name = strings.TrimSpace(requestBody.Name)
-	if len(requestBody.Name) < MinNameLength {
+	requestBody.Username = strings.TrimSpace(requestBody.Username)
+	if len(requestBody.Username) < MinUsernameLength {
 		http.Error(w, "Username is too short", http.StatusBadRequest)
 		return
 	}
-	if len(requestBody.Name) > MaxNameLength {
+	if len(requestBody.Username) > MaxUsernameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
 		return
 	}
 
-	if !UsernameRegex.MatchString(requestBody.Name) {
+	if !UsernameRegex.MatchString(requestBody.Username) {
 		http.Error(w, "Username is not valid, only letters, numbers and underscores are allowed",
 			http.StatusBadRequest)
 		return
 	}
 
-	if h.DB.IsNameTaken(requestBody.Name) {
+	if h.DB.IsNameTaken(requestBody.Username) {
 		http.Error(w, "Username is already in use", http.StatusBadRequest)
 		return
 	}
@@ -156,7 +156,7 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := h.DB.AddUser(
-		requestBody.Name,
+		requestBody.Username,
 		requestBody.Email,
 		string(encryptedPassword),
 		sql.NullString{String: requestBody.FirstName, Valid: true},

@@ -123,7 +123,7 @@ const ChatInfo: FC<{ userId: number }> = ({ userId }) => {
     <h1 className={"text-2xl mb-auto pb-2 border-b"}>
       Chat with{" "}
       <Link href={`/user/${userId}`}>
-        <span className={"font-bold clickable"}>{user?.name}</span> {isOnline ? "🟢" : "🔴"}
+        <span className={"font-bold clickable"}>{user?.username}</span> {isOnline ? "🟢" : "🔴"}
       </Link>
     </h1>
   )

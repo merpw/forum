@@ -49,7 +49,7 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
             {" by "}
           </span>
           <span className={"clickable font-Alatsi align-middle"}>
-            <Link href={`/user/${post.author.id}`}>{post.author.name}</Link>
+            <Link href={`/user/${post.author.id}`}>{post.author.username}</Link>
           </span>
         </span>
       </div>

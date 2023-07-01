@@ -74,7 +74,7 @@ const CompanionData: FC<{ userId: number }> = ({ userId }) => {
   return (
     <div>
       <div className={"text-xl"}>
-        {user.name} {isOnline ? "🟢" : "🔴"}
+        {user.username} {isOnline ? "🟢" : "🔴"}
       </div>
     </div>
   )
@@ -127,7 +127,7 @@ const FormattedDate: FC<{ timestamp: string }> = ({ timestamp }) => {
 const UserName: FC<{ userId: number }> = ({ userId }) => {
   const { user: author } = useUser(userId)
 
-  return <>{author?.name}: </>
+  return <>{author?.username}: </>
 }
 
 export default ChatList

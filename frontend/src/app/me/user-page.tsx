@@ -142,7 +142,7 @@ const UserInfo: FC<{ user: User }> = ({ user }) => {
       >
         {"Hey, "}
         <span className={"text-3xl sm:text-4xl text-primary font-Yesteryear mx-1"}>
-          {user.name}
+          {user.username}
         </span>
         {"Forgot who you are?"}
       </div>

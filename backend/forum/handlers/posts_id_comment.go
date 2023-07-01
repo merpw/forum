@@ -198,7 +198,7 @@ func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 		response = append(response, SafeComment{
 			Id:            comment.Id,
 			Content:       comment.Content,
-			Author:        SafeUser{user.Id, user.Name},
+			Author:        SafeUser{user.Id, user.Username},
 			Date:          comment.Date,
 			LikesCount:    comment.LikesCount,
 			DislikesCount: comment.DislikesCount,

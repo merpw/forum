@@ -12,7 +12,7 @@ const SignupPage = () => {
   const { isLoading, isLoggedIn, mutate } = useMe()
 
   const [formFields, setFormFields] = useState<{
-    name: string
+    username: string
     email: string
     password: string
     passwordConfirm: string
@@ -21,7 +21,7 @@ const SignupPage = () => {
     dob: string
     gender: string
   }>({
-    name: "",
+    username: "",
     email: "",
     password: "",
     passwordConfirm: "",
@@ -56,7 +56,7 @@ const SignupPage = () => {
           setFormFields({ ...formFields, [target.name]: target.value })
         }}
         onBlur={() => {
-          formFields.name = formFields.name.trim()
+          formFields.username = formFields.username.trim()
           formFields.first_name = formFields.first_name.trim()
           formFields.last_name = formFields.last_name.trim()
           formFields.email = formFields.email.trim()
@@ -101,11 +101,11 @@ const SignupPage = () => {
                   <input
                     type={"text"}
                     className={"input input-bordered"}
-                    name={"name"}
+                    name={"username"}
                     minLength={3}
                     maxLength={15}
                     placeholder={"username"}
-                    value={formFields.name}
+                    value={formFields.username}
                     onChange={() => void 0 /* handled by Form */}
                     required
                   />
@@ -128,7 +128,7 @@ const SignupPage = () => {
                     />
                   </div>
                   <div className={"grow basis-1/3"}>
-                    <label className={"label "}>
+                    <label className={"label"}>
                       <span className={"label-text"}>Last Name </span>
                     </label>
                     <input

@@ -68,7 +68,7 @@ const UserInfo = () => {
         >
           <li className={"menu-title inline"}>
             <span className={"font-light"}>Hello, </span>
-            <span className={"text-primary"}>{user?.name}</span>
+            <span className={"text-primary"}>{user?.username}</span>
           </li>
           <hr className={"mx-3 mb-1 border-dotted border-t-0 border-b-4 border-info opacity-20"} />
           <li>

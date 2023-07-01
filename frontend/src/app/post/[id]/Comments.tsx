@@ -53,7 +53,7 @@ const CommentCard: FC<{ comment: Comment; postId: number }> = ({ comment, postId
         <div className={"clickable flex flex-wrap text-xl my-1"}>
           <Link href={`/user/${comment.author.id}`}>
             <h3 className={"clickable font-Alatsi text-base"}>
-              {comment.author.name}{" "}
+              {comment.author.username}{" "}
               <span className={"font-sans font-bold text-xl gradient-text"}>:</span>
             </h3>
           </Link>

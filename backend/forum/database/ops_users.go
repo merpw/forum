@@ -7,7 +7,7 @@ import (
 
 // GetAllUserIds returns slice of all users ids
 func (db DB) GetAllUserIds() (userIds []int) {
-	query, err := db.Query("SELECT id FROM users ORDER BY name ASC")
+	query, err := db.Query("SELECT id FROM users ORDER BY username ASC")
 	if err != nil {
 		log.Panic(err)
 	}
@@ -39,7 +39,7 @@ func (db DB) GetUserById(id int) *User {
 		return nil
 	}
 	err = query.Scan(
-		&user.Id, &user.Name, &user.Email, &user.Password,
+		&user.Id, &user.Username, &user.Email, &user.Password,
 		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
 	if err != nil {
 		log.Panic(err)
@@ -53,7 +53,7 @@ func (db DB) GetUserById(id int) *User {
 //
 // returns nil if user not found
 func (db DB) GetUserByLogin(login string) *User {
-	query, err := db.Query("SELECT * FROM users WHERE email = ? OR name = ? COLLATE NOCASE", login, login)
+	query, err := db.Query("SELECT * FROM users WHERE email = ? OR username = ? COLLATE NOCASE", login, login)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -63,7 +63,7 @@ func (db DB) GetUserByLogin(login string) *User {
 	}
 	var user User
 	err = query.Scan(
-		&user.Id, &user.Name, &user.Email, &user.Password,
+		&user.Id, &user.Username, &user.Email, &user.Password,
 		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
 	if err != nil {
 		log.Panic(err)
@@ -74,11 +74,11 @@ func (db DB) GetUserByLogin(login string) *User {
 }
 
 // AddUser adds user to database, returns id of new user
-func (db DB) AddUser(name, email, password string, firstName, lastName, dob, gender sql.NullString) int {
+func (db DB) AddUser(username, email, password string, firstName, lastName, dob, gender sql.NullString) int {
 	result, err := db.Exec(
-		`INSERT INTO users (name, email, password, first_name, last_name, dob, gender)
+		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender)
 		VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		name, email, password, firstName.String, lastName.String, dob.String, gender.String)
+		username, email, password, firstName.String, lastName.String, dob.String, gender.String)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -104,8 +104,8 @@ func (db DB) IsEmailTaken(email string) bool {
 
 // IsNameTaken checks if name is already in use.
 // Added because authorization supports the name and the email as login
-func (db DB) IsNameTaken(name string) bool {
-	query, err := db.Query("SELECT 1 FROM users WHERE name = ? COLLATE NOCASE", name)
+func (db DB) IsNameTaken(username string) bool {
+	query, err := db.Query("SELECT 1 FROM users WHERE username = ? COLLATE NOCASE", username)
 	if err != nil {
 		log.Panic(err)
 	}

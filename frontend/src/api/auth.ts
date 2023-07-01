@@ -57,7 +57,7 @@ export const useLogOut = () => {
 }
 
 export const SignUp = async (data: {
-  name: string
+  username: string
   email: string
   password: string
   first_name: string

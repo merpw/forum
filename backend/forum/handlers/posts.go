@@ -19,7 +19,7 @@ func (h *Handlers) posts(w http.ResponseWriter, _ *http.Request) {
 			Title:         post.Title,
 			Description:   post.Description,
 			Date:          post.Date,
-			Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+			Author:        SafeUser{Id: postAuthor.Id, Username: postAuthor.Username},
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
 			DislikesCount: post.DislikesCount,

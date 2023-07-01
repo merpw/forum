@@ -31,7 +31,7 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 		Title:         post.Title,
 		Content:       post.Content,
 		Description:   post.Description,
-		Author:        SafeUser{Id: postAuthor.Id, Name: postAuthor.Name},
+		Author:        SafeUser{Id: postAuthor.Id, Username: postAuthor.Username},
 		Date:          post.Date,
 		CommentsCount: post.CommentsCount,
 		LikesCount:    post.LikesCount,

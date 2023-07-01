@@ -19,7 +19,7 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		DoB       string `json:"dob,omitempty"`
 		Gender    string `json:"gender,omitempty"`
 	}{
-		SafeUser:  SafeUser{Id: user.Id, Name: user.Name},
+		SafeUser:  SafeUser{Id: user.Id, Username: user.Username},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
 		LastName:  user.LastName.String,
@@ -48,7 +48,7 @@ func (h *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 				Id:            post.Id,
 				Title:         post.Title,
 				Description:   post.Description,
-				Author:        SafeUser{Id: user.Id, Name: user.Name},
+				Author:        SafeUser{Id: user.Id, Username: user.Username},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
 				LikesCount:    post.LikesCount,
@@ -80,7 +80,7 @@ func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 				Id:            post.Id,
 				Title:         post.Title,
 				Description:   post.Description,
-				Author:        SafeUser{Id: author.Id, Name: author.Name},
+				Author:        SafeUser{Id: author.Id, Username: author.Username},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
 				LikesCount:    post.LikesCount,
