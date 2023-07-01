@@ -9,15 +9,23 @@ const nextConfig = {
   //   scrollRestoration: true,
   // },
   async rewrites() {
-    if (process.env.DEV_FORUM_BACKEND_REWRITE_URL) {
-      return [
-        {
-          source: "/api/:path*",
-          destination: `${process.env.DEV_FORUM_BACKEND_REWRITE_URL}/api/:path*`,
-        },
-      ]
+    const rewrites = []
+
+    if (process.env.DEV_FORUM_WS_REWRITE_URL) {
+      rewrites.push({
+        source: "/ws",
+        destination: `${process.env.DEV_FORUM_WS_REWRITE_URL}/ws`,
+      })
     }
-    return []
+
+    if (process.env.DEV_FORUM_BACKEND_REWRITE_URL) {
+      rewrites.push({
+        source: "/api/:path*",
+        destination: `${process.env.DEV_FORUM_BACKEND_REWRITE_URL}/api/:path*`,
+      })
+    }
+
+    return rewrites
   },
   output: "standalone",
 }

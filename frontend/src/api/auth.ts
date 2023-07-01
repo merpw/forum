@@ -1,10 +1,14 @@
 import axios from "axios"
 import useSWR from "swr"
+import { useDispatch } from "react-redux"
+import { useRouter } from "next/navigation"
 
 import { User } from "@/custom"
+import { chatActions } from "@/store/chats"
+import wsActions from "@/store/ws/actions"
 
 export const useMe = () => {
-  const { data, mutate, error } = useSWR<{ user: User | undefined }>("/api/me", getMe, {
+  const { data, mutate, error } = useSWR<{ user: User | null }>("/api/me", getMe, {
     revalidateOnFocus: false,
   })
   return {
@@ -24,9 +28,9 @@ const getMe = async () =>
           return { user: res.data }
         })
         .catch(() => {
-          return { user: undefined }
+          return { user: null }
         })
-    : { user: undefined }
+    : { user: null }
 
 export const logIn = async (login: string, password: string) =>
   axios.post("/api/login", { login, password }, { withCredentials: true }).catch((err) => {
@@ -35,6 +39,22 @@ export const logIn = async (login: string, password: string) =>
 
 export const logOut = async (): Promise<void> =>
   axios.post("/api/logout", {}, { withCredentials: true })
+
+export const useLogOut = () => {
+  const { mutate } = useMe()
+  const router = useRouter()
+  const dispatch = useDispatch()
+
+  const logOut = async () => {
+    await axios.post("/api/logout", {}, { withCredentials: true })
+    await mutate({ user: null }, false)
+    dispatch(chatActions.reset())
+    dispatch(wsActions.close())
+    router.refresh()
+  }
+
+  return logOut
+}
 
 export const SignUp = async (data: {
   username: string

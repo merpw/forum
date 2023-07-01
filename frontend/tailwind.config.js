@@ -5,12 +5,6 @@ module.exports = {
     hoverOnlyWhenSupported: true,
   },
   theme: {
-    container: {
-      screens: {
-        xl: "1200px",
-        // TODO: remove when we will have more content to display (e.g. sidebar)
-      },
-    },
     extend: {
       fontFamily: {
         Alatsi: "var(--font-alatsi)",

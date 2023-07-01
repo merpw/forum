@@ -1,14 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 
-import { logOut, useMe } from "@/api/auth"
+import { useLogOut, useMe } from "@/api/auth"
 
 const UserInfo = () => {
-  const { user, isError, isLoading, isLoggedIn, mutate } = useMe()
+  const { user, isError, isLoading, isLoggedIn } = useMe()
+  const logOut = useLogOut()
 
-  const router = useRouter()
   if (isError || isLoading) {
     return null
   }
@@ -76,18 +75,7 @@ const UserInfo = () => {
             <Link href={"/me"}>Profile</Link>
           </li>
           <li>
-            <button
-              type={"submit"}
-              title={"Logout"}
-              onClick={() =>
-                logOut()
-                  .then(() => {
-                    router.refresh()
-                    mutate()
-                  })
-                  .catch(null)
-              }
-            >
+            <button type={"submit"} title={"Logout"} onClick={() => logOut()}>
               Logout
             </button>
           </li>
