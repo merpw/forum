@@ -52,7 +52,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
               <div className={"self-center font-light text-center sm:text-left"}>
                 {/* TODO: add user info if they follows you */}
                 {"Hey! I'm "}
-                <p className={"text-4xl text-primary font-Yesteryear mx-1"}>{user.name}</p>
+                <p className={"text-4xl text-primary font-Yesteryear mx-1"}>{user.username}</p>
               </div>
             </div>
           </div>
@@ -86,7 +86,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
       <div className={"mt-5"}>
         <div className={"text-center"}>
           <h2 className={"tab tab-bordered tab-active cursor-default self-center mb-3"}>
-            {user.name}
+            {user.username}
             {"'s posts"}
           </h2>
         </div>

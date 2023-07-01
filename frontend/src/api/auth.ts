@@ -37,7 +37,7 @@ export const logOut = async (): Promise<void> =>
   axios.post("/api/logout", {}, { withCredentials: true })
 
 export const SignUp = async (data: {
-  name: string
+  username: string
   email: string
   password: string
   first_name: string

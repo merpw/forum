@@ -9,7 +9,7 @@ import (
 )
 
 type TestClientData struct {
-	Name      string `json:"name"`
+	Username  string `json:"username"`
 	Email     string `json:"email"`
 	Password  string `json:"password"`
 	FirstName string `json:"first_name"`
@@ -23,7 +23,7 @@ func NewClientData() TestClientData {
 	genders := []string{"male", "female", "other"}
 
 	return TestClientData{
-		Name:      "t" + uuid.Must(uuid.NewV4()).String()[0:8],
+		Username:  "t" + uuid.Must(uuid.NewV4()).String()[0:8],
 		Email:     "t" + uuid.Must(uuid.NewV4()).String()[0:8] + "@test.com",
 		Password:  uuid.Must(uuid.NewV4()).String()[0:8],
 		FirstName: "John",

@@ -34,7 +34,7 @@ func TestMe(t *testing.T) {
 
 		var respData struct {
 			Id        int    `json:"id"`
-			Name      string `json:"name"`
+			Username  string `json:"username"`
 			Email     string `json:"email"`
 			FirstName string `json:"first_name"`
 			LastName  string `json:"last_name"`
@@ -44,8 +44,8 @@ func TestMe(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		if respData.Name != cli.Name {
-			t.Fatalf("invalid name, expected %s, got %s", cli.Name, respData.Name)
+		if respData.Username != cli.Username {
+			t.Fatalf("invalid username, expected %s, got %s", cli.Username, respData.Username)
 		}
 
 		if respData.Email != cli.Email {

@@ -35,7 +35,7 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	server.SendObject(w, SafeUser{Id: user.Id, Name: user.Name})
+	server.SendObject(w, SafeUser{Id: user.Id, Username: user.Username})
 }
 
 // usersIdPosts Returns the posts of the user with the given id.
@@ -66,7 +66,7 @@ func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 			Id:            post.Id,
 			Title:         post.Title,
 			Description:   post.Description,
-			Author:        SafeUser{user.Id, user.Name},
+			Author:        SafeUser{user.Id, user.Username},
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,

@@ -17,8 +17,8 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
   const user = await getUserLocal(id).catch(notFound)
 
   return {
-    title: user.name,
-    description: `Posts created by ${user.name}`,
+    title: user.username,
+    description: `Posts created by ${user.username}`,
   }
 }
 
