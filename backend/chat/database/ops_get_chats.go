@@ -6,8 +6,13 @@ import (
 )
 
 // GetUserChats returns a slice of all user's chats ids.
+//
+// Sorted by the last message's id in each chat.
 func (db DB) GetUserChats(userId int) (chats []int) {
-	q, err := db.Query("SELECT chat_id FROM memberships WHERE user_id = ?", userId)
+	q, err := db.Query(`
+		SELECT chat_id FROM memberships WHERE user_id = ? 
+		ORDER BY (SELECT id FROM messages WHERE chat_id = memberships.chat_id ORDER BY id DESC LIMIT 1) DESC
+`, userId)
 	if err != nil {
 		panic(err)
 	}
