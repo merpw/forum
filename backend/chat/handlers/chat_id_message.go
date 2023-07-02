@@ -24,7 +24,7 @@ func (h *Handlers) chatIdMessage(message ws.Message, client *ws.Client) {
 
 	isMember := h.DB.IsChatMember(chatId, client.UserId)
 	if !isMember {
-		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
+		h.Hub.Broadcast(ws.BuildResponseMessage(message, nil), client.UserId)
 		return
 	}
 

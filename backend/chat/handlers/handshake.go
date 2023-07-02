@@ -4,7 +4,6 @@ import (
 	"backend/chat/external"
 	"backend/chat/ws"
 	"encoding/json"
-	"fmt"
 	"log"
 )
 
@@ -41,10 +40,27 @@ func (h *Handlers) handshake(messageBody []byte, client *ws.Client) {
 	client.UserId = userId
 	client.Token = message.Item.Token
 
-	err = client.Conn.WriteMessage(1, []byte(fmt.Sprintf(`{"type":"handshake","item":{"data":{"userId":%d}}}`, userId)))
-	if err != nil {
-		log.Println(err)
-	}
+	h.Hub.Broadcast(struct {
+		Type string `json:"type"`
+		Item struct {
+			Data struct {
+				UserId int `json:"userId"`
+			}
+		}
+	}{
+		Type: "handshake",
+		Item: struct {
+			Data struct {
+				UserId int `json:"userId"`
+			}
+		}{
+			Data: struct {
+				UserId int `json:"userId"`
+			}{
+				UserId: userId,
+			},
+		},
+	}, client.UserId)
 
 	h.Hub.BroadcastOnlineStatus()
 }

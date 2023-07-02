@@ -25,7 +25,7 @@ func (h *Handlers) chatId(message ws.Message, client *ws.Client) {
 
 	isMember := h.DB.IsChatMember(chatId, client.UserId)
 	if !isMember {
-		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
+		h.Hub.Broadcast(ws.BuildResponseMessage(message, nil), client.UserId)
 		return
 	}
 
@@ -38,11 +38,7 @@ func (h *Handlers) chatId(message ws.Message, client *ws.Client) {
 	}
 	responseMessage := ws.BuildResponseMessage(message, responseData)
 
-	err = client.Conn.WriteJSON(responseMessage)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	h.Hub.Broadcast(responseMessage, client.UserId)
 }
 
 // chatIdMessages responds with all messages from a chat
@@ -58,13 +54,13 @@ func (h *Handlers) chatIdMessages(message ws.Message, client *ws.Client) {
 
 	isMember := h.DB.IsChatMember(chatId, client.UserId)
 	if !isMember {
-		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
+		h.Hub.Broadcast(ws.BuildResponseMessage(message, nil), client.UserId)
 		return
 	}
 
 	chats := h.DB.GetChatMessages(chatId)
 	responseMessage := ws.BuildResponseMessage(message, chats)
-	err = client.Conn.WriteJSON(responseMessage)
+	h.Hub.Broadcast(responseMessage, client.UserId)
 	if err != nil {
 		log.Println(err)
 		return

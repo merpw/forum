@@ -27,9 +27,5 @@ func (h *Handlers) usersIdChat(message ws.Message, client *ws.Client) {
 
 	responseMessage := ws.BuildResponseMessage(message, data)
 
-	err = client.Conn.WriteJSON(responseMessage)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	h.Hub.Broadcast(responseMessage, client.UserId)
 }

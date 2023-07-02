@@ -103,6 +103,9 @@ func (h *Hub) Unregister(client *Client) {
 //
 // If no clients specified, sends to all
 func (h *Hub) Broadcast(data interface{}, clients ...int) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if clients == nil {
 		// not specified, send to all
 		for _, c := range h.Clients {

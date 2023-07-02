@@ -20,7 +20,7 @@ func (h *Handlers) messageId(message ws.Message, client *ws.Client) {
 	msg := h.DB.GetMessage(messageId)
 
 	if !h.DB.IsChatMember(msg.ChatId, client.UserId) {
-		_ = client.Conn.WriteJSON(ws.BuildResponseMessage(message, nil))
+		h.Hub.Broadcast(ws.BuildResponseMessage(message, nil), client.UserId)
 		return
 	}
 
@@ -40,9 +40,5 @@ func (h *Handlers) messageId(message ws.Message, client *ws.Client) {
 		Timestamp: msg.Time,
 	})
 
-	err = client.Conn.WriteJSON(responseMessage)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	h.Hub.Broadcast(responseMessage, client.UserId)
 }
