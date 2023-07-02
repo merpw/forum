@@ -4,7 +4,7 @@ import { useContext } from "react"
 
 import { ChatSectionCollapsedContext } from "@/components/layout"
 import { useChatIds } from "@/api/chats/chats"
-import ChatList from "@/components/chats/list"
+import ChatList from "@/components/chats/ChatList"
 
 const ChatsSection = () => {
   const { chatIds } = useChatIds()
