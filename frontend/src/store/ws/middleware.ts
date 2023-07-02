@@ -86,10 +86,18 @@ const wsConnectionMiddleware: Middleware = (store) => {
 
     if (state.wsConnection.status === "disconnected") {
       store.dispatch(wsActions.connect())
-      return next(action)
     }
 
     if (wsActions.sendGet.match(action) || wsActions.sendPost.match(action)) {
+      if (state.wsConnection.status !== "connected") {
+        // not connected yet, retry later
+        setTimeout(() => {
+          store.dispatch(action)
+        }, retryTimeout + 100)
+
+        return next(action)
+      }
+
       const type = action.payload.type
       const url = action.payload.item.url
 
@@ -98,15 +106,8 @@ const wsConnectionMiddleware: Middleware = (store) => {
         return next(action)
       }
 
-      if (state.wsConnection.status === "connected") {
-        ws.send(JSON.stringify(action.payload))
-        store.dispatch(wsConnectionActions.requestPending(action.payload.item.url))
-      } else {
-        setTimeout(() => {
-          store.dispatch({ type: "ws/send", payload: action.payload })
-        }, retryTimeout)
-        return next(action)
-      }
+      ws.send(JSON.stringify(action.payload))
+      store.dispatch(wsConnectionActions.requestPending(action.payload.item.url))
     }
 
     return next(action)
