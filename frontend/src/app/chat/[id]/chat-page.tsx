@@ -79,14 +79,14 @@ const ChatPage: FC<{ id: number }> = ({ id }) => {
     <div className={"flex flex-col h-full pb-60 max-w-3xl m-auto"}>
       <ChatInfo userId={chat.companionId} />
       <div
-          className={
-            "border rounded-lg min-h-full flex flex-col-reverse p-1 pb-3 my-3 gradient-light dark:gradient-dark"
-          }
+        className={
+          "border border-base-100 rounded-lg min-h-full flex flex-col-reverse p-1 pb-3 my-3 gradient-light dark:gradient-dark"
+        }
       >
-      <ChatMessages chatId={chat.id} />
+        <ChatMessages chatId={chat.id} />
       </div>
       <div className={"mb-16"}>
-      <WriteMessageForm sendMessage={(content) => sendMessage(chat.id, content)} />
+        <WriteMessageForm sendMessage={(content) => sendMessage(chat.id, content)} />
       </div>
     </div>
   )
