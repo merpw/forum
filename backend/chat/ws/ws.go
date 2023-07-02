@@ -56,6 +56,12 @@ var wsUpgrader = websocket.Upgrader{
 
 // UpgradeHandler upgrades HTTP connection to WebSocket
 func (h *Hub) UpgradeHandler(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("ERROR 500: ", err)
+		}
+	}()
+
 	conn, err := wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
