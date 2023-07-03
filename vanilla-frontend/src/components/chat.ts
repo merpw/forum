@@ -4,7 +4,27 @@ import { userInfo } from "./auth.js"
 import { createElement, iterator } from "./utils.js"
 import { getUserById, getUserIds } from "../api/get.js"
 
-// This file is dedicated to sorting and displaying chat users in the sidebar.
+export const chat = {
+  list: {
+    idMap: new Map<number, number>, // companionId, chatId
+    users: [] as ChatUser[],
+  }, 
+
+  messages: {
+    list: [] as Message[],
+    buffer: [] as Message[],
+    current: {} as Message
+  },
+
+  current: {
+    username: "",
+    userId: -1,
+    chatId: -1,
+  }
+}
+
+chat.current
+
 export const chatList = {
   Ids: new Map<number, number>, //companionId, chatId
   Users: [] as ChatUser[],
@@ -22,7 +42,6 @@ export const currentChat = {
   userId: -1,
   chatId: -1
 }
-
 
 const getChatUsers = async () => {
   Object.assign(chatList, {
@@ -103,8 +122,9 @@ const showChat = async (id: number) => {
 
   const messageSend = createElement("button", null, "chat-send", "Send")
   messageSend.style.marginLeft = "4px"
-  messageSend.addEventListener("click", () => {
+  messageSend.addEventListener("click", (e) => {
     sendMessage(chatId)
+    e.preventDefault()
   })
 
   chatForm.append(messageField, messageSend)
@@ -136,7 +156,8 @@ const showChat = async (id: number) => {
 
 }
 
-const sendMessage = async (chatId: number) => {
+const sendMessage = async (chatId: number): Promise<void> => {
+  return new Promise<void>((resolve) => {
   const content = document.getElementById("chat-text") as HTMLInputElement
   let message = content.value.toString().trim()
   if (message.length > 0) {
@@ -154,51 +175,65 @@ const sendMessage = async (chatId: number) => {
       },
     })
   }
+    setTimeout(resolve, 10)
+  })
 }
 
-export const updateChat = (chatId: number) => {
-  const message = messages.list[0]
-  setTimeout(() => {
-    const chatMessages = document.getElementById(
-      `Chat${chatId}`
-    ) as HTMLDivElement
-    const msgElement = createElement(
-      "div",
-      "message",
-      null,
-      message.content
-    ) as HTMLDivElement
-    const date = new Date(message.timestamp)
-    const formatDate = date
-    .toLocaleString("en-GB", { timeZone: "EET" })
-    .slice(0, 10)
-    if (message.authorId === userInfo.Id) {
-      msgElement.classList.add("send")
-      msgElement.textContent = "You:\n" + message.content + "\n" + formatDate
-    } else if (message.authorId === -1) {
-      msgElement.classList.add("status")
-      msgElement.textContent = message.content + "\n" + formatDate
-    } else {
-      msgElement.textContent = currentChat.username + ":\n" + message.content + "\n" + formatDate
-      msgElement.classList.add("recieve")
-    }
-    if (currentChat.chatId === messages.current.chatId) {
-      chatMessages.prepend(msgElement)
-    } 
-  }, 5)
-    renderChatList()
+export const updateChat = (chatId: number): Promise<void> => {
+  return new Promise<void>((resolve) => {
+    const message = messages.list[0]
+    setTimeout(() => {
+      const chatMessages = document.getElementById(
+        `Chat${chatId}`
+      ) as HTMLDivElement
+      const msgElement = createElement(
+        "div",
+        "message",
+        null,
+        message.content
+      ) as HTMLDivElement
+      const date = new Date(message.timestamp)
+      const formatDate = date
+      .toLocaleString("en-GB", { timeZone: "EET" })
+      .slice(0, 10)
+      if (message.authorId === userInfo.Id) {
+        msgElement.classList.add("send")
+        msgElement.textContent = "You:\n" + message.content + "\n" + formatDate
+      } else if (message.authorId === -1) {
+        msgElement.classList.add("status")
+        msgElement.textContent = message.content + "\n" + formatDate
+      } else {
+        msgElement.textContent = currentChat.username + ":\n" + message.content + "\n" + formatDate
+        msgElement.classList.add("recieve")
+      }
+      if (currentChat.chatId === messages.current.chatId) {
+        chatMessages.prepend(msgElement)
+      } 
+    }, 5)
+    resolve(renderChatList())
+  })
 }
 
 const getMessages = async (chatId: number): Promise<void> => {
-  Object.assign(messages, { list: [] })
-  setTimeout(() => {
-    sendWsObject({
-      type: "get",
-      item: {
-        url: `/chat/${chatId}/messages`,
-      },
-    })
-  }, 10)
+  return new Promise<void>((resolve, reject) => {
+    // Reset the state of the messages
+    Object.assign(messages, { list: [] })
+    setTimeout(() => {
+      sendWsObject({
+        type: "get",
+        item: {
+          url: `/chat/${chatId}/messages`,
+        },
+      })
+    }, 20)
+    setTimeout(() => {
+      if (messages.list.length === 0) {
+        reject("Empty chat")
+      } else {
+        resolve()
+      }
+    }, 50)
+  })
 }
 
 export const displayChatUsers = async () => {
@@ -213,44 +248,47 @@ export const displayChatUsers = async () => {
   renderChatList()
 }
 
-export function renderChatList() {
-  sendWsObject({
-    type: "get",
-    item: {
-      url: "/chat/all",
-    },
-  }) 
-  setTimeout(() => {
-    const onlineList = document.getElementById("online-users") as HTMLUListElement,
-    offlineList = document.getElementById("offline-users") as HTMLUListElement
+export function renderChatList(): Promise<void> {
+  return new Promise((resolve) => {
+    sendWsObject({
+      type: "get",
+      item: {
+        url: "/chat/all",
+      },
+    }) 
+    setTimeout(() => {
+      const onlineList = document.getElementById("online-users") as HTMLUListElement,
+      offlineList = document.getElementById("offline-users") as HTMLUListElement
 
-    /* Resets the list if user logging in or out */
-    onlineList.replaceChildren()
-    offlineList.replaceChildren()
+      /* Resets the list if user logging in or out */
+      onlineList.replaceChildren()
+      offlineList.replaceChildren()
 
-    for (const u of chatList.Users) {
-      const user = createElement("li", "chat-user", u.Name)
-      const name = createElement("p", null, null, u.Name)
-      user.appendChild(name)
+      for (const u of chatList.Users) {
+        const user = createElement("li", "chat-user", u.Name)
+        const name = createElement("p", null, null, u.Name)
+        user.appendChild(name)
 
-      if (u.UnreadMsg) {
-        const unread = createElement("i", "bx bx-message-dots")
-        user.appendChild(unread)
+        if (u.UnreadMsg) {
+          const unread = createElement("i", "bx bx-message-dots")
+          user.appendChild(unread)
+        }
+
+        user.addEventListener("click", () => {
+          showChat(u.Id)
+        })
+
+        if (u.Online) {
+          user.classList.add("online")
+          onlineList.appendChild(user)
+        } else {
+          user.classList.add("offline")
+          offlineList.appendChild(user)
+        }
       }
-
-      user.addEventListener("click", () => {
-        showChat(u.Id)
-      })
-
-      if (u.Online) {
-        user.classList.add("online")
-        onlineList.appendChild(user)
-      } else {
-        user.classList.add("offline")
-        offlineList.appendChild(user)
-      }
-    }
-  }, 120)
+    }, 120)
+    setTimeout(resolve, 130)
+  })
 }
 
 
