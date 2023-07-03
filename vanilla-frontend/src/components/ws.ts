@@ -1,7 +1,7 @@
-import { chatList, currentChat, displayChatUsers, messages, renderChatList } from "./chat.js"
+import { chatList, currentChat, messages, renderChatList } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../types"
 import { iterator } from "./utils.js"
-import { Auth, userInfo } from "./auth.js"
+import { Auth } from "./auth.js"
 
 export const messageEvent = new Event("messageEvent")
 const WS_URL = "ws://localhost:8081/ws"
@@ -12,6 +12,7 @@ export const wsHandler = async () => {
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data) as WebSocketResponse<never>
+
       if (data.type === "handshake") {
         console.log("ws handshake success")
         return
@@ -29,17 +30,20 @@ export const wsHandler = async () => {
 
       if (data.type === "get") {
         getHandler(data)
+        return
       }
 
       if (data.type === "post") {
         postHandler(data)
+        return
       }
+
     } catch (e) {
       console.error("ws error", e)
       ws.close()
       setTimeout(() => {
         Auth(false)
-      }, 50)
+      }, 25)
     }
   }
 
@@ -58,16 +62,16 @@ export const wsHandler = async () => {
   }
 }
 
-const postHandler = async (resp: WSPostResponse<object | any>) => {
+const postHandler = async (resp: WSPostResponse<never>) => {
   const data = resp.item.data
   const url = resp.item.url
-  // const createChat = new RegExp(/^\/chat\/create$/)
+
   if (url.match(/^\/chat\/\d{1,}\/message$/)) { // /chat/{id}/message
     getMessage(data)
   }
 }
 
-const getHandler = (resp: WSGetResponse<object>) => {
+const getHandler = (resp: WSGetResponse<never>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
 
@@ -78,6 +82,7 @@ const getHandler = (resp: WSGetResponse<object>) => {
           break
         }
       }
+
       if (!chatList.Ids.has(data.companionId)) {
         chatList.Ids.set(data.companionId, data.id)
       }
