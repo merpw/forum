@@ -56,6 +56,12 @@ var wsUpgrader = websocket.Upgrader{
 
 // UpgradeHandler upgrades HTTP connection to WebSocket
 func (h *Hub) UpgradeHandler(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("ERROR 500: ", err)
+		}
+	}()
+
 	conn, err := wsUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -103,6 +109,9 @@ func (h *Hub) Unregister(client *Client) {
 //
 // If no clients specified, sends to all
 func (h *Hub) Broadcast(data interface{}, clients ...int) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
 	if clients == nil {
 		// not specified, send to all
 		for _, c := range h.Clients {
