@@ -39,7 +39,7 @@ const PostPage: FC<{ post: Post; comments: Comment[] }> = ({ post, comments }) =
       </div>
       <div>
         <CommentForm postId={post.id} />
-        <div className={"text-center mt-5"}>
+        <div className={"text-center mt-12"}>
           <h2 className={"tab tab-bordered tab-active cursor-default self-center mb-3"}>
             Comments
           </h2>
