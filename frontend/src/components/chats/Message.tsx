@@ -15,42 +15,41 @@ const Message: FC<{ id: number }> = ({ id }) => {
     return null
   }
 
-  if (message.authorId === -1) {
-    return (
-      <span
-        className={"mx-auto italic"}
-        title={dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")}
-      >
-        {message.content} at {dayjs(message.timestamp).format("HH:mm")}
-      </span>
-    )
-  }
-
   return (
-    <div
-      ref={ref}
-      className={
-        "py-1 px-3 rounded w-fit flex flex-wrap max-w-[85%]" +
-        " " +
-        (message.authorId === -1
-          ? "mx-auto"
-          : user?.id !== message.authorId
-          ? "rounded-bl-none dark:bg-gray-800 bg-blue-200 mr-auto justify-end"
-          : "rounded-br-none dark:bg-gray-900 bg-gray-200 ml-auto justify-end")
-      }
-    >
-      <Markdown
-        className={"prose-img:max-h-[50vh]"}
-        content={message.content}
-        fallback={message.content}
-      />
-      <span
-        className={"ml-2 mt-auto text-sm opacity-75"}
-        title={dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")}
-      >
-        {dayjs(message.timestamp).format("HH:mm")}
-      </span>
-    </div>
+    <>
+      {message.authorId === -1 ? (
+        <span
+          className={"mx-auto italic"}
+          title={dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")}
+        >
+          {message.content} at {dayjs(message.timestamp).format("HH:mm")}
+        </span>
+      ) : (
+        <div
+          ref={ref}
+          className={
+            "py-1 px-3 rounded w-fit flex flex-wrap max-w-[85%]" +
+            " " +
+            (user?.id !== message.authorId
+              ? "rounded-bl-none dark:bg-gray-800 bg-blue-200 mr-auto justify-end"
+              : "rounded-br-none dark:bg-gray-900 bg-gray-200 ml-auto justify-end")
+          }
+        >
+          <Markdown
+            className={"prose-img:max-h-[50vh]"}
+            content={message.content}
+            fallback={message.content}
+          />
+          <span
+            className={"ml-2 mt-auto text-sm opacity-75"}
+            title={dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")}
+          >
+            {dayjs(message.timestamp).format("HH:mm")}
+          </span>
+        </div>
+      )}
+    </>
   )
 }
+
 export default Message

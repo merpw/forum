@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux"
 
 import { useChat } from "@/api/chats/chats"
 import ChatInfo from "@/components/chats/ChatInfo"
-import ChatMessages from "@/components/chats/Messages"
+import ChatMessages from "@/components/chats/ChatMessages"
 import WriteMessageForm from "@/components/chats/WriteMessageForm"
 import { chatActions } from "@/store/chats"
 
