@@ -11,6 +11,11 @@ type createChatRequestData struct {
 	UserId int `json:"userId"`
 }
 
+type createChatResponseData struct {
+	ChatId int `json:"chatId"`
+	UserId int `json:"userId"`
+}
+
 func (h *Handlers) chatCreate(message ws.Message, client *ws.Client) {
 	var data createChatRequestData
 	err := json.Unmarshal(message.Item.Data, &data)
@@ -38,7 +43,13 @@ func (h *Handlers) chatCreate(message ws.Message, client *ws.Client) {
 
 	chatId := h.DB.CreateChat(client.UserId, data.UserId)
 
-	responseMessage := ws.BuildResponseMessage(message, chatId)
+	h.Hub.Broadcast(ws.BuildResponseMessage(message, createChatResponseData{
+		ChatId: chatId,
+		UserId: data.UserId,
+	}), client.UserId)
 
-	h.Hub.Broadcast(responseMessage, client.UserId, data.UserId)
+	h.Hub.Broadcast(ws.BuildResponseMessage(message, createChatResponseData{
+		ChatId: chatId,
+		UserId: client.UserId,
+	}), data.UserId)
 }

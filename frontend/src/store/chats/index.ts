@@ -111,11 +111,12 @@ const chatSlice = createSlice({
     },
 
     handleChatCreate: {
-      reducer: (state, action: PayloadAction<{ chatId: number }>) => {
+      reducer: (state, action: PayloadAction<{ chatId: number; userId: number }>) => {
         state.chatIds?.unshift(action.payload.chatId)
+        state.userChats[action.payload.userId] = action.payload.chatId
       },
-      prepare: (response: WSPostResponse<number>) => {
-        return { payload: { chatId: response.item.data } }
+      prepare: (response: WSPostResponse<{ chatId: number; userId: number }>) => {
+        return { payload: response.item.data }
       },
     },
 
