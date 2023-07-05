@@ -7,7 +7,7 @@ import (
 
 // GetAllUserIds returns slice of all users ids
 func (db DB) GetAllUserIds() (userIds []int) {
-	query, err := db.Query("SELECT id FROM users ORDER BY username ASC")
+	query, err := db.Query("SELECT id FROM users ORDER BY username COLLATE NOCASE ASC")
 	if err != nil {
 		log.Panic(err)
 	}
