@@ -15,7 +15,7 @@ import Link from "next/link"
 import { useMe } from "@/api/auth/hooks"
 import Navbar from "@/components/navbar"
 import store from "@/store/store"
-import ChatsSection from "@/components/ChatSection"
+import ChatsSection from "@/components/chats/section/ChatSection"
 
 export const ChatSectionCollapsedContext = createContext({
   isCollapsed: false,
