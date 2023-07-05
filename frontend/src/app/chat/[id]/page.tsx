@@ -4,6 +4,10 @@ import ChatPage from "@/app/chat/[id]/chat-page"
 
 type Props = { params: { id: string } }
 
+export const metadata = {
+  title: "Chats",
+}
+
 const Page = ({ params }: Props) => {
   const id = +params.id
   if (isNaN(id) || id < 0) {
