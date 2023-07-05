@@ -2,7 +2,6 @@ import { FC } from "react"
 import Link from "next/link"
 
 import { useIsUserOnline, useUser, useUsers, useUsersOnline } from "@/api/users/hooks"
-import { useUserChat } from "@/api/chats/chats"
 
 const UserList = () => {
   const { users } = useUsers()
@@ -28,8 +27,6 @@ const UserCard: FC<{ id: number }> = ({ id }) => {
   const { user } = useUser(id)
   const isUserOnline = useIsUserOnline(id)
 
-  const { chatId } = useUserChat(id)
-
   if (!user) {
     return <div>loading...</div>
   }
@@ -40,7 +37,7 @@ const UserCard: FC<{ id: number }> = ({ id }) => {
         {user.username}
       </Link>
       {isUserOnline ? "🟢" : "🔴"}
-      {chatId && <Link href={`/chat/${chatId}`}>chat</Link>}
+      <Link href={`/chat/u${id}`}>chat</Link>
     </div>
   )
 }
