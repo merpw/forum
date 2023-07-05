@@ -1,19 +1,17 @@
 import { FC, useEffect, useRef, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 
-import { useSendMessage } from "@/api/chats/messages"
-
-const WriteMessageForm: FC<{ chatId: number }> = ({ chatId }) => {
+const WriteMessageForm: FC<{
+  sendMessage: (content: string) => void
+}> = ({ sendMessage }) => {
   const [input, setInput] = useState("")
 
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  const sendMessage = useSendMessage()
-
   useEffect(() => {
     inputRef.current?.focus()
-  }, [chatId])
+  }, [sendMessage])
 
   return (
     <form
@@ -21,8 +19,7 @@ const WriteMessageForm: FC<{ chatId: number }> = ({ chatId }) => {
       className={"mb-6"}
       onSubmit={async (e) => {
         e.preventDefault()
-        sendMessage(chatId, input)
-        // await mutateMessages()
+        sendMessage(input)
         setInput("")
       }}
     >
