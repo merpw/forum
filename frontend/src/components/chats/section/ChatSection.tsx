@@ -1,13 +1,22 @@
 // TODO: improve styles
 
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 
 import { ChatSectionCollapsedContext } from "@/components/layout"
 import { useChatIds } from "@/api/chats/chats"
 import ChatList from "@/components/chats/section/ChatList"
+import UserList from "@/components/chats/section/UserList"
 
 const ChatsSection = () => {
   const { chatIds } = useChatIds()
+
+  const [tab, setTab] = useState<"chats" | "users">("chats")
+
+  useEffect(() => {
+    if (chatIds && chatIds.length === 0) {
+      setTab("users")
+    }
+  }, [chatIds])
 
   const { isCollapsed, setIsCollapsed } = useContext(ChatSectionCollapsedContext)
 
@@ -43,12 +52,24 @@ const ChatsSection = () => {
             {/* TODO: add User list */}
             <ul className={"tab tab-md p-0 font-bold"}>
               <li>
-                <button type={"button"} className={"tab tab-bordered space-y-5 tab-active "}>
+                <button
+                  type={"button"}
+                  className={
+                    "tab tab-bordered space-y-5" + " " + (tab === "chats" ? "tab-active" : "")
+                  }
+                  onClick={() => setTab("chats")}
+                >
                   Chats
                 </button>
               </li>
               <li>
-                <button type={"button"} className={"tab tab-bordered space-y-5 tab-disabled"}>
+                <button
+                  type={"button"}
+                  className={
+                    "tab tab-bordered space-y-5" + " " + (tab === "users" ? "tab-active" : "")
+                  }
+                  onClick={() => setTab("users")}
+                >
                   Users
                 </button>
               </li>
@@ -73,7 +94,8 @@ const ChatsSection = () => {
           </svg>
         </button>
       </div>
-      {chatIds ? <ChatList chatIds={chatIds} /> : <div>loading...</div>}
+      {tab === "chats" && chatIds && <ChatList chatIds={chatIds} />}
+      {tab === "users" && <UserList />}
     </div>
   )
 }
