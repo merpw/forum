@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 
-import { useLogOut, useMe } from "@/api/auth"
+import { useLogOut, useMe } from "@/api/auth/hooks"
 
 const UserInfo = () => {
   const { user, isError, isLoading, isLoggedIn } = useMe()

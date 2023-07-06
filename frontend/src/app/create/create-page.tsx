@@ -6,7 +6,6 @@ import ReactTextAreaAutosize from "react-textarea-autosize"
 import Select from "react-select"
 import dynamic from "next/dynamic"
 
-import { useMe } from "@/api/auth"
 import { CreatePost, generateDescription } from "@/api/posts/create"
 import { FormError } from "@/components/error"
 import { Capitalize } from "@/helpers/text"
@@ -15,24 +14,6 @@ import { MarkdownToPlain } from "@/components/markdown/render"
 const Markdown = dynamic(() => import("@/components/markdown/markdown"))
 
 const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
-  categories,
-  isAIEnabled,
-}) => {
-  const { isLoading, isLoggedIn } = useMe()
-  const router = useRouter()
-
-  const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
-  useEffect(() => {
-    if (!isLoading && !isLoggedIn && !isRedirecting) {
-      setIsRedirecting(true)
-      router.push("/login")
-    }
-  }, [router, isLoggedIn, isRedirecting, isLoading])
-
-  return <CreatePostForm categories={categories} isAIEnabled={isAIEnabled} />
-}
-
-const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
   categories,
   isAIEnabled,
 }) => {

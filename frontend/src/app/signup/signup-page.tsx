@@ -1,16 +1,13 @@
 "use client"
 
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
-import { logIn, SignUp, useMe } from "@/api/auth"
+import { logIn, SignUp } from "@/api/auth/hooks"
 import { FormError } from "@/components/error"
 
 const SignupPage = () => {
   const router = useRouter()
-
-  const { isLoading, isLoggedIn, mutate } = useMe()
-
   const [formFields, setFormFields] = useState<{
     username: string
     email: string
@@ -35,14 +32,6 @@ const SignupPage = () => {
   const [isSame, setIsSame] = useState(false)
 
   const [formError, setFormError] = useState<string | null>(null)
-
-  const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
-  useEffect(() => {
-    if (!isLoading && isLoggedIn && !isRedirecting) {
-      setIsRedirecting(true)
-      router.replace("/me")
-    }
-  }, [router, isLoggedIn, isRedirecting, isLoading])
 
   useEffect(() => {
     setIsSame(false)
@@ -77,7 +66,11 @@ const SignupPage = () => {
           }
 
           SignUp(formFields)
-            .then(() => logIn(formFields.email, formFields.password).then(() => mutate()))
+            .then(() =>
+              logIn(formFields.email, formFields.password).then(() => {
+                router.refresh()
+              })
+            )
             .catch((err) => setFormError(err.message))
         }}
       >

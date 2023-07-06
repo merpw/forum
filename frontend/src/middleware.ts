@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import checkSession from "@/api/auth/edge"
+
 export async function middleware(request: NextRequest) {
   if (process.env.FORUM_IS_PRIVATE === "false") {
     return NextResponse.next()
@@ -12,21 +14,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  const response = await fetch(
-    `${process.env.FORUM_BACKEND_PRIVATE_URL}/api/internal/check-session?token=${token}`,
-    {
-      headers: {
-        "Internal-Auth": process.env.FORUM_BACKEND_SECRET || "secret",
-      },
-    }
-  )
-
-  const body = await response.json()
-  if (body.error) {
+  checkSession(token).catch(() => {
     const resp = NextResponse.rewrite(new URL("/login", request.url))
     resp.cookies.set("forum-token", "", { maxAge: 0 })
     return resp
-  }
+  })
 
   return NextResponse.next()
 }

@@ -1,13 +1,13 @@
 "use client"
 
 import { FC } from "react"
-import Link from "next/link"
 import { SWRConfig } from "swr"
 
 import { Comment } from "@/custom"
 import { useComments } from "@/api/posts/comment"
 import { ReactionsCommentButtons } from "@/components/posts/reactions"
 import AutoDate from "@/components/AutoDate"
+import UserLink from "@/components/UserLink"
 
 const Comments: FC<{ postId: number; fallback: Comment[] }> = ({ postId, fallback }) => {
   return (
@@ -51,12 +51,12 @@ const CommentCard: FC<{ comment: Comment; postId: number }> = ({ comment, postId
     <div className={"max-w-3xl rounded-lg border border-base-100 shadow-base-100 shadow-sm"}>
       <div className={"mx-5"}>
         <div className={"clickable flex flex-wrap text-xl my-1"}>
-          <Link href={`/user/${comment.author.id}`}>
+          <UserLink userId={comment.author.id}>
             <h3 className={"clickable font-Alatsi text-base"}>
               {comment.author.username}{" "}
               <span className={"font-sans font-bold text-xl gradient-text"}>:</span>
             </h3>
-          </Link>
+          </UserLink>
         </div>
         <p className={"whitespace-pre-line mb-3 ml-5 font-light"}>{comment.content}</p>
       </div>
