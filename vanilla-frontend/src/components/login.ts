@@ -25,8 +25,8 @@ class Login {
       password: passwordInput.value,
       rememberMe: rememberMeInput.checked,
     }
-    const loginstatus = await login(formData)
-    loginstatus == true ? Auth(true) : Auth(false)
+    const loginStatus = await login(formData)
+    loginStatus == true ? Auth(true) : Auth(false)
   }
 }
 
@@ -40,8 +40,20 @@ class Signup {
 
   private async onSubmit(event: Event) {
     event.preventDefault()
-    // const formData: SignupForm = this.getFormData()
-    await signup(this.getFormData() as SignupForm)
+    const formData = this.getFormData() as SignupForm
+    await signup(formData)
+    
+    const loginForm: LoginForm = {
+      login: formData.name.trim(),
+      password: formData.password.trim(),
+      rememberMe: false
+    }
+    const loginStatus = await login(loginForm)
+    if (loginStatus) {
+      Auth(true)
+    }
+
+
   }
 
   private getFormData(): SignupForm {

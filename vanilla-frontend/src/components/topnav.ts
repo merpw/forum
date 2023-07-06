@@ -34,9 +34,16 @@ export const openCloseCreatePost = async () => {
 // Goes to home page
 export const goHome = () => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
+  const categories = document.querySelectorAll(".category-title") as NodeListOf <HTMLElement>
   if (postFormElement.classList.contains("open-create-post")) {
     postFormElement.classList.replace("open-create-post", "close-create-post")
   }
+  categories.forEach((category) => {
+    if (category.classList.contains("selected")) {
+      category.classList.remove("selected")
+      return
+    }
+  })
   displayPosts("/api/posts")
 }
 
