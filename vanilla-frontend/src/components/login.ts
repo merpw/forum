@@ -52,8 +52,6 @@ class Signup {
     if (loginStatus) {
       Auth(true)
     }
-
-
   }
 
   private getFormData(): SignupForm {
@@ -86,7 +84,7 @@ class Signup {
       first_name: firstNameInput.value,
       last_name: lastNameInput.value,
       dob: ageInput.value,
-      gender: genderInput.value,
+      gender: genderInput.value.toString().toLowerCase(),
     }
     return formData
   }

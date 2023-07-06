@@ -36,7 +36,7 @@ const login = async (formData: LoginForm): Promise<boolean | undefined> => {
       return true
     } else {
       response.text().then((error) => {
-        console.error(error)
+        alert(error)
         return false
       })
     }
@@ -56,7 +56,7 @@ const signup = async (formData: SignupForm) => {
         
       } else {
         response.text().then((error) => {
-          console.log(`Error: ${error}`)
+          alert(error)
         })
       }
     })
