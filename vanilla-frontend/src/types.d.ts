@@ -33,6 +33,7 @@ export type User = {
 }
 
 export type ChatUser = User & {
+  ChatId: number
   Online: boolean
   UnreadMsg: boolean
   LastMessageId: number

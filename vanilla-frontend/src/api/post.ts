@@ -53,7 +53,7 @@ const signup = async (formData: SignupForm) => {
   })
     .then((response) => {
       if (response.ok) {
-        loginController()
+        
       } else {
         response.text().then((error) => {
           console.log(`Error: ${error}`)

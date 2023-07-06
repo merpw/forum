@@ -1,7 +1,7 @@
 import { chatList, currentChat, messages, renderChatList } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../types"
 import { iterator } from "./utils.js"
-import { Auth } from "./auth.js"
+import { Auth, userInfo } from "./auth.js"
 
 export const messageEvent = new Event("messageEvent")
 const WS_URL = "ws://localhost:8081/ws"
@@ -75,9 +75,12 @@ const getHandler = (resp: WSGetResponse<never>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
 
+  /* /chat/{id} */
   if (url.match(/^\/chat\/\d{1,}$/)) {
+    setTimeout(() => {
       for (const user of Object.values(chatList.Users)) {
         if (user.Id == data.companionId) {
+          console.log("chat", data)
           Object.assign(user, {LastMessageId: data.lastMessageId})
           break
         }
@@ -85,15 +88,33 @@ const getHandler = (resp: WSGetResponse<never>) => {
 
       if (!chatList.Ids.has(data.companionId)) {
         chatList.Ids.set(data.companionId, data.id)
+        chatList.Users.forEach((user) => {
+          if (user.Id == data.companionId) {
+            user.ChatId = data.id
+            return
+          }
+        })
       }
+    }, 20)
   }
 
-  if (url.match(/^\/chat\/\d{1,}\/messages$/)) { // /chat/{id}/messages
+  /* /chat/{id}/messages */
+  if (url.match(/^\/chat\/\d{1,}\/messages$/)) { 
     getMessageList(data as number[])
     return
   }
 
-  if (url.match(/^\/message\/\d{1,}$/)) { // /message/{id}
+  /* /message/{id} */
+  if (url.match(/^\/message\/\d{1,}$/)) {
+    if (data.authorId != -1) {
+      chatList.Users.forEach((user) => {
+        if (user.ChatId == data.chatId) {
+          user.LastMessageId = data.id
+          return
+        }
+      }) 
+    }
+
     setTimeout(() => {
       messages.current = data as Message
       if (data.chatId === currentChat.chatId) {      
@@ -101,11 +122,11 @@ const getHandler = (resp: WSGetResponse<never>) => {
       } else {
         updateUnreadMessages()
       }
-    }, 10)
+    }, 20)
     return
   }
-
-  if (url.match(/^\/users\/online$/)) { // /users/online
+ /* /users/online */
+  if (url.match(/^\/users\/online$/)) {
     updateOnlineUsers(data as number[])
     return
   }
