@@ -5,6 +5,7 @@ import { Category, CommentsCount, ReactionsButtons } from "./reactions"
 
 import { Post } from "@/custom"
 import AutoDate from "@/components/AutoDate"
+import UserLink from "@/components/UserLink"
 
 export const PostList: FC<{ posts: Post[] }> = ({ posts }) => {
   if (posts.length == 0) {
@@ -49,7 +50,7 @@ const PostCard: FC<{ post: Post }> = ({ post }) => {
             {" by "}
           </span>
           <span className={"clickable font-Alatsi align-middle"}>
-            <Link href={`/user/${post.author.id}`}>{post.author.username}</Link>
+            <UserLink userId={post.author.id}>{post.author.username}</UserLink>
           </span>
         </span>
       </div>

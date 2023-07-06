@@ -1,4 +1,3 @@
-import Link from "next/link"
 import { FC } from "react"
 
 import { Comment, Post } from "@/custom"
@@ -6,6 +5,7 @@ import { Category, ReactionsButtons } from "@/components/posts/reactions"
 import CommentForm from "@/app/post/[id]/CommentForm"
 import Comments from "@/app/post/[id]/Comments"
 import AutoDate from "@/components/AutoDate"
+import UserLink from "@/components/UserLink"
 
 import "highlight.js/styles/github-dark.css"
 
@@ -32,7 +32,7 @@ const PostPage: FC<{ post: Post; comments: Comment[] }> = ({ post, comments }) =
               {" by "}
             </span>
             <span className={"clickable text-lg font-Alatsi self-center"}>
-              <Link href={`/user/${post.author.id}`}>{post.author.username}</Link>
+              <UserLink userId={post.author.id}>{post.author.username}</UserLink>
             </span>
           </span>
         </div>

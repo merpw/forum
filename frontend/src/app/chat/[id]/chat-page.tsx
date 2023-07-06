@@ -3,7 +3,6 @@
 import { FC, useEffect, useRef, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import { useParams, useRouter } from "next/navigation"
-import Link from "next/link"
 import dayjs from "dayjs"
 import { useDispatch } from "react-redux"
 
@@ -13,6 +12,7 @@ import { useIsUserOnline, useUser } from "@/api/users/hooks"
 import { useChat } from "@/api/chats/chats"
 import { chatActions } from "@/store/chats"
 import { useMe } from "@/api/auth/hooks"
+import UserLink from "@/components/UserLink"
 
 const ChatPage = () => {
   const chatId = Number(useParams().id)
@@ -121,9 +121,9 @@ const ChatInfo: FC<{ userId: number }> = ({ userId }) => {
   return (
     <h1 className={"text-2xl mb-auto pb-2 border-b"}>
       Chat with{" "}
-      <Link href={`/user/${userId}`}>
+      <UserLink userId={user.id}>
         <span className={"font-bold clickable"}>{user?.username}</span> {isOnline ? "🟢" : "🔴"}
-      </Link>
+      </UserLink>
     </h1>
   )
 }
