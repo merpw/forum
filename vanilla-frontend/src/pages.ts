@@ -7,7 +7,7 @@ export const LoginSignup = (): string => {
 			<span class="title">Login</span>
 			<form (submit)="onSubmit()" id="login-form">
 				<div class="input-field">
-					<input id="username-login" type="text" placeholder="Nickname/Email" required>
+					<input id="username-login" type="text" placeholder="Nickname/Email" required autofocus>
 					<i class="uil uil-user"></i>
 				</div>
 
@@ -43,7 +43,7 @@ export const LoginSignup = (): string => {
 			<form (submit)="onSubmit()" id="signup-form">
         <label for="username-register"></label>
 				<div class="input-field">
-					<input id="username-register" type="text" placeholder="Nickname" required>
+					<input id="username-register" type="text" placeholder="Nickname" required autofocus>
 					<i class="uil uil-user-circle"></i>
 				</div>
 
@@ -78,7 +78,12 @@ export const LoginSignup = (): string => {
 
 				<div class="input-field">
 				<label for="gender"></label>
-					<input id="gender" type="text" placeholder="Gender" required>
+					<input list="genders" name="gender" id="gender" placeholder="Gender" required>
+            <datalist id="genders">
+              <option value="Male">
+              <option value="Female">
+              <option value="Other">
+            </datalist>
 					<i class="uil uil-android-alt"></i>
 				</div>
 
@@ -141,7 +146,7 @@ export const Index = (): string => {
   <section id="feed">
   <section id="create-post" class="close"></section>
       <div class="categories">
-      <span class="title">Categories:</span>
+      <span class="title">Categories</span>
         <div class="category-selection">
           <h3 class="category-title" id="category-facts">#facts</h3>
           <h3 class="category-title" id="category-rumors">#rumors</h3>
@@ -156,7 +161,7 @@ export const Index = (): string => {
 
 export const postForm = (): string => {
   return `
-<span class="title">New post:</span>
+<span class="title">New post</span>
 <form id="post-form" (submit)="onSubmit()">
 	<input id="post-title" placeholder="Title"></input>
 	<textarea id="post-content" 
