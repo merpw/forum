@@ -9,7 +9,7 @@ import { NextPage } from "next/types"
 import { FC, useEffect, useState } from "react"
 import relativeTime from "dayjs/plugin/relativeTime"
 
-import { useMe } from "@/api/auth"
+import { useMe } from "@/api/auth/hooks"
 import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"

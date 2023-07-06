@@ -6,7 +6,7 @@ import { FC, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 
 import { Post, User } from "@/custom"
-import { useMe } from "@/api/auth"
+import { useMe } from "@/api/auth/hooks"
 import { PostList } from "@/components/posts/list"
 import { useCreateChat, useUserChat } from "@/api/chats/chats"
 

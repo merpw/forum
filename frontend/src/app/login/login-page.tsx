@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { logIn, useMe } from "@/api/auth"
+import { logIn, useMe } from "@/api/auth/hooks"
 import { FormError } from "@/components/error"
 
 const LoginPage = () => {

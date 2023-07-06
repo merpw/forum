@@ -37,23 +37,18 @@ export const logIn = async (login: string, password: string) =>
     throw new Error(err.response?.data?.length < 200 ? err.response.data : "Unexpected error")
   })
 
-export const logOut = async (): Promise<void> =>
-  axios.post("/api/logout", {}, { withCredentials: true })
-
 export const useLogOut = () => {
   const { mutate } = useMe()
   const router = useRouter()
   const dispatch = useDispatch()
 
-  const logOut = async () => {
+  return async () => {
     await axios.post("/api/logout", {}, { withCredentials: true })
     await mutate({ user: null }, false)
     dispatch(chatActions.reset())
     dispatch(wsActions.close())
     router.refresh()
   }
-
-  return logOut
 }
 
 export const SignUp = async (data: {

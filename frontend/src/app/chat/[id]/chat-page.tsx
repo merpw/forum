@@ -12,7 +12,7 @@ import { useChatMessages, useMessage, useSendMessage } from "@/api/chats/message
 import { useIsUserOnline, useUser } from "@/api/users/hooks"
 import { useChat } from "@/api/chats/chats"
 import { chatActions } from "@/store/chats"
-import { useMe } from "@/api/auth"
+import { useMe } from "@/api/auth/hooks"
 
 const ChatPage = () => {
   const chatId = Number(useParams().id)

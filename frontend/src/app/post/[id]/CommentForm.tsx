@@ -3,7 +3,7 @@
 import { FC, useEffect, useState } from "react"
 import ReactTextareaAutosize from "react-textarea-autosize"
 
-import { useMe } from "@/api/auth"
+import { useMe } from "@/api/auth/hooks"
 import { CreateComment, useComments } from "@/api/posts/comment"
 import { FormError } from "@/components/error"
 

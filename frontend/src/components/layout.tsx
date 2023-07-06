@@ -12,7 +12,7 @@ import {
 import { Provider } from "react-redux"
 import Link from "next/link"
 
-import { useMe } from "@/api/auth"
+import { useMe } from "@/api/auth/hooks"
 import Navbar from "@/components/navbar"
 import store from "@/store/store"
 import ChatsSection from "@/components/ChatSection"

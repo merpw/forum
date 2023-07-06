@@ -6,7 +6,7 @@ import ReactTextAreaAutosize from "react-textarea-autosize"
 import Select from "react-select"
 import dynamic from "next/dynamic"
 
-import { useMe } from "@/api/auth"
+import { useMe } from "@/api/auth/hooks"
 import { CreatePost, generateDescription } from "@/api/posts/create"
 import { FormError } from "@/components/error"
 import { Capitalize } from "@/helpers/text"

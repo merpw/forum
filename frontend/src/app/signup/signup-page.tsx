@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { logIn, SignUp, useMe } from "@/api/auth"
+import { logIn, SignUp, useMe } from "@/api/auth/hooks"
 import { FormError } from "@/components/error"
 
 const SignupPage = () => {

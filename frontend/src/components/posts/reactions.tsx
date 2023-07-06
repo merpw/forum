@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { FC, useEffect } from "react"
 
-import { useMe } from "@/api/auth"
+import { useMe } from "@/api/auth/hooks"
 import {
   dislikeComment,
   dislikePost,
