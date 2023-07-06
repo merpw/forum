@@ -2,27 +2,14 @@
 
 import { NextPage } from "next"
 import { useRouter } from "next/navigation"
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useRef } from "react"
 import Link from "next/link"
 
 import { Post, User } from "@/custom"
-import { useMe } from "@/api/auth/hooks"
 import { PostList } from "@/components/posts/list"
 import { useCreateChat, useUserChat } from "@/api/chats/chats"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
-  const router = useRouter()
-  const { user: req_user } = useMe()
-  const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
-
-  useEffect(() => {
-    // Redirect to /me if user is logged in and is viewing their own profile
-    if (!isRedirecting && req_user?.id == user.id) {
-      setIsRedirecting(true)
-      router.replace("/me")
-    }
-  }, [router, isRedirecting, req_user?.id, user.id])
-
   return (
     <>
       <div className={"hero"}>

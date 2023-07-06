@@ -4,13 +4,11 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { logIn, useMe } from "@/api/auth/hooks"
+import { logIn } from "@/api/auth/hooks"
 import { FormError } from "@/components/error"
 
 const LoginPage = () => {
   const router = useRouter()
-
-  const { isLoading, isLoggedIn, mutate } = useMe()
 
   const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
@@ -18,14 +16,6 @@ const LoginPage = () => {
   const [formError, setFormError] = useState<string | null>(null)
 
   const [isSame, setIsSame] = useState(false)
-
-  const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
-  useEffect(() => {
-    if (!isLoading && isLoggedIn && !isRedirecting) {
-      setIsRedirecting(true)
-      router.replace("/me")
-    }
-  }, [router, isLoggedIn, isRedirecting, isLoading])
 
   useEffect(() => {
     setIsSame(false)
@@ -45,7 +35,6 @@ const LoginPage = () => {
           logIn(login, password)
             .then(() => {
               router.refresh()
-              mutate()
             })
             .catch((err) => setFormError(err.message))
         }}

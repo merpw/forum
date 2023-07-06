@@ -4,9 +4,8 @@
 /* https://github.com/iamkun/dayjs/issues/1242 */
 import dayjs from "dayjs"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { NextPage } from "next/types"
-import { FC, useEffect, useState } from "react"
+import { FC, useState } from "react"
 import relativeTime from "dayjs/plugin/relativeTime"
 
 import { useMe } from "@/api/auth/hooks"
@@ -18,23 +17,13 @@ import { User } from "@/custom"
 /* TODO: add placeholders */
 
 const UserPage: NextPage = () => {
-  const router = useRouter()
-  const { user, isLoading, isLoggedIn } = useMe()
-
-  const [isRedirecting, setIsRedirecting] = useState(false) // Prevents duplicated redirects
+  const { user, isLoading } = useMe()
 
   const tabs = [
     { title: "Your posts", component: <UserPosts /> },
     { title: "Your liked posts", component: <UserLikedPosts /> },
   ]
   const [activeTab, setActiveTab] = useState(0)
-
-  useEffect(() => {
-    if (!isLoading && !isLoggedIn && !isRedirecting) {
-      setIsRedirecting(true)
-      router.push("/login")
-    }
-  }, [router, isLoggedIn, isRedirecting, isLoading])
 
   if (isLoading || !user) return <div>Loading...</div>
 
