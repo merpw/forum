@@ -7,6 +7,7 @@ services:
     volumes:
       - "db:/app/db"
     command: "server -db /app/db/database.db"
+    platform: linux/amd64
   frontend:
     image: ghcr.io/merpw/forum/frontend:latest
     container_name: forum-frontend
@@ -14,6 +15,7 @@ services:
       - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
     depends_on:
       - backend
+    platform: linux/amd64
   nginx:
     image: nginx:1.17.8-alpine
     volumes:
