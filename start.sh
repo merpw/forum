@@ -1,42 +1,64 @@
 #!/bin/bash
 
-TAG=${1:-"latest"}
+if [ -z "$1" ]; then
+   if [ -z "$TAG" ]; then
+      export TAG="latest"
+   fi;
+else
+  export TAG=$1
+fi;
+
+export FORUM_BACKEND_SECRET=$(openssl rand -hex 32)
 
 if [ "$TAG" == "latest" ]; then
     echo "Starting latest revision"
-    cd production && FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker compose up;
-    return
+    cd production && docker compose up;
+    exit
 fi;
 
 if [ "$TAG" == "local" ]; then
     echo "Starting build from local files"
-    FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker compose up;
-    return
+    docker compose up;
+    exit
 fi;
 
 if [ "$TAG" == "main" ]; then
     echo "Starting main revision"
-    FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker-compose -f docker-compose.yml -f docker-compose.tag.yml up;
-    return
+    docker-compose -f docker-compose.yml -f docker-compose.tag.yml up;
+    exit
 fi;
 
-# Other revisions, e.g. pr-76. Use `main` tag if the revision doesn't exist
-exists () {
-    docker pull ghcr.io/merpw/forum/$1 >&2 2>&1
-}
-tagOrMain () {
-    echo "Checking if $1:$TAG exists" >&2
-    if exists "$1:$TAG"; then
-        echo $TAG
-    else
-        echo "main"
-    fi
-}
+if [ -z "$FORUM_TAG" ]; then
+    export FORUM_TAG=$TAG
+fi;
 
-export FORUM_TAG=$(tagOrMain "backend-forum")
-export CHAT_TAG=$(tagOrMain "backend-chat")
-export FRONTEND_TAG=$(tagOrMain "frontend")
+if [ -z "$CHAT_TAG" ]; then
+    export CHAT_TAG=$TAG
+fi;
 
-echo "Starting forum-backend:$FORUM_TAG, chat-backend:$CHAT_TAG, frontend:$FRONTEND_TAG"
+if [ -z "$FRONTEND_TAG" ]; then
+    export FRONTEND_TAG=$TAG
+fi;
 
-TAG=$TAG FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker-compose -f docker-compose.yml -f docker-compose.tag.yml up;
+echo "Pulling images forum-backend:$FORUM_TAG, chat-backend:$CHAT_TAG, frontend:$FRONTEND_TAG..."
+
+# Fallback images to main if tag is not found
+
+PULL_RESULT=$(docker compose -f docker-compose.yml -f docker-compose.tag.yml pull 2>&1 | tee /dev/tty \
+| grep "Warning" | grep -Eo "backend-forum|backend-chat|frontend" )
+
+while read -r line ; do
+    if [ "$line" == "backend-forum" ]; then
+      export FORUM_TAG=main
+    fi;
+    if [ "$line" == "backend-chat" ]; then
+      export CHAT_TAG=main
+    fi;
+    if [ "$line" == "frontend" ]; then
+      export FRONTEND_TAG=main
+    fi;
+done <<< "$PULL_RESULT"
+
+echo "Starting forum-backend:$FORUM_TAG, chat-backend:$CHAT_TAG, frontend:$FRONTEND_TAG..."
+
+docker-compose -f docker-compose.yml -f docker-compose.tag.yml up;
