@@ -55,16 +55,16 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
     >
       <div
         className={
-          "border border-base-300 bg-base-200 p-3 pb-1.5 rounded-lg" +
+          "bg-base-200 p-3 pt-2 pb-1 rounded-lg" +
           " " +
-          (chatId === activeChatId && "border-base-200 gradient-light dark:gradient-dark shadow-lg")
+          (chatId === activeChatId && "border-base-200 gradient-light dark:gradient-dark shadow-sm")
         }
       >
         <div className={"flex gap-1"}>
-          <div className={"mr-2 mt-2 w-14"}>
+          <div className={"mr-2 mt-2 w-12"}>
             <Avatar userId={chat.companionId} />
           </div>
-          <div className={"w-full space-y-0.5"}>
+          <div className={"w-full"}>
             <CompanionData userId={chat.companionId} />
             <MessageInfo id={chat.lastMessageId} />
           </div>
@@ -76,7 +76,6 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
 
 const CompanionData: FC<{ userId: number }> = ({ userId }) => {
   const { user } = useUser(userId)
-  const isOnline = useIsUserOnline(userId)
 
   if (user === undefined) {
     return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
@@ -115,12 +114,18 @@ const MessageInfo: FC<{ id: number }> = ({ id }) => {
 
   return (
     <>
-      <div>
+      <div
+        className={"text-sm " + (message.authorId === -1 ? " text-info italic font-light " : "")}
+      >
         {message.authorId !== -1 &&
-          (message.authorId === user?.id ? "You: " : <UserName userId={message.authorId} />)}
+          (message.authorId === user?.id ? (
+            <span className={"end-dot text-info font-light"}>You</span>
+          ) : (
+            ""
+          ))}
         {MarkdownToPlain(message.content, { async: false, removeNewLines: true, limit: 50 })}
       </div>
-      <div className={"flex justify-end"}>
+      <div className={"flex justify-end text-info text-xs font-light mt-1"}>
         <FormattedDate timestamp={message.timestamp} />
       </div>
     </>
@@ -134,12 +139,6 @@ const FormattedDate: FC<{ timestamp: string }> = ({ timestamp }) => {
       {date.diff(dayjs(), "day") === 0 ? date.format("HH:mm") : date.format("YYYY-MM-DD HH:mm")}
     </div>
   )
-}
-
-const UserName: FC<{ userId: number }> = ({ userId }) => {
-  const { user: author } = useUser(userId)
-
-  return <>{author?.username}: </>
 }
 
 export default ChatList
