@@ -14,11 +14,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  checkSession(token).catch(() => {
-    const resp = NextResponse.rewrite(new URL("/login", request.url))
+  try {
+    await checkSession(token)
+  } catch (error) {
+    console.error("check session error", error)
+    const resp = NextResponse.redirect(new URL("/login", request.url))
     resp.cookies.set("forum-token", "", { maxAge: 0 })
     return resp
-  })
+  }
 
   return NextResponse.next()
 }
