@@ -10,6 +10,7 @@ services:
       - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     volumes:
       - db:/app/db
+    platform: linux/amd64
   backend-chat:
     build:
       context: backend
@@ -22,6 +23,7 @@ services:
       - db:/app/db
     depends_on:
       - backend-forum
+    platform: linux/amd64
   frontend:
     build:
       context: frontend
@@ -33,6 +35,7 @@ services:
       - backend-forum
     volumes:
       - cache:/app/.next/cache
+    platform: linux/amd64
   nginx:
     image: nginx:1.17.8-alpine
     volumes:

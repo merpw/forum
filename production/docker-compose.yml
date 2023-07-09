@@ -1,0 +1,32 @@
+version: "3"
+name: "forum-prod"
+services:
+  backend:
+    image: ghcr.io/merpw/forum/backend:latest
+    container_name: forum-backend
+    volumes:
+      - "db:/app/db"
+    command: "server -db /app/db/database.db"
+    platform: linux/amd64
+  frontend:
+    image: ghcr.io/merpw/forum/frontend:latest
+    container_name: forum-frontend
+    environment:
+      - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
+    depends_on:
+      - backend
+    platform: linux/amd64
+  nginx:
+    image: nginx:1.17.8-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+      - frontend
+volumes:
+  db:
+    external: false
+  pages:
+    external: false
