@@ -41,8 +41,9 @@ class Signup {
   private async onSubmit(event: Event) {
     event.preventDefault()
     const formData = this.getFormData() as SignupForm
-    await signup(formData)
-    
+    if (!await signup(formData)) {
+      return
+    } 
     const loginForm: LoginForm = {
       login: formData.name.trim(),
       password: formData.password.trim(),

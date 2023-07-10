@@ -44,26 +44,28 @@ const login = async (formData: LoginForm): Promise<boolean | undefined> => {
   })
 }
 
-const signup = async (formData: SignupForm) => {
-  await fetch(`${backendUrl}/api/signup`, {
+const signup = async (formData: SignupForm): Promise<boolean | undefined> => {
+  return await fetch(`${backendUrl}/api/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(formData),
   })
-    .then((r) => {
-      if (r.ok) {
-        
-      } else {
-        r.text().then((error) => {
-          alert(error)
-        })
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-    })
+  .then((r) => {
+    if (r.ok) {
+      return true
+    } else {
+      r.text().then((error) => {
+        alert(error)
+          return false
+      })
+    }
+  })
+  .catch((error) => {
+    alert(error)
+      return false
+  })
 }
 
 const postCreatePost = (formData: CreatePostBody) => {
