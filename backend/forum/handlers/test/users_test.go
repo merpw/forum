@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 )
 
@@ -97,7 +98,11 @@ func TestUsers(t *testing.T) {
 	for i := 0; i < UsersCount; i++ {
 		// create users with random names
 		cli := testServer.TestClient()
-		cli.TestAuth(t)
+		cli.TestClientData = NewClientData()
+		if i%2 == 0 {
+			cli.TestClientData.Username = strings.ToUpper(cli.TestClientData.Username)
+		}
+		cli.TestPost(t, "/api/signup", cli.TestClientData, http.StatusOK)
 	}
 
 	cliAnon := testServer.TestClient()
@@ -140,8 +145,8 @@ func TestUsers(t *testing.T) {
 	for i := 0; i < len(users); i++ {
 		for j := i + 1; j < len(users); j++ {
 			// should be sorted by username
-			if users[i].Username > users[j].Username {
-				t.Fatalf("users are not sorted by username, expected %s > %s", users[i].Username, users[j].Username)
+			if strings.ToLower(users[i].Username) > strings.ToLower(users[j].Username) {
+				t.Fatalf("users are not sorted by username, expected %s < %s", users[i].Username, users[j].Username)
 			}
 		}
 	}
