@@ -19,9 +19,15 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ## How to run?
 
-## Docker compose: `docker compose up`
+## Run `./start.sh`
+
+Docker v3.4+ is required.
 
 ## Production:
+
+## Run `./start.sh`
+
+or `cd production && docker-compose up`
 
 > Note: in production, it's highly recommended to use `FORUM_BACKEND_SECRET` to secure private API endpoints.
 >
@@ -29,11 +35,27 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 >
 > `FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker compose up`
 
-### To run `main` branch version ([forum-ci.mer.pw](https://forum-ci.mer.pw))
+### Other revisions: `./start.sh <revision>`
+
+To run `main` branch version ([forum-ci.mer.pw](https://forum-ci.mer.pw))
 
 ```shell
-FORUM_BACKEND_SECRET=$(openssl rand -hex 32) docker compose -f docker-compose.yml -f docker-compose.main.yml up
+./start.sh main
 ```
+
+To run `pr-76` revision
+
+```shell
+./start.sh pr-76
+```
+
+To build and run local revision
+
+```shell
+./start.sh local
+```
+
+> Note: if there's no such revision for one of the services, the default `main` revision will be used.
 
 ### Natively (dev)
 
