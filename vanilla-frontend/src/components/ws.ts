@@ -138,6 +138,12 @@ const getHandler = (resp: WSGetResponse<never>) => {
 }
 
 async function updateOnlineUsers(users: number[]) {
+  sendWsObject({
+    type: "get",
+    item: {
+      url: "/chat/all",
+    },
+  }) 
   Object.assign(chatList, {
     Ids: new Map<number, number>,
     Users: [],
@@ -150,15 +156,16 @@ async function updateOnlineUsers(users: number[]) {
     }
   }
 
-  console.log(chatList.Users)
   for (const user of Object.values(chatList.Users)) {
     user.Online = users.includes(user.Id)
-  } 
+  }
+
   renderChatList()
 }
 
 function updateUnreadMessages() {
   for (const [userId, chatId] of chatList.Ids) {
+    console.log(chatId, messages.current.chatId)
     if (chatId === messages.current.chatId) {
       for (const user of Object.values(chatList.Users)) {
         if (user.Id === userId) {
@@ -197,6 +204,8 @@ const getMessage = (id: number) => {
     const chat = document.getElementById(`Chat${currentChat.chatId}`) as HTMLDivElement
     if (chat) {
       chat.dispatchEvent(messageEvent)
+    } else {
+      updateUnreadMessages()
     }
   }, 80)
 }
