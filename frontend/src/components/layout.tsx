@@ -53,7 +53,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             className={
               "max-h-full overflow-auto grow" +
               " " +
-              (user && !isCollapsed ? "hidden sm:block w-3/4" : "")
+              (user && !isCollapsed ? "hidden md:block w-3/4" : "")
             }
           >
             {children}
