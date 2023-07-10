@@ -2,6 +2,7 @@ import { chatList, currentChat, messages, renderChatList } from "./chat.js"
 import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../types"
 import { iterator } from "./utils.js"
 import { Auth, userInfo } from "./auth.js"
+import { getUserById, getUserIds } from "../api/get.js"
 
 export const messageEvent = new Event("messageEvent")
 const WS_URL = "ws://localhost:8081/ws"
@@ -136,10 +137,23 @@ const getHandler = (resp: WSGetResponse<never>) => {
   }
 }
 
-function updateOnlineUsers(users: number[]) {
-    for (const user of Object.values(chatList.Users)) {
-      user.Online = users.includes(user.Id);
-    } 
+async function updateOnlineUsers(users: number[]) {
+  Object.assign(chatList, {
+    Ids: new Map<number, number>,
+    Users: [],
+  })
+
+  const userIds: iterator = await getUserIds()
+  for (const id of Object.values(userIds)) {
+    if (id !== userInfo.Id) {
+      chatList.Users.push(await getUserById(id))
+    }
+  }
+
+  console.log(chatList.Users)
+  for (const user of Object.values(chatList.Users)) {
+    user.Online = users.includes(user.Id)
+  } 
   renderChatList()
 }
 
