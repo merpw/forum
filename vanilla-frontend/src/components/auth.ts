@@ -14,7 +14,7 @@ export const userInfo = {
   Name: "",
 }
 
-export const Auth = async (session: boolean) => {
+export const Auth = (session: boolean): void => {
   if (session) {
     wsHandler()
     setTimeout(async () => {

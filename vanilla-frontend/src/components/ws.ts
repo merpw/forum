@@ -7,9 +7,9 @@ export const messageEvent = new Event("messageEvent")
 const WS_URL = "ws://localhost:8081/ws"
 export let ws: WebSocket
 
-export const wsHandler = async () => {
+export const wsHandler = (): void => {
   ws = new WebSocket(WS_URL)
-  ws.onmessage = (event) => {
+  ws.onmessage = (event: MessageEvent): void => {
     try {
       const data = JSON.parse(event.data) as WebSocketResponse<never>
 
@@ -62,7 +62,7 @@ export const wsHandler = async () => {
   }
 }
 
-const postHandler = async (resp: WSPostResponse<never>) => {
+const postHandler = async (resp: WSPostResponse<never>): Promise<void> => {
   const data = resp.item.data
   const url = resp.item.url
 
@@ -80,7 +80,6 @@ const getHandler = (resp: WSGetResponse<never>) => {
     setTimeout(() => {
       for (const user of Object.values(chatList.Users)) {
         if (user.Id == data.companionId) {
-          console.log("chat", data)
           Object.assign(user, {LastMessageId: data.lastMessageId})
           break
         }
@@ -100,7 +99,7 @@ const getHandler = (resp: WSGetResponse<never>) => {
 
   /* /chat/{id}/messages */
   if (url.match(/^\/chat\/\d{1,}\/messages$/)) { 
-    getMessageList(data as number[])
+    messages.ids = data as number[]
     return
   }
 
@@ -139,11 +138,7 @@ const getHandler = (resp: WSGetResponse<never>) => {
 
 function updateOnlineUsers(users: number[]) {
     for (const user of Object.values(chatList.Users)) {
-      if (users.includes(user.Id)) {
-        user.Online = true
-      } else {
-        user.Online = false
-      }
+      user.Online = users.includes(user.Id);
     } 
   renderChatList()
 }
@@ -186,14 +181,13 @@ const getMessage = (id: number) => {
   })
   setTimeout(() => {
     const chat = document.getElementById(`Chat${currentChat.chatId}`) as HTMLDivElement
-        if (!chat) {
-          } else {
+    if (chat) {
       chat.dispatchEvent(messageEvent)
     }
   }, 80)
 }
 
-const getMessageList = (ids: number[]) => {
+export const getMessageList = (ids: number[]) => {
   for (const id of ids) {
       sendWsObject({
       type: "get",

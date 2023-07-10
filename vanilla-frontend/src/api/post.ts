@@ -1,11 +1,12 @@
 import { Auth } from "../components/auth.js"
 import { superDivision, backendUrl } from "../main.js"
 import { errorPage } from "../pages.js"
-import { loginController } from "../components/login.js"
 import { CreatePostBody, LoginForm, SignupForm } from "../types"
 import { displayPosts, updatePostValues } from "../components/posts.js"
 import { displayCommentSection } from "../components/comments.js"
 import { openCloseCreatePost } from "../components/topnav.js"
+
+// POST API endpoints
 
 // Logs out the user, deletes the cookie from backend.
 const logout = async () => {
@@ -14,11 +15,11 @@ const logout = async () => {
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((response) => {
-    if (response.ok) {
+  }).then((r) => {
+    if (r.ok) {
       Auth(false)
     } else {
-      superDivision.innerHTML = errorPage(response.status)
+      superDivision.innerHTML = errorPage(r.status)
       return
     }
   })
@@ -31,11 +32,11 @@ const login = async (formData: LoginForm): Promise<boolean | undefined> => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(formData),
-  }).then((response) => {
-    if (response.ok) {
+  }).then((r) => {
+    if (r.ok) {
       return true
     } else {
-      response.text().then((error) => {
+      r.text().then((error) => {
         alert(error)
         return false
       })
@@ -51,11 +52,11 @@ const signup = async (formData: SignupForm) => {
     },
     body: JSON.stringify(formData),
   })
-    .then((response) => {
-      if (response.ok) {
+    .then((r) => {
+      if (r.ok) {
         
       } else {
-        response.text().then((error) => {
+        r.text().then((error) => {
           alert(error)
         })
       }
@@ -73,13 +74,13 @@ const postCreatePost = (formData: CreatePostBody) => {
     },
     body: JSON.stringify(formData),
   })
-    .then((response) => {
-      if (response.ok) {
+    .then((r) => {
+      if (r.ok) {
         openCloseCreatePost()
         displayPosts("/api/posts/")
         return
       } else {
-        response.text().then((error) => {
+        r.text().then((error) => {
           console.log(`Error: ${error}`)
           // TODO: Displaying error message to user.
         })
@@ -98,8 +99,8 @@ const postComment = (postId: string, formData: unknown) => {
     },
     body: JSON.stringify(formData),
   })
-    .then((response) => {
-      if (response.ok) {
+    .then((r) => {
+      if (r.ok) {
         console.log("PostID in CommentCreator", postId)
         const commentSection = document.getElementById(
           `CS${postId}`
@@ -110,7 +111,7 @@ const postComment = (postId: string, formData: unknown) => {
         displayCommentSection(postId)
         return
       } else {
-        response.text().then((error) => {
+        r.text().then((error) => {
           console.log(`Error: ${error}`)
         })
       }
@@ -126,8 +127,8 @@ const likePost = (id: string) => {
       "Content-Type": "application/json",
     },
   })
-    .then((res) => {
-      if (!res.ok) throw new Error()
+    .then((r) => {
+      if (!r.ok) throw new Error()
       // Call the function to update the post values after liking
       updatePostValues(id)
     })
@@ -144,8 +145,8 @@ const dislikePost = (id: string) => {
       "Content-Type": "application/json",
     },
   })
-    .then((res) => {
-      if (!res.ok) throw new Error()
+    .then((r) => {
+      if (!r.ok) throw new Error()
       // Call the function to update the post values after liking
       updatePostValues(id)
     })
