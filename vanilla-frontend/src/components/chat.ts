@@ -4,29 +4,6 @@ import { userInfo } from "./auth.js"
 import { createElement, iterator } from "./utils.js"
 import { getUserById, getUserIds } from "../api/get.js"
 
-export const chat = {
-  list: {
-    idMap: new Map<number, number>, // companionId, chatId
-    users: [] as ChatUser[],
-  }, 
-
-  messages: {
-    list: [] as number[],
-    loaded: [] as Message[],
-    current: {} as Message
-  },
-
-  current: {
-    username: "",
-    userId: -1,
-    chatId: -1,
-    range: {
-      min: 0,
-      max: 10
-    }
-  }
-}
-
 export const chatList = {
   Ids: new Map<number, number>, //companionId, chatId
   Users: [] as ChatUser[],
@@ -134,7 +111,6 @@ const showChat = async (id: number) => {
   })
   chatHeader.append(chatName, closeBtn)
 
-  console.log(messages.list)
   const chatMessages = createElement("div", "chat-messages", `Chat${chatId}`)
 
   const chatFormContainer = createElement("div", "chat-form-container")
