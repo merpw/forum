@@ -2,9 +2,11 @@ import { Auth } from "../components/auth.js"
 import { backendUrl } from "../main.js"
 import { ChatUser } from "../types"
 
+// GET API endpoints
+
 const getPosts = async (endpoint: string): Promise<object[]> => {
   return fetch(backendUrl + endpoint)
-    .then((response) => response.json())
+    .then((r) => r.json())
     .then((data) => data)
 }
 

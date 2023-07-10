@@ -63,6 +63,7 @@ export const displayCommentSection = async (id: string) => {
   return
 }
 
+// Parses and sends the data from the comment form
 export class CommentCreator {
   private readonly form: HTMLFormElement
   constructor(form: HTMLFormElement) {

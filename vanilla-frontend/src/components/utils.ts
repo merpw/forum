@@ -1,9 +1,12 @@
+// Creates and returns a HTMLElement.
+// Current options:
+// className, id, textContent, innerHTML.
 export const createElement = (
   element: string,
   className: string | null = null,
   id: string | null = null,
   textContent: string | null = null,
-  innerHtml: string | null = null
+  innerHTML: string | null = null
 ): HTMLElement => {
   const newElement = document.createElement(element)
   if (className) {
@@ -15,8 +18,8 @@ export const createElement = (
   if (textContent) {
     newElement.textContent = textContent
   }
-  if (innerHtml) {
-    newElement.innerHTML = innerHtml
+  if (innerHTML) {
+    newElement.innerHTML = innerHTML
   }
   return newElement
 }
