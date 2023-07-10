@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import wsActions from "@/store/ws/actions"
@@ -27,6 +27,26 @@ export const useMessage = (messageId: number) => {
   }, [dispatch, message, messageId])
 
   return { message }
+}
+
+export const useMessages = (messageIds: number[]) => {
+  const allMessages = useAppSelector((state) => state.chats.messages)
+
+  const messages = useMemo(() => {
+    return messageIds.map((id) => allMessages?.[id]).filter(Boolean)
+  }, [allMessages, messageIds])
+
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    messageIds
+      .filter((id) => !allMessages?.[id])
+      .forEach((id) => {
+        dispatch(wsActions.sendGet(`/message/${id}`))
+      })
+  }, [dispatch, messageIds, allMessages])
+
+  return { messages }
 }
 
 export const useSendMessage = () => {
