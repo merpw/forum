@@ -31,7 +31,7 @@ export const ChatPageFirstMessage: FC<{ userId: number }> = ({ userId }) => {
   }, [chatId, createChat, firstMessage, sendMessage, userId])
 
   if (chatId === undefined) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   if (chatId === null) {
@@ -72,14 +72,22 @@ const ChatPage: FC<{ id: number }> = ({ id }) => {
   }, [chat, dispatch, id, router])
 
   if (!chat) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   return (
-    <div className={"flex flex-col h-full"}>
+    <div className={"flex flex-col h-full pb-60 max-w-3xl m-auto"}>
       <ChatInfo userId={chat.companionId} />
-      <ChatMessages chatId={chat.id} />
-      <WriteMessageForm sendMessage={(content) => sendMessage(chat.id, content)} />
+      <div
+        className={
+          "border border-base-100 rounded-lg min-h-full flex flex-col-reverse p-1 pb-3 my-3 gradient-light dark:gradient-dark"
+        }
+      >
+        <ChatMessages chatId={chat.id} />
+      </div>
+      <div className={"mb-16"}>
+        <WriteMessageForm sendMessage={(content) => sendMessage(chat.id, content)} />
+      </div>
     </div>
   )
 }

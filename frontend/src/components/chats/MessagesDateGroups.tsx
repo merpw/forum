@@ -27,13 +27,14 @@ const MessagesDateGroups: FC<{ messageIds: number[] }> = ({ messageIds }) => {
     <>
       {Object.entries(groupedMessages).map(([date, messages]) => (
         <div key={date} className={"relative flex flex-col gap-1.5 items-center"}>
-          <div
+          <span
             className={
-              "sticky top-1 text-base-content bg-base bg-opacity-80 backdrop-blur px-2 rounded-xl"
+              "sticky top-1 z-50 text-xs text-info bg-primary bg-opacity-10 backdrop-brightness-200 dark:backdrop-brightness-50 backdrop-blur-sm px-3 rounded-xl"
             }
           >
             {formatDate(date)}
-          </div>
+          </span>
+
           {messages.map((messageId) => (
             <Message key={messageId} id={messageId} />
           ))}

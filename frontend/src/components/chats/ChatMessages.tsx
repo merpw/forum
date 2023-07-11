@@ -75,13 +75,13 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
   }, [chatMessages, messagesCount])
 
   if (!chatMessages) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   const messages = chatMessages.slice(-messagesCount)
 
   return (
-    <div ref={scrollRef} onScroll={onScroll} className={"overflow-y-auto"}>
+    <div ref={scrollRef} onScroll={onScroll} className={"overflow-y-auto flex flex-col gap-1.5"}>
       <div />
       <MessageGroups messageIds={messages} />
     </div>
