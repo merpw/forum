@@ -1,5 +1,12 @@
-import { LoginForm, SignupForm } from "../types"
-import { login, signup } from "../api/post.js"
+/* IMPORTS */
+
+/* Root */
+import { LoginForm, SignupForm } from "../../types"
+
+/* API */
+import { login, signup } from "../../api/post.js"
+
+/* Local */
 import { Auth } from "./auth.js"
 
 class Login {
@@ -38,7 +45,7 @@ class Signup {
     this.form.addEventListener("submit", this.onSubmit.bind(this))
   }
 
-  private async onSubmit(event: Event) {
+  private async onSubmit(event: Event): Promise<void> {
     event.preventDefault()
     const formData = this.getFormData() as SignupForm
     if (!await signup(formData)) {

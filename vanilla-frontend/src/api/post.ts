@@ -1,15 +1,20 @@
-import { Auth } from "../components/auth.js"
+/* IMPORTS */
+
+/* Root */
 import { superDivision, backendUrl } from "../main.js"
 import { errorPage } from "../pages.js"
 import { CreatePostBody, LoginForm, SignupForm } from "../types"
-import { displayPosts, updatePostValues } from "../components/posts.js"
-import { displayCommentSection } from "../components/comments.js"
-import { openCloseCreatePost } from "../components/topnav.js"
 
-// POST API endpoints
+/* Authorization */
+import { Auth } from "../components/authorization/auth.js"
+
+/* Feed */
+import { displayPosts, updatePostValues } from "../components/feed/posts.js"
+import { displayCommentSection } from "../components/feed/comments.js"
+import { openCloseCreatePost } from "../components/feed/topnav.js"
 
 // Logs out the user, deletes the cookie from backend.
-const logout = async () => {
+const logout = async (): Promise<void> => {
   await fetch("/api/logout", {
     method: "POST",
     headers: {
@@ -25,6 +30,7 @@ const logout = async () => {
   })
 }
 
+// Logs in the user. Adds cookie from backend.
 const login = async (formData: LoginForm): Promise<boolean | undefined> => {
   return await fetch(`${backendUrl}/api/login`, {
     method: "POST",
@@ -44,6 +50,7 @@ const login = async (formData: LoginForm): Promise<boolean | undefined> => {
   })
 }
 
+// Signs up the user, calls login() if successful signup
 const signup = async (formData: SignupForm): Promise<boolean | undefined> => {
   return await fetch(`${backendUrl}/api/signup`, {
     method: "POST",
@@ -68,7 +75,8 @@ const signup = async (formData: SignupForm): Promise<boolean | undefined> => {
   })
 }
 
-const postCreatePost = (formData: CreatePostBody) => {
+// Creates a post and sends a post request to backend with the form data
+const postCreatePost = (formData: CreatePostBody): void => {
   fetch(`${backendUrl}/api/posts/create/`, {
     method: "POST",
     headers: {
@@ -83,9 +91,7 @@ const postCreatePost = (formData: CreatePostBody) => {
         return
       } else {
         r.text().then((error) => {
-          console.log(`Error: ${error}`)
-          // TODO: Displaying error message to user.
-        })
+          alert(error)})        
       }
     })
     .catch((error) => {
@@ -93,7 +99,8 @@ const postCreatePost = (formData: CreatePostBody) => {
     })
 }
 
-const postComment = (postId: string, formData: unknown) => {
+// Comments on a post and sends a post request to the backend with the formData
+const postComment = (postId: string, formData: unknown): void => {
   fetch(`${backendUrl}/api/posts/${postId}/comment`, {
     method: "POST",
     headers: {
@@ -114,7 +121,7 @@ const postComment = (postId: string, formData: unknown) => {
         return
       } else {
         r.text().then((error) => {
-          console.log(`Error: ${error}`)
+          alert(error)
         })
       }
     })
@@ -122,7 +129,9 @@ const postComment = (postId: string, formData: unknown) => {
       console.error(error)
     })
 }
-const likePost = (id: string) => {
+
+// Likes a post and sends a request to the backend
+const likePost = (id: string): void => {
   fetch(`${backendUrl}/api/posts/${id}/like`, {
     method: "POST",
     headers: {
@@ -130,17 +139,18 @@ const likePost = (id: string) => {
     },
   })
     .then((r) => {
-      if (!r.ok) throw new Error()
+      if (!r.ok) throw new Error("Something went wrong. Please try again.")
       // Call the function to update the post values after liking
       updatePostValues(id)
     })
     .catch((error) => {
-      console.error(error)
+        alert(error)
       // Handle the error if the request fails
     })
 }
 
-const dislikePost = (id: string) => {
+// Dislikes a post and sends a request to the backend
+const dislikePost = (id: string): void => {
   fetch(`${backendUrl}/api/posts/${id}/dislike`, {
     method: "POST",
     headers: {
@@ -148,12 +158,12 @@ const dislikePost = (id: string) => {
     },
   })
     .then((r) => {
-      if (!r.ok) throw new Error()
+      if (!r.ok) throw new Error("Something went wrong. Please try again.")
       // Call the function to update the post values after liking
       updatePostValues(id)
     })
     .catch((error) => {
-      console.error(error)
+        alert(error)
       // Handle the error if the request fails
     })
 }

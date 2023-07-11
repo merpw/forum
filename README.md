@@ -3,13 +3,13 @@
 ---
 
 Authors: [@maximihajlov](https://github.com/maximihajlov), [@healingdrawing](https://github.com/healingdrawing)
-, [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere)
+, [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere), [@bomanviktor](https://github.com/bomanviktor)
 
-Solved during studying in Gritlab coding school on Åland, January 2023
+Solved during studying in Gritlab coding school on Åland, Spring 2023
 
 ---
 
-## [Task description and audit questions](https://github.com/01-edu/public/tree/master/subjects/forum)
+## [Task description and audit questions](https://github.com/01-edu/public/tree/master/subjects/real-time-forum)
 
 ---
 

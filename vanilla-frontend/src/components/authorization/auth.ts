@@ -1,19 +1,31 @@
-import { LoginSignup, Index } from "../pages.js"
-import { topnavController } from "./topnav.js"
-import { superDivision } from "../main.js"
-import { categoriesSelector } from "./categories.js"
+/* IMPORTS */
+
+/* Root */
+import { superDivision } from "../../main.js"
+import { LoginSignup, Index } from "../../pages.js"
+
+/* API */
+import { getMe } from "../../api/get.js"
+
+/* Feed */
+import { topnavController } from "../feed/topnav.js"
+import { categoriesSelector } from "../feed/categories.js"
+import { displayPosts } from "../feed/posts.js"
+
+/* Chat */
+import { ws, wsHandler } from "../chat/ws.js"
+import { displayChatUsers } from "../chat/chat.js"
+
+/* Local */
 import { loginController } from "./login.js"
-import { displayPosts } from "./posts.js"
-import { ws, wsHandler } from "./ws.js"
 
-import { getMe } from "../api/get.js"
-import { displayChatUsers } from "./chat.js"
-
+// userInfo keeps info of the authorized user
 export const userInfo = {
   Id: -1,
   Name: "",
 }
 
+// Auth keeps state of wether or not the user is authorized or not
 export const Auth = (session: boolean): void => {
   if (session) {
     wsHandler()
