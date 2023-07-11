@@ -31,7 +31,7 @@ export const displayPosts = async (endpoint: string) => {
       post.author.id.toString(),
       formatDate,
       post.categories,
-      post.content,
+      post.description,
       post.comments_count.toString(),
       post.likes_count.toString(),
       post.dislikes_count.toString()
@@ -80,7 +80,7 @@ export class PostCreator {
     const formData: CreatePostBody = {
       Title: title.value,
       Content: content.value,
-      Description: `${title.value} ${category.value} ${content.value}`,
+      Description: content.value,
       Categories: [category.value],
     }
     return formData
