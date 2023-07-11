@@ -8,15 +8,10 @@ const MessagesDateGroups: FC<{ messageIds: number[]; showStickyDate: boolean }> 
   messageIds,
   showStickyDate,
 }) => {
-  // load the most recent messages first
-  messageIds.reverse()
-
-  const { messages } = useMessages(messageIds)
-
-  // reverse back to original order
-  messages.reverse()
+  const { messages: reversedMessages } = useMessages(messageIds.slice().reverse())
 
   const { groupedMessages, processingMessages } = useMemo(() => {
+    const messages = reversedMessages.slice().reverse()
     const groupedMessages = messages.reduce((acc, message) => {
       if (!message) {
         return acc
@@ -32,7 +27,7 @@ const MessagesDateGroups: FC<{ messageIds: number[]; showStickyDate: boolean }> 
     const processingMessages = messages.filter((message) => !message)
 
     return { groupedMessages, processingMessages }
-  }, [messages])
+  }, [reversedMessages])
 
   const groups = Object.entries(groupedMessages)
 
