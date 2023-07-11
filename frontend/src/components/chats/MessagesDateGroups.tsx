@@ -29,7 +29,7 @@ const MessagesDateGroups: FC<{ messageIds: number[] }> = ({ messageIds }) => {
         <div key={date} className={"relative flex flex-col gap-1.5 items-center"}>
           <span
             className={
-              "sticky top-1 text-sm text-info bg-primary bg-opacity-10 backdrop-blur px-3 rounded-xl"
+              "sticky top-1 z-50 text-xs text-info bg-primary bg-opacity-10 backdrop-brightness-200 dark:backdrop-brightness-50 backdrop-blur-sm px-3 rounded-xl"
             }
           >
             {formatDate(date)}
