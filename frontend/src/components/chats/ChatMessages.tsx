@@ -37,10 +37,26 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
 
   const [hasUnread, setHasUnread] = useState(false)
 
+  const showStickyDateTimeout = useRef<NodeJS.Timeout | null>(null)
+  const [showStickyDate, setShowStickyDate] = useState(false)
+
   const onScroll = throttle(() => {
     if (!scrollRef.current) {
       return
     }
+
+    if (!showStickyDate) {
+      setShowStickyDate(true)
+    }
+
+    if (showStickyDateTimeout.current) {
+      clearTimeout(showStickyDateTimeout.current)
+    }
+    showStickyDateTimeout.current = setTimeout(() => {
+      if (showStickyDate) {
+        setShowStickyDate(false)
+      }
+    }, 1000)
 
     isOnBottom.current =
       scrollRef.current.scrollHeight -
@@ -105,7 +121,7 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
   return (
     <div ref={scrollRef} onScroll={onScroll} className={"overflow-y-auto"}>
       <div ref={observerRef}>
-        <MessageGroups messageIds={messages} />
+        <MessageGroups messageIds={messages} showStickyDate={showStickyDate} />
       </div>
     </div>
   )
