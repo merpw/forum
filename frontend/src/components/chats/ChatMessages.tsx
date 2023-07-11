@@ -19,6 +19,16 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
     return state.chats.messages[lastMessageId]
   })
 
+  useEffect(() => {
+    if (lastMessage?.authorId === user?.id) {
+      isOnBottom.current = true
+      setTimeout(() => {
+        // fallback, sometimes the observer misses the scroll (when the message is too small)
+        scrollRef.current?.scrollTo(0, scrollRef.current?.scrollHeight)
+      }, 200)
+    }
+  }, [chatMessages, lastMessage?.authorId, user?.id])
+
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const isOnBottom = useRef(true)
@@ -42,26 +52,36 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
       setHasUnread(false)
     }
 
-    if (scrollRef.current.scrollTop < 100) {
-      if (scrollRef.current.scrollTop < 10 && messagesCount < (chatMessages?.length ?? 0)) {
-        scrollRef.current.scrollTo(0, 10)
+    if (
+      scrollRef.current.scrollTop < scrollRef.current.clientHeight / 2 &&
+      messagesCount < (chatMessages?.length ?? 0)
+    ) {
+      if (scrollRef.current.scrollTop === 0) {
+        scrollRef.current.scrollTo(0, 1)
       }
       setMessagesCount((prev) => prev + 10)
     }
-  }, 100)
+  }, 500)
 
   useEffect(() => {
-    if (lastMessage?.authorId === user?.id || isOnBottom.current) {
-      setTimeout(() => {
-        scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight)
-      }, 200)
-      return
-    }
+    setTimeout(() => {
+      if (!scrollRef.current || !observerRef.current) {
+        return
+      }
 
-    if (lastMessage?.authorId !== user?.id) {
-      setHasUnread(true)
-    }
-  }, [lastMessage, user])
+      const observer = new ResizeObserver(() => {
+        if (isOnBottom.current) {
+          scrollRef.current?.scrollTo(0, scrollRef.current?.scrollHeight)
+          setTimeout(() => {
+            scrollRef.current?.scrollTo(0, scrollRef.current?.scrollHeight)
+          }, 100)
+        }
+      })
+
+      observer.observe(observerRef.current)
+      observer.observe(scrollRef.current)
+    }, 100)
+  }, [])
 
   useEffect(() => {
     setTimeout(() => {
@@ -74,16 +94,19 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
     }, 100)
   }, [chatMessages, messagesCount])
 
+  const observerRef = useRef<HTMLDivElement>(null)
+
   if (!chatMessages) {
-    return <div>loading...</div>
+    return null
   }
 
   const messages = chatMessages.slice(-messagesCount)
 
   return (
     <div ref={scrollRef} onScroll={onScroll} className={"overflow-y-auto"}>
-      <div />
-      <MessageGroups messageIds={messages} />
+      <div ref={observerRef}>
+        <MessageGroups messageIds={messages} />
+      </div>
     </div>
   )
 }
