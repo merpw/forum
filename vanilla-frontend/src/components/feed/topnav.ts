@@ -1,8 +1,15 @@
-import { postForm } from "../pages.js"
-import { PostCreator, displayPosts } from "./posts.js"
-import { logout } from "../api/post.js"
-import { displayChatUsers } from "./chat.js"
+/* IMPORTS */
 
+/* Root */
+import { postForm } from "../../pages.js"
+
+/* API */
+import { logout } from "../../api/post.js"
+
+/* Local */
+import { PostCreator, displayPosts } from "./posts.js"
+
+/* DOM elements */
 export const postBtn = document.getElementById(
   "topnav-post"
 ) as HTMLAnchorElement
@@ -14,7 +21,7 @@ export const homeBtn = document.getElementById(
 ) as HTMLAnchorElement
 
 // Opens the create post section of the feed
-export const openCloseCreatePost = async () => {
+export const openCloseCreatePost = (): void => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
   if (postFormElement.classList.contains("close")) {
     postFormElement.innerHTML = postForm()
@@ -23,16 +30,14 @@ export const openCloseCreatePost = async () => {
     if (createPostForm) {
       new PostCreator(createPostForm)
     }
-    return
   } else {
     postFormElement.innerHTML = ""
     postFormElement.classList.replace("open", "close")
-    return
   }
 }
 
 // Goes to home page
-export const goHome = () => {
+export const goHome = (): void => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
   const categories = document.querySelectorAll(".category-title") as NodeListOf <HTMLElement>
   if (postFormElement.classList.contains("open-create-post")) {
@@ -41,36 +46,37 @@ export const goHome = () => {
   categories.forEach((category) => {
     if (category.classList.contains("selected")) {
       category.classList.remove("selected")
-      return
     }
   })
   displayPosts("/api/posts")
 }
 
-// Adds event listener to the topNav
-export const topnavController = () => {
+// Adds eventlisteners to the topNav
+export const topnavController = (): void => {
   const topNavPost = document.getElementById(
-      "topnav-post"
-    ) as HTMLAnchorElement,
-    topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
-    topNavLogout = document.getElementById(
-      "topnav-logout"
-    ) as HTMLAnchorElement,
-    topNavChat = document.getElementById("topnav-chat") as HTMLAnchorElement,
-    chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
-    chatDisplay = document.getElementById("chatlist") as HTMLDivElement,
-    chat = document.getElementById("chat-area") as HTMLDivElement
+    "topnav-post"
+  ) as HTMLAnchorElement,
+  topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
+  topNavLogout = document.getElementById(
+    "topnav-logout"
+  ) as HTMLAnchorElement,
+  chatOpen = document.getElementById("topnav-chat") as HTMLAnchorElement,
+  chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
+  chatDisplay = document.getElementById("chatlist") as HTMLDivElement,
+  chat = document.getElementById("chat-area") as HTMLDivElement
 
   topNavPost.addEventListener("click", openCloseCreatePost)
   topNavHome.addEventListener("click", goHome)
   topNavLogout.addEventListener("click", logout)
-  topNavChat.addEventListener("click", () => {
-    setTimeout(() => {
-      chatDisplay.classList.add("chat-list-open")
-      chatDisplay.style.width = "200px"
-      chat.style.left = "210px"
-    }, 50)
+
+  // Opens the chat list
+  chatOpen.addEventListener("click", () => {
+    chatDisplay.classList.add("chat-list-open")
+    chatDisplay.style.width = "200px"
+    chat.style.left = "210px"
   })
+
+  // Closes the chat list
   chatClose.addEventListener("click", () => {
     chatDisplay.classList.remove("chat-list-open")
     chatDisplay.style.width = "0"

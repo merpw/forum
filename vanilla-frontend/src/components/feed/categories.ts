@@ -1,3 +1,6 @@
+/* IMPORTS */
+
+/* Local */
 import { displayPosts } from "./posts.js"
 
 // Category state
@@ -6,24 +9,26 @@ export const category = {
 }
 
 // Helper function to select functions. It affects the category state
-export const categoriesSelector = async () => {
+export const categoriesSelector = (): void => {
   const categories = document.querySelectorAll(
     ".category-title"
   ) as NodeListOf<Element>
 
-  categories.forEach((categoryElement) => {
-    categoryElement.addEventListener("click", () => {
-      if (categoryElement.classList.contains("selected")) {
-        categoryElement.classList.remove("selected")
+  // Selects the category
+  categories.forEach((element) => {
+    element.addEventListener("click", () => {
+      if (element.classList.contains("selected")) {
+        element.classList.remove("selected")
         category.selected = "all"
       } else {
-        categories.forEach((otherCategoryElement) => {
-          if (otherCategoryElement !== categoryElement) {
-            otherCategoryElement.classList.remove("selected")
+        // De-select all other categories
+        categories.forEach((otherElement) => {
+          if (otherElement !== element) {
+            otherElement.classList.remove("selected")
           }
         })
-        categoryElement.classList.add("selected")
-        category.selected = categoryElement.id
+        element.classList.add("selected")
+        category.selected = element.id
       }
       categoriesController()
     })
@@ -31,7 +36,8 @@ export const categoriesSelector = async () => {
   return
 }
 
-const categoriesController = () => {
+// Sends a request to the server based on selected category
+const categoriesController = (): void => {
   switch (category.selected) {
     case "category-facts":
       displayPosts(`/api/posts/categories/facts`)

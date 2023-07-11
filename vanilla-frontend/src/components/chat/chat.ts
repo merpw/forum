@@ -1,21 +1,45 @@
-import { ChatUser, Message } from "../types"
-import { sendWsObject, getMessageList } from "./ws.js"
-import { userInfo } from "./auth.js"
-import { createElement, iterator } from "./utils.js"
-import { getUserById, getUserIds } from "../api/get.js"
+/* IMPORTS */
 
+/* Root */
+import { ChatUser, Message } from "../../types"
+
+/* API */
+import { getUserById, getUserIds } from "../../api/get.js"
+
+/* Authorization */
+import { userInfo } from "../authorization/auth.js"
+
+/* Local */
+import { 
+  sendWsObject,
+  getMessageList, 
+  toggleOfflineSection, 
+  toggleOnlineSection, 
+  lazyLoading, 
+  hideChat,
+  sendMessage,
+  createMessage } from "./helpers.js"
+
+/* Utilities */
+import { createElement, iterator } from "../utils.js"
+
+
+/* State managing objects */
+
+// chatList keeps track of all the users on the database
 export const chatList = {
-  Ids: new Map<number, number>, //companionId, chatId
+  Ids: new Map<number, number>(), //companionId, chatId
   Users: [] as ChatUser[],
 }
 
+// messages is used for message-state handling
 export const messages = {
   list: [] as Message[],
   ids: [] as number[],
   current: {} as Message 
 }
 
-
+// currentChat keeps track of the state of the current chat
 export const currentChat = {
   username: "",
   userId: -1,
@@ -27,10 +51,11 @@ export const currentChat = {
 }
 
 
-// Gets all chat users and assigns them both as IDs and as 
+// Gets all chat users and assigns them both as IDs as users
+// Also creates ALL chats if not already created
 const getChatUsers = async () => {
   Object.assign(chatList, {
-    Ids: new Map<number, number>,
+    Ids: new Map<number, number>(),
     Users: [],
   })
 
@@ -151,98 +176,12 @@ const showChat = async (id: number) => {
   }, 200)
 }
 
-// Hides the chat and resets the state of the current chat
-const hideChat = () => {
-  document.getElementById("chat-area")?.replaceChildren()
-  Object.assign(currentChat, {
-    username: "",
-    userId: -1,
-    chatId: -1,
-    range: {
-      min: 0,
-      max: 10
-    }
-  })
-}
+
 
 // Sends a message to another chat user through the WebSocket server
-const sendMessage = (chatId: number): void => {
-  const content = document.getElementById("chat-text") as HTMLInputElement
-  let message = content.value.toString().trim()
-  if (message.length > 0) {
-    content.value = ""
-    if (message.length > 150) {
-      message = message.slice(0, 150)
-    }
-    sendWsObject({
-      type: "post",
-      item: {
-        url: `/chat/${chatId}/message`,
-        data: {
-          content: message,
-        },
-      },
-    })
-  }
-  renderChatList()
-}
 
-// Creates a message in the DOM and returns the HTMLDivElement
-const createMessage = (message: Message): HTMLDivElement => {
-  const msgElement = createElement("div", "message") as HTMLDivElement
-  const date = new Date(message.timestamp)
-  const formatDate = date
-  .toLocaleString("en-GB", { timeZone: "EET" })
-  .slice(0, 10)
-  const dateElement = createElement("p", "date", null, formatDate)
-  if (message.authorId === userInfo.Id) {
-    msgElement.classList.add("send")
-    msgElement.textContent = "You:\n" + message.content + "\n"
-  } else if (message.authorId === -1) {
-    msgElement.classList.add("status")
-    msgElement.textContent = message.content + "\n"
-  } else {
-    msgElement.classList.add("recieve")
-    msgElement.textContent = currentChat.username + ":\n" + message.content + "\n"
-  }
-  msgElement.appendChild(dateElement)
-  return msgElement
 
-}
 
-const throttle = (cb: Function, delay: number = 1000): Function => {
-  let shouldWait = false
-  return (...args: any) => {
-    if (shouldWait) return
-
-    cb(...args)
-    shouldWait = true
-    setTimeout(() => {
-      shouldWait = false
-    }, delay)
-  }
-}
-
-const lazyLoading = throttle((chatId: number): void => {
-  if (currentChat.chatId !== chatId) return
-  const chatMessages = document.getElementById(
-    `Chat${chatId}`
-  ) as HTMLDivElement
-  console.log("messages.list", messages.list)
-
-  const buffer = messages.list.splice(currentChat.range.min, currentChat.range.max)
-  console.log("buffer", buffer)
-  for (const message of Object.values(buffer)) {
-    chatMessages.append(createMessage(message))
-  }
-  if (currentChat.range.min + 10 > messages.list.length) {
-    return
-  }
-  currentChat.range.min += 10
-  currentChat.range.max += 10
-  console.log("range", currentChat.range)
-
-})
 
 // Updates the chat if you send or recieve a chat message
 export const updateChat = (chatId: number): void => {
@@ -258,7 +197,7 @@ export const updateChat = (chatId: number): void => {
   currentChat.range.max += 1
 }
 
-// Gets the message list and populates the messages.list array with message ids
+// Gets the message list of provided chatId and populates the messages.list array with messages
 const getMessages = async (chatId: number): Promise<void> => {
   return new Promise<void>((resolve) => {
     // Reset the state of the messages
@@ -343,34 +282,4 @@ export function renderChatList(): void {
     }, 120)
 }
 
-// toggleOnlineSection just shows/hides the online section
-// Visible by default
-const toggleOnlineSection = () => {
-  const onlineToggle = document.getElementById("online-toggle") as HTMLElement,
-  onlineUsers = document.getElementById("online-users") as HTMLUListElement
-  
-  if (onlineToggle.className === "bx bx-chevron-down") {
-    onlineToggle.className = "bx bx-chevron-right"
-    onlineUsers.style.display = "none"
-  } else {
-    onlineToggle.className = "bx bx-chevron-down"
-    onlineUsers.style.display = "block"
-  }
-}
 
-// toggleOfflineSection just shows/hides the offline section
-// Hidden by default
-const toggleOfflineSection = () => {
-  const offlineToggle = document.getElementById("offline-toggle") as HTMLElement
-  const offlineUsers = document.getElementById(
-    "offline-users"
-  ) as HTMLUListElement
-
-  if (offlineToggle.className === "bx bx-chevron-down") {
-    offlineToggle.className = "bx bx-chevron-right"
-    offlineUsers.style.display = "none"
-  } else {
-    offlineToggle.className = "bx bx-chevron-down"
-    offlineUsers.style.display = "block"
-  }
-}

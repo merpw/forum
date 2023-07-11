@@ -1,10 +1,17 @@
-import { CreatePostBody } from "../types"
+/* IMPORTS */
 
+/* Root */
+import { CreatePostBody } from "../../types"
+
+/* API */
+import { getPosts, getPostValues } from "../../api/get.js"
+import { dislikePost, likePost, postCreatePost } from "../../api/post.js"
+
+/* Local */
 import { displayCommentSection } from "./comments.js"
-import { iterator, createElement } from "./utils.js"
 
-import { getPosts, getPostValues } from "../api/get.js"
-import { dislikePost, likePost, postCreatePost } from "../api/post.js"
+/* Utilities */
+import { iterator, createElement } from "../utils.js"
 
 export const displayPosts = async (endpoint: string) => {
   const postsDisplay = document.getElementById("posts-display") as HTMLElement
@@ -38,7 +45,8 @@ export const displayPosts = async (endpoint: string) => {
   }
 }
 
-export const updatePostValues = async (postId: string) => {
+// Updates likes/dislikes/comments when values change
+export const updatePostValues = async (postId: string): Promise<void> => {
   const post: iterator = await getPostValues(postId),
     postCommentsElement = document.getElementById(`C${postId}`) as HTMLElement,
     postLikesElement = document.getElementById(`L${postId}`) as HTMLElement,
@@ -79,6 +87,7 @@ export class PostCreator {
   }
 }
 
+// Creates a post in the DOM and returns the HTMLDivElement
 const formattedPost = (
   id: string,
   title: string,

@@ -1,9 +1,17 @@
-import { commentForm } from "../pages.js"
-import { getComments } from "../api/get.js"
-import { postComment } from "../api/post.js"
-import { createElement, iterator } from "./utils.js"
+/* IMPORTS */
 
-export const displayCommentSection = async (id: string) => {
+/* Root */
+import { commentForm } from "../../pages.js"
+
+/* API */
+import { getComments } from "../../api/get.js"
+import { postComment } from "../../api/post.js"
+
+/* Utilities */
+import { createElement, iterator } from "../utils.js"
+
+// Displays the comment section on a post
+export const displayCommentSection = async (id: string): Promise<void> => {
   const comments: iterator = await getComments(id)
   if (!comments) return
 
@@ -63,7 +71,7 @@ export const displayCommentSection = async (id: string) => {
   return
 }
 
-// Parses and sends the data from the comment form
+// Parses and sends the data from the comment form to the server
 export class CommentCreator {
   private readonly form: HTMLFormElement
   constructor(form: HTMLFormElement) {

@@ -1,13 +1,28 @@
-import { chatList, currentChat, messages, renderChatList } from "./chat.js"
-import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../types"
-import { iterator } from "./utils.js"
-import { Auth, userInfo } from "./auth.js"
-import { getUserById, getUserIds } from "../api/get.js"
+/* IMPORTS */
 
+/* Root */
+import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../../types"
+
+/* Authorization */
+import { Auth } from "../authorization/auth.js"
+
+/* Local */
+import { chatList, currentChat, messages } from "./chat.js"
+import { getMessage, updateUnreadMessages, updateOnlineUsers, getChatIds } from "./helpers.js"
+
+/* Utilities */
+import { iterator } from "../utils.js"
+
+// Message event. Updates the chat.
 export const messageEvent = new Event("messageEvent")
+
+// WebSocket URL
 const WS_URL = "ws://localhost:8081/ws"
+
+// WebSocket connection
 export let ws: WebSocket
 
+// Handles all ws events
 export const wsHandler = (): void => {
   ws = new WebSocket(WS_URL)
   ws.onmessage = (event: MessageEvent): void => {
@@ -63,6 +78,7 @@ export const wsHandler = (): void => {
   }
 }
 
+// Handles WS responses with type "post" 
 const postHandler = async (resp: WSPostResponse<never>): Promise<void> => {
   const data = resp.item.data
   const url = resp.item.url
@@ -72,6 +88,7 @@ const postHandler = async (resp: WSPostResponse<never>): Promise<void> => {
   }
 }
 
+// Handles WS responses with type "get"
 const getHandler = (resp: WSGetResponse<never>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
@@ -131,100 +148,10 @@ const getHandler = (resp: WSGetResponse<never>) => {
     return
   }
 
+  /* /chat/all */
   if (url.match(/^\/chat\/all$/)) {
     getChatIds(resp)
     return
   }
 }
 
-async function updateOnlineUsers(users: number[]) {
-  sendWsObject({
-    type: "get",
-    item: {
-      url: "/chat/all",
-    },
-  }) 
-  Object.assign(chatList, {
-    Ids: new Map<number, number>,
-    Users: [],
-  })
-
-  const userIds: iterator = await getUserIds()
-  for (const id of Object.values(userIds)) {
-    if (id !== userInfo.Id) {
-      chatList.Users.push(await getUserById(id))
-    }
-  }
-
-  for (const user of Object.values(chatList.Users)) {
-    user.Online = users.includes(user.Id)
-  }
-
-  renderChatList()
-}
-
-function updateUnreadMessages() {
-  for (const [userId, chatId] of chatList.Ids) {
-    console.log(chatId, messages.current.chatId)
-    if (chatId === messages.current.chatId) {
-      for (const user of Object.values(chatList.Users)) {
-        if (user.Id === userId) {
-          user.UnreadMsg = true
-          break
-        }
-      }
-      break
-    }
-  }
-  renderChatList()
-}
-
-const getChatIds = (resp: iterator) => {
-  for (const chat of resp.item.data) {
-    if (!chatList.Ids.has(chat)) {
-      sendWsObject({
-        type: "get",
-        item: {
-          url: `/chat/${chat}`,
-        },
-      })
-    }
-  }
-  return
-}
-
-const getMessage = (id: number) => {
-  sendWsObject({
-    type: "get",
-    item: {
-      url: `/message/${id}`,
-    },
-  })
-  setTimeout(() => {
-    const chat = document.getElementById(`Chat${currentChat.chatId}`) as HTMLDivElement
-    if (chat) {
-      chat.dispatchEvent(messageEvent)
-    } else {
-      updateUnreadMessages()
-    }
-  }, 80)
-}
-
-export const getMessageList = (ids: number[]) => {
-  for (const id of ids) {
-      sendWsObject({
-      type: "get",
-      item: {
-        url: `/message/${id}`,
-      },
-    })
-  }
-  return
-}
-
-export function sendWsObject(obj: object) {
-    if (ws.readyState === 1) {
-      ws.send(JSON.stringify(obj))
-    }
-  return
-}
