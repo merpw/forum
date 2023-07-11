@@ -55,7 +55,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
     >
       <div
         className={
-          "bg-base-200 p-3 pt-2 pb-1 rounded-lg" +
+          "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral hover:saturate-150 " +
           " " +
           (chatId === activeChatId && "border-base-200 gradient-light dark:gradient-dark shadow-sm")
         }
