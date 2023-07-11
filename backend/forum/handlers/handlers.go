@@ -27,6 +27,8 @@ type Handlers struct {
 	lock sync.Mutex
 }
 
+const FRONTEND_DIR = "../../vanilla-frontend/public"
+
 // New connects database to Handlers
 func New(db *sql.DB) *Handlers {
 
@@ -49,6 +51,9 @@ func New(db *sql.DB) *Handlers {
 
 // Handler returns http.Handler with all routes registered
 func (h *Handlers) Handler() http.Handler {
+	router := http.NewServeMux()
+	fs := http.FileServer(http.Dir(FRONTEND_DIR))
+	router.Handle("/", fs)
 
 	var routes = []server.Route{
 		// method GET endpoints
@@ -77,6 +82,12 @@ func (h *Handlers) Handler() http.Handler {
 
 		server.NewRoute(http.MethodGet, `/api/me/posts`, h.mePosts),
 		server.NewRoute(http.MethodGet, `/api/me/posts/liked`, h.mePostsLiked),
+
+		server.NewRoute(http.MethodGet, `/api/user/(\d+)`, h.usersId),
+		server.NewRoute(http.MethodGet, `/api/user/(\d+)/posts`, h.usersIdPosts),
+
+		server.NewRoute(http.MethodGet, `/api/posts`, h.posts),
+		server.NewRoute(http.MethodGet, `/api/posts/(\d+)`, h.postsId),
 
 		server.NewRoute(http.MethodGet, `/api/posts/(\d+)/reaction`, h.postsIdReaction),
 
@@ -107,64 +118,64 @@ func (h *Handlers) Handler() http.Handler {
 				server.ErrorResponse(w, http.StatusInternalServerError) // 500 ERROR
 			}
 		}()
+		if !strings.HasPrefix(r.URL.Path, "/api/") {
+			router.ServeHTTP(w, r) // For dev purposes only.
+		} else {
+			r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
 
-		// remove trailing slash
-		r.URL.Path = strings.TrimSuffix(r.URL.Path, "/")
+			for _, route := range routes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
 
-		for _, route := range routes {
-			if route.Pattern.MatchString(r.URL.Path) {
-				if r.Method != route.Method {
-					server.ErrorResponse(w, http.StatusMethodNotAllowed)
+					if os.Getenv("FORUM_IS_PRIVATE") == "true" {
+						h.withAuth(route.Handler)(w, r)
+						return
+					}
+
+					route.Handler(w, r)
 					return
 				}
+			}
 
-				if os.Getenv("FORUM_IS_PRIVATE") == "true" {
+			for _, route := range publicRoutes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
+
+					route.Handler(w, r)
+					return
+				}
+			}
+
+			for _, route := range authRoutes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
+
 					h.withAuth(route.Handler)(w, r)
 					return
 				}
-
-				route.Handler(w, r)
-				return
 			}
-		}
 
-		for _, route := range publicRoutes {
-			if route.Pattern.MatchString(r.URL.Path) {
-				if r.Method != route.Method {
-					server.ErrorResponse(w, http.StatusMethodNotAllowed)
+			for _, route := range internalRoutes {
+				if route.Pattern.MatchString(r.URL.Path) {
+					if r.Method != route.Method {
+						server.ErrorResponse(w, http.StatusMethodNotAllowed)
+						return
+					}
+
+					h.withInternal(route.Handler)(w, r)
 					return
 				}
-
-				route.Handler(w, r)
-				return
 			}
+
 		}
-
-		for _, route := range authRoutes {
-			if route.Pattern.MatchString(r.URL.Path) {
-				if r.Method != route.Method {
-					server.ErrorResponse(w, http.StatusMethodNotAllowed)
-					return
-				}
-
-				h.withAuth(route.Handler)(w, r)
-				return
-			}
-		}
-
-		for _, route := range internalRoutes {
-			if route.Pattern.MatchString(r.URL.Path) {
-				if r.Method != route.Method {
-					server.ErrorResponse(w, http.StatusMethodNotAllowed)
-					return
-				}
-
-				h.withInternal(route.Handler)(w, r)
-				return
-			}
-		}
-
-		// if we're still here, no route was found
-		server.ErrorResponse(w, http.StatusNotFound)
 	})
 }
