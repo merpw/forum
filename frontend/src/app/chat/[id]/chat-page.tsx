@@ -36,14 +36,20 @@ export const ChatPageFirstMessage: FC<{ userId: number }> = ({ userId }) => {
 
   if (chatId === null) {
     return (
-      <div className={"flex flex-col h-full"}>
+      <div className={"flex flex-col h-full pb-60 max-w-3xl m-auto"}>
         <ChatInfo userId={userId} />
-        <div className={"flex-grow"} />
-        <WriteMessageForm
-          sendMessage={(message: string) => {
-            setFirstMessage(message)
-          }}
-        />
+        <div
+          className={
+            "border border-base-100 rounded-lg min-h-full my-3 gradient-light dark:gradient-dark"
+          }
+        ></div>
+        <div className={"mb-16"}>
+          <WriteMessageForm
+            sendMessage={(message: string) => {
+              setFirstMessage(message)
+            }}
+          />
+        </div>
       </div>
     )
   }
