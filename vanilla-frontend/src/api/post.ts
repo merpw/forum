@@ -110,7 +110,6 @@ const postComment = (postId: string, formData: unknown): void => {
   })
     .then((r) => {
       if (r.ok) {
-        console.log("PostID in CommentCreator", postId)
         const commentSection = document.getElementById(
           `CS${postId}`
         ) as HTMLElement

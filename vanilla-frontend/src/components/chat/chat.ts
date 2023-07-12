@@ -122,6 +122,7 @@ const showChat = async (id: number) => {
     "chat-header"
   )
 
+
   const chatName   = createElement(
     "div",
     "chat-name",
@@ -144,7 +145,7 @@ const showChat = async (id: number) => {
   const messageField = createElement("input", null, "chat-text")
   messageField.setAttribute("maxlength", "150")
 
-  // Adding eventlisteners for messageEvents and lazyloading
+  // Adding event listeners for messageEvents and lazy loading
   chatMessages.addEventListener("messageEvent", () => {
     updateChat(chatId)
   })

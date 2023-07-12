@@ -51,7 +51,7 @@ export const displayCommentSection = async (id: string): Promise<void> => {
         "div",
         "comment-info",
         null,
-        `${c.author.name}\n\tat ${formatDate}`
+        `${c.author.username}\n\tat ${formatDate}`
       )
       // Comment content
       const commentContent = createElement(

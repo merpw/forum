@@ -1,19 +1,41 @@
 version: "3"
 services:
-  backend:
+  backend-forum:
     build:
       context: backend
+      args:
+        - SERVICE_NAME=forum
     environment:
       - FRONTEND_REVALIDATE_URL=http://frontend:3000/api/revalidate
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     volumes:
       - db:/app/db
+    platform: linux/amd64
+  backend-chat:
+    build:
+      context: backend
+      args:
+        - SERVICE_NAME=chat
+    environment:
+      - AUTH_BASE_URL=http://backend-forum:8080
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
+    volumes:
+      - db:/app/db
+    depends_on:
+      - backend-forum
+    platform: linux/amd64
   frontend:
     build:
       context: vanilla-frontend
     environment:
-      - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
+      - FORUM_BACKEND_PRIVATE_URL=http://backend-forum:8080
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     depends_on:
-      - backend
+      - backend-forum
+    volumes:
+      - cache:/app/.next/cache
+    platform: linux/amd64
   nginx:
     image: nginx:1.17.8-alpine
     volumes:
@@ -21,8 +43,9 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      - backend-forum
+      - backend-chat
       - frontend
 volumes:
   db:
-  pages:
+  cache:

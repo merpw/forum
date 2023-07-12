@@ -35,7 +35,7 @@ const getMe = async (): Promise<object | void> => {
     .then((data) => {
       return {
         Id: data.id,
-        Name: data.name,
+        Name: data.username,
       }
     })
     .catch(() => {
@@ -51,7 +51,7 @@ const getUserById = async (id: string): Promise<ChatUser> => {
     .then((data) => {
       return <ChatUser>{
         Id: data.id,
-        Name: data.name,
+        Name: data.username,
         UnreadMsg: false,
         Online: false,
       }
