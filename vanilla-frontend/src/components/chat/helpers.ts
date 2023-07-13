@@ -162,19 +162,27 @@ export async function updateOnlineUsers(users: number[]): Promise<void> {
   
   }
 
-// throttle function
-// eslint-disable-next-line @typescript-eslint/ban-types
-const throttle = (cb: Function, delay = 1000): Function => {
-    let shouldWait = false
-    return (...args: never) => {
-      if (shouldWait) return
-      cb([...args])
-      shouldWait = true
-      setTimeout(() => {
-        shouldWait = false
-      }, delay)
-    }
-  }
+  const throttle = <F extends (...args: Parameters<F>) => ReturnType<F>>( 
+    fn: F, 
+    delay: number, 
+    options: { leading?: boolean; trailing?: boolean } = { 
+      leading: true, 
+      trailing: true, 
+    } 
+  ) => { 
+    let timer: ReturnType<typeof setTimeout> | undefined 
+   
+    return (...args: Parameters<F>): void => { 
+      if (timer !== undefined) return 
+   
+      options.leading && fn(...args) 
+   
+      timer = setTimeout(() => { 
+        timer = undefined 
+        options.trailing && fn(...args) 
+      }, delay) 
+    } 
+  } 
   
   // lazyLoading of messages
   export const lazyLoading = throttle((chatId: number): void => {
@@ -182,10 +190,8 @@ const throttle = (cb: Function, delay = 1000): Function => {
     const chatMessages = document.getElementById(
       `Chat${chatId}`
     ) as HTMLDivElement
-    console.log("messages.list", messages.list)
   
     const buffer = messages.list.splice(currentChat.range.min, currentChat.range.max)
-    console.log("buffer", buffer)
     for (const message of Object.values(buffer)) {
       chatMessages.append(createMessage(message))
     }
@@ -195,9 +201,8 @@ const throttle = (cb: Function, delay = 1000): Function => {
     // Updates the range of messages that should be displayed
     currentChat.range.min += 10
     currentChat.range.max += 10
-    console.log("range", currentChat.range)
   
-  })
+  }, 100)
 
   // Hides the chat and resets the state of the current chat
 export const hideChat = (): void => {
