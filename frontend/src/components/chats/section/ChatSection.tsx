@@ -6,6 +6,7 @@ import { ChatSectionCollapsedContext } from "@/components/layout"
 import { useChatIds } from "@/api/chats/chats"
 import ChatList from "@/components/chats/section/ChatList"
 import UserList from "@/components/chats/section/UserList"
+import { useAppSelector } from "@/store/hooks"
 
 const ChatsSection = () => {
   const { chatIds } = useChatIds()
@@ -19,6 +20,8 @@ const ChatsSection = () => {
   }, [chatIds])
 
   const { isCollapsed, setIsCollapsed } = useContext(ChatSectionCollapsedContext)
+
+  const unreadCount = useAppSelector((state) => state.chats.unreadMessagesChatIds.length)
 
   if (isCollapsed) {
     return (
@@ -63,6 +66,11 @@ const ChatsSection = () => {
               />
             </svg>
           </span>
+          {unreadCount > 0 && (
+              <span className={"absolute -top-1 -right-1 bg-primary  rounded-full text-white p-1"}>
+            {unreadCount}
+          </span>
+          )}
         </div>
       </button>
     )

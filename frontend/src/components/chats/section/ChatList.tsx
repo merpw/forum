@@ -36,6 +36,10 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
 
   const activeChatId = useAppSelector((state) => state.chats.activeChatId)
 
+  const unreadMessagesCount = useAppSelector(
+    (state) => state.chats.unreadMessagesChatIds.filter((id) => id === chatId).length
+  )
+
   if (chat === undefined) {
     return <div className={"text-info"}>loading...</div>
   }
@@ -64,6 +68,9 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
           <div className={"mr-2 mt-2 w-12"}>
             <Avatar userId={chat.companionId} />
           </div>
+          {unreadMessagesCount > 0 && (
+              <div className={"badge badge-primary text-white"}>{unreadMessagesCount}</div>
+          )}
           <div className={"w-full"}>
             <CompanionData userId={chat.companionId} />
             <MessageInfo id={chat.lastMessageId} />
@@ -81,7 +88,7 @@ const CompanionData: FC<{ userId: number }> = ({ userId }) => {
     return <div className={"text-info"}>loading...</div>
   }
   if (user === null) {
-    return <div className={"text-info text-center mt-5 mb-7"}>User not found</div>
+    return <div className={"text-info text-center"}>User not found</div>
   }
 
   return (
@@ -109,7 +116,7 @@ const MessageInfo: FC<{ id: number }> = ({ id }) => {
   }
 
   if (message === null) {
-    return <div className={"text-info text-center"}>Message not found</div>
+    return <div className={"text-info"}>Message not found</div>
   }
 
   return (

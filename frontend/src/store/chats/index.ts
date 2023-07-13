@@ -9,6 +9,7 @@ type ObjectMap<K extends number | string | symbol, T> = Partial<Record<K, T>>
 
 const initialState: {
   activeChatId: number | null
+  unreadMessagesChatIds: number[]
   chatIds: number[] | undefined
   chats: ObjectMap<number, Chat | null>
   chatMessages: ObjectMap<number, number[]>
@@ -17,6 +18,7 @@ const initialState: {
   usersOnline: number[] | undefined
 } = {
   activeChatId: null,
+  unreadMessagesChatIds: [],
   chatIds: undefined,
   chats: {},
   chatMessages: {},
@@ -31,6 +33,10 @@ const chatSlice = createSlice({
   reducers: {
     setActiveChatId(state, action: PayloadAction<number | null>) {
       state.activeChatId = action.payload
+
+      state.unreadMessagesChatIds = state.unreadMessagesChatIds.filter(
+        (id) => id !== action.payload
+      )
     },
 
     reset: () => initialState,
@@ -81,6 +87,10 @@ const chatSlice = createSlice({
           if (!chatB) return -1
           return chatB.lastMessageId - chatA.lastMessageId
         })
+
+        if (state.activeChatId !== action.payload.chatId) {
+          state.unreadMessagesChatIds.push(action.payload.chatId)
+        }
       },
       prepare: (response: WSPostResponse<number>) => {
         const chatId = +response.item.url.split("/")[2]
