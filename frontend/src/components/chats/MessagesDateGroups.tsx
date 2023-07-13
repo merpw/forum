@@ -41,7 +41,7 @@ const MessagesDateGroups: FC<{ messageIds: number[]; showStickyDate: boolean }> 
         <span key={date} className={"relative flex flex-col gap-1.5 items-center"}>
           <span
             className={
-              "z-50 text-xs text-info bg-primary bg-opacity-10 backdrop-brightness-200 dark:backdrop-brightness-50 backdrop-blur-sm px-3 rounded-xl" +
+              "z-50 text-xs text-info bg-primary bg-opacity-10 backdrop-brightness-200 dark:backdrop-brightness-50 backdrop-blur-sm mt-1 px-3 rounded-xl" +
               " " +
               (key === groups.length - 1 && !showStickyDate ? "" : "sticky top-0")
             }
