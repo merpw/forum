@@ -1,10 +1,6 @@
-/* IMPORTS */
-
-/* Root */
 import { backendUrl } from "../main.js"
 import { ChatUser } from "../types"
 
-/* Authorization */
 import { Auth } from "../components/authorization/auth.js"
 
 // Gets all posts of the selected endpoint

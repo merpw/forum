@@ -1,9 +1,9 @@
-/* IMPORTS */
+ 
 
-/* Root */
+
 import { commentForm } from "../../pages.js"
 
-/* API */
+
 import { getComments } from "../../api/get.js"
 import { postComment } from "../../api/post.js"
 

@@ -1,12 +1,8 @@
-/* IMPORTS */
-
-/* Root */
 import { LoginForm, SignupForm } from "../../types"
 
-/* API */
 import { login, signup } from "../../api/post.js"
 
-/* Local */
+
 import { Auth } from "./auth.js"
 
 class Login {

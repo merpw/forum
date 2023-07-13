@@ -1,15 +1,8 @@
-/* IMPORTS */
-
-/* Root */
 import { ChatUser, Message } from "../../types"
-
-/* API */
 import { getUserById, getUserIds } from "../../api/get.js"
 
-/* Authorization */
 import { userInfo } from "../authorization/auth.js"
 
-/* Local */
 import { 
   sendWsObject,
   getMessageList, 
@@ -20,11 +13,7 @@ import {
   sendMessage,
   createMessage } from "./helpers.js"
 
-/* Utilities */
-import { createElement, iterator } from "../utils.js"
-
-
-/* State managing objects */
+  import { createElement, iterator } from "../utils.js"
 
 // chatList keeps track of all the users on the database
 export const chatList = {

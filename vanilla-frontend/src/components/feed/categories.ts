@@ -1,6 +1,6 @@
-/* IMPORTS */
+ 
 
-/* Local */
+
 import { displayPosts } from "./posts.js"
 
 // Category state

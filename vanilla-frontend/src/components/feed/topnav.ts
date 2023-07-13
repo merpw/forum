@@ -1,12 +1,12 @@
-/* IMPORTS */
+ 
 
-/* Root */
+
 import { postForm } from "../../pages.js"
 
-/* API */
+
 import { logout } from "../../api/post.js"
 
-/* Local */
+
 import { PostCreator, displayPosts } from "./posts.js"
 
 /* DOM elements */

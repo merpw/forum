@@ -1,22 +1,14 @@
-/* IMPORTS */
-
-/* Root */
 import { superDivision } from "../../main.js"
 import { LoginSignup, Index } from "../../pages.js"
-
-/* API */
 import { getMe } from "../../api/get.js"
 
-/* Feed */
 import { topnavController } from "../feed/topnav.js"
 import { categoriesSelector } from "../feed/categories.js"
 import { displayPosts } from "../feed/posts.js"
 
-/* Chat */
 import { ws, wsHandler } from "../chat/ws.js"
 import { displayChatUsers } from "../chat/chat.js"
 
-/* Local */
 import { loginController } from "./login.js"
 
 // userInfo keeps info of the authorized user

@@ -1,16 +1,10 @@
-/* IMPORTS */
-
-/* Root */
 import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../../types"
 
-/* Authorization */
 import { Auth } from "../authorization/auth.js"
 
-/* Local */
 import { chatList, currentChat, messages } from "./chat.js"
 import { getMessage, updateUnreadMessages, updateOnlineUsers, getChatIds } from "./helpers.js"
 
-/* Utilities */
 import { iterator } from "../utils.js"
 
 // Message event. Updates the chat.

@@ -1,13 +1,13 @@
-/* IMPORTS */
+ 
 
-/* Root */
+
 import {CreatePostBody} from "../../types"
 
-/* API */
+
 import {getPosts, getPostValues} from "../../api/get.js"
 import {dislikePost, likePost, postCreatePost} from "../../api/post.js"
 
-/* Local */
+
 import {displayCommentSection} from "./comments.js"
 
 /* Utilities */

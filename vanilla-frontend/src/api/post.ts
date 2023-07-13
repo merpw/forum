@@ -1,14 +1,9 @@
-/* IMPORTS */
-
-/* Root */
 import { superDivision, backendUrl } from "../main.js"
 import { errorPage } from "../pages.js"
 import { CreatePostBody, LoginForm, SignupForm } from "../types"
 
-/* Authorization */
 import { Auth } from "../components/authorization/auth.js"
 
-/* Feed */
 import { displayPosts, updatePostValues } from "../components/feed/posts.js"
 import { displayCommentSection } from "../components/feed/comments.js"
 import { openCloseCreatePost } from "../components/feed/topnav.js"

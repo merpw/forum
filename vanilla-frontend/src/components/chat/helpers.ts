@@ -1,16 +1,10 @@
-/* IMPORTS */
-
-/* API */
 import { getUserIds, getUserById } from "../../api/get.js"
 
-/* Authorization */
 import { userInfo } from "../authorization/auth.js"
 
-/* Local */
 import { chatList, renderChatList, messages, currentChat } from "./chat.js"
 import { messageEvent, ws } from "./ws.js"
 
-/* Utilities */
 import { createElement, iterator } from "../utils.js"
 import { Message } from "../../types.js"
 
