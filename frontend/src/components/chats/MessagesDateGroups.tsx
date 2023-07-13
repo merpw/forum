@@ -4,36 +4,55 @@ import dayjs from "dayjs"
 import { useMessages } from "@/api/chats/messages"
 import Message from "@/components/chats/Message"
 
-const MessagesDateGroups: FC<{ messageIds: number[] }> = ({ messageIds }) => {
-  const { messages } = useMessages(messageIds)
+const MessagesDateGroups: FC<{ messageIds: number[]; showStickyDate: boolean }> = ({
+  messageIds,
+  showStickyDate,
+}) => {
+  const { messages: reversedMessages } = useMessages(messageIds.slice().reverse())
 
-  const groupedMessages = useMemo(
-    () =>
-      messages.reduce((acc, message) => {
-        if (!message) {
-          return acc
-        }
-        const date = dayjs(message.timestamp).format("YYYY-MM-DD")
-        if (!acc[date]) {
-          acc[date] = []
-        }
-        acc[date].push(message.id)
+  const { groupedMessages, processingMessages } = useMemo(() => {
+    const messages = reversedMessages.slice().reverse()
+    const groupedMessages = messages.reduce((acc, message) => {
+      if (!message) {
         return acc
-      }, {} as Record<string, number[]>),
-    [messages]
-  )
+      }
+      const date = dayjs(message.timestamp).format("YYYY-MM-DD")
+      if (!acc[date]) {
+        acc[date] = []
+      }
+      acc[date].push(message.id)
+      return acc
+    }, {} as Record<string, number[]>)
+
+    const processingMessages = messages.filter((message) => !message)
+
+    return { groupedMessages, processingMessages }
+  }, [reversedMessages])
+
+  const groups = Object.entries(groupedMessages)
 
   return (
     <>
-      {Object.entries(groupedMessages).map(([date, messages]) => (
+      {processingMessages.map((_, key) => {
+        // TODO: add placeholders
+        return <div className={"h-20"} key={key} />
+      })}
+      {groups.map(([date, messages], key) => (
         <div key={date} className={"relative flex flex-col gap-1.5 items-center"}>
           <div
             className={
-              "sticky top-1 text-base-content bg-base bg-opacity-80 backdrop-blur px-2 rounded-xl"
+              "pt-1 text-base-content bg-base bg-opacity-80 backdrop-blur px-2 rounded-xl" +
+              " " +
+              (key === groups.length - 1 && !showStickyDate ? "" : "sticky top-0")
             }
           >
             {formatDate(date)}
           </div>
+          {key === 0 &&
+            processingMessages.map((_, key) => {
+              // TODO: add placeholders
+              return <div className={"h-20"} key={key} />
+            })}
           {messages.map((messageId) => (
             <Message key={messageId} id={messageId} />
           ))}

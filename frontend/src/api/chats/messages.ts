@@ -33,17 +33,17 @@ export const useMessages = (messageIds: number[]) => {
   const allMessages = useAppSelector((state) => state.chats.messages)
 
   const messages = useMemo(() => {
-    return messageIds.map((id) => allMessages?.[id]).filter(Boolean)
+    return messageIds.map((id) => allMessages?.[id])
   }, [allMessages, messageIds])
 
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    messageIds
-      .filter((id) => !allMessages?.[id])
-      .forEach((id) => {
+    messageIds.forEach((id) => {
+      if (!allMessages?.[id]) {
         dispatch(wsActions.sendGet(`/message/${id}`))
-      })
+      }
+    })
   }, [dispatch, messageIds, allMessages])
 
   return { messages }

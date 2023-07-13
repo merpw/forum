@@ -29,6 +29,7 @@ const WriteMessageForm: FC<{
         onChange={(e) => setInput(e.currentTarget.value)}
         onBlur={() => setInput(input.trim())}
         value={input}
+        maxRows={5}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault()
