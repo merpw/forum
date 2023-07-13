@@ -7,16 +7,12 @@ import { getMessage, updateUnreadMessages, updateOnlineUsers, getChatIds } from 
 
 import { iterator } from "../utils.js"
 
-// Message event. Updates the chat.
 export const messageEvent = new Event("messageEvent")
 
-// WebSocket URL
 const WS_URL = "ws://localhost:8081/ws"
 
-// WebSocket connection
 export let ws: WebSocket
 
-// Handles all ws events
 export const wsHandler = (): void => {
   ws = new WebSocket(WS_URL)
   ws.onmessage = (event: MessageEvent): void => {
@@ -71,8 +67,7 @@ export const wsHandler = (): void => {
     console.log("ws disconnected")
   }
 }
-
-// Handles WS responses with type "post" 
+ 
 const postHandler = async (resp: WSPostResponse<never>): Promise<void> => {
   const data = resp.item.data
   const url = resp.item.url
@@ -82,7 +77,6 @@ const postHandler = async (resp: WSPostResponse<never>): Promise<void> => {
   }
 }
 
-// Handles WS responses with type "get"
 const getHandler = (resp: WSGetResponse<never>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url

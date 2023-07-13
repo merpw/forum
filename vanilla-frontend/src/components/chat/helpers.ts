@@ -184,7 +184,6 @@ export async function updateOnlineUsers(users: number[]): Promise<void> {
     } 
   } 
   
-  // lazyLoading of messages
   export const lazyLoading = throttle((chatId: number): void => {
     if (currentChat.chatId !== chatId) return
     const chatMessages = document.getElementById(
@@ -192,12 +191,15 @@ export async function updateOnlineUsers(users: number[]): Promise<void> {
     ) as HTMLDivElement
   
     const buffer = messages.list.splice(currentChat.range.min, currentChat.range.max)
+
     for (const message of Object.values(buffer)) {
       chatMessages.append(createMessage(message))
     }
+
     if (currentChat.range.min + 10 > messages.list.length) {
       return
     }
+    
     // Updates the range of messages that should be displayed
     currentChat.range.min += 10
     currentChat.range.max += 10

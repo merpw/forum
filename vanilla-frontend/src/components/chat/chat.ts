@@ -40,7 +40,7 @@ export const currentChat = {
 }
 
 
-// Gets all chat users and assigns them both as IDs as users
+// Gets all chat users and assigns them both as IDs and as users
 // Also creates ALL chats if not already created
 const getChatUsers = async () => {
   Object.assign(chatList, {
@@ -111,8 +111,7 @@ const showChat = async (id: number) => {
     "chat-header"
   )
 
-
-  const chatName   = createElement(
+  const chatName = createElement(
     "div",
     "chat-name",
     null,
@@ -134,7 +133,6 @@ const showChat = async (id: number) => {
   const messageField = createElement("input", null, "chat-text")
   messageField.setAttribute("maxlength", "150")
 
-  // Adding event listeners for messageEvents and lazy loading
   chatMessages.addEventListener("messageEvent", () => {
     updateChat(chatId)
   })
@@ -166,14 +164,6 @@ const showChat = async (id: number) => {
   }, 200)
 }
 
-
-
-// Sends a message to another chat user through the WebSocket server
-
-
-
-
-// Updates the chat if you send or recieve a chat message
 export const updateChat = (chatId: number): void => {
   if (currentChat.chatId !== messages.current.chatId) {
     return

@@ -2,7 +2,6 @@ import { LoginForm, SignupForm } from "../../types"
 
 import { login, signup } from "../../api/post.js"
 
-
 import { Auth } from "./auth.js"
 
 class Login {
@@ -77,9 +76,7 @@ class Signup {
       ) as HTMLInputElement
 
     if (passwordInput.value != passwordRepeatInput.value) {
-      //TODO: Display error message to user.
-      console.log("password != repeat")
-      throw new Error("Kek")
+      alert("Passwords do not match.")
     }
     const formData: SignupForm = {
       name: usernameInput.value,
