@@ -209,6 +209,7 @@ func (h *Handlers) login(w http.ResponseWriter, r *http.Request) {
 	expire := time.Now().Add(24 * time.Hour)
 
 	h.DB.AddSession(token.String(), int(expire.Unix()), user.Id)
+
 	http.SetCookie(w, &http.Cookie{
 		Name:    "forum-token",
 		Value:   token.String(),
