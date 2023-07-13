@@ -9,7 +9,7 @@ const UserInfo = () => {
   const { user, isError, isLoading, isLoggedIn } = useMe()
   const logOut = useLogOut()
 
-  if (isError || isLoading) {
+  if (isError || isLoading || !user) {
     return null
   }
 
@@ -42,7 +42,7 @@ const UserInfo = () => {
       <div className={"dropdown dropdown-end"}>
         <div tabIndex={0} className={"btn min-w-full btn-ghost btn-circle"}>
           <div className={"w-9"}>
-            <Avatar userId={user!.id} />
+            <Avatar userId={user.id} />
           </div>
         </div>
 
@@ -54,7 +54,7 @@ const UserInfo = () => {
         >
           <li className={"menu-title inline"}>
             <span className={"font-light"}>Hello, </span>
-            <span className={"text-primary"}>{user?.username}</span>
+            <span className={"text-primary"}>{user.username}</span>
           </li>
           <hr className={"mx-3 mb-1 border-dotted border-t-0 border-b-4 border-info opacity-20"} />
           <li>
