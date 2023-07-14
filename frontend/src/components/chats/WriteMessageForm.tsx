@@ -25,11 +25,11 @@ const WriteMessageForm: FC<{
     >
       <ReactTextAreaAutosize
         ref={inputRef}
-        className={"absolute input input-bordered border-primary bg-base-100 p-2 w-full"}
+        className={"input input-bordered border-primary bg-base-100 p-2 pr-10 w-full"}
         onChange={(e) => setInput(e.currentTarget.value)}
         onBlur={() => setInput(input.trim())}
         value={input}
-        maxRows={4}
+        maxRows={5}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault()
@@ -44,7 +44,7 @@ const WriteMessageForm: FC<{
         required
       />
       <button
-        className={"absolute z-10 clickable disabled:opacity-50 right-1.5 m-1.5"}
+        className={"absolute z-10 clickable disabled:opacity-50 right-2.5 bottom-3.5"}
         type={"submit"}
       >
         <svg

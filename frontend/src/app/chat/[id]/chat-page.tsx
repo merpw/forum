@@ -36,20 +36,19 @@ export const ChatPageFirstMessage: FC<{ userId: number }> = ({ userId }) => {
 
   if (chatId === null) {
     return (
-      <div className={"flex flex-col h-full pb-60 max-w-3xl m-auto"}>
+      <div className={"flex flex-col h-full"}>
         <ChatInfo userId={userId} />
         <div
           className={
-            "border border-base-100 rounded-lg min-h-full my-3 gradient-light dark:gradient-dark"
+            "flex overflow-y-auto border border-base-100 rounded-lg grow p-1 pb-3 my-3 gradient-light dark:gradient-dark"
           }
         ></div>
-        <div className={"mb-16"}>
-          <WriteMessageForm
-            sendMessage={(message: string) => {
-              setFirstMessage(message)
-            }}
-          />
-        </div>
+
+        <WriteMessageForm
+          sendMessage={(message: string) => {
+            setFirstMessage(message)
+          }}
+        />
       </div>
     )
   }
@@ -82,18 +81,12 @@ const ChatPage: FC<{ id: number }> = ({ id }) => {
   }
 
   return (
-    <div className={"flex flex-col h-full pb-60 max-w-3xl m-auto"}>
+    <div className={"flex flex-col h-full"}>
       <ChatInfo userId={chat.companionId} />
-      <div
-        className={
-          "border border-base-100 rounded-lg min-h-full flex flex-col-reverse p-1 pb-3 my-3 gradient-light dark:gradient-dark"
-        }
-      >
-        <ChatMessages chatId={chat.id} />
-      </div>
-      <div className={"mb-16"}>
-        <WriteMessageForm sendMessage={(content) => sendMessage(chat.id, content)} />
-      </div>
+
+      <ChatMessages chatId={chat.id} />
+
+      <WriteMessageForm sendMessage={(content) => sendMessage(chat.id, content)} />
     </div>
   )
 }
