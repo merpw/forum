@@ -31,14 +31,19 @@ export const ChatPageFirstMessage: FC<{ userId: number }> = ({ userId }) => {
   }, [chatId, createChat, firstMessage, sendMessage, userId])
 
   if (chatId === undefined) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   if (chatId === null) {
     return (
       <div className={"flex flex-col h-full"}>
         <ChatInfo userId={userId} />
-        <div className={"flex-grow"} />
+        <div
+          className={
+            "flex overflow-y-auto border border-base-100 rounded-lg grow p-1 pb-3 my-3 gradient-light dark:gradient-dark"
+          }
+        ></div>
+
         <WriteMessageForm
           sendMessage={(message: string) => {
             setFirstMessage(message)
@@ -72,13 +77,15 @@ const ChatPage: FC<{ id: number }> = ({ id }) => {
   }, [chat, dispatch, id, router])
 
   if (!chat) {
-    return <div>loading...</div>
+    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
   }
 
   return (
     <div className={"flex flex-col h-full"}>
       <ChatInfo userId={chat.companionId} />
+
       <ChatMessages chatId={chat.id} />
+
       <WriteMessageForm sendMessage={(content) => sendMessage(chat.id, content)} />
     </div>
   )

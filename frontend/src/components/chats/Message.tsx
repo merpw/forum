@@ -17,7 +17,7 @@ const Message: FC<{ id: number }> = ({ id }) => {
     <>
       {message.authorId === -1 ? (
         <span
-          className={"mx-auto italic"}
+          className={"mx-auto text-info text-xs italic"}
           title={dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")}
         >
           {message.content} at {dayjs(message.timestamp).format("HH:mm")}
@@ -47,19 +47,19 @@ const MarkdownMessage: FC<{ message: MessageType }> = ({ message }) => {
   return (
     <div
       className={
-        "py-1 px-3 rounded w-fit flex flex-wrap max-w-[85%]" +
+        "px-3 rounded-2xl w-fit flex flex-wrap max-w-[73%]" +
         " " +
         (user?.id !== message.authorId
-          ? "rounded-bl-none dark:bg-gray-800 bg-blue-200 mr-auto justify-end"
-          : "rounded-br-none dark:bg-gray-900 bg-gray-200 ml-auto justify-end")
+          ? "rounded-bl-none bg-secondary-content text-info ml-2 mr-auto justify-end"
+          : "rounded-br-none bg-base-300 text-info brightness-110 mr-2 ml-auto justify-end")
       }
     >
       <div
-        className={"prose dark:prose-invert max-w-full prose-img:max-h-[50vh]"}
+        className={"prose dark:prose-invert max-w-full prose-img:max-h-[50vh] font-medium p-1"}
         dangerouslySetInnerHTML={{ __html: html }}
       />
       <span
-        className={"ml-2 mt-auto text-sm opacity-75"}
+        className={"mb-1 ml-2 mt-auto text-xs bg-opacity-80"}
         title={dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")}
       >
         {dayjs(message.timestamp).format("HH:mm")}

@@ -44,30 +44,46 @@ const CommentForm: FC<{ postId: number }> = ({ postId }) => {
               }
             })
         }}
-        className={"mb-5"}
+        className={"relative mb-7"}
       >
         <div className={"mb-3"}>
           <label htmlFor={"comment-text"} className={"block mb-2 font-light"}>
-            Write a comment:
+            Leave a comment:
           </label>
 
           <ReactTextareaAutosize
             id={"comment-text"}
-            className={"textarea textarea-bordered w-full"}
+            className={"absolute input input-bordered w-full py-3 px-3 pr-10"}
             value={text}
             onInput={(e) => setText(e.currentTarget.value)}
             required
-            rows={1}
+            maxRows={2}
           />
         </div>
 
         <FormError error={formError} />
 
-        <div className={"text-center"}>
-          <button type={"submit"} className={"btn button"}>
-            Submit
-          </button>
-        </div>
+        <button
+          type={"submit"}
+          className={"absolute z-10 clickable disabled:opacity-50 right-1.5 m-1.5 mt-1.5"}
+        >
+          <svg
+            xmlns={"http://www.w3.org/2000/svg"}
+            fill={"none"}
+            viewBox={"0 0 24 24"}
+            strokeWidth={2}
+            stroke={"currentColor"}
+            className={"w-7 h-7 text-primary"}
+          >
+            <path
+              strokeLinecap={"round"}
+              strokeLinejoin={"round"}
+              d={
+                "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+              }
+            />
+          </svg>
+        </button>
       </form>
     </div>
   )

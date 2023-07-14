@@ -74,8 +74,8 @@ const SignupPage = () => {
             .catch((err) => setFormError(err.message))
         }}
       >
-        <div className={"py-1 bg-base-200"}>
-          <div className={"hero-content flex-col py-7"}>
+        <div className={"min-h-screen py-1 bg-base-200"}>
+          <div className={"hero-content flex-col py-7 min-w-full"}>
             <div className={"text-center"}>
               <h1 className={"text-6xl gradient-text font-Yesteryear"}>Welcome</h1>
               <div className={"opacity-50 font-light"}>

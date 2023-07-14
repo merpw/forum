@@ -119,8 +119,14 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
   const messages = chatMessages.slice(-messagesCount)
 
   return (
-    <div ref={scrollRef} onScroll={onScroll} className={"overflow-y-auto"}>
-      <div ref={observerRef}>
+    <div
+      ref={scrollRef}
+      onScroll={onScroll}
+      className={
+        "flex overflow-y-auto border border-base-100 rounded-lg grow p-1 pb-3 my-3 gradient-light dark:gradient-dark"
+      }
+    >
+      <div ref={observerRef} className={"mt-auto w-full"}>
         <MessageGroups messageIds={messages} showStickyDate={showStickyDate} />
       </div>
     </div>
