@@ -13,7 +13,7 @@ const UserList = () => {
   const { user: reqUser } = useMe()
 
   if (!users || !usersOnline || !reqUser) {
-    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
+    return <div className={"text-info"}>loading...</div>
   }
 
   return (
@@ -58,7 +58,7 @@ const UserCard: FC<{ id: number }> = ({ id }) => {
   const { user } = useUser(id)
 
   if (!user) {
-    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
+    return <div className={"text-info"}>loading...</div>
   }
 
   return (

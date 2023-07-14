@@ -59,7 +59,7 @@ const MarkdownMessage: FC<{ message: MessageType }> = ({ message }) => {
         dangerouslySetInnerHTML={{ __html: html }}
       />
       <span
-        className={"mb-1 ml-2 mt-auto text-xs opacity-75"}
+        className={"mb-1 ml-2 mt-auto text-xs bg-opacity-80"}
         title={dayjs(message.timestamp).format("YYYY-MM-DD HH:mm:ss")}
       >
         {dayjs(message.timestamp).format("HH:mm")}

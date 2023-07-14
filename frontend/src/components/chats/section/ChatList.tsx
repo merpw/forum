@@ -37,7 +37,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   const activeChatId = useAppSelector((state) => state.chats.activeChatId)
 
   if (chat === undefined) {
-    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
+    return <div className={"text-info"}>loading...</div>
   }
   if (chat === null) {
     return null
@@ -78,7 +78,7 @@ const CompanionData: FC<{ userId: number }> = ({ userId }) => {
   const { user } = useUser(userId)
 
   if (user === undefined) {
-    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
+    return <div className={"text-info"}>loading...</div>
   }
   if (user === null) {
     return <div className={"text-info text-center mt-5 mb-7"}>User not found</div>
@@ -105,11 +105,11 @@ const MessageInfo: FC<{ id: number }> = ({ id }) => {
   }, [newMessage])
 
   if (message === undefined) {
-    return <div className={"text-info text-center mt-5 mb-7"}>loading...</div>
+    return <div className={"text-info"}>loading...</div>
   }
 
   if (message === null) {
-    return <div className={"text-info text-center mt-5 mb-7"}>Message not found</div>
+    return <div className={"text-info text-center"}>Message not found</div>
   }
 
   return (
@@ -125,7 +125,7 @@ const MessageInfo: FC<{ id: number }> = ({ id }) => {
           ))}
         {MarkdownToPlain(message.content, { async: false, removeNewLines: true, limit: 50 })}
       </div>
-      <div className={"flex justify-end text-info text-xs font-light mt-1"}>
+      <div className={"flex justify-end text-info text-xs mt-1"}>
         <FormattedDate timestamp={message.timestamp} />
       </div>
     </>
