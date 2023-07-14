@@ -6,6 +6,8 @@ import { useMessage } from "@/api/chats/messages"
 import RenderMarkdown from "@/components/markdown/render"
 import { Message as MessageType } from "@/ws"
 
+import "highlight.js/styles/github-dark.css"
+
 const Message: FC<{ id: number }> = ({ id }) => {
   const { message } = useMessage(id)
 

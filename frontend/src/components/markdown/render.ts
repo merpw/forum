@@ -39,7 +39,7 @@ export function MarkdownToPlain<
   }
 
   const codeHandler: Handler = (node) => {
-    return { type: "code", value: `[code in ${node.lang}]` }
+    return { type: "code", value: node.lang ? `[code in ${node.lang}]` : "[code]" }
   }
 
   const processor = remark().use(stripMarkdown, {
