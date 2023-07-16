@@ -9,11 +9,11 @@ const UserInfo = () => {
   const { user, isError, isLoading, isLoggedIn } = useMe()
   const logOut = useLogOut()
 
-  if (isError || isLoading || !user) {
+  if (isError || isLoading) {
     return null
   }
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !user) {
     return (
       <Link className={"clickable flex font-light space-x-0.5"} href={"/login"}>
         <span>Login</span>
