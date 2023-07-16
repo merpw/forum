@@ -36,6 +36,10 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
 
   const activeChatId = useAppSelector((state) => state.chats.activeChatId)
 
+  const unreadMessagesCount = useAppSelector(
+    (state) => state.chats.unreadMessagesChatIds.filter((id) => id === chatId).length
+  )
+
   if (chat === undefined) {
     return <div className={"text-info"}>loading...</div>
   }
@@ -46,7 +50,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   return (
     <Link
       href={`/chat/${chatId}`}
-      className={"w-full"}
+      className={"relative w-full"}
       onClick={() => {
         if (!isCollapsed && window.innerWidth < 640) {
           setIsCollapsed(true)
@@ -55,12 +59,19 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
     >
       <div
         className={
-          "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral hover:saturate-150 " +
+          "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral" +
           " " +
-          (chatId === activeChatId && "border-base-200 gradient-light dark:gradient-dark shadow-sm")
+          (chatId === activeChatId && "gradient-light dark:gradient-dark shadow-sm") +
+          " " +
+          (unreadMessagesCount > 0 && "border-2 border-secondary")
         }
       >
         <div className={"flex gap-1"}>
+          {unreadMessagesCount > 0 && (
+            <div className={"absolute badge badge-secondary top-3 right-3 font-bold py-3"}>
+              {unreadMessagesCount}
+            </div>
+          )}
           <div className={"mr-2 mt-2 w-12"}>
             <Avatar userId={chat.companionId} />
           </div>
@@ -81,7 +92,7 @@ const CompanionData: FC<{ userId: number }> = ({ userId }) => {
     return <div className={"text-info"}>loading...</div>
   }
   if (user === null) {
-    return <div className={"text-info text-center mt-5 mb-7"}>User not found</div>
+    return <div className={"text-info text-center"}>User not found</div>
   }
 
   return (
@@ -109,7 +120,7 @@ const MessageInfo: FC<{ id: number }> = ({ id }) => {
   }
 
   if (message === null) {
-    return <div className={"text-info text-center"}>Message not found</div>
+    return <div className={"text-info"}>Message not found</div>
   }
 
   return (
