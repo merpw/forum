@@ -50,7 +50,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   return (
     <Link
       href={`/chat/${chatId}`}
-      className={"w-full"}
+      className={"relative w-full"}
       onClick={() => {
         if (!isCollapsed && window.innerWidth < 640) {
           setIsCollapsed(true)
@@ -59,18 +59,22 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
     >
       <div
         className={
-          "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral hover:saturate-150 " +
+          "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral" +
           " " +
-          (chatId === activeChatId && "border-base-200 gradient-light dark:gradient-dark shadow-sm")
+          (chatId === activeChatId && "gradient-light dark:gradient-dark shadow-sm") +
+          " " +
+          (unreadMessagesCount > 0 && "border-2 border-secondary")
         }
       >
         <div className={"flex gap-1"}>
+          {unreadMessagesCount > 0 && (
+            <div className={"absolute badge badge-secondary top-3 right-3 font-bold py-3"}>
+              {unreadMessagesCount}
+            </div>
+          )}
           <div className={"mr-2 mt-2 w-12"}>
             <Avatar userId={chat.companionId} />
           </div>
-          {unreadMessagesCount > 0 && (
-              <div className={"badge badge-primary text-white"}>{unreadMessagesCount}</div>
-          )}
           <div className={"w-full"}>
             <CompanionData userId={chat.companionId} />
             <MessageInfo id={chat.lastMessageId} />

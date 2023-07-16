@@ -27,7 +27,7 @@ const ChatsSection = () => {
     return (
       <button
         onClick={() => setIsCollapsed(false)}
-        className={"absolute clickable right-2 rounded-2xl pr-1 sm:pr-3 pt-4 text-secondary"}
+        className={"absolute clickable right-2 rounded-2xl pr-1 sm:pr-3 pt-4 text-primary"}
       >
         <div className={"relative w-16 h-12"}>
           <span className={"absolute left-0 top-0"}>
@@ -67,9 +67,9 @@ const ChatsSection = () => {
             </svg>
           </span>
           {unreadCount > 0 && (
-              <span className={"absolute -top-1 -right-1 bg-primary  rounded-full text-white p-1"}>
-            {unreadCount}
-          </span>
+            <span className={"absolute badge badge-secondary -right-3 rounded-full font-bold py-3"}>
+              {unreadCount}
+            </span>
           )}
         </div>
       </button>
