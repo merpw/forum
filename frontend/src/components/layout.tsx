@@ -47,7 +47,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         <header>
           <Navbar />
         </header>
-        <div className={"mx-5 flex gap-3 flex-row h-[calc(100vh-10.5rem)] relative"}>
+        <div className={"flex gap-3 flex-row h-[calc(100vh-10.5rem)] relative"}>
           <main
             ref={scrollRef}
             className={
