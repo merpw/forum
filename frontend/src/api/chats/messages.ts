@@ -1,7 +1,9 @@
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useRef } from "react"
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import wsActions from "@/store/ws/actions"
+import { TypingData } from "@/ws"
+import { chatActions } from "@/store/chats"
 
 export const useChatMessages = (chatId: number) => {
   const chatMessages = useAppSelector((state) => state.chats.chatMessages?.[chatId])
@@ -55,4 +57,27 @@ export const useSendMessage = () => {
   return (chatId: number, content: string) => {
     dispatch(wsActions.sendPost(`/chat/${chatId}/message`, { content }))
   }
+}
+
+export const useChatTyping = (chatId: number): TypingData | null => {
+  const typingData = useAppSelector((state) => state.chats.chatsTyping?.[chatId])
+  const timeout = useRef<NodeJS.Timeout>()
+
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if (!typingData) {
+      return
+    }
+
+    if (timeout.current) {
+      clearTimeout(timeout.current)
+    }
+
+    timeout.current = setTimeout(() => {
+      dispatch(chatActions.resetChatTyping(chatId))
+    }, 3000)
+  }, [chatId, dispatch, typingData])
+
+  return typingData ?? null
 }
