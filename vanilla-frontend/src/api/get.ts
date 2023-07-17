@@ -1,29 +1,28 @@
-import { backendUrl } from "../main.js"
 import { ChatUser } from "../types"
 
 import { Auth } from "../components/authorization/auth.js"
 
 const getPosts = async (endpoint: string): Promise<object[]> => {
-  return fetch(backendUrl + endpoint)
-    .then((r) => r.json())
-    .then((data) => data)
+  return fetch(endpoint)
+    .then(r => r.json())
+    .then(data => data)
 }
 
 const getPostValues = async (postId: string): Promise<object> => {
-  return fetch(`${backendUrl}/api/posts/${postId}`)
-    .then((r) => r.json())
-    .then((data) => data)
+  return fetch(`/api/posts/${postId}`)
+    .then(r => r.json())
+    .then(data => data)
 }
 
 const getComments = async (postId: string): Promise<object[]> => {
-  return fetch(`${backendUrl}/api/posts/${postId}/comments`)
-    .then((r) => r.json())
-    .then((data) => data)
+  return fetch(`/api/posts/${postId}/comments`)
+    .then(r => r.json())
+    .then(data => data)
 }
 
 const getMe = async (): Promise<object | void> => {
-  return fetch(`${backendUrl}/api/me`)
-    .then((r) => r.json())
+  return fetch(`/api/me`)
+    .then(r => r.json())
     .then((data) => {
       return {
         Id: data.id,
@@ -36,7 +35,7 @@ const getMe = async (): Promise<object | void> => {
 }
 
 const getUserById = async (id: string): Promise<ChatUser> => {
-  return await fetch(`${backendUrl}/api/users/${id}`)
+  return await fetch(`/api/users/${id}`)
     .then((r) => r.json())
     .then((data) => {
       return <ChatUser>{
@@ -49,15 +48,9 @@ const getUserById = async (id: string): Promise<ChatUser> => {
 }
 
 const getUserIds = async (): Promise<number[]> => {
-  const ids: number[] = []
-  return await fetch(`${backendUrl}/api/users`)
+  return await fetch(`/api/users`)
     .then((r) => r.json())
-    .then((data) => {
-      for (const id of data) {
-        ids.push(id)
-      }
-      return ids
-    })
+    .then(([...ids]) => ids as number[])
 }
 
 export { getPosts, getPostValues, getComments, getMe, getUserIds, getUserById }

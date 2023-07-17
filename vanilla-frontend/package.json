@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "tsc -w & serve public",
-    "start": "serve public",
+    "start": "npx serve public",
     "build": "npx tsc",
     "lint": "eslint .",
     "format": "prettier -w ."

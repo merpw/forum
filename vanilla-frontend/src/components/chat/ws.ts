@@ -9,12 +9,12 @@ import { iterator } from "../utils.js"
 
 export const messageEvent = new Event("messageEvent")
 
-const WS_URL = "ws://localhost:8081/ws"
+const WSUrl = "ws://backend-forum:8080/ws"
 
 export let ws: WebSocket
 
 export const wsHandler = (): void => {
-  ws = new WebSocket(WS_URL)
+  ws = new WebSocket(`${location.protocol.replace("http", "ws")}//${location.host}/ws`)
   ws.onmessage = (event: MessageEvent): void => {
     try {
       const data = JSON.parse(event.data) as WebSocketResponse<never>
@@ -63,8 +63,9 @@ export const wsHandler = (): void => {
     ws.send(JSON.stringify({ type: "handshake", item: { token } }))
   }
 
-  ws.onclose = () => {
-    console.log("ws disconnected")
+  ws.onclose = (event) => {
+    console.log(event)
+    console.log("ws vedisconnecdted")
   }
 }
  

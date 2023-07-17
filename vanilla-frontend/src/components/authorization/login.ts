@@ -47,7 +47,7 @@ class Signup {
       return
     } 
     const loginForm: LoginForm = {
-      login: formData.name.trim(),
+      login: formData.username.trim(),
       password: formData.password.trim(),
       rememberMe: false
     }
@@ -79,7 +79,7 @@ class Signup {
       alert("Passwords do not match.")
     }
     const formData: SignupForm = {
-      name: usernameInput.value,
+      username: usernameInput.value,
       email: emailInput.value,
       password: passwordInput.value,
       first_name: firstNameInput.value,

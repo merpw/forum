@@ -1,4 +1,4 @@
-import { superDivision, backendUrl } from "../main.js"
+import { superDivision } from "../main.js"
 import { errorPage } from "../pages.js"
 import { CreatePostBody, LoginForm, SignupForm } from "../types"
 
@@ -25,7 +25,7 @@ const logout = async (): Promise<void> => {
 }
 
 const login = async (formData: LoginForm): Promise<boolean | undefined> => {
-  return await fetch(`${backendUrl}/api/login`, {
+  return await fetch(`/api/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -44,7 +44,7 @@ const login = async (formData: LoginForm): Promise<boolean | undefined> => {
 }
 
 const signup = async (formData: SignupForm): Promise<boolean | undefined> => {
-  return await fetch(`${backendUrl}/api/signup`, {
+  return await fetch(`/api/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +68,7 @@ const signup = async (formData: SignupForm): Promise<boolean | undefined> => {
 }
 
 const postCreatePost = (formData: CreatePostBody): void => {
-  fetch(`${backendUrl}/api/posts/create/`, {
+  fetch(`/api/posts/create/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -91,7 +91,7 @@ const postCreatePost = (formData: CreatePostBody): void => {
 }
 
 const postComment = (postId: string, formData: unknown): void => {
-  fetch(`${backendUrl}/api/posts/${postId}/comment`, {
+  fetch(`/api/posts/${postId}/comment`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -120,7 +120,7 @@ const postComment = (postId: string, formData: unknown): void => {
 }
 
 const likePost = (id: string): void => {
-  fetch(`${backendUrl}/api/posts/${id}/like`, {
+  fetch(`/api/posts/${id}/like`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -136,7 +136,7 @@ const likePost = (id: string): void => {
 }
 
 const dislikePost = (id: string): void => {
-  fetch(`${backendUrl}/api/posts/${id}/dislike`, {
+  fetch(`/api/posts/${id}/dislike`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

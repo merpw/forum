@@ -1,15 +1,39 @@
-FROM node:alpine
+FROM node:alpine AS base
 
-WORKDIR /app
+FROM base AS deps
 
-COPY package*.json ./
+WORKDIR /app/
+
+COPY package.json package-lock.json ./
 
 RUN npm install
 
-RUN npm build
+FROM deps AS builder
 
+WORKDIR /app/
+
+COPY --from=deps /app/node_modules /app/node_modules
 COPY . .
+
+ARG FORUM_BACKEND_PRIVATE_URL
+
+RUN npm run build
+
+FROM builder AS runner
+
+WORKDIR /app/
+
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 user --ingroup nodejs
+
+COPY --from=builder /app/public /app/public
+
+USER user
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+ENV PORT 3000
+
+CMD npm run start
