@@ -9,11 +9,10 @@ import { iterator } from "../utils.js"
 
 export const messageEvent = new Event("messageEvent")
 
-const WSUrl = "ws://backend-forum:8080/ws"
-
 export let ws: WebSocket
 
 export const wsHandler = (): void => {
+  let retryTimeout = 0
   ws = new WebSocket(`${location.protocol.replace("http", "ws")}//${location.host}/ws`)
   ws.onmessage = (event: MessageEvent): void => {
     try {
@@ -60,15 +59,18 @@ export const wsHandler = (): void => {
       console.error("Not logged in")
       return
     }
+    retryTimeout = 0
     ws.send(JSON.stringify({ type: "handshake", item: { token } }))
   }
 
-  ws.onclose = (event) => {
-    console.log(event)
-    console.log("ws vedisconnecdted")
-  }
-}
- 
+  ws.onclose = () => {
+    console.log("ws disconnected")
+    setTimeout(() => {
+      retryTimeout += 1000
+      wsHandler() 
+    }, retryTimeout)
+  }}
+
 const postHandler = async (resp: WSPostResponse<never>): Promise<void> => {
   const data = resp.item.data
   const url = resp.item.url
