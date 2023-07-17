@@ -38,9 +38,7 @@ const UserPage: NextPage = () => {
             }
           >
             <div className={"card-body sm:flex-row sm:gap-5"}>
-              <div className={"w-24 sm:w-52 self-center"}>
-                <Avatar userId={user.id} />
-              </div>
+              <Avatar userId={user.id} className={"w-24 sm:w-52 self-center"} />
               <div className={"self-center text-sm"}>
                 <UserInfo user={user} />
               </div>

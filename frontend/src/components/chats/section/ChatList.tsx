@@ -72,9 +72,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
               {unreadMessagesCount}
             </div>
           )}
-          <div className={"mr-2 mt-2 w-12"}>
-            <Avatar userId={chat.companionId} />
-          </div>
+          <Avatar userId={chat.companionId} className={"mr-2 mt-2 w-12 mb-auto"} />
           <div className={"w-full"}>
             <CompanionData userId={chat.companionId} />
             <MessageInfo id={chat.lastMessageId} />

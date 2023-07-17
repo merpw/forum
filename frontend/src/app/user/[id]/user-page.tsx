@@ -17,9 +17,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
             }
           >
             <div className={"card-body sm:flex-row sm:gap-5"}>
-              <div className={"w-24 sm:w-48 m-auto self-center"}>
-                <Avatar userId={user.id} />
-              </div>
+              <Avatar userId={user.id} className={"w-24 sm:w-48 m-auto self-center"} />
               <div className={"self-center font-light text-center sm:text-left"}>
                 {/* TODO: add user info if they follows you */}
                 {"Hey! I'm "}

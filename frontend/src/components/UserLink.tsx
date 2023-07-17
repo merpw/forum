@@ -5,10 +5,18 @@ import Link from "next/link"
 
 import { useMe } from "@/api/auth/hooks"
 
-const UserLink: FC<{ userId: number; children?: ReactNode }> = ({ userId, children }) => {
+const UserLink: FC<{ userId: number; children?: ReactNode; className?: string }> = ({
+  userId,
+  children,
+  className,
+}) => {
   const { user: meUser } = useMe()
 
-  return <Link href={meUser && meUser.id === userId ? "/me" : `/user/${userId}`}>{children}</Link>
+  return (
+    <Link href={meUser && meUser.id === userId ? "/me" : `/user/${userId}`} className={className}>
+      {children}
+    </Link>
+  )
 }
 
 export default UserLink
