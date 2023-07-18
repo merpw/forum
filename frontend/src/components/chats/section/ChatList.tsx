@@ -80,7 +80,9 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
           {typingData ? (
             <div className={"flex items-center gap-1 mb-5 text-sm"}>
               <UserName userId={typingData.userId} /> is typing
-              <span className={"loading loading-dots loading-xs mt-auto"}></span>
+              <span
+                className={"loading loading-dots loading-xs mt-2 opacity-60 dark:opacity-80"}
+              ></span>
             </div>
           ) : (
             <MessageInfo id={chat.lastMessageId} />
