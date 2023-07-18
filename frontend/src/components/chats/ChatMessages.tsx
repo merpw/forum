@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useRef, useState } from "react"
+import { FC, useEffect, useRef, useState } from "react"
 
 import { useChatMessages, useChatTyping } from "@/api/chats/messages"
 import { useMe } from "@/api/auth/hooks"
@@ -143,7 +143,7 @@ const ChatTyping: FC<{ chatId: number }> = ({ chatId }) => {
   }
 
   return (
-    <div className={"flex items-center gap-1 ml-3 mt-1"}>
+    <div className={"flex items-center gap-1 ml-3 mt-1 text-primary"}>
       <span>
         <UserName userId={typingData.userId} /> is typing
       </span>
