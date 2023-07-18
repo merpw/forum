@@ -33,10 +33,6 @@ const MessagesDateGroups: FC<{ messageIds: number[]; showStickyDate: boolean }> 
 
   return (
     <>
-      {processingMessages.map((_, key) => {
-        // TODO: add placeholders
-        return <div className={"h-20"} key={key} />
-      })}
       {groups.map(([date, messages], key) => (
         <span key={date} className={"relative flex flex-col gap-1.5 items-center"}>
           <span
@@ -51,7 +47,7 @@ const MessagesDateGroups: FC<{ messageIds: number[]; showStickyDate: boolean }> 
           {key === 0 &&
             processingMessages.map((_, key) => {
               // TODO: add placeholders
-              return <div className={"h-20"} key={key} />
+              return <div className={"h-30"} key={key} />
             })}
           {messages.map((messageId) => (
             <Message key={messageId} id={messageId} />

@@ -64,9 +64,9 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
         className={
           "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral break-all flex gap-1" +
           " " +
-          (chatId === activeChatId && "gradient-light dark:gradient-dark shadow-sm") +
+          (chatId === activeChatId ? "gradient-light dark:gradient-dark shadow-sm" : "") +
           " " +
-          (unreadMessagesCount > 0 && "border-2 border-secondary")
+          (unreadMessagesCount > 0 ? "ring-2 ring-secondary" : "")
         }
       >
         <Avatar userId={chat.companionId} className={"mr-2 mt-2 w-12 mb-auto"} />

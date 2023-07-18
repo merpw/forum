@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useEffect, useMemo, useRef, useState } from "react"
 
 import { useChatMessages, useChatTyping } from "@/api/chats/messages"
 import { useMe } from "@/api/auth/hooks"
@@ -41,44 +41,48 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
   const showStickyDateTimeout = useRef<NodeJS.Timeout | null>(null)
   const [showStickyDate, setShowStickyDate] = useState(false)
 
-  const onScroll = throttle(() => {
-    if (!scrollRef.current) {
-      return
-    }
+  const onScroll = useMemo(
+    () =>
+      throttle(() => {
+        if (!scrollRef.current) {
+          return
+        }
 
-    if (!showStickyDate) {
-      setShowStickyDate(true)
-    }
+        if (!showStickyDate) {
+          setShowStickyDate(true)
+        }
 
-    if (showStickyDateTimeout.current) {
-      clearTimeout(showStickyDateTimeout.current)
-    }
-    showStickyDateTimeout.current = setTimeout(() => {
-      if (showStickyDate) {
-        setShowStickyDate(false)
-      }
-    }, 1000)
+        if (showStickyDateTimeout.current) {
+          clearTimeout(showStickyDateTimeout.current)
+        }
+        showStickyDateTimeout.current = setTimeout(() => {
+          if (showStickyDate) {
+            setShowStickyDate(false)
+          }
+        }, 1000)
 
-    isOnBottom.current =
-      scrollRef.current.scrollHeight -
-        scrollRef.current.scrollTop -
-        scrollRef.current.clientHeight <
-      50
+        isOnBottom.current =
+          scrollRef.current.scrollHeight -
+            scrollRef.current.scrollTop -
+            scrollRef.current.clientHeight <
+          50
 
-    if (isOnBottom.current && hasUnread) {
-      setHasUnread(false)
-    }
+        if (isOnBottom.current && hasUnread) {
+          setHasUnread(false)
+        }
 
-    if (
-      scrollRef.current.scrollTop < scrollRef.current.clientHeight / 2 &&
-      messagesCount < (chatMessages?.length ?? 0)
-    ) {
-      if (scrollRef.current.scrollTop === 0) {
-        scrollRef.current.scrollTo(0, 1)
-      }
-      setMessagesCount((prev) => prev + 10)
-    }
-  }, 500)
+        if (
+          scrollRef.current.scrollTop < scrollRef.current.clientHeight / 2 &&
+          messagesCount < (chatMessages?.length ?? 0)
+        ) {
+          if (scrollRef.current.scrollTop < 10) {
+            scrollRef.current.scrollTop = 10
+          }
+          setMessagesCount((prev) => prev + 10)
+        }
+      }, 500),
+    [chatMessages, hasUnread, messagesCount, showStickyDate]
+  )
 
   useEffect(() => {
     setTimeout(() => {

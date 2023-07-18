@@ -77,6 +77,9 @@ const chatSlice = createSlice({
     handleChatMessage: {
       reducer: (state, action: PayloadAction<{ chatId: number; messageId: number }>) => {
         state.chatMessages[action.payload.chatId]?.push(action.payload.messageId)
+        if (state.activeChatId !== action.payload.chatId) {
+          state.unreadMessagesChatIds.push(action.payload.chatId)
+        }
         const changedChat = state.chats[action.payload.chatId]
         if (!changedChat) return
 
@@ -89,10 +92,6 @@ const chatSlice = createSlice({
           if (!chatB) return -1
           return chatB.lastMessageId - chatA.lastMessageId
         })
-
-        if (state.activeChatId !== action.payload.chatId) {
-          state.unreadMessagesChatIds.push(action.payload.chatId)
-        }
       },
       prepare: (response: WSPostResponse<number>) => {
         const chatId = +response.item.url.split("/")[2]

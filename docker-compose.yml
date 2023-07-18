@@ -31,6 +31,7 @@ services:
       - FORUM_BACKEND_PRIVATE_URL=http://backend-forum:8080
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
+      - FORUM_BASE=https://forum-ci.mer.pw
     depends_on:
       - backend-forum
     volumes:
