@@ -6,13 +6,14 @@ import dayjs from "dayjs"
 
 import { useChat } from "@/api/chats/chats"
 import { useUser } from "@/api/users/hooks"
-import { useMessage } from "@/api/chats/messages"
+import { useChatTyping, useMessage } from "@/api/chats/messages"
 import { useMe } from "@/api/auth/hooks"
 import { MarkdownToPlain } from "@/components/markdown/render"
 import { ChatSectionCollapsedContext } from "@/components/layout"
 import { Message } from "@/ws"
 import { useAppSelector } from "@/store/hooks"
 import Avatar from "@/components/Avatar"
+import UserName from "@/components/chats/UserName"
 
 const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
   return (
@@ -35,6 +36,8 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   const { isCollapsed, setIsCollapsed } = useContext(ChatSectionCollapsedContext)
 
   const activeChatId = useAppSelector((state) => state.chats.activeChatId)
+
+  const typingData = useChatTyping(chatId)
 
   const unreadMessagesCount = useAppSelector(
     (state) => state.chats.unreadMessagesChatIds.filter((id) => id === chatId).length
@@ -59,26 +62,31 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
     >
       <div
         className={
-          "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral" +
+          "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral break-all flex gap-1" +
           " " +
           (chatId === activeChatId && "gradient-light dark:gradient-dark shadow-sm") +
           " " +
           (unreadMessagesCount > 0 && "border-2 border-secondary")
         }
       >
-        <div className={"flex gap-1"}>
-          {unreadMessagesCount > 0 && (
-            <div className={"absolute badge badge-secondary top-3 right-3 font-bold py-3"}>
-              {unreadMessagesCount}
+        <Avatar userId={chat.companionId} className={"mr-2 mt-2 w-12 mb-auto"} />
+        {unreadMessagesCount > 0 && (
+          <div className={"absolute badge badge-secondary top-3 right-3 font-bold py-3"}>
+            {unreadMessagesCount}
+          </div>
+        )}
+        <div className={"w-full"}>
+          <CompanionData userId={chat.companionId} />
+          {typingData ? (
+            <div className={"flex items-center gap-1 mb-5 text-sm"}>
+              <UserName userId={typingData.userId} /> is typing
+              <span
+                className={"loading loading-dots loading-xs mt-2 opacity-60 dark:opacity-80"}
+              ></span>
             </div>
-          )}
-          <div className={"mr-2 mt-2 w-12"}>
-            <Avatar userId={chat.companionId} />
-          </div>
-          <div className={"w-full"}>
-            <CompanionData userId={chat.companionId} />
+          ) : (
             <MessageInfo id={chat.lastMessageId} />
-          </div>
+          )}
         </div>
       </div>
     </Link>
