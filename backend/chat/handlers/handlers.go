@@ -29,6 +29,7 @@ func (h *Handlers) PrimaryHandler() ws.MessageHandler {
 		// method POST endpoints
 		newEvent("post", `/chat/create`, h.chatCreate),
 		newEvent("post", `/chat/\d+/message`, h.chatIdMessage),
+		newEvent("post", `/chat/\d+/typing`, h.chatIdTyping),
 	}
 
 	return func(messageBody []byte, client *ws.Client) {

@@ -13,6 +13,11 @@ export type Chat = {
   companionId: number
 }
 
+export type TypingData = {
+  userId: number
+  isTyping: boolean
+}
+
 export type WSBase = {
   type: string
   item: object

@@ -1,17 +1,54 @@
-import { FC, useEffect, useRef, useState } from "react"
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
+import { useDispatch } from "react-redux"
+
+import throttle from "@/helpers/throttle"
+import wsActions from "@/store/ws/actions"
+import { useAppSelector } from "@/store/hooks"
 
 const WriteMessageForm: FC<{
   sendMessage: (content: string) => void
 }> = ({ sendMessage }) => {
   const [input, setInput] = useState("")
 
+  const chatId = useAppSelector((state) => state.chats.activeChatId)
+
   const formRef = useRef<HTMLFormElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
+  const dispatch = useDispatch()
+
+  const sendTypingStatus = useCallback(
+    (isTyping: boolean) => {
+      dispatch(
+        wsActions.sendPost(`/chat/${chatId}/typing`, {
+          isTyping,
+        })
+      )
+    },
+    [chatId, dispatch]
+  )
+
+  const sendTyping = useMemo(
+    () =>
+      throttle(() => sendTypingStatus(true), 2000, {
+        leading: true,
+        trailing: false,
+      }),
+    [sendTypingStatus]
+  )
+
   useEffect(() => {
     inputRef.current?.focus()
-  }, [sendMessage])
+  }, [chatId])
+
+  useEffect(() => {
+    const listener = () => {
+      sendTypingStatus(false)
+    }
+    window.addEventListener("blur", listener)
+    return () => window.removeEventListener("blur", listener)
+  }, [sendTypingStatus])
 
   return (
     <form
@@ -21,12 +58,19 @@ const WriteMessageForm: FC<{
         e.preventDefault()
         sendMessage(input)
         setInput("")
+        sendTypingStatus(false)
+      }}
+      onBlur={() => {
+        sendTypingStatus(false)
       }}
     >
       <ReactTextAreaAutosize
         ref={inputRef}
         className={"input input-bordered border-primary bg-base-100 p-2 pr-10 w-full"}
-        onChange={(e) => setInput(e.currentTarget.value)}
+        onChange={(e) => {
+          setInput(e.target.value)
+          sendTyping()
+        }}
         onBlur={() => setInput(input.trim())}
         value={input}
         maxRows={5}

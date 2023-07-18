@@ -31,9 +31,12 @@ const PostPage: FC<{ post: Post; comments: Comment[] }> = ({ post, comments }) =
               <AutoDate date={post.date} />
               {" by "}
             </span>
-            <span className={"clickable text-lg font-Alatsi self-center"}>
-              <UserLink userId={post.author.id}>{post.author.username}</UserLink>
-            </span>
+            <UserLink
+              userId={post.author.id}
+              className={"clickable text-lg font-Alatsi self-center"}
+            >
+              {post.author.username}
+            </UserLink>
           </span>
         </div>
       </div>

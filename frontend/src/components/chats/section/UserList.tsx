@@ -44,9 +44,7 @@ const MeCard: FC<{ user: User }> = ({ user }) => {
   return (
     <div className={"flex flex-row w-full rounded-3xl hover:bg-neutral hover:saturate-150"}>
       <Link className={"flex clickable w-full self-center"} href={`/me`}>
-        <span className={"mr-2 w-7"}>
-          <Avatar userId={user.id} />
-        </span>
+        <Avatar userId={user.id} className={"mr-2 w-7"} />
         <span className={"end-dot text-primary self-center"}>{user.username}</span>
         <span className={"text-info font-light self-center"}>You</span>
       </Link>
@@ -68,9 +66,7 @@ const UserCard: FC<{ id: number }> = ({ id }) => {
       }
     >
       <Link className={"clickable self-center w-full text-primary flex"} href={`/user/${id}`}>
-        <span className={"mr-2 w-7"}>
-          <Avatar userId={user.id} />
-        </span>
+        <Avatar userId={user.id} className={"mr-2 w-7"} />
         <span className={"self-center"}>{user.username}</span>
       </Link>
 

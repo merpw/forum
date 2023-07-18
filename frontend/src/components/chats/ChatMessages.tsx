@@ -1,10 +1,11 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react"
 
-import { useChatMessages } from "@/api/chats/messages"
+import { useChatMessages, useChatTyping } from "@/api/chats/messages"
 import { useMe } from "@/api/auth/hooks"
 import { useAppSelector } from "@/store/hooks"
 import throttle from "@/helpers/throttle"
 import MessageGroups from "@/components/chats/MessagesDateGroups"
+import UserName from "@/components/chats/UserName"
 
 const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
   const { chatMessages } = useChatMessages(chatId)
@@ -132,7 +133,25 @@ const ChatMessages: FC<{ chatId: number }> = ({ chatId }) => {
     >
       <div ref={observerRef} className={"mt-auto w-full"}>
         <MessageGroups messageIds={messages} showStickyDate={showStickyDate} />
+        <ChatTyping chatId={chatId} />
       </div>
+    </div>
+  )
+}
+
+const ChatTyping: FC<{ chatId: number }> = ({ chatId }) => {
+  const typingData = useChatTyping(chatId)
+
+  if (!typingData) {
+    return null
+  }
+
+  return (
+    <div className={"flex items-center gap-1 ml-3 mt-1 text-primary"}>
+      <span>
+        <UserName userId={typingData.userId} /> is typing
+      </span>
+      <span className={"loading loading-dots loading-xs mt-auto"}></span>
     </div>
   )
 }

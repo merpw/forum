@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-import { Chat, Message, WSGetResponse, WSPostResponse } from "@/ws"
+import { Chat, Message, TypingData, WSGetResponse, WSPostResponse } from "@/ws"
 
 // TODO: split into separate files
 
@@ -16,6 +16,7 @@ const initialState: {
   messages: ObjectMap<number, Message | null>
   userChats: ObjectMap<number, number | null>
   usersOnline: number[] | undefined
+  chatsTyping: ObjectMap<number, TypingData>
 } = {
   activeChatId: null,
   unreadMessagesChatIds: [],
@@ -25,6 +26,7 @@ const initialState: {
   messages: {},
   userChats: {},
   usersOnline: undefined,
+  chatsTyping: {},
 }
 
 const chatSlice = createSlice({
@@ -137,6 +139,26 @@ const chatSlice = createSlice({
         return { payload: response.item.data }
       },
     },
+
+    handleChatTyping: {
+      reducer: (state, action: PayloadAction<{ chatId: number; data: TypingData }>) => {
+        if (action.payload.data.isTyping) {
+          state.chatsTyping[action.payload.chatId] = action.payload.data
+        } else {
+          delete state.chatsTyping[action.payload.chatId]
+        }
+      },
+      prepare: (response: WSGetResponse<TypingData>) => {
+        const chatId = +response.item.url.split("/")[2]
+        return {
+          payload: { chatId, data: response.item.data },
+        }
+      },
+    },
+
+    resetChatTyping: (state, action: PayloadAction<number>) => {
+      delete state.chatsTyping[action.payload]
+    },
   },
 })
 
@@ -174,6 +196,10 @@ export const chatHandlers = [
   {
     regex: /^\/users\/online$/,
     handler: chatActions.handleUsersOnline,
+  },
+  {
+    regex: /^\/chat\/\d+\/typing$/,
+    handler: chatActions.handleChatTyping,
   },
 ]
 
