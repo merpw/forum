@@ -23,10 +23,7 @@ const Page = async () => {
   }
 
   return (
-    <CreatePostPage
-      categories={categories}
-      isAIEnabled={process.env.OPENAI_API_KEY !== undefined}
-    />
+    <CreatePostPage categories={categories} isAIEnabled={Boolean(process.env.OPENAI_API_KEY)} />
   )
 }
 
