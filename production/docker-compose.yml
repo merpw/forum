@@ -1,20 +1,37 @@
 version: "3"
-name: "forum-prod"
 services:
-  backend:
-    image: ghcr.io/merpw/forum/backend:latest
-    container_name: forum-backend
+  backend-forum:
+    image: ghcr.io/merpw/forum/backend-forum:latest
+    container_name: forum-backend-forum
+    environment:
+      - DB_FILE=/app/db/database.db
+      - FRONTEND_REVALIDATE_URL=http://frontend:3000/api/revalidate
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     volumes:
-      - "db:/app/db"
-    command: "server -db /app/db/database.db"
+      - db:/app/db
+    platform: linux/amd64
+  backend-chat:
+    image: ghcr.io/merpw/forum/backend-chat:latest
+    container_name: forum-backend-chat
+    environment:
+      - AUTH_BASE_URL=http://backend-forum:8080
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
+    volumes:
+      - db:/app/db
+    depends_on:
+      - backend-forum
     platform: linux/amd64
   frontend:
     image: ghcr.io/merpw/forum/frontend:latest
     container_name: forum-frontend
     environment:
-      - FORUM_BACKEND_PRIVATE_URL=http://backend:8080
+      - FORUM_BACKEND_PRIVATE_URL=http://backend-forum:8080
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
     depends_on:
-      - backend
+      - backend-forum
+    volumes:
+      - cache:/app/.next/cache
     platform: linux/amd64
   nginx:
     image: nginx:1.17.8-alpine
@@ -23,10 +40,9 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - backend
+      - backend-forum
+      - backend-chat
       - frontend
 volumes:
   db:
-    external: false
-  pages:
-    external: false
+  cache:
