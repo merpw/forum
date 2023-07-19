@@ -59,27 +59,9 @@ export const topnavController = (): void => {
   topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
   topNavLogout = document.getElementById(
     "topnav-logout"
-  ) as HTMLAnchorElement,
-  chatOpen = document.getElementById("topnav-chat") as HTMLAnchorElement,
-  chatClose = document.getElementById("chat-close") as HTMLAnchorElement,
-  chatDisplay = document.getElementById("chatlist") as HTMLDivElement,
-  chat = document.getElementById("chat-area") as HTMLDivElement
+  ) as HTMLAnchorElement
 
   topNavPost.addEventListener("click", openCloseCreatePost)
   topNavHome.addEventListener("click", goHome)
   topNavLogout.addEventListener("click", logout)
-
-  // Opens the chat list
-  chatOpen.addEventListener("click", () => {
-    chatDisplay.classList.add("chat-list-open")
-    chatDisplay.style.width = "200px"
-    chat.style.left = "210px"
-  })
-
-  // Closes the chat list
-  chatClose.addEventListener("click", () => {
-    chatDisplay.classList.remove("chat-list-open")
-    chatDisplay.style.width = "0"
-    chat.style.left = "10px"
-  })
 }
