@@ -2,9 +2,6 @@ import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../..
 
 import { Auth } from "../authorization/auth.js"
 
-import { chatList, currentChat, messages } from "./chat.js"
-import { getMessage, updateUnreadMessages, updateOnlineUsers, getChatIds } from "./helpers.js"
-
 import { iterator } from "../utils.js"
 
 export const messageEvent = new Event("messageEvent")
@@ -75,8 +72,12 @@ const postHandler = async (resp: WSPostResponse<never>): Promise<void> => {
   const data = resp.item.data
   const url = resp.item.url
 
-  if (url.match(/^\/chat\/\d{1,}\/message$/)) { // /chat/{id}/message
-    getMessage(data)
+  if (url.match(/^\/chat\/\d+\/message$/)) { // /chat/{id}/message
+
+  }
+
+  if (url.match(/^\/chat\/create$/)) { // /chat/create
+    
   }
 }
 
@@ -85,64 +86,27 @@ const getHandler = (resp: WSGetResponse<never>) => {
   const url = resp.item.url
 
   /* /chat/{id} */
-  if (url.match(/^\/chat\/\d{1,}$/)) {
-    setTimeout(() => {
-      for (const user of Object.values(chatList.Users)) {
-        if (user.Id == data.companionId) {
-          Object.assign(user, {LastMessageId: data.lastMessageId})
-          break
-        }
-      }
+  if (url.match(/^\/chat\/\d+$/)) {
 
-      if (!chatList.Ids.has(data.companionId)) {
-        chatList.Ids.set(data.companionId, data.id)
-        chatList.Users.forEach((user) => {
-          if (user.Id == data.companionId) {
-            user.ChatId = data.id
-            return
-          }
-        })
-      }
-    }, 20)
   }
 
   /* /chat/{id}/messages */
-  if (url.match(/^\/chat\/\d{1,}\/messages$/)) { 
-    messages.ids = data as number[]
-    return
+  if (url.match(/^\/chat\/\d+\/messages$/)) { 
+
   }
 
   /* /message/{id} */
-  if (url.match(/^\/message\/\d{1,}$/)) {
-    if (data.authorId != -1) {
-      chatList.Users.forEach((user) => {
-        if (user.ChatId == data.chatId) {
-          user.LastMessageId = data.id
-          return
-        }
-      }) 
-    }
+  if (url.match(/^\/message\/\d+$/)) {
 
-    setTimeout(() => {
-      messages.current = data as Message
-      if (data.chatId === currentChat.chatId) {      
-        messages.list.unshift(data as Message)
-      } else {
-        updateUnreadMessages()
-      }
-    }, 20)
-    return
   }
  /* /users/online */
   if (url.match(/^\/users\/online$/)) {
-    updateOnlineUsers(data as number[])
-    return
+
   }
 
   /* /chat/all */
   if (url.match(/^\/chat\/all$/)) {
-    getChatIds(resp)
-    return
+
   }
 }
 
