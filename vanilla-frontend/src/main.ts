@@ -6,7 +6,7 @@ export const superDivision = document.getElementById(
   "super-division"
 ) as HTMLElement
 
-export let client = new Client()
+export const client = new Client()
 
 
 if (document.cookie) {

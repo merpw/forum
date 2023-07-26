@@ -1,7 +1,7 @@
 import { ChatUser } from "../types"
 
 import { Auth } from "../components/authorization/auth.js"
-import { chatState } from "../components/chat/ws.js"
+import { client } from "../main.js"
 
 const getPosts = async (endpoint: string): Promise<object[]> => {
   return fetch(endpoint)
@@ -43,7 +43,7 @@ const getUserById = async (id: number): Promise<ChatUser> => {
         Id: data.id,
         Name: data.username,
         UnreadMsg: false,
-        Online: chatState.onlineUsers?.includes(data.id)
+        Online: client.usersOnline?.includes(data.id)
       }
     })
 }
