@@ -16,14 +16,18 @@ export const userInfo = {
 
 export const Auth = async (session: boolean) => {
   if (session) {
-    console.log("client on startup:", client)
-    wsHandler()
+    Object.assign(userInfo, await getMe())
     superDivision.innerHTML = Index()
     superDivision.classList.replace("login-style", "index-style")
-    Object.assign(userInfo, await getMe())
+    document.getElementById("greeting-name")!.textContent = userInfo.Name
+
     topnavController()
     categoriesSelector()
     displayPosts("/api/posts")
+
+    console.log("client on startup:", client)
+    client.reset()
+    wsHandler()
     window.addEventListener("startChat", client.getAllChats)
   }
   if (!session) {

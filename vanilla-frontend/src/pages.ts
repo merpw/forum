@@ -120,7 +120,7 @@ export const LoginSignup = (): string => {
 
 export const Index = (): string => {
   return `
-    <div class="topnav" id="myTopnav">
+    <section class="topnav" id="myTopnav">
         <a id="topnav-chat"><i class='bx bx-chat' ></i> Chat</a>
 		<a id="topnav-post" href="#post">
 		<i class='bx bx-duplicate' ></i> Post
@@ -129,19 +129,26 @@ export const Index = (): string => {
         <i class='bx bx-home'></i> Home
         </a>
         <a id="topnav-logout" class="logout" href="#logout"><i class='bx bx-log-out'></i> Logout</a>
-    </div>
+    </section>
 
-    <div id="chatlist" class="chatlist">
-        <a href="#close-chat" id="chat-close" class="closebtn"><i class='bx bx-x'></i></a>
-        <h2 id="online-title" style="color: black; margin-left: 20px;">Online: </h2>
+    <section id="chatlist" class="chatlist">
+      <div id="greeting">
+        <h3>Welcome,</h3>
+        <h4 id="greeting-name"></h4>
+      </div>
+      <div id="chats">
+        <h3 id="chat-title">Chats: </h3>
+        <ul id="chat.list" class="chat-users"></ul>
+      </div>
+      <div id="">
+        <h3 id="online-title">Online Users: </h3>
         <ul id="online-users" class="chat-users"></ul>
-        <h2 id="offline-title" style="color: black; margin: 10px 0px 0px 20px;">Offline: </h2>
-        <ul id="offline-users" class="chat-users"></ul>
-    </div>
+      </div>
+    </section>
 
 
 <main id="main">
-<div id="chat-area"></div>
+<section id="chat-area"></section>
 
   <section id="feed">
   <section id="create-post" class="close"></section>
@@ -196,45 +203,39 @@ export const commentForm = (postId: string): string => {
 	`
 }
 
-export const errorPage = (errorcode: number): string => {
-  let errorHTML: string
-  switch (errorcode) {
+export const errorPage = (code: number): string => {
+  switch (code) {
     case 400:
-      errorHTML = `
-			<h1 class="error-code">${errorcode.toString()}:</h1>
+      return `
+			<h1 class="error-code">${code}:</h1>
 			<br>
-			<h1 class="error-title">Bad request</h1>
+			<h1 class="error-title">Bad request.</h1>
 		`
-      break
     case 401:
-      errorHTML = `
-			<h1 class="error-code">${errorcode.toString()}:</h1>
+      return `
+			<h1 class="error-code">${code}:</h1>
 			<br>
 			<h1 class="error-title">Unauthorized.</h1>
 		`
-      break
     case 404:
-      errorHTML = `
-			<h1 class="error-code">${errorcode.toString()}:</h1>
+      return `
+			<h1 class="error-code">${code}:</h1>
 			<br>
 			<h1 class="error-title">Not found.</h1>
 		`
-      break
     case 405:
-      errorHTML = `
-			<h1 class="error-code">${errorcode.toString()}:</h1>
+      return `
+			<h1 class="error-code">${code}:</h1>
 			<br>
 			<h1 class="error-title">Method not allowed.</h1>
 		`
-      break
     default:
-      errorHTML = `
-			<h1 class="error-code">${errorcode.toString()}:</h1>
+      return `
+			<h1 class="error-code">${code}:</h1>
 			<br>
 			<h1 class="error-title">Internal server error.</h1>
 		`
   }
-  return errorHTML
 }
 
 /*

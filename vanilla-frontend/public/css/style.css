@@ -218,7 +218,7 @@ body {
 .topnav a {
   display: flex;
   align-items: center;
-  color: black;
+  color: #292727;
   padding: 14px 16px;
   text-decoration: none;
   font-size: 17px;
@@ -250,21 +250,25 @@ body {
 
 /* The side navigation menu */
 .chatlist {
+  display: flex;
+  flex-direction: column;
   height: 100%;
-  width: 0;
+  width: 200px;
   position: fixed;
-  z-index: 999; /* Stay on top */
+  z-index: 999;
   top: 0;
   left: 0;
+  color: #292727;
   background-color: whitesmoke;
   overflow-x: hidden;
-  padding-top: 70px;
+  padding: 10px;
   transition: 0.5s ease;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
 }
 
-.chatlist h2 {
-  cursor: pointer;
+.chatlist div {
+  padding: 5px;
+  overflow: hidden;
+  word-break: break-all;
 }
 
 /* The navigation menu links */
@@ -279,7 +283,7 @@ body {
 
 /* When you mouse over the navigation links, change their color */
 .chatlist a:hover {
-  color: black;
+  color: #292727;
 }
 
 /* Position and style the close button (top right corner) */
@@ -292,7 +296,7 @@ body {
 
 .chatlist .chat-users {
   margin-left: 20px;
-  color: black;
+  color: #292727;
   height: auto;
   transition: 0.3s ease;
 }
@@ -300,7 +304,7 @@ body {
 .chat-users li {
   display: flex;
   align-items: center;
-  color: black;
+  color: #292727;
   list-style-type: none;
   cursor: pointer;
 }
@@ -418,7 +422,7 @@ body {
   justify-content: space-around;
   align-items: center;
   overflow: hidden;
-  color: black;
+  color: #292727;
   background-color: whitesmoke;
   height: 40px;
   font-size: 16px;
@@ -522,7 +526,7 @@ body {
 }
 
 .comment {
-  color: black;
+  color: #292727;
   background-color: whitesmoke;
   border-radius: 5px;
   margin: 5px;

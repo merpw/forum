@@ -85,12 +85,12 @@ const postHandler = async (resp: WSPostResponse<never>) => {
   // also ADD to client object as a Chat object.
   if (url.match(/^\/chat\/create$/)) { // /chat/create
     console.log("chat/create", data)
-    if(!client.chatIds?.includes(data.companionId as number)){
-      client.chatIds?.unshift(data.chatId as number)
+    if(!client.chatIds?.includes(data.id as number)){
+      client.chatIds?.unshift(data.id as number)
       sendWsObject({
         type: "get",
         item: {
-          url: `/chat/${data.chatId as number}`
+          url: `/chat/${data.id as number}`
         }
       })
       window.dispatchEvent(chatCreated)

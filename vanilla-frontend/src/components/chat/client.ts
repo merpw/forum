@@ -9,7 +9,7 @@ import { sendWsObject } from "./helpers/sendobject.js"
 export class Client {
   activeChat: Chat | null // signals which 
   chatIds: number[] | undefined
-  chats: Map<number, Chat | null> // userId => Chat
+  chats: Map<number, Chat | null> // chatId => Chat
   messages: Map<number, Message | null> // messageId => Message
   userChats: Map<number, number | null> // userId => chatId
   usersOnline: number[] | undefined
@@ -21,6 +21,15 @@ export class Client {
     this.chats = new Map<number, Chat | null>
     this.messages = new Map<number, Message | null>
     this.userChats = new Map<number, number | null>
+    this.usersOnline = undefined
+  }
+
+  reset(){
+    this.activeChat = null
+    this.chatIds = undefined
+    this.chats.clear()
+    this.messages.clear()
+    this.userChats.clear()
     this.usersOnline = undefined
   }
 
