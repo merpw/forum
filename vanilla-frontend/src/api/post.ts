@@ -51,20 +51,20 @@ const signup = async (formData: SignupForm): Promise<boolean | undefined> => {
     },
     body: JSON.stringify(formData),
   })
-  .then((r) => {
-    if (r.ok) {
-      return true
-    } else {
-      r.text().then((error) => {
-        alert(error)
+    .then((r) => {
+      if (r.ok) {
+        return true
+      } else {
+        r.text().then((error) => {
+          alert(error)
           return false
-      })
-    }
-  })
-  .catch((error) => {
-    alert(error)
+        })
+      }
+    })
+    .catch((error) => {
+      alert(error)
       return false
-  })
+    })
 }
 
 const postCreatePost = (formData: CreatePostBody): void => {
@@ -82,7 +82,8 @@ const postCreatePost = (formData: CreatePostBody): void => {
         return
       } else {
         r.text().then((error) => {
-          alert(error)})        
+          alert(error)
+        })
       }
     })
     .catch((error) => {
@@ -90,7 +91,7 @@ const postCreatePost = (formData: CreatePostBody): void => {
     })
 }
 
-const postComment = (postId: number, formData: {content: string}): void => {
+const postComment = (postId: number, formData: { content: string }): void => {
   fetch(`/api/posts/${postId}/comment`, {
     method: "POST",
     headers: {
@@ -131,7 +132,7 @@ const likePost = (id: number): void => {
       updatePostValues(id)
     })
     .catch((error) => {
-        alert(error)
+      alert(error)
     })
 }
 
@@ -147,7 +148,7 @@ const dislikePost = (id: number): void => {
       updatePostValues(id)
     })
     .catch((error) => {
-        alert(error)
+      alert(error)
     })
 }
 

@@ -1,11 +1,6 @@
- 
-
-
 import { postForm } from "../../pages.js"
 
-
 import { logout } from "../../api/post.js"
-
 
 import { PostCreator, displayPosts } from "./posts.js"
 
@@ -39,7 +34,9 @@ export const openCloseCreatePost = (): void => {
 // Goes to home page
 export const goHome = (): void => {
   const postFormElement = document.getElementById("create-post") as HTMLElement
-  const categories = document.querySelectorAll(".category-title") as NodeListOf <HTMLElement>
+  const categories = document.querySelectorAll(
+    ".category-title"
+  ) as NodeListOf<HTMLElement>
   if (postFormElement.classList.contains("open-create-post")) {
     postFormElement.classList.replace("open-create-post", "close-create-post")
   }
@@ -54,12 +51,10 @@ export const goHome = (): void => {
 // Adds eventlisteners to the topNav
 export const topnavController = (): void => {
   const topNavPost = document.getElementById(
-    "topnav-post"
-  ) as HTMLAnchorElement,
-  topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
-  topNavLogout = document.getElementById(
-    "topnav-logout"
-  ) as HTMLAnchorElement
+      "topnav-post"
+    ) as HTMLAnchorElement,
+    topNavHome = document.getElementById("topnav-home") as HTMLAnchorElement,
+    topNavLogout = document.getElementById("topnav-logout") as HTMLAnchorElement
 
   topNavPost.addEventListener("click", openCloseCreatePost)
   topNavHome.addEventListener("click", goHome)

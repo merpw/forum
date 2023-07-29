@@ -1,4 +1,4 @@
- import { displayPosts } from "./posts.js"
+import { displayPosts } from "./posts.js"
 
 // Category state
 export const category = {

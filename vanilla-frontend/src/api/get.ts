@@ -4,29 +4,29 @@ import { Auth } from "../components/authorization/auth.js"
 
 const getPosts = async (endpoint: string): Promise<object[]> => {
   return fetch(endpoint)
-    .then(r => r.json())
-    .then(data => data)
+    .then((r) => r.json())
+    .then((data) => data)
 }
 
 const getPostValues = async (postId: number): Promise<object> => {
   return fetch(`/api/posts/${postId}`)
-    .then(r => r.json())
-    .then(data => data)
+    .then((r) => r.json())
+    .then((data) => data)
 }
 
 const getComments = async (postId: number): Promise<object[]> => {
   return fetch(`/api/posts/${postId}/comments`)
-    .then(r => r.json())
-    .then(data => data)
+    .then((r) => r.json())
+    .then((data) => data)
 }
 
 const getMe = async (): Promise<User | void> => {
   return fetch(`/api/me`)
-    .then(r => r.json())
+    .then((r) => r.json())
     .then((data) => {
       return {
-        Id: data.id,
-        Name: data.username,
+        id: data.id,
+        name: data.username,
       }
     })
     .catch(() => {
@@ -38,9 +38,9 @@ const getUserById = async (id: number): Promise<User> => {
   return await fetch(`/api/users/${id}`)
     .then((r) => r.json())
     .then((data) => {
-      return <User>{
-        Id: data.id,
-        Name: data.username,
+      return {
+        id: data.id,
+        name: data.username,
       }
     })
 }

@@ -1,13 +1,12 @@
-import {CreatePostBody} from "../../types"
+import { CreatePostBody } from "../../types"
 
-import {getPosts, getPostValues} from "../../api/get.js"
-import {dislikePost, likePost, postCreatePost} from "../../api/post.js"
+import { getPosts, getPostValues } from "../../api/get.js"
+import { dislikePost, likePost, postCreatePost } from "../../api/post.js"
 
-
-import {displayCommentSection} from "./comments.js"
+import { displayCommentSection } from "./comments.js"
 
 /* Utilities */
-import {createElement, iterator} from "../utils.js"
+import { createElement, iterator } from "../utils.js"
 
 export const displayPosts = async (endpoint: string): Promise<void> => {
   const postsDisplay = document.getElementById("posts-display") as HTMLElement
@@ -138,7 +137,6 @@ const formattedPost = (
     updatePostValues(id)
     e.preventDefault()
   })
-
 
   const postFooter = createElement("div", "post-footer")
   const postComments = createElement(

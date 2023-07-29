@@ -1,8 +1,4 @@
- 
-
-
 import { commentForm } from "../../pages.js"
-
 
 import { getComments } from "../../api/get.js"
 import { postComment } from "../../api/post.js"
@@ -12,7 +8,7 @@ import { createElement, iterator } from "../utils.js"
 
 // Displays the comment section on a post
 export const displayCommentSection = async (id: number): Promise<void> => {
-  const comments: iterator = await getComments(id) as object[]
+  const comments: iterator = (await getComments(id)) as object[]
   if (!comments) return
 
   // Opens and closes comment section if you press the comment section button
@@ -34,7 +30,7 @@ export const displayCommentSection = async (id: number): Promise<void> => {
     const createPostForm = document.querySelector(
       `#comment-form-${id}`
     ) as HTMLFormElement
-    
+
     new CommentCreator(createPostForm)
 
     // Loop through all the comments and creates them in the DOM.

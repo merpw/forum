@@ -12,25 +12,24 @@ import { User } from "../../types.js"
 
 interface forumState {
   me: User
-  users: Map <number, User>
- }
-
+  users: Map<number, User>
+}
 
 export const state: forumState = {
   me: {
-    Id: -1,
-    Name: ""
+    id: -1,
+    name: "",
   },
   users: new Map<number, User>(),
 }
 
 async function initializeState() {
-    Object.assign(state.me, await getMe())
-    const ids = await getUserIds()
-    const filteredIds = ids.filter(id => id !== state.me.Id)
-    for(const id of filteredIds){
-      state.users.set(id, await getUserById(id))
-    }
+  Object.assign(state.me, await getMe())
+  const ids = await getUserIds()
+  const filteredIds = ids.filter((id) => id !== state.me.id)
+  for (const id of filteredIds) {
+    state.users.set(id, await getUserById(id))
+  }
 }
 
 export const Auth = async (session: boolean) => {
@@ -41,7 +40,7 @@ export const Auth = async (session: boolean) => {
     superDivision.classList.replace("login-style", "index-style")
 
     const greeting = document.getElementById("greeting-name") as HTMLElement
-    greeting.textContent = state.me.Name
+    greeting.textContent = state.me.name
 
     topnavController()
     categoriesSelector()

@@ -1,3 +1,5 @@
+// POST request types
+
 export type SignupForm = {
   username: string
   email: string
@@ -21,46 +23,37 @@ export type CreatePostBody = {
   Categories: string[]
 }
 
-export type SafePost = {
-  HTML: string
-  Content: string
-}
+// GET response types
 
-// Change name to GET Module
 export type User = {
-  Id: number
-  Name: string
+  id: number
+  name: string
 }
 
 export type Post = {
-  Id: number
-  Title: string
-  Content: string
-  Description: string
-  Author: User
-  Date: string
-  CommentsCount: number
-  Likes: number
-  Dislikes: number
-  Categories: string
+  id: number
+  title: string
+  content: string
+  description: string
+  author: User
+  date: string
+  commentsCount: number
+  likes: number
+  dislikes: number
+  categories: string
 }
 
 export type Comment = {
-  Id: number
-  Content: string
-  Author: User
-  Date: string
-  Likes: number
-  Dislikes: number
+  id: number
+  content: string
+  author: User
+  date: string
+  likes: number
+  dislikes: number
 }
 
-export type Reaction = {
-  Reaction: number
-  Likes: number
-  Dislikes: number
-}
-
-
+// WS Types
+// Authored by Maksim
 
 export type Message = {
   id: number
