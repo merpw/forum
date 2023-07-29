@@ -25,7 +25,7 @@ class Login {
     const formData: LoginForm = {
       login: usernameInput.value,
       password: passwordInput.value,
-      rememberMe: rememberMeInput.checked,
+      // rememberMe: rememberMeInput.checked,
     }
     const loginStatus = await login(formData)
     loginStatus == true ? Auth(true) : Auth(false)
@@ -49,7 +49,7 @@ class Signup {
     const loginForm: LoginForm = {
       login: formData.username.trim(),
       password: formData.password.trim(),
-      rememberMe: false
+      // rememberMe: false
     }
     const loginStatus = await login(loginForm)
     if (loginStatus) {
@@ -93,15 +93,11 @@ class Signup {
 
 // All functionality for the login/signup form
 export const loginController = async () => {
-  const loginSignupForm = document.querySelector(".container") as HTMLElement,
-    pwShowHide = document.querySelectorAll(
-      ".showHidePw"
-    ) as NodeListOf<HTMLElement>,
-    pwFields = document.querySelectorAll(
-      ".password"
-    ) as NodeListOf<HTMLInputElement>,
-    signUpLink = document.querySelector(".signup-link") as HTMLInputElement,
-    loginLink = document.querySelector(".login-link") as HTMLInputElement
+  const loginSignupForm = document.querySelector(".container") as HTMLElement
+  const pwShowHide = document.querySelectorAll(".showHidePw") as NodeListOf<HTMLElement>
+  const pwFields = document.querySelectorAll(".password") as NodeListOf<HTMLInputElement>
+  const signUpLink = document.querySelector(".signup-link") as HTMLInputElement
+  const loginLink = document.querySelector(".login-link") as HTMLInputElement
 
   if (loginSignupForm.classList.contains("active")) {
     loginSignupForm.classList.remove("active")
@@ -114,6 +110,14 @@ export const loginController = async () => {
           input.setAttribute("type", "text")
         } else {
           input.setAttribute("type", "password")
+        }
+      })
+      pwShowHide.forEach((eyeIcon) => {
+        console.log("eye icon pressed")
+        if (eyeIcon.classList.contains("uil-eye-slash")){
+          eyeIcon.classList.replace("uil-eye-slash", "uil-eye")
+        } else {
+          eyeIcon.classList.replace("uil-eye", "uil-eye-slash")
         }
       })
     })

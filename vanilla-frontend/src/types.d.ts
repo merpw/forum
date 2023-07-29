@@ -11,7 +11,7 @@ export type SignupForm = {
 export type LoginForm = {
   login: string
   password: string
-  rememberMe: boolean
+  // rememberMe: boolean
 }
 
 export type CreatePostBody = {

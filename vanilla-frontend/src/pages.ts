@@ -18,10 +18,12 @@ export const LoginSignup = (): string => {
 				</div>
 
 				<div class="checkbox-text">
+					<!-- 
 					<div class="checkbox-content">
 						<input type="checkbox" id="logCheck">
 						<label for="forgot-pw" class="text">Remember me</label>
-					</div>
+					</div> 
+					-->
 					<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" class="text" id="forgot-pw">Forgot password?</a>
 				</div>
 
@@ -188,7 +190,7 @@ export const postForm = (): string => {
 	`
 }
 
-export const commentForm = (postId: string): string => {
+export const commentForm = (postId: number): string => {
   return `
 	<form id="comment-form-${postId}" (submit)="onSubmit()">	
 		<textarea id="comment-content" 
