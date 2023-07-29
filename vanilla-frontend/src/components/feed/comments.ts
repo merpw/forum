@@ -11,7 +11,7 @@ import { postComment } from "../../api/post.js"
 import { createElement, iterator } from "../utils.js"
 
 // Displays the comment section on a post
-export const displayCommentSection = async (id: string): Promise<void> => {
+export const displayCommentSection = async (id: number): Promise<void> => {
   const comments: iterator = await getComments(id) as object[]
   if (!comments) return
 
@@ -34,6 +34,7 @@ export const displayCommentSection = async (id: string): Promise<void> => {
     const createPostForm = document.querySelector(
       `#comment-form-${id}`
     ) as HTMLFormElement
+    
     new CommentCreator(createPostForm)
 
     // Loop through all the comments and creates them in the DOM.
@@ -82,7 +83,7 @@ export class CommentCreator {
 
   private onSubmit(event: Event) {
     event.preventDefault()
-    const postId = this.form.id.slice(13)
+    const postId = +this.form.id.slice(13)
     const formData: { content: string } = this.getFormData()
     postComment(postId, formData)
   }

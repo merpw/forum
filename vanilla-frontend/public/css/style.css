@@ -684,7 +684,7 @@ body {
   height: 100%;
   width: 100%;
   background-color: whitesmoke;
-  overflow: scroll;
+  overflow: auto;
   border-radius: 5px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
   padding: 1px 8px 12px;

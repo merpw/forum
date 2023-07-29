@@ -1,8 +1,4 @@
- 
-
-
 import {CreatePostBody} from "../../types"
-
 
 import {getPosts, getPostValues} from "../../api/get.js"
 import {dislikePost, likePost, postCreatePost} from "../../api/post.js"
@@ -25,27 +21,28 @@ export const displayPosts = async (endpoint: string): Promise<void> => {
     const formatDate = date.toLocaleString("en-GB", { timeZone: "EET" })
 
     const postDiv = formattedPost(
-      post.id.toString(),
+      post.id,
       post.title,
       post.author.username,
-      post.author.id.toString(),
+      post.author.id,
       formatDate,
       post.categories,
       post.description,
-      post.comments_count.toString(),
-      post.likes_count.toString(),
-      post.dislikes_count.toString()
+      post.comments_count,
+      post.likes_count,
+      post.dislikes_count
     )
-    postList.push(postDiv)
+
+    postList.unshift(postDiv)
   }
-  postList.reverse()
+
   for (const post of postList) {
     postsDisplay.appendChild(post)
   }
 }
 
 // Updates likes/dislikes/comments when values change
-export const updatePostValues = async (postId: string): Promise<void> => {
+export const updatePostValues = async (postId: number): Promise<void> => {
   const post: iterator = await getPostValues(postId),
     postCommentsElement = document.getElementById(`C${postId}`) as HTMLElement,
     postLikesElement = document.getElementById(`L${postId}`) as HTMLElement,
@@ -87,21 +84,26 @@ export class PostCreator {
 
 // Creates a post in the DOM and returns the HTMLDivElement
 const formattedPost = (
-  id: string,
+  id: number,
   title: string,
   author: string,
-  authorId: string,
+  authorId: number,
   date: string,
   category: string,
   content: string,
-  commentCount: string,
-  likeCount: string,
-  dislikeCount: string
+  commentCount: number,
+  likeCount: number,
+  dislikeCount: number
 ): HTMLDivElement => {
-  const newPost = createElement("div", "post", id) as HTMLDivElement
+  const newPost = createElement("div", "post", `PostId${id}`) as HTMLDivElement
 
   // Creates the post information div
   const postInformation = createElement("div", "post-information")
+  postInformation.addEventListener("click", (e) => {
+    displayCommentSection(id)
+    updatePostValues(id)
+    e.preventDefault()
+  })
 
   // Creates the post title
   const postTitle = createElement("div", "post-title")
@@ -111,7 +113,7 @@ const formattedPost = (
   const postAuthor = createElement(
     "div",
     "post-author",
-    authorId,
+    `AuthorId${authorId}`,
     `by ${author} at ${date}`
   )
 
@@ -131,7 +133,14 @@ const formattedPost = (
   )
 
   const postContent = createElement("div", "post-content", null, content)
-  const postFooter = createElement("div", "post-footer", id)
+  postContent.addEventListener("click", (e) => {
+    displayCommentSection(id)
+    updatePostValues(id)
+    e.preventDefault()
+  })
+
+
+  const postFooter = createElement("div", "post-footer")
   const postComments = createElement(
     "div",
     "post-comments post-icon",

@@ -90,7 +90,7 @@ const postCreatePost = (formData: CreatePostBody): void => {
     })
 }
 
-const postComment = (postId: string, formData: unknown): void => {
+const postComment = (postId: number, formData: {content: string}): void => {
   fetch(`/api/posts/${postId}/comment`, {
     method: "POST",
     headers: {
@@ -119,7 +119,7 @@ const postComment = (postId: string, formData: unknown): void => {
     })
 }
 
-const likePost = (id: string): void => {
+const likePost = (id: number): void => {
   fetch(`/api/posts/${id}/like`, {
     method: "POST",
     headers: {
@@ -135,7 +135,7 @@ const likePost = (id: string): void => {
     })
 }
 
-const dislikePost = (id: string): void => {
+const dislikePost = (id: number): void => {
   fetch(`/api/posts/${id}/dislike`, {
     method: "POST",
     headers: {

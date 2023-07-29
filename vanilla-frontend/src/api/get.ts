@@ -8,13 +8,13 @@ const getPosts = async (endpoint: string): Promise<object[]> => {
     .then(data => data)
 }
 
-const getPostValues = async (postId: string): Promise<object> => {
+const getPostValues = async (postId: number): Promise<object> => {
   return fetch(`/api/posts/${postId}`)
     .then(r => r.json())
     .then(data => data)
 }
 
-const getComments = async (postId: string): Promise<object[]> => {
+const getComments = async (postId: number): Promise<object[]> => {
   return fetch(`/api/posts/${postId}/comments`)
     .then(r => r.json())
     .then(data => data)
