@@ -12,7 +12,7 @@ import { createElement, iterator } from "../utils.js"
 
 // Displays the comment section on a post
 export const displayCommentSection = async (id: string): Promise<void> => {
-  const comments: iterator = await getComments(id)
+  const comments: iterator = await getComments(id) as object[]
   if (!comments) return
 
   // Opens and closes comment section if you press the comment section button
@@ -74,6 +74,7 @@ export const displayCommentSection = async (id: string): Promise<void> => {
 // Parses and sends the data from the comment form to the server
 export class CommentCreator {
   private readonly form: HTMLFormElement
+
   constructor(form: HTMLFormElement) {
     this.form = form
     this.form.addEventListener("submit", this.onSubmit.bind(this))

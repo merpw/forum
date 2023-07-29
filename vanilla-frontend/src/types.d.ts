@@ -32,13 +32,6 @@ export type User = {
   Name: string
 }
 
-export type ChatUser = User & {
-  ChatId: number
-  Online: boolean
-  UnreadMsg: boolean
-  LastMessageId: number
-}
-
 export type Post = {
   Id: number
   Title: string
@@ -76,12 +69,6 @@ export type Message = {
   // -1 for system messages
   authorId: number
   timestamp: string
-}
-
-export type Chat = {
-  id: number
-  lastMessageId: number
-  userId: number
 }
 
 export type WSBase = {

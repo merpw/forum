@@ -295,7 +295,7 @@ body {
 }
 
 .chatlist .chat-users {
-  margin-left: 20px;
+  margin-left: 5px;
   color: #292727;
   height: auto;
   transition: 0.3s ease;

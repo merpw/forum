@@ -1,7 +1,6 @@
-import { ChatUser } from "../types"
+import { User } from "../types"
 
 import { Auth } from "../components/authorization/auth.js"
-import { client } from "../main.js"
 
 const getPosts = async (endpoint: string): Promise<object[]> => {
   return fetch(endpoint)
@@ -21,7 +20,7 @@ const getComments = async (postId: string): Promise<object[]> => {
     .then(data => data)
 }
 
-const getMe = async (): Promise<object | void> => {
+const getMe = async (): Promise<User | void> => {
   return fetch(`/api/me`)
     .then(r => r.json())
     .then((data) => {
@@ -35,15 +34,13 @@ const getMe = async (): Promise<object | void> => {
     })
 }
 
-const getUserById = async (id: number): Promise<ChatUser> => {
+const getUserById = async (id: number): Promise<User> => {
   return await fetch(`/api/users/${id}`)
     .then((r) => r.json())
     .then((data) => {
-      return <ChatUser>{
+      return <User>{
         Id: data.id,
         Name: data.username,
-        UnreadMsg: false,
-        Online: client.usersOnline?.includes(data.id)
       }
     })
 }

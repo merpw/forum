@@ -136,13 +136,13 @@ export const Index = (): string => {
         <h3>Welcome,</h3>
         <h4 id="greeting-name"></h4>
       </div>
-      <div id="chats">
-        <h3 id="chat-title">Chats: </h3>
-        <ul id="chat.list" class="chat-users"></ul>
+      <div id="your-chats-div">
+        <h3 id="chat-title">Your chats: </h3>
+        <ul id="your-chats-list" class="chat-users"></ul>
       </div>
-      <div id="">
-        <h3 id="online-title">Online Users: </h3>
-        <ul id="online-users" class="chat-users"></ul>
+      <div id="online-users-div">
+        <h3 id="online-title">Online users: </h3>
+        <ul id="online-users-list" class="chat-users"></ul>
       </div>
     </section>
 

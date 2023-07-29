@@ -1,19 +1,20 @@
 import { client } from "../../main.js"
-import { WSGetResponse, WSPostResponse, WebSocketResponse, Message } from "../../types"
+import { WSGetResponse, WSPostResponse, WebSocketResponse, Message, User } from "../../types"
 
-import { Auth } from "../authorization/auth.js"
+import { Auth, state } from "../authorization/auth.js"
 
 import { iterator } from "../utils.js"
 import { sendWsObject } from "./helpers/sendobject.js"
-import { renderChatList, startChat, chatCreated } from "./helpers/events.js"
-import { Chat } from "./client.js"
+import { renderChatList, renderNewMessages, startChat } from "./helpers/events.js"
+import { Chat } from "./chat.js"
 import { getUserById } from "../../api/get.js"
 
 export let ws: WebSocket
+const WSUrl = "ws://localhost/ws"
 
 export const wsHandler = () => {
   let retryTimeout = 0
-  ws = new WebSocket(`${location.protocol.replace("http", "ws")}//${location.host}/ws`)
+  ws = new WebSocket(WSUrl)
   ws.onmessage = (event: MessageEvent): void => {
     try {
       const data = JSON.parse(event.data) as WebSocketResponse<never>
@@ -64,7 +65,7 @@ export const wsHandler = () => {
 
   ws.onclose = () => {
     console.log("ws disconnected")
-    if (document.cookie){
+    if (document.cookie.match(/forum-token=(.*?)(;|$)/)?.[1]){
       setTimeout(() => {
         retryTimeout += 1000
         wsHandler() 
@@ -72,28 +73,62 @@ export const wsHandler = () => {
     }
   }}
 
-const postHandler = async (resp: WSPostResponse<never>) => {
+const postHandler = (resp: WSPostResponse<never>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
 
-  if (url.match(/^\/chat\/\d+\/message$/)) { // /chat/{id}/message
+  if (url.match(/^\/chat\/\d+\/message$/)) {
+    const chatId = +url.split("/")[2]
+    console.log("post/msg data and chatId", data, chatId)
+    if (!client.chatIds?.includes(chatId)) return;
 
+    sendWsObject({
+      type: "get",
+      item: {
+        url: `/message/${data}`
+      }
+    })
+
+    const chat = client.chats.get(chatId) as Chat
+    const messageId = parseInt(`${data}`)
+    chat.lastMessageId = messageId
+    if(!chat.messageIds.includes(messageId)){
+      chat.messageIds.unshift(messageId)
+    }
+    
+    // This is just for notifications. Will add if chat is not opened or if you have scrolled too far up.
+    if (chat.chatId === client.activeChat?.chatId){
+      if (chat.chatMessages.scrollTop <= -50) {
+        chat.unreadMessages += 1
+      }
+
+      chat.chatMessages.dispatchEvent(renderNewMessages)
+    } else {
+      chat.unreadMessages += 1
+    }
+
+    window.dispatchEvent(renderChatList)
   }
 
   // CREATES a chat if not existing in DB.
   // ADDS chatId to list of chatIds
   // also ADD to client object as a Chat object.
-  if (url.match(/^\/chat\/create$/)) { // /chat/create
+  if (url.match(/^\/chat\/create$/)) {
+    const chatId = data.chatId as number
     console.log("chat/create", data)
-    if(!client.chatIds?.includes(data.id as number)){
-      client.chatIds?.unshift(data.id as number)
+    if(!client.chatIds?.includes(chatId)){
+      client.chatIds?.unshift(chatId)
       sendWsObject({
         type: "get",
         item: {
-          url: `/chat/${data.id as number}`
+          url: `/chat/${chatId}`
         }
       })
-      window.dispatchEvent(chatCreated)
+      setTimeout(() => {
+        const chat = client.chats.get(chatId) as Chat
+        chat.open() 
+        window.dispatchEvent(renderChatList)
+      }, 100)
     }    
   }
 }
@@ -102,11 +137,13 @@ const getHandler = async (resp: WSGetResponse<never>) => {
   const data: iterator = resp.item.data
   const url = resp.item.url
 
-  /* /chat/all */
+  // Assign chats to all IDs from the response array.
+  // Example:
+  // [1, 2, 3] => (1 => Chat, 2 => Chat, 3 => Chat)
   if (url.match(/^\/chat\/all$/)) {
-    console.log("chat/all", data)
     const chatIds = data as number[]
     client.chatIds = chatIds
+
     for(const id of chatIds){
       sendWsObject({
         type: "get",
@@ -115,57 +152,72 @@ const getHandler = async (resp: WSGetResponse<never>) => {
         }
       })
     }
+
+
     window.dispatchEvent(renderChatList)
   }
 
   // ADD new Chat if not in memory, UPDATE lastMessageId if already in memory
   // Chat will be added as following format: Name, userId, chatId, lastMessageId 
   if (url.match(/^\/chat\/\d+$/)) {
-    console.log("chat/id", data)
     client.userChats.set(data.companionId, data.id)
+     
     if(!client.chats.has(data.id as number)){
-      // ADD chat 
-      const user = await getUserById(data.companionId)
-      client.chats.set(data.id, new Chat(user.Name, data.companionId, data.id, data.lastMessageId))
+      const user = state.users.get(data.companionId as number) as User
+      client.chats.set(data.id, new Chat(
+        user.Name, 
+        data.companionId, 
+        data.id, 
+        data.lastMessageId, 
+        client.onlineUsers.includes(user.Id)))
     } else {
-      // UPDATE lastMessageId
       const chat = client.chats.get(data.id) as Chat
       chat.lastMessageId = data.lastMessageId
     }
+
+    sendWsObject({
+      type: "get",
+      item: {
+        url: `/chat/${data.id}/messages`
+      }
+    })
   }
 
-  // ADD messageIds to CHAT selected by URL
+  // ADD messageIds to Chat
   if (url.match(/^\/chat\/\d+\/messages$/)) { 
-    console.log("chat/id/messages:", data)
     const id = +url.split("/")[2]
     const chat = client.chats.get(id)
     if (!chat) return;
 
-    const messageIds = data as number[]
-    for (const id of messageIds){
-      sendWsObject({
-        type: "get",
-        item: {
-          url: `/message/${id}`
-        }
-      })
-    }
+    const messageIds = data.reverse() as number[]
     chat.messageIds = messageIds 
   }
 
   // SET client messages with this format: MessageId => Message 
   if (url.match(/^\/message\/\d+$/)) {
-    console.log("message/id", data)
     const id = +url.split("/")[2]
     client.messages.set(id, data as Message)
   }
 
   // UPDATE list of online users in memory. Dispatch event to render chat list.
   if (url.match(/^\/users\/online$/)) {
-    console.log("users/online", data)
-    client.usersOnline = data as number[]
-    window.dispatchEvent(renderChatList)
-  }
+    const onlineIds = data as number[]
+    const filteredIds = onlineIds.filter(id => id !== state.me.Id && id !== -1)
+    
+    for (const id of filteredIds) {
+      if (!state.users.has(id)) {
+        state.users.set(id, await getUserById(id))
+      }
+    }
+    
+    client.onlineUsers = filteredIds
 
+    sendWsObject({
+      type: "get",
+      item: {
+        url: "/chat/all"
+      }
+    })
+  }
 }
 
