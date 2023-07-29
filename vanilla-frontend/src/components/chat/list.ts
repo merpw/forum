@@ -1,19 +1,18 @@
 import { client } from "../../main.js"
 import { User } from "../../types.js"
 import { state } from "../authorization/auth.js"
-import { createElement } from "../utils.js"
 import { Chat } from "./chat.js"
 import { sendWsObject } from "./helpers/sendobject.js"
-
+import { createElement } from "../utils.js"
 
 export class List {
   public onlineUsers: User[]
   public chats: Chat[]
 
-  constructor(onlineList: number[], chats: Chat[], chatUserIds: number[]){
+  constructor(onlineList: number[], chats: Chat[], chatUserIds: number[]) {
     const onlineUsers = onlineList
-      .filter(id => id !== state.me.Id && !chatUserIds.includes(id))
-      .map(id => state.users.get(id)) as User[]
+      .filter((id) => id !== state.me.id && !chatUserIds.includes(id))
+      .map((id) => state.users.get(id)) as User[]
 
     chats.forEach((chat) => {
       chat.online = onlineList.includes(chat.userId) ? true : false
@@ -21,18 +20,24 @@ export class List {
 
     this.onlineUsers = onlineUsers
     this.chats = chats
+
+    this.render()
   }
 
   chatsList = document.getElementById("your-chats-list") as HTMLUListElement
-  onlineUsersList = document.getElementById("online-users-list") as HTMLUListElement
+  onlineUsersList = document.getElementById(
+    "online-users-list"
+  ) as HTMLUListElement
 
-
-  render(){
-    console.log("in render")
+  private render() {
     // Add chats to DOM.
     this.chatsList.replaceChildren()
-    for(const chat of this.chats){
-      const chatUserElement = createElement("li", "chat-user", `chatId${chat.chatId}`)
+    for (const chat of this.chats) {
+      const chatUserElement = createElement(
+        "li",
+        "chat-user",
+        `chatId${chat.chatId}`
+      )
       const userNameElement = createElement("p", null, null, chat.name)
       chatUserElement.appendChild(userNameElement)
 
@@ -42,28 +47,25 @@ export class List {
         notification.style.display = "none"
         amount.style.display = "none"
       } else {
-        notification.style.display = "flex" 
-        amount.style.display = "flex" 
+        notification.style.display = "flex"
+        amount.style.display = "flex"
       }
 
       chatUserElement.append(notification, amount)
 
-
-
-      if(chat.online){
+      if (chat.online) {
         chatUserElement.classList.add("online")
       } else {
         chatUserElement.classList.add("offline")
       }
 
       chatUserElement.addEventListener("click", (e) => {
-        if(chat.chatId === client.activeChat?.chatId) {
+        if (chat.chatId === client.activeChat?.chatId) {
           return
         }
-        
-        chat.open() 
+
+        chat.open()
         e.preventDefault()
-        
       })
 
       this.chatsList.appendChild(chatUserElement)
@@ -72,29 +74,34 @@ export class List {
     // Add online users to DOM.
     this.onlineUsersList.replaceChildren()
 
-    for(const user of this.onlineUsers){
+    for (const user of this.onlineUsers) {
       const userElement = createElement("li", "chat-user online")
-      const nameElement = createElement("p", null, null, user.Name)
+      const nameElement = createElement("p", null, null, user.name)
       userElement.appendChild(nameElement)
 
       userElement.addEventListener("click", (e) => {
-        this.createChat(user.Id)
+        this.createChat(user.id)
+        setTimeout(() => {
+          const chatId = client.userChats.get(user.id) as number
+          const chat = client.chats.get(chatId) as Chat
+          chat.open()
+        }, 100)
         e.preventDefault()
       })
 
       this.onlineUsersList.appendChild(userElement)
-    } 
+    }
   }
 
-  private createChat(userId: number){
+  private createChat(userId: number) {
     sendWsObject({
       type: "post",
       item: {
         url: "/chat/create",
         data: {
-          userId: userId
-        }
-      }
+          userId: userId,
+        },
+      },
     })
   }
 }

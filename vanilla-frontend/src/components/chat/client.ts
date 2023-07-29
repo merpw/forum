@@ -1,36 +1,30 @@
 import { Message } from "../../types"
-
 import { List } from "./list.js"
 import { Chat } from "./chat.js"
-import { renderChatMessages } from "./helpers/events"
 
 export class Client {
-  activeChat: Chat | null 
+  activeChat: Chat | null
   chatIds: number[] | undefined
   chats: Map<number, Chat> // chatId => Chat
   messages: Map<number, Message | null> // messageId => Message
   userChats: Map<number, number | null> // userId => chatId
   usersOnline: number[] | undefined
 
-
-  constructor(){
-    this.activeChat = null 
+  constructor() {
+    this.activeChat = null
     this.chatIds = undefined
-    this.chats = new Map<number, Chat>
-    this.messages = new Map<number, Message | null>
-    this.userChats = new Map<number, number | null>
+    this.chats = new Map<number, Chat>()
+    this.messages = new Map<number, Message | null>()
+    this.userChats = new Map<number, number | null>()
     this.usersOnline = undefined
     window.addEventListener("renderChatList", () => {
       setTimeout(() => {
-        this.list = new List(this.onlineUsers, this.sortedChats, this.chatUserIds)
-        this.list.render()
+        new List(this.onlineUsers, this.sortedChats, this.chatUserIds)
       }, 100)
-    }) 
+    })
   }
 
-  list: List | undefined
-
-  reset(){
+  reset() {
     this.activeChat = null
     this.chatIds = undefined
     this.chats.clear()
@@ -39,21 +33,21 @@ export class Client {
     this.usersOnline = undefined
   }
 
-  private get sortedChats(): Chat[]{
-    return [...this.chats.values()].sort((a, b) => a.lastMessageId - b.lastMessageId).reverse()
+  private get sortedChats(): Chat[] {
+    return [...this.chats.values()]
+      .sort((a, b) => a.lastMessageId - b.lastMessageId)
+      .reverse()
   }
 
-  get chatUserIds(): number[]{
+  get chatUserIds(): number[] {
     return this.sortedChats.map((chat) => chat.userId)
   }
 
-  get onlineUsers(): number[]{
-    return this.usersOnline as number[] 
+  get onlineUsers(): number[] {
+    return this.usersOnline as number[]
   }
 
-  set onlineUsers(users: number[]){
-    this.usersOnline = users 
+  set onlineUsers(users: number[]) {
+    this.usersOnline = users
   }
 }
-
-
