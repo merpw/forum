@@ -1,0 +1,762 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap");
+
+body {
+  background-color: #4070f4;
+  height: 100vh;
+  font-weight: 500;
+  overflow-y: scroll;
+}
+
+#super-division {
+  background-color: #4070f4;
+  display: flex;
+}
+
+.login-style {
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.index-style {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+/* LOGIN/SIGNIN STYLES */
+.container {
+  position: relative;
+  max-width: 430px;
+  width: 430px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.container .forms {
+  display: flex;
+  align-items: center;
+  height: 440px;
+  width: 200%;
+  transition: height 0.2s ease;
+}
+
+.container .form {
+  width: 50%;
+  padding: 30px;
+  background-color: #fff;
+  transition: margin-left 0.18s ease;
+}
+
+.container.active .login {
+  margin-left: -50%;
+  opacity: 0;
+  transition: margin-left 0.18s ease, opacity 0.15s ease;
+}
+
+.container .signup {
+  opacity: 0;
+  transition: opacity 0.09s ease;
+}
+
+.container.active .signup {
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+.container.active .forms {
+  height: 800px;
+}
+.title {
+  position: relative;
+  font-size: 27px;
+  font-weight: 600;
+}
+
+.title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 30px;
+  background-color: #4070f4;
+  border-radius: 25px;
+}
+
+.form .input-field {
+  position: relative;
+  height: 50px;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.input-field input {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  padding: 0 35px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  border-bottom: 2px solid #ccc;
+  border-top: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.name-fields {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-field input:is(:focus, :valid) {
+  border-bottom-color: #4070f4;
+}
+
+.input-field i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+  font-size: 23px;
+}
+
+.input-field input:is(:focus, :valid) ~ i {
+  color: #4070f4;
+}
+
+.input-field i.icon {
+  left: 0;
+}
+
+.input-field i.showHidePw {
+  right: 0;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.form .checkbox-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.checkbox-text .checkbox-content {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-content input {
+  margin: 0 8px -2px 4px;
+  accent-color: #4070f4;
+}
+
+.form .text {
+  color: #333;
+  font-size: 14px;
+}
+
+.form a.text {
+  color: blue;
+  text-decoration: none;
+}
+
+.form a:hover {
+  text-decoration: underline;
+}
+
+.form .button {
+  margin-top: 35px;
+}
+
+.form .button input {
+  border: none;
+  color: whitesmoke;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  background-color: blue;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.button input:hover {
+  background-color: #265df2;
+}
+
+.form .login-signup {
+  margin-top: 30px;
+  text-align: center;
+}
+/* END OF LOGIN STYLES */
+
+/* TOPNAV STYLES */
+.topnav {
+  top: 0;
+  z-index: 99;
+  position: fixed;
+  display: flex;
+  justify-content: space-between;
+  background-color: whitesmoke;
+  overflow: hidden;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  display: flex;
+  align-items: center;
+  color: #292727;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  transition: 0.4s ease;
+  cursor: pointer;
+}
+
+.topnav a i {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #4070f4;
+  color: white;
+}
+
+/* Add an active class to highlight the current page */
+.topnav a.active {
+  background-color: #72bee4;
+  color: white;
+}
+
+/* Hide the link that should open and close the topnav on small screens */
+.topnav .icon {
+  display: none;
+}
+
+/* The side navigation menu */
+.chatlist {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 200px;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  color: #292727;
+  background-color: whitesmoke;
+  overflow-x: hidden;
+  padding: 10px;
+  transition: 0.5s ease;
+}
+
+.chatlist div {
+  padding: 5px;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+/* The navigation menu links */
+.chatlist a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+/* When you mouse over the navigation links, change their color */
+.chatlist a:hover {
+  color: #292727;
+}
+
+/* Position and style the close button (top right corner) */
+.chatlist .closebtn {
+  position: absolute;
+  top: 0;
+  right: 0px;
+  font-size: 36px;
+}
+
+.chatlist .chat-users {
+  margin-left: 5px;
+  color: #292727;
+  height: auto;
+  transition: 0.3s ease;
+}
+
+.chat-users li {
+  display: flex;
+  align-items: center;
+  color: #292727;
+  list-style-type: none;
+  cursor: pointer;
+}
+
+.chat-users p {
+  margin-right: 5px;
+}
+
+.chatlist li:before {
+  /* Unicode bullet symbol */
+  content: "\2022 ";
+  font-size: 22px;
+  padding-right: 0.5em;
+}
+
+.online:before {
+  color: green;
+}
+
+/* 
+ * On smaller screens, where height is less than 450px, change the style of the chatlist.
+ * (less padding and a smaller font size) 
+ */
+@media screen and (max-height: 450px) {
+  .chatlist {
+    padding-top: 15px;
+  }
+  .chatlist a {
+    font-size: 18px;
+  }
+}
+
+#main {
+  margin-top: 56px; /* Just to put it below the navbar */
+  width: 700px;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.categories {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.categories .category-selection {
+  display: flex;
+  flex-direction: row;
+}
+
+.categories .selected {
+  color: blueviolet;
+}
+
+#feed {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 6px;
+  padding: 10px 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+.categories h3 {
+  margin: 10px;
+  color: blue;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+#posts-display {
+  width: 100%;
+}
+
+#feed .post {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 10px;
+  width: 100%;
+  background-color: #265df2;
+  color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8);
+  transition: 0.3s ease;
+  overflow: hidden;
+}
+
+#feed .post:hover {
+  box-shadow: 0 6px 12px rgb(0, 0, 0);
+}
+
+.post-information {
+  padding: 0px 5px;
+}
+
+.post .post-content {
+  box-sizing: border-box;
+  max-height: 120px;
+  padding: 5px;
+  margin: 5px 0px;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.post .post-footer {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  overflow: hidden;
+  color: #292727;
+  background-color: whitesmoke;
+  height: 40px;
+  font-size: 16px;
+  border-radius: 5px;
+  margin-top: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+.post-footer .post-comments {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 35%;
+  transition: 0.3s ease;
+}
+.post-comments:hover {
+  background-color: #4070f4;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+.post-footer .post-likes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 35%;
+  transition: 0.3s ease;
+}
+
+.post-likes:hover {
+  background-color: #4070f4;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+.post-footer .post-dislikes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 30%;
+  transition: 0.3s ease;
+}
+
+.post-footer i {
+  font-size: 20px;
+  margin-right: 5px;
+}
+
+.post-dislikes:hover {
+  background-color: #4070f4;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* Classes that will open and close elements */
+.open {
+  display: flex;
+}
+
+.close {
+  display: none;
+}
+
+.comments-section {
+  flex-direction: column;
+  overflow: auto;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.comment-form {
+  background-color: whitesmoke;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  margin-bottom: 5px;
+}
+
+#comment-content {
+  width: 100%;
+  padding: 5px;
+  border-radius: 10px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.2);
+}
+
+.comment-submit {
+  height: 30px;
+  padding: 5px 10px 5px 10px;
+  border: none;
+  border-radius: 3px;
+  background-color: #72bee4;
+  transition: 0.4s ease;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.comment-submit:hover {
+  background-color: #4672ea;
+  cursor: pointer;
+}
+
+.comment {
+  color: #292727;
+  background-color: whitesmoke;
+  border-radius: 5px;
+  margin: 5px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.4);
+  padding: 5px;
+  word-wrap: break-word;
+}
+
+.comment-info {
+  font-weight: 600;
+}
+
+/* CREATE POST STYLES */
+#create-post {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  width: 100%;
+  padding: 6px;
+  border-radius: 10px;
+  background-color: whitesmoke;
+  margin: 6px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+}
+
+#post-form {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px;
+}
+
+#post-title {
+  width: 35%;
+  align-self: flex-start;
+  border-radius: 8px;
+  padding: 3px 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#post-content {
+  margin: 5px;
+  padding: 5px;
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+#create-post-footer {
+  display: flex;
+  align-self: self-start;
+  align-items: center;
+  margin-left: 5px;
+}
+
+#post-submit {
+  height: 30px;
+  padding: 5px 10px 5px 10px;
+  border: none;
+  border-radius: 3px;
+  margin-left: 10px;
+  background-color: #72bee4;
+  transition: 0.4s ease;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+#post-submit:hover {
+  background-color: #4672ea;
+  cursor: pointer;
+}
+
+#post-category {
+  height: 30px;
+  border-radius: 3px;
+  box-shadow: 0 5px 5px rgba(0, 0, 0, 0.1);
+}
+/* On smaller screens, where width is less than 500px, change the style of the chatlist (less padding and a smaller font size) */
+@media screen and (max-width: 500px) {
+  #main {
+    width: 90%;
+  }
+
+  .chat-list-open {
+    width: 100%;
+  }
+
+  .topnav a {
+    font-size: 12px;
+  }
+
+  .category-selection {
+    flex-direction: column;
+  }
+  /* .title { */
+  /*   font-size: 12px; */
+  /* } */
+  /* #create-post { */
+  /*   width: 80%; */
+  /*   padding: 6px; */
+  /* } */
+}
+
+.hide-chat {
+  display: none;
+}
+
+.show-chat {
+  display: flex;
+}
+
+#chat-area {
+  position: fixed;
+  z-index: 999;
+  bottom: 0px;
+  left: 210px;
+  width: 20%;
+  transition: 0.5s ease;
+}
+
+.chat {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 500px;
+  height: 600px;
+  background-color: rgba(255, 255, 255);
+  border-radius: 5px;
+  padding: 10px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+}
+
+.chat-header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-content: center;
+}
+
+#chat-window-close {
+  font-size: 24px;
+  transition: 0.2s ease;
+}
+
+#chat-window-close:hover {
+  cursor: pointer;
+  color: grey;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column-reverse;
+  height: 100%;
+  width: 100%;
+  background-color: whitesmoke;
+  overflow: auto;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+  padding: 1px 8px 12px;
+}
+
+.message {
+  text-align: center;
+  background-color: whitesmoke;
+  max-width: 75%;
+  word-wrap: break-word;
+  white-space: pre-line;
+  margin-top: 10px;
+  border-radius: 15px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  padding: 8px;
+}
+
+.send .date {
+  font-size: 10px;
+  color: rgba(245, 245, 245, 0.7);
+}
+.recieve .date {
+  font-size: 10px;
+  color: grey;
+}
+
+.status .date {
+  font-size: 10px;
+  color: grey;
+}
+
+.send {
+  border-bottom-right-radius: 0px;
+  background-color: #4672ea;
+  align-self: flex-end;
+}
+
+.recieve {
+  border-bottom-left-radius: 0px;
+  align-self: flex-start;
+}
+
+.status {
+  max-width: 100%;
+  width: 80%;
+  text-align: center;
+  align-self: center;
+}
+
+.chat-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+}
+
+#chat-send {
+  border: none;
+  padding: 3px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  background-color: #72bee4;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: 0.1s ease;
+}
+
+#chat-send:hover {
+  background-color: #4672ea;
+}
+
+#chat-text {
+  padding: 0px 3px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}

@@ -1,0 +1,40 @@
+version: "3"
+services:
+  backend-forum:
+    build:
+      context: backend
+      args:
+        - SERVICE_NAME=forum
+    environment:
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
+    volumes:
+      - db:/app/db
+  backend-chat:
+    build:
+      context: backend
+      args:
+        - SERVICE_NAME=chat
+    environment:
+      - AUTH_BASE_URL=http://backend-forum:8080
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
+    volumes:
+      - db:/app/db
+    depends_on:
+      - backend-forum
+  frontend:
+    build:
+      context: vanilla-frontend
+    depends_on:
+      - backend-forum
+  nginx:
+    image: nginx:1.17.8-alpine
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - "80:80"
+    depends_on:
+      - backend-forum
+      - backend-chat
+      - frontend
+volumes:
+  db:
