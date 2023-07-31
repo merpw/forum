@@ -3,11 +3,10 @@ FROM node:alpine AS builder
 WORKDIR /app/
 
 COPY package.json package-lock.json ./
-RUN npm ci --production
+RUN npm ci
 
 COPY . .
 
-ARG FORUM_BACKEND_PRIVATE_URL
 RUN npm run build
 
 FROM node:alpine AS runner
@@ -17,7 +16,8 @@ WORKDIR /app/
 ENV NODE_ENV=production
 
 COPY --from=builder /app/package.json /app/package-lock.json ./
-COPY --from=builder /app/node_modules /app/node_modules
+
+RUN npm ci
 COPY --from=builder /app/public /app/public
 
 EXPOSE 3000

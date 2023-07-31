@@ -6,6 +6,9 @@
     "lint": "eslint .",
     "format": "prettier -w ."
   },
+  "dependencies": {
+    "serve": "^14.2.0"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",
@@ -13,7 +16,6 @@
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-tsdoc": "^0.2.17",
     "prettier": "^2.8.8",
-    "serve": "^14.2.0",
     "typescript": "^5.0.4"
   },
   "eslintConfig": {
