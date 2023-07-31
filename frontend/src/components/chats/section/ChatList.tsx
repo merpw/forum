@@ -1,6 +1,6 @@
 "use client"
 
-import { FC, useContext, useEffect, useRef } from "react"
+import { FC, useEffect, useRef } from "react"
 import Link from "next/link"
 import dayjs from "dayjs"
 
@@ -9,11 +9,11 @@ import { useUser } from "@/api/users/hooks"
 import { useChatTyping, useMessage } from "@/api/chats/messages"
 import { useMe } from "@/api/auth/hooks"
 import { MarkdownToPlain } from "@/components/markdown/render"
-import { ChatSectionCollapsedContext } from "@/components/layout"
 import { Message } from "@/ws"
 import { useAppSelector } from "@/store/hooks"
 import Avatar from "@/components/Avatar"
 import UserName from "@/components/chats/UserName"
+import { useCollapseIfMobile } from "@/components/chats/section/ChatSection"
 
 const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
   return (
@@ -33,7 +33,7 @@ const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
 const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   const { chat } = useChat(chatId)
 
-  const { isCollapsed, setIsCollapsed } = useContext(ChatSectionCollapsedContext)
+  const collapseIfMobile = useCollapseIfMobile()
 
   const activeChatId = useAppSelector((state) => state.chats.activeChatId)
 
@@ -51,15 +51,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   }
 
   return (
-    <Link
-      href={`/chat/${chatId}`}
-      className={"relative w-full"}
-      onClick={() => {
-        if (!isCollapsed && window.innerWidth < 640) {
-          setIsCollapsed(true)
-        }
-      }}
-    >
+    <Link href={`/chat/${chatId}`} className={"relative w-full"} onClick={collapseIfMobile}>
       <div
         className={
           "bg-base-200 p-3 pt-2 pb-1 rounded-lg hover:bg-neutral break-all flex gap-1" +

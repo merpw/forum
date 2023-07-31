@@ -119,4 +119,14 @@ const CollapseButton: FC = () => {
   )
 }
 
+export const useCollapseIfMobile = () => {
+  const { setIsCollapsed } = useContext(ChatSectionCollapsedContext)
+
+  return () => {
+    if (window.innerWidth < 768) {
+      setIsCollapsed(true)
+    }
+  }
+}
+
 export default ChatsSection
