@@ -4,15 +4,6 @@ RESTful API server to manage data about users, posts, comments and reactions.
 
 ---
 
-Authors: [@maximihajlov](https://github.com/maximihajlov), [@healingdrawing](https://github.com/healingdrawing)
-, [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere)
-
-Solved during studying in Gritlab coding school on Åland, January 2023
-
----
-
-## [Task description and audit questions](https://github.com/01-edu/public/tree/master/subjects/forum)
-
 ## Usage
 
 ### Run `go run backend/forum [PARAMS]` to start API server
@@ -75,4 +66,16 @@ in [backend/migrate](../migrate/README.md) package.
 - POST `/api/posts/{id}/comment/{id}/like` - like comment by id
 - POST `/api/posts/{id}}/comment/{id}/dislike` - dislike comment by id
 
-[//]: # "TODO: add request body examples"
+## Migrations
+
+We use our custom package [backend/migrate](../migrate/README.md) for migrations. Check it out for more details.
+
+### CLI
+
+To manually migrate the database between revisions, you can use the `cli` tool.
+
+#### To run `go run backend/forum/database/migrations/cli -h`
+
+#### To build `go build backend/forum/database/migrations/cli`
+
+Run `./cli -h` to see the available commands

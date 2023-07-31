@@ -2,14 +2,16 @@
 
 ---
 
-Authors: [@maximihajlov](https://github.com/maximihajlov), [@healingdrawing](https://github.com/healingdrawing)
-, [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere)
+Authors:  [@maximihajlov](https://github.com/maximihajlov), 
+          [@nattikim](https://github.com/nattikim), 
+          [@sagarishere](https://github.com/sagarishere), 
+          [@bomanviktor](https://github.com/bomanviktor)
 
-Solved during studying in Gritlab coding school on Åland, January 2023
+Solved during studying in Grit:lab coding school on Åland, 2023
 
 ---
 
-## [Task description and audit questions](https://github.com/01-edu/public/tree/master/subjects/forum)
+## [Task description and audit questions](https://github.com/01-edu/public/tree/master/subjects/real-time-forum)
 
 ---
 
@@ -19,17 +21,17 @@ Solved during studying in Gritlab coding school on Åland, January 2023
 
 ## How to run?
 
-## Run `./start.sh`
+### Run `./start.sh`
 
 Docker v3.4+ is required.
 
 ## Production:
 
-## Run `./start.sh`
+### Run `./start.sh`
 
 or `cd production && docker-compose up`
 
-> Note: in production, it's highly recommended to use `FORUM_BACKEND_SECRET` to secure private API endpoints.
+> **Note:** In production, it's highly recommended to use `FORUM_BACKEND_SECRET` to secure private API endpoints.
 >
 > This can be done by generating a random string and passing it as an environment variable to docker compose:
 >
@@ -55,7 +57,7 @@ To build and run local revision
 ./start.sh local
 ```
 
-> Note: if there's no such revision for one of the services, the default `main` revision will be used.
+> **Note:** If there's no such revision for one of the services, the default `main` revision will be used.
 
 ### Natively (dev)
 

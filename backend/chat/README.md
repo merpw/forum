@@ -2,11 +2,13 @@
 
 Real-time chat service using WebSockets.
 
+---
+
 ## Usage
 
 ### Run `go run backend/chat [PARAMS]` to start API server
 
-#### Example: `go run .` to run on default port 8081
+_**Example:** `go run .` to run on default port 8081_
 
 ### Params:
 

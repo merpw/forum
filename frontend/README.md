@@ -1,13 +1,6 @@
-# FORUM-FRONTEND
+# frontend
 
-Next.js based frontend for [FORUM](https://github.com/01-edu/public/tree/master/subjects/forum) task
-
----
-
-Authors: [@maximihajlov](https://github.com/maximihajlov), [@healingdrawing](https://github.com/healingdrawing)
-, [@nattikim](https://github.com/nattikim), [@sagarishere](https://github.com/sagarishere)
-
-Solved during studying in Gritlab coding school on Åland, January 2023
+Next.js based frontend for [real-time-forum](https://github.com/01-edu/public/tree/master/subjects/real-time-forum) task
 
 ---
 
