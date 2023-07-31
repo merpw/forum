@@ -5,6 +5,7 @@ import { useUser, useUsers, useUsersOnline } from "@/api/users/hooks"
 import { useMe } from "@/api/auth/hooks"
 import { User } from "@/custom"
 import Avatar from "@/components/Avatar"
+import { useCollapseIfMobile } from "@/components/chats/section/ChatSection"
 
 const UserList = () => {
   const { users } = useUsers()
@@ -41,9 +42,11 @@ const UserList = () => {
 }
 
 const MeCard: FC<{ user: User }> = ({ user }) => {
+  const collapseIfMobile = useCollapseIfMobile()
+
   return (
     <div className={"flex flex-row w-full rounded-3xl hover:bg-neutral hover:saturate-150"}>
-      <Link className={"flex clickable w-full self-center"} href={`/me`}>
+      <Link className={"flex clickable w-full self-center"} href={`/me`} onClick={collapseIfMobile}>
         <Avatar userId={user.id} className={"mr-2 w-7"} />
         <span className={"end-dot text-primary self-center"}>{user.username}</span>
         <span className={"text-info font-light self-center"}>You</span>
@@ -55,6 +58,8 @@ const MeCard: FC<{ user: User }> = ({ user }) => {
 const UserCard: FC<{ id: number }> = ({ id }) => {
   const { user } = useUser(id)
 
+  const collapseIfMobile = useCollapseIfMobile()
+
   if (!user) {
     return <div className={"text-info"}>loading...</div>
   }
@@ -65,7 +70,11 @@ const UserCard: FC<{ id: number }> = ({ id }) => {
         "flex flex-row w-full justify-between hover:bg-neutral hover:saturate-150 rounded-3xl"
       }
     >
-      <Link className={"clickable self-center w-full text-primary flex"} href={`/user/${id}`}>
+      <Link
+        className={"clickable self-center w-full text-primary flex"}
+        href={`/user/${id}`}
+        onClick={collapseIfMobile}
+      >
         <Avatar userId={user.id} className={"mr-2 w-7"} />
         <span className={"self-center"}>{user.username}</span>
       </Link>
@@ -73,6 +82,7 @@ const UserCard: FC<{ id: number }> = ({ id }) => {
       <Link
         className={"flex justify-end self-center clickable text-sm text-primary mr-1.5 gap-0.5"}
         href={`/chat/u${id}`}
+        onClick={collapseIfMobile}
       >
         <span className={"self-center"}>
           <svg

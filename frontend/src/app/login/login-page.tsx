@@ -4,11 +4,13 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
-import { logIn } from "@/api/auth/hooks"
+import { logIn, useMe } from "@/api/auth/hooks"
 import { FormError } from "@/components/error"
 
 const LoginPage = () => {
   const router = useRouter()
+
+  const { mutate: mutateMe } = useMe()
 
   const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
@@ -34,6 +36,7 @@ const LoginPage = () => {
 
           logIn(login, password)
             .then(() => {
+              mutateMe()
               router.refresh()
             })
             .catch((err) => setFormError(err.message))

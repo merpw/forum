@@ -1,6 +1,7 @@
 // TODO: improve styles
 
-import { FC, useContext, useEffect, useState } from "react"
+import { FC, useCallback, useContext, useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 
 import { ChatSectionCollapsedContext } from "@/components/layout"
 import { useChatIds } from "@/api/chats/chats"
@@ -20,6 +21,13 @@ const ChatsSection = () => {
   }, [chatIds])
 
   const { isCollapsed } = useContext(ChatSectionCollapsedContext)
+
+  const pathname = usePathname()
+  const collapseIfMobile = useCollapseIfMobile()
+
+  useEffect(() => {
+    collapseIfMobile()
+  }, [collapseIfMobile, pathname])
 
   return (
     <>
@@ -68,7 +76,9 @@ const CollapseButton: FC = () => {
   return (
     <button
       onClick={() => setIsCollapsed((prev) => !prev)}
-      className={"absolute clickable right-2 rounded-2xl pr-1 sm:pr-3 pt-4 text-primary"}
+      className={
+        "absolute hover:text-opacity-70 right-5 top-3 rounded-2xl p-1 text-primary z-40 backdrop-blur"
+      }
     >
       <div className={"relative w-16 h-12"}>
         <span className={"absolute left-0 top-0"}>
@@ -115,6 +125,16 @@ const CollapseButton: FC = () => {
       </div>
     </button>
   )
+}
+
+export const useCollapseIfMobile = () => {
+  const { setIsCollapsed } = useContext(ChatSectionCollapsedContext)
+
+  return useCallback(() => {
+    if (window.innerWidth < 768) {
+      setIsCollapsed(true)
+    }
+  }, [setIsCollapsed])
 }
 
 export default ChatsSection
