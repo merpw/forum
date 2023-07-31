@@ -143,7 +143,7 @@ export const Index = (): string => {
         <ul id="your-chats-list" class="chat-users"></ul>
       </div>
       <div id="online-users-div">
-        <h3 id="online-title">Online users: </h3>
+        <h3 id="online-title">Users: </h3>
         <ul id="online-users-list" class="chat-users"></ul>
       </div>
     </section>

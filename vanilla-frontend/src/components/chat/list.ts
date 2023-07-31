@@ -6,26 +6,27 @@ import { sendWsObject } from "./helpers/sendobject.js"
 import { createElement } from "../utils.js"
 
 export class List {
-  public onlineUsers: User[]
+  public users: User[]
   public chats: Chat[]
+  private onlineList: number[]
 
   constructor(onlineList: number[], chats: Chat[], chatUserIds: number[]) {
-    const onlineUsers = onlineList
-      .filter((id) => id !== state.me.id && !chatUserIds.includes(id))
-      .map((id) => state.users.get(id)) as User[]
+    const users = [...state.users.values()]
+      .filter((user) => !chatUserIds.includes(user.id))
 
     chats.forEach((chat) => {
       chat.online = onlineList.includes(chat.userId) ? true : false
     })
 
-    this.onlineUsers = onlineUsers
+    this.onlineList = onlineList
+    this.users = users
     this.chats = chats
 
     this.render()
   }
 
   chatsList = document.getElementById("your-chats-list") as HTMLUListElement
-  onlineUsersList = document.getElementById(
+  usersList = document.getElementById(
     "online-users-list"
   ) as HTMLUListElement
 
@@ -72,10 +73,10 @@ export class List {
     }
 
     // Add online users to DOM.
-    this.onlineUsersList.replaceChildren()
+    this.usersList.replaceChildren()
 
-    for (const user of this.onlineUsers) {
-      const userElement = createElement("li", "chat-user online")
+    for (const user of this.users) {
+      const userElement = createElement("li", "chat-user")
       const nameElement = createElement("p", null, null, user.name)
       userElement.appendChild(nameElement)
 
@@ -89,7 +90,13 @@ export class List {
         e.preventDefault()
       })
 
-      this.onlineUsersList.appendChild(userElement)
+      if(this.onlineList.includes(user.id)){
+        userElement.classList.add("online")
+      } else {
+        userElement.classList.add("offline")
+      }
+
+      this.usersList.appendChild(userElement)
     }
   }
 

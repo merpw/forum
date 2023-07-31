@@ -15,8 +15,12 @@ export class Chat {
     public online: boolean
   ) {}
 
-  messageIds: number[] = [] // Set with an easy call to WS
+  messageIds: number[] = []
   unreadMessages = 0
+
+  private range = 0 // Determines how many messages should be loaded
+
+  typing = false
 
   // DOM for chat window
   chatArea = document.getElementById("chat-area") as HTMLElement
@@ -56,8 +60,7 @@ export class Chat {
     "Send"
   ) as HTMLButtonElement
 
-  private range = 0 // Determines how many messages should be loaded
-  typing = false
+
 
   open() {
     client.activeChat = this
@@ -103,7 +106,6 @@ export class Chat {
       this.sendMessage(content)
       this.messageField.value = ""
       this.chatMessages.scrollTop = 0
-
       e.preventDefault()
     })
 
@@ -158,28 +160,38 @@ export class Chat {
       this.unreadMessages = 0
       window.dispatchEvent(renderChatList)
     }
-  }, 100)
+  }, 200)
 
-  private renderNewMessage() {
+  private renderNewMessage(): void {
     const [id] = this.messageIds
-    const message = this.chatMessages.querySelector(`#msgId${id}`)
-    if (message) return
+    const messageElement = this.chatMessages.querySelector(`#msgId${id}`)
+    if (messageElement) return
+
+    const message = client.messages.get(id)
+    if (!message){
+      return this.renderNewMessage()
+    }
 
     this.chatMessages.prepend(
-      this.createMessage(client.messages.get(id) as Message)
+      this.createMessage(message)
     )
-    this.range++
+
+    this.range += 1
   }
 
-  private renderMessages() {
+  private renderMessages(): void {
     for (const id of this.messageIds.slice(this.range, this.range + 10)) {
-      const message = this.chatMessages.querySelector(`#msgId${id}`)
-      if (message) {
+      const messageElement = this.chatMessages.querySelector(`#msgId${id}`)
+      if (messageElement) {
         continue
       }
-      this.chatMessages.appendChild(
-        this.createMessage(client.messages.get(id) as Message)
-      )
+
+      const message = client.messages.get(id)
+      if (!message) {
+        return this.renderMessages()
+      }
+
+      this.chatMessages.appendChild(this.createMessage(message))
     }
   }
 

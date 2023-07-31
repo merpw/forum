@@ -75,4 +75,3 @@ Here's the list of environment variables used by both:
 - `FORUM_IS_PRIVATE` - optional, default: `true`.
   Makes all endpoints private by default. If set to `false`, some endpoints will be available to anyone (
   like `/api/posts`).
-  

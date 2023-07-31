@@ -6,7 +6,7 @@ export class Client {
   activeChat: Chat | null
   chatIds: number[] | undefined
   chats: Map<number, Chat> // chatId => Chat
-  messages: Map<number, Message | null> // messageId => Message
+  messages: Map<number, Message> // messageId => Message
   userChats: Map<number, number | null> // userId => chatId
   usersOnline: number[] | undefined
 
@@ -14,9 +14,10 @@ export class Client {
     this.activeChat = null
     this.chatIds = undefined
     this.chats = new Map<number, Chat>()
-    this.messages = new Map<number, Message | null>()
+    this.messages = new Map<number, Message>()
     this.userChats = new Map<number, number | null>()
     this.usersOnline = undefined
+    
     window.addEventListener("renderChatList", () => {
       setTimeout(() => {
         new List(this.onlineUsers, this.sortedChats, this.chatUserIds)

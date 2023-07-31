@@ -15,7 +15,7 @@ import {
   startChat,
 } from "./helpers/events.js"
 import { Chat } from "./chat.js"
-import { getUserById } from "../../api/get.js"
+import { getUserById, getUserIds } from "../../api/get.js"
 
 export let ws: WebSocket
 const WSUrl = "ws://localhost/ws"
@@ -196,7 +196,7 @@ const getHandler = async (resp: WSGetResponse<never>) => {
     const chat = client.chats.get(id)
     if (!chat) return
 
-    const messageIds = data.reverse() as number[]
+    const messageIds = data.slice(1).reverse() as number[]
     chat.messageIds = messageIds
   }
 
@@ -215,7 +215,12 @@ const getHandler = async (resp: WSGetResponse<never>) => {
 
     for (const id of filteredIds) {
       if (!state.users.has(id)) {
-        state.users.set(id, await getUserById(id))
+        state.users.clear()
+        const ids = await getUserIds()
+        const filteredIds = ids.filter((id) => id !== state.me.id)
+        for (const id of filteredIds) {
+          state.users.set(id, await getUserById(id))
+        }
       }
     }
 

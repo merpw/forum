@@ -119,7 +119,6 @@ export const loginController = async () => {
         }
       })
       pwShowHide.forEach((eyeIcon) => {
-        console.log("eye icon pressed")
         if (eyeIcon.classList.contains("uil-eye-slash")) {
           eyeIcon.classList.replace("uil-eye-slash", "uil-eye")
         } else {
