@@ -68,7 +68,9 @@ const CollapseButton: FC = () => {
   return (
     <button
       onClick={() => setIsCollapsed((prev) => !prev)}
-      className={"absolute clickable right-2 rounded-2xl pr-1 sm:pr-3 pt-4 text-primary"}
+      className={
+        "absolute hover:text-opacity-70 right-5 top-3 rounded-2xl p-1 text-primary z-40 backdrop-blur"
+      }
     >
       <div className={"relative w-16 h-12"}>
         <span className={"absolute left-0 top-0"}>
