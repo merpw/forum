@@ -145,9 +145,9 @@ export class Chat {
 
   private lazyLoading = throttle(() => {
     const scrollableHeight =
-      this.chatMessages.scrollHeight - this.chatMessages.clientHeight
+      this.chatMessages.scrollHeight - this.chatMessages.clientHeight - 50
 
-    if (Math.abs(this.chatMessages.scrollTop) === scrollableHeight) {
+    if (Math.abs(this.chatMessages.scrollTop) >= scrollableHeight) {
       this.range =
         this.range + 10 < this.messageIds.length
           ? this.range + 10
