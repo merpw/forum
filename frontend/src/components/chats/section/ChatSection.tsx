@@ -1,6 +1,7 @@
 // TODO: improve styles
 
-import { FC, useContext, useEffect, useState } from "react"
+import { FC, useCallback, useContext, useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 
 import { ChatSectionCollapsedContext } from "@/components/layout"
 import { useChatIds } from "@/api/chats/chats"
@@ -20,6 +21,13 @@ const ChatsSection = () => {
   }, [chatIds])
 
   const { isCollapsed } = useContext(ChatSectionCollapsedContext)
+
+  const pathname = usePathname()
+  const collapseIfMobile = useCollapseIfMobile()
+
+  useEffect(() => {
+    collapseIfMobile()
+  }, [collapseIfMobile, pathname])
 
   return (
     <>
@@ -122,11 +130,11 @@ const CollapseButton: FC = () => {
 export const useCollapseIfMobile = () => {
   const { setIsCollapsed } = useContext(ChatSectionCollapsedContext)
 
-  return () => {
+  return useCallback(() => {
     if (window.innerWidth < 768) {
       setIsCollapsed(true)
     }
-  }
+  }, [setIsCollapsed])
 }
 
 export default ChatsSection
