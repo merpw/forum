@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import { logIn, SignUp } from "@/api/auth/hooks"
 import { FormError } from "@/components/error"
 
-const SignupPage = () => {
+const SignUpForm = () => {
   const router = useRouter()
   const [formFields, setFormFields] = useState<{
     username: string
@@ -278,4 +278,4 @@ const SignupPage = () => {
   )
 }
 
-export default SignupPage
+export default SignUpForm
