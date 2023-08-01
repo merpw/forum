@@ -11,6 +11,7 @@ import FullName from "@/components/forms/signup/FullName"
 import Username from "@/components/forms/signup/Username"
 import Email from "@/components/forms/signup/Email"
 import DateOfBirth from "@/components/forms/signup/DateOfBirth"
+import Bio from "@/components/forms/signup/Bio"
 
 const SignUpForm = () => {
   const router = useRouter()
@@ -43,6 +44,7 @@ const SignUpForm = () => {
             gender: formData.get("gender") as string,
 
             avatar: formData.get("avatar") || undefined,
+            bio: formData.get("bio") || undefined,
           }
 
           if (formError != null) setFormError(null)
@@ -82,6 +84,8 @@ const SignUpForm = () => {
               <FullName />
 
               <DateOfBirth />
+
+              <Bio />
 
               <Email />
 
