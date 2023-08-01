@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 
 import { logIn, SignUp } from "@/api/auth/hooks"
 import { FormError } from "@/components/error"
+import ChooseAvatar from "@/components/forms/signup/ChooseAvatar"
 
 const SignUpForm = () => {
   const router = useRouter()
@@ -17,6 +18,8 @@ const SignUpForm = () => {
     last_name: string
     dob: string
     gender: string
+
+    avatar?: string
   }>({
     username: "",
     email: "",
@@ -87,7 +90,11 @@ const SignUpForm = () => {
 
           <div className={"card flex-shrink-0 w-full max-w-2xl shadow-xl bg-base-100"}>
             <div className={"card-body"}>
-              <div className={"form-control"}>
+              <ChooseAvatar
+                avatar={formFields.avatar}
+                setAvatar={(newAvatar) => setFormFields({ ...formFields, avatar: newAvatar })}
+              />
+              <div className={"form-control mt-3"}>
                 <label className={"label pt-0"}>
                   <span className={"label-text"}>Username</span>
                 </label>
@@ -262,6 +269,7 @@ const SignUpForm = () => {
                   required
                 />
               </div>
+
               <FormError error={formError} />
               <div className={"form-control inline mt-5 mx-auto"}>
                 <span className={"font-black mr-3 text-neutral"}>• •</span>
