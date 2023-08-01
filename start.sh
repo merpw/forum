@@ -16,12 +16,6 @@ if [ "$TAG" == "latest" ]; then
     exit
 fi;
 
-if [ "$TAG" == "vanilla" ]; then
-    echo "Starting vanilla frontend revision"
-    docker compose -f docker-compose.vanilla.yml up;
-    exit
-fi;
-
 if [ "$TAG" == "local" ]; then
     echo "Starting build from local files"
     docker compose up;
