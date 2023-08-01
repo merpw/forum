@@ -25,10 +25,6 @@ Solved during studying in Grit:lab coding school on Åland, 2023
 
 Docker v3.4+ is required.
 
-### Vanilla frontend version
-
-### Run `./start.sh vanilla`
-
 ## Production:
 
 ### Run `./start.sh`
