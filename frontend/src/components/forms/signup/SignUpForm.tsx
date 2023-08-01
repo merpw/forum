@@ -200,8 +200,9 @@ const SignUpForm = () => {
                   <span className={"label-text"}>Create password </span>
                   <button
                     type={"button"}
-                    onClick={() => setShowPassword(!showPassword)}
+                    onClick={() => setShowPassword((prev) => !prev)}
                     className={"label-text text-info clickable"}
+                    tabIndex={-1}
                   >
                     {showPassword ? (
                       <svg
