@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-const Username: FC<{ username: string }> = ({ username }) => {
+const Username: FC = () => {
   return (
     <div className={"form-control mt-3"}>
       <label className={"label pt-0"}>
@@ -13,8 +13,24 @@ const Username: FC<{ username: string }> = ({ username }) => {
         minLength={3}
         maxLength={15}
         placeholder={"username"}
-        value={username}
-        onChange={() => void 0 /* handled by Form */}
+        onInput={(e) => {
+          const updatedValue = e.currentTarget.value.replace(/\W/g, "")
+          if (updatedValue !== e.currentTarget.value) {
+            console.log(
+              "updatedValue",
+              updatedValue,
+              "e.currentTarget.value",
+              e.currentTarget.value
+            )
+            e.currentTarget.value = updatedValue
+            e.currentTarget.setCustomValidity(
+              "Only latin letters, numbers, and underscores are allowed."
+            )
+            e.currentTarget.reportValidity()
+          } else {
+            e.currentTarget.setCustomValidity("")
+          }
+        }}
         required
       />
     </div>

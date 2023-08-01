@@ -1,6 +1,8 @@
 import { FC } from "react"
 
-const Email: FC<{ email: string }> = ({ email }) => {
+import { trimInput } from "@/helpers/input"
+
+const Email: FC = () => {
   return (
     <div className={"form-control"}>
       <label className={"label"}>
@@ -11,8 +13,7 @@ const Email: FC<{ email: string }> = ({ email }) => {
         className={"input input-bordered"}
         name={"email"}
         placeholder={"email"}
-        value={email}
-        onChange={() => void 0 /* handled by Form */}
+        onBlur={trimInput}
         required
       />
     </div>

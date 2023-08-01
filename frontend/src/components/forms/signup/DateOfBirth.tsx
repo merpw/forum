@@ -1,6 +1,6 @@
 import { FC } from "react"
 
-const DateOfBirth: FC<{ dob: string }> = ({ dob }) => {
+const DateOfBirth: FC = () => {
   return (
     <div className={"flex flex-wrap flex-row gap-3"}>
       <div className={"grow basis-1/3"}>
@@ -13,8 +13,6 @@ const DateOfBirth: FC<{ dob: string }> = ({ dob }) => {
           max={new Date().toISOString().split("T")[0]}
           className={"input input-bordered w-full text-sm"}
           name={"dob"}
-          value={dob}
-          onChange={() => void 0 /* handled by Form */}
           placeholder={"Date of Birth"}
           required
         />

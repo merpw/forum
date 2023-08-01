@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { logIn, SignUp } from "@/api/auth/hooks"
@@ -14,54 +14,36 @@ import DateOfBirth from "@/components/forms/signup/DateOfBirth"
 
 const SignUpForm = () => {
   const router = useRouter()
-  const [formFields, setFormFields] = useState<{
-    username: string
-    email: string
-    password: string
-    passwordConfirm: string
-    first_name: string
-    last_name: string
-    dob: string
-    gender: string
 
-    avatar?: string
-  }>({
-    username: "",
-    email: "",
-    password: "",
-    passwordConfirm: "",
-    first_name: "",
-    last_name: "",
-    dob: "",
-    gender: "",
-  })
   const [isSame, setIsSame] = useState(false)
 
   const [formError, setFormError] = useState<string | null>(null)
 
-  useEffect(() => {
-    setIsSame(false)
-  }, [formFields])
-
   return (
     <>
       <form
-        onChange={(e) => {
-          const target = e.target as HTMLInputElement
-          setFormFields({ ...formFields, [target.name]: target.value })
-        }}
-        onBlur={() => {
-          formFields.username = formFields.username.trim()
-          formFields.first_name = formFields.first_name.trim()
-          formFields.last_name = formFields.last_name.trim()
-          formFields.email = formFields.email.trim()
-
-          setFormFields({ ...formFields })
+        onChange={() => {
+          if (isSame) setIsSame(false)
         }}
         onSubmit={async (e) => {
           e.preventDefault()
 
           if (isSame) return
+
+          const formData = new FormData(e.target as HTMLFormElement)
+
+          const formFields = {
+            username: formData.get("username") as string,
+            email: formData.get("email") as string,
+            password: formData.get("password") as string,
+            passwordConfirm: formData.get("passwordConfirm") as string,
+            first_name: formData.get("first_name") as string,
+            last_name: formData.get("last_name") as string,
+            dob: formData.get("dob") as string,
+            gender: formData.get("gender") as string,
+
+            avatar: formData.get("avatar") || undefined,
+          }
 
           if (formError != null) setFormError(null)
           setIsSame(true)
@@ -93,18 +75,15 @@ const SignUpForm = () => {
 
           <div className={"card flex-shrink-0 w-full max-w-2xl shadow-xl bg-base-100"}>
             <div className={"card-body"}>
-              <ChooseAvatar
-                avatar={formFields.avatar}
-                setAvatar={(newAvatar) => setFormFields({ ...formFields, avatar: newAvatar })}
-              />
+              <ChooseAvatar />
 
-              <Username {...formFields} />
+              <Username />
 
-              <FullName first_name={formFields.first_name} last_name={formFields.last_name} />
+              <FullName />
 
-              <DateOfBirth dob={formFields.dob} />
+              <DateOfBirth />
 
-              <Email email={formFields.email} />
+              <Email />
 
               <Passwords />
 

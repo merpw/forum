@@ -1,6 +1,8 @@
 import { FC } from "react"
 
-const FullName: FC<{ first_name: string; last_name: string }> = ({ first_name, last_name }) => {
+import { trimInput } from "@/helpers/input"
+
+const FullName: FC = () => {
   return (
     <div className={"flex flex-wrap flex-row gap-3"}>
       <div className={"grow basis-1/3"}>
@@ -12,8 +14,7 @@ const FullName: FC<{ first_name: string; last_name: string }> = ({ first_name, l
           className={"input input-bordered w-full"}
           name={"first_name"}
           placeholder={"first name"}
-          value={first_name}
-          onChange={() => void 0 /* handled by Form */}
+          onBlur={trimInput}
           maxLength={15}
           required
         />
@@ -27,8 +28,7 @@ const FullName: FC<{ first_name: string; last_name: string }> = ({ first_name, l
           className={"input input-bordered w-full"}
           name={"last_name"}
           placeholder={"last name"}
-          value={last_name}
-          onChange={() => void 0 /* handled by Form */}
+          onBlur={trimInput}
           maxLength={15}
           required
         />

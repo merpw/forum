@@ -1,4 +1,4 @@
-import { FC } from "react"
+import { FC, useState } from "react"
 import Image from "next/image"
 
 import AvatarPlaceholder from "@/components/placeholders/avatar"
@@ -16,12 +16,12 @@ const AVATARS = [
   "9.jpg",
 ]
 
-const ChooseAvatar: FC<{
-  avatar: string | undefined
-  setAvatar: (newAvatar: string | undefined) => void
-}> = ({ avatar, setAvatar }) => {
+const ChooseAvatar: FC = () => {
+  const [avatar, setAvatar] = useState<string | undefined>(undefined)
+
   return (
     <div className={"mx-auto"}>
+      {avatar && <input type={"hidden"} name={"avatar"} value={avatar} />}
       {avatar ? (
         <Image
           src={`/avatars/${avatar}`}
