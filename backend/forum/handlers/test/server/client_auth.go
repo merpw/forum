@@ -3,6 +3,7 @@ package server
 import (
 	"math/rand"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -16,6 +17,8 @@ type TestClientData struct {
 	LastName  string `json:"last_name"`
 	DoB       string `json:"dob"`
 	Gender    string `json:"gender"`
+	Avatar    string `json:"avatar"`
+	Bio       string `json:"bio"`
 }
 
 // NewClientData returns random TestClientData
@@ -30,6 +33,8 @@ func NewClientData() TestClientData {
 		LastName:  "Doe",
 		DoB:       "2000-01-01",
 		Gender:    genders[rand.Intn(3)], //nolint:gosec // it's ok for tests
+		Avatar:    strconv.Itoa(rand.Intn(10)) + ".jpg",
+		Bio:       "t" + uuid.Must(uuid.NewV4()).String()[0:8],
 	}
 }
 

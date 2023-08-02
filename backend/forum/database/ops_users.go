@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -42,13 +43,15 @@ func (db DB) GetUserById(id int) *User {
 	}
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Bio, &user.Avatar)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
 	if err != nil {
 		log.Panic(err)
 	}
 	if err = query.Close(); err != nil {
 		log.Panic(err)
 	}
+
+	fmt.Println("User in GetUserById", user)
 
 	return &user
 }
@@ -91,7 +94,7 @@ func (db DB) GetUserByLogin(login string) *User {
 	var user User
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Bio, &user.Avatar)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -111,7 +114,16 @@ func (db DB) AddUser(
 	result, err := db.Exec(
 		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		username, email, password, firstName.String, lastName.String, dob.String, gender.String, bio.String, avatar.String)
+		username,
+		email,
+		password,
+		firstName.String,
+		lastName.String,
+		dob.String,
+		gender.String,
+		avatar.String,
+		bio.String,
+	)
 	if err != nil {
 		log.Panic(err)
 	}

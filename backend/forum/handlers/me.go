@@ -14,12 +14,12 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 	response := struct {
 		SafeUser
 		Email     string `json:"email"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-		DoB       string `json:"dob"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+		DoB       string `json:"dob,omitempty"`
 		Gender    string `json:"gender,omitempty"`
-		Bio       string `json:"bio,omitempty"`
 		Avatar    string `json:"avatar,omitempty"`
+		Bio       string `json:"bio,omitempty"`
 	}{
 		SafeUser:  SafeUser{Id: user.Id, Username: user.Username},
 		Email:     user.Email,

@@ -62,8 +62,8 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		LastName  string `json:"last_name"`
 		DoB       string `json:"dob"`
 		Gender    string `json:"gender"`
-		Bio       string `json:"bio"`
 		Avatar    string `json:"avatar"`
+		Bio       string `json:"bio"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -92,22 +92,6 @@ skipLengthCheck:
 
 	if len(requestBody.Username) > MaxUsernameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
-		return
-	}
-
-	if !AvatarRegex.MatchString(requestBody.Avatar) {
-		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
-		return
-	}
-
-	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
-
-	if len(requestBody.Bio) == 0 {
-		requestBody.Bio = sql.NullString{String: "", Valid: false}.String
-	}
-
-	if len(requestBody.Bio) > MaxBioLength {
-		http.Error(w, "Bio is too long", http.StatusBadRequest)
 		return
 	}
 
@@ -198,6 +182,22 @@ skipLengthCheck:
 		return
 	}
 
+	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
+
+	if !AvatarRegex.MatchString(requestBody.Avatar) {
+		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
+		return
+	}
+
+	if len(requestBody.Bio) == 0 {
+		requestBody.Bio = sql.NullString{String: "", Valid: false}.String
+	}
+
+	if len(requestBody.Bio) > MaxBioLength {
+		http.Error(w, "Bio is too long", http.StatusBadRequest)
+		return
+	}
+
 	id := h.DB.AddUser(
 		requestBody.Username,
 		requestBody.Email,
@@ -206,8 +206,8 @@ skipLengthCheck:
 		sql.NullString{String: requestBody.LastName, Valid: true},
 		sql.NullString{String: requestBody.DoB, Valid: true},
 		sql.NullString{String: requestBody.Gender, Valid: true},
-		sql.NullString{String: requestBody.Bio, Valid: true},
 		sql.NullString{String: requestBody.Avatar, Valid: true},
+		sql.NullString{String: requestBody.Bio, Valid: true},
 	)
 
 	external.RevalidateURL(fmt.Sprintf("/user/%d", id))
