@@ -18,6 +18,8 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		LastName  string `json:"last_name,omitempty"`
 		DoB       string `json:"dob,omitempty"`
 		Gender    string `json:"gender,omitempty"`
+		Bio       string `json:"bio,omitempty"`
+		Avatar    string `json:"avatar,omitempty"`
 	}{
 		SafeUser:  SafeUser{Id: user.Id, Username: user.Username},
 		Email:     user.Email,

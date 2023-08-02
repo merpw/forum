@@ -40,7 +40,7 @@ func (db DB) GetUserById(id int) *User {
 	}
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Bio, &user.Avatar)
 	if err != nil {
 		log.Panic(err)
 	}

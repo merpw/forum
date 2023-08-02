@@ -32,10 +32,15 @@ const (
 
 	MinEmailLength = 3
 	MaxEmailLength = 254
+
+	MinBioLength = 0
+	MaxBioLength = 200
 )
 
 var (
 	UsernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+	//Check by regex if avatar exists(matches 0..9.jpg)
+	AvatarRegex = regexp.MustCompile(`^[0-9]\.jpg$`)
 
 	MinLoginLength = int(math.Min(MinUsernameLength, MinEmailLength))
 	MaxLoginLength = int(math.Max(MaxUsernameLength, MaxEmailLength))
@@ -57,6 +62,8 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		LastName  string `json:"last_name"`
 		DoB       string `json:"dob"`
 		Gender    string `json:"gender"`
+		Bio       string `json:"bio"`
+		Avatar    string `json:"avatar"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -71,6 +78,17 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(requestBody.Username) > MaxUsernameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
+		return
+	}
+
+	if !AvatarRegex.MatchString(requestBody.Avatar) {
+		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
+		return
+	}
+
+	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
+	if len(requestBody.Bio) < MinBioLength || len(requestBody.Bio) > MaxBioLength {
+		http.Error(w, "Bio length is invalid", http.StatusBadRequest)
 		return
 	}
 
