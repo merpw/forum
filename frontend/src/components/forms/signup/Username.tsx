@@ -1,5 +1,7 @@
 import { FC } from "react"
 
+const IllegalRegexp = /^u\d+$/
+
 const Username: FC = () => {
   return (
     <div className={"form-control mt-3"}>
@@ -30,6 +32,11 @@ const Username: FC = () => {
             e.currentTarget.reportValidity()
           } else {
             e.currentTarget.setCustomValidity("")
+          }
+
+          if (IllegalRegexp.test(updatedValue)) {
+            e.currentTarget.setCustomValidity("This username is reserved.")
+            e.currentTarget.reportValidity()
           }
         }}
       />
