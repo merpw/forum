@@ -50,11 +50,21 @@ func (db DB) GetUserById(id int) *User {
 }
 
 func (db DB) GetLastUserId() int {
-	var userId int
-	err := db.QueryRow("SELECT id FROM users ORDER BY id DESC LIMIT 1").Scan(&userId)
+	query, err := db.Query("SELECT id FROM users ORDER BY id DESC LIMIT 1")
 	if err != nil {
 		log.Panic(err)
 	}
+
+	if !query.Next() {
+		return 0
+	}
+
+	var userId int
+	err = query.Scan(&userId)
+	if err != nil {
+		log.Panic(err)
+	}
+	query.Close()
 
 	return userId
 }
