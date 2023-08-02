@@ -49,6 +49,16 @@ func (db DB) GetUserById(id int) *User {
 	return &user
 }
 
+func (db DB) GetLastUserId() int {
+	var userId int
+	err := db.QueryRow("SELECT id FROM users ORDER BY id DESC LIMIT 1").Scan(&userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return userId
+}
+
 // GetUserByLogin returns user with specified login
 //
 // returns nil if user not found
