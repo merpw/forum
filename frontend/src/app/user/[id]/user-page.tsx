@@ -24,6 +24,12 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
                 <p className={"text-4xl text-primary font-Yesteryear mx-1"}>{user.username}</p>
               </div>
             </div>
+            {user.bio && (
+              <div className={"mb-5 text-center"}>
+                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
+                <div className={"text-sm"}>{user.bio}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>

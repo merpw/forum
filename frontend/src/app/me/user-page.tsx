@@ -43,6 +43,13 @@ const UserPage: NextPage = () => {
                 <UserInfo user={user} />
               </div>
             </div>
+
+            {user.bio && (
+              <div className={"mb-5 text-center"}>
+                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
+                <div className={"text-sm"}>{user.bio}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
