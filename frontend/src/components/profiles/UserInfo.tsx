@@ -2,10 +2,11 @@
 /* https://github.com/iamkun/dayjs/issues/1242 */
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { FC } from "react"
+import { FC, useState } from "react"
 
 import { User } from "@/custom"
 import Avatar from "@/components/Avatar"
+import { togglePrivacy } from "@/api/users/hooks"
 
 export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isOwnProfile }) => {
   const age = user.dob ? calculateAge(user.dob) : null
@@ -30,7 +31,14 @@ export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isO
                   <span className={"text-3xl sm:text-4xl text-primary font-Yesteryear mx-1"}>
                     {user.username}
                   </span>
-                  {isOwnProfile && "Forgot who you are?"}
+                  {isOwnProfile ? (
+                    <>
+                      Forgot who you are?
+                      <PrivacyToggle user={user} />
+                    </>
+                  ) : (
+                    user.privacy && <span className={"badge badge-outline"}>private</span>
+                  )}
                 </div>
                 <div className={"font-light"}>
                   {user.first_name || user.last_name ? (
@@ -85,4 +93,21 @@ const calculateAge = (dob: string): string | null => {
 
   const age = parsedDob.fromNow(true)
   return age.includes("year") ? age + " old" : "baby 👶"
+}
+
+const PrivacyToggle: FC<{ user: User }> = ({ user }) => {
+  const [privacy, setPrivacy] = useState(user.privacy)
+  return (
+    <div className={"form-control mt-3"}>
+      <label className={"label cursor-pointer"}>
+        <span className={"label-text"}>Private</span>
+        <input
+          type={"checkbox"}
+          className={"toggle ml-3 mr-auto"}
+          checked={Boolean(privacy)}
+          onChange={() => togglePrivacy().then(setPrivacy)}
+        />
+      </label>
+    </div>
+  )
 }

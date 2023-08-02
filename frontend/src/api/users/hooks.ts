@@ -31,3 +31,9 @@ export const useUsersOnline = () => {
 
   return { usersOnline }
 }
+
+export const togglePrivacy = async (): Promise<boolean | undefined> =>
+  axios
+    .post<boolean>(`/api/me/privacy`)
+    .then((res) => res.data)
+    .catch(() => undefined)

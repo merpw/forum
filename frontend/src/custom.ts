@@ -22,6 +22,7 @@ export type User = {
   gender?: string
   avatar?: string
   bio?: string
+  privacy?: boolean
 }
 
 export type Comment = {
