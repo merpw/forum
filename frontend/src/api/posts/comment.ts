@@ -2,10 +2,9 @@ import axios from "axios"
 import useSWR from "swr"
 
 import { Comment } from "@/custom"
+
 export const CreateComment = (post_id: number, text: string) =>
-  axios
-    .post<number>(`/api/posts/${post_id}/comment`, { content: text }, { withCredentials: true })
-    .then((res) => res.data)
+  axios.post<number>(`/api/posts/${post_id}/comment`, { content: text }).then((res) => res.data)
 
 const getComments = (path: string) => axios.get<Comment[]>(path).then((res) => res.data)
 

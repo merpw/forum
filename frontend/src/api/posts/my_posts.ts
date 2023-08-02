@@ -6,7 +6,7 @@ import { Post } from "@/custom"
 const getMyPosts = async () =>
   document.cookie.includes("forum-token")
     ? axios
-        .get<Post[]>(`/api/me/posts`, { withCredentials: true })
+        .get<Post[]>(`/api/me/posts`)
         .then((res) => {
           return { posts: res.data }
         })
