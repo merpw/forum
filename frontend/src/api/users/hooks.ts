@@ -1,7 +1,7 @@
 import axios from "axios"
 import useSWR from "swr"
 
-import { User } from "@/custom"
+import { FollowStatus, User } from "@/custom"
 import { useAppSelector } from "@/store/hooks"
 
 const getUser = (id: number) => axios<User>(`/api/users/${id}`).then((res) => res.data)
@@ -35,5 +35,11 @@ export const useUsersOnline = () => {
 export const togglePrivacy = async (): Promise<boolean | undefined> =>
   axios
     .post<boolean>(`/api/me/privacy`)
+    .then((res) => res.data)
+    .catch(() => undefined)
+
+export const followUser = async (id: number): Promise<FollowStatus | undefined> =>
+  axios
+    .post<FollowStatus>(`/api/users/${id}/follow`)
     .then((res) => res.data)
     .catch(() => undefined)
