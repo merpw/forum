@@ -61,7 +61,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
           (unreadMessagesCount > 0 ? "ring-2 ring-secondary" : "")
         }
       >
-        <Avatar userId={chat.companionId} className={"mr-2 mt-2 w-12 mb-auto"} />
+        <CompanionAvatar userId={chat.companionId} />
         {unreadMessagesCount > 0 && (
           <div className={"absolute badge badge-secondary top-3 right-3 font-bold py-3"}>
             {unreadMessagesCount}
@@ -83,6 +83,16 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
       </div>
     </Link>
   )
+}
+
+const CompanionAvatar: FC<{ userId: number }> = ({ userId }) => {
+  const { user } = useUser(userId)
+
+  if (!user) {
+    return null
+  }
+
+  return <Avatar user={user} size={50} className={"mr-2 mt-2 w-12 mb-auto"} />
 }
 
 const CompanionData: FC<{ userId: number }> = ({ userId }) => {

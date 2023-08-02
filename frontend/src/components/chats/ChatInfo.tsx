@@ -12,7 +12,7 @@ const ChatInfo: FC<{ userId: number }> = ({ userId }) => {
   }
   return (
     <div className={"flex font-light mb-auto p-2 items-center gap-3"}>
-      <Avatar userId={userId} className={"w-16"} />
+      <Avatar user={user} size={60} className={"w-16"} />
       <div className={"text-info"}>
         Chat with <br />
         <UserLink userId={userId}>
