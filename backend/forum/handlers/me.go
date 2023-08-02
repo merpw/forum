@@ -14,9 +14,9 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 	response := struct {
 		SafeUser
 		Email     string `json:"email"`
-		FirstName string `json:"first_name,omitempty"`
-		LastName  string `json:"last_name,omitempty"`
-		DoB       string `json:"dob,omitempty"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		DoB       string `json:"dob"`
 		Gender    string `json:"gender,omitempty"`
 		Bio       string `json:"bio,omitempty"`
 		Avatar    string `json:"avatar,omitempty"`
@@ -27,6 +27,8 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		LastName:  user.LastName.String,
 		DoB:       user.DoB.String,
 		Gender:    user.Gender.String,
+		Avatar:    user.Avatar.String,
+		Bio:       user.Bio.String,
 	}
 
 	server.SendObject(w, response)

@@ -39,8 +39,7 @@ const (
 
 var (
 	UsernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
-	//Check by regex if avatar exists(matches 0..9.jpg)
-	AvatarRegex = regexp.MustCompile(`^[0-9]\.jpg$`)
+	AvatarRegex   = regexp.MustCompile(`^[0-9]\.jpg$`)
 
 	MinLoginLength = int(math.Min(MinUsernameLength, MinEmailLength))
 	MaxLoginLength = int(math.Max(MaxUsernameLength, MaxEmailLength))
@@ -87,7 +86,9 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
-	if len(requestBody.Bio) < MinBioLength || len(requestBody.Bio) > MaxBioLength {
+	if len(requestBody.Bio) == 0 {
+		requestBody.Bio = sql.NullString{String: "", Valid: false}.String
+	} else if len(requestBody.Bio) < MinBioLength || len(requestBody.Bio) > MaxBioLength {
 		http.Error(w, "Bio length is invalid", http.StatusBadRequest)
 		return
 	}
@@ -181,6 +182,8 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		sql.NullString{String: requestBody.LastName, Valid: true},
 		sql.NullString{String: requestBody.DoB, Valid: true},
 		sql.NullString{String: requestBody.Gender, Valid: true},
+		sql.NullString{String: requestBody.Bio, Valid: true},
+		sql.NullString{String: requestBody.Avatar, Valid: true},
 	)
 
 	external.RevalidateURL(fmt.Sprintf("/user/%d", id))
