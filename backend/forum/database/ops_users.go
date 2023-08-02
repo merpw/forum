@@ -74,7 +74,10 @@ func (db DB) GetUserByLogin(login string) *User {
 }
 
 // AddUser adds user to database, returns id of new user
-func (db DB) AddUser(username, email, password string, firstName, lastName, dob, gender, bio, avatar sql.NullString) int {
+func (db DB) AddUser(
+	username, email, password string,
+	firstName, lastName, dob, gender, bio, avatar sql.NullString) int {
+
 	result, err := db.Exec(
 		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
