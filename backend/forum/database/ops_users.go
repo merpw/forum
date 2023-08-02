@@ -20,7 +20,9 @@ func (db DB) GetAllUserIds() (userIds []int) {
 		}
 		userIds = append(userIds, userId)
 	}
-	query.Close()
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return
 }
@@ -44,7 +46,9 @@ func (db DB) GetUserById(id int) *User {
 	if err != nil {
 		log.Panic(err)
 	}
-	query.Close()
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return &user
 }
@@ -64,7 +68,10 @@ func (db DB) GetLastUserId() int {
 	if err != nil {
 		log.Panic(err)
 	}
-	query.Close()
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return userId
 }
@@ -84,11 +91,14 @@ func (db DB) GetUserByLogin(login string) *User {
 	var user User
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Bio, &user.Avatar)
 	if err != nil {
 		log.Panic(err)
 	}
-	query.Close()
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return &user
 }
@@ -120,7 +130,9 @@ func (db DB) IsEmailTaken(email string) bool {
 		log.Panic(err)
 	}
 	isTaken := query.Next()
-	query.Close()
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return isTaken
 }
@@ -133,7 +145,10 @@ func (db DB) IsNameTaken(username string) bool {
 		log.Panic(err)
 	}
 	isTaken := query.Next()
-	query.Close()
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return isTaken
 }
