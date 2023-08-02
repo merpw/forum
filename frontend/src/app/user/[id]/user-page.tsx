@@ -1,7 +1,7 @@
 "use client"
 
 import { NextPage } from "next"
-import { FC, useState } from "react"
+import { FC, useRef, useState } from "react"
 import Link from "next/link"
 import { SWRConfig } from "swr"
 
@@ -82,50 +82,81 @@ const FollowButton: FC<{ userId: number; followStatus: FollowStatus | undefined 
 }) => {
   const [currentFollowStatus, setCurrentFollowStatus] = useState(followStatus)
 
+  const popupRef = useRef<HTMLDialogElement>(null)
+
   return (
-    <button className={"button"} onClick={() => followUser(userId).then(setCurrentFollowStatus)}>
-      {currentFollowStatus ? (
-        <>
-          <svg
-            xmlns={"http://www.w3.org/2000/svg"}
-            fill={"none"}
-            viewBox={"0 0 24 24"}
-            strokeWidth={1.5}
-            stroke={"currentColor"}
-            className={"w-5 h-5"}
-          >
-            <path
-              strokeLinecap={"round"}
-              strokeLinejoin={"round"}
-              d={
-                "M22 10.5h-6m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
-              }
-            />
-          </svg>
-          {currentFollowStatus === 1 ? "Unfollow" : "Cancel request"}
-        </>
-      ) : (
-        <>
-          <svg
-            xmlns={"http://www.w3.org/2000/svg"}
-            fill={"none"}
-            viewBox={"0 0 24 24"}
-            strokeWidth={1.5}
-            stroke={"currentColor"}
-            className={"w-5 h-5"}
-          >
-            <path
-              strokeLinecap={"round"}
-              strokeLinejoin={"round"}
-              d={
-                "M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
-              }
-            />
-          </svg>
-          Follow
-        </>
-      )}
-    </button>
+    <>
+      <button
+        className={"button"}
+        onClick={() => {
+          if (currentFollowStatus) {
+            popupRef.current?.showModal()
+            return
+          }
+          followUser(userId).then(setCurrentFollowStatus)
+        }}
+      >
+        {currentFollowStatus ? (
+          <>
+            <svg
+              xmlns={"http://www.w3.org/2000/svg"}
+              fill={"none"}
+              viewBox={"0 0 24 24"}
+              strokeWidth={1.5}
+              stroke={"currentColor"}
+              className={"w-5 h-5"}
+            >
+              <path
+                strokeLinecap={"round"}
+                strokeLinejoin={"round"}
+                d={
+                  "M22 10.5h-6m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
+                }
+              />
+            </svg>
+            {currentFollowStatus === 1 ? "Unfollow" : "Cancel request"}
+          </>
+        ) : (
+          <>
+            <svg
+              xmlns={"http://www.w3.org/2000/svg"}
+              fill={"none"}
+              viewBox={"0 0 24 24"}
+              strokeWidth={1.5}
+              stroke={"currentColor"}
+              className={"w-5 h-5"}
+            >
+              <path
+                strokeLinecap={"round"}
+                strokeLinejoin={"round"}
+                d={
+                  "M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
+                }
+              />
+            </svg>
+            Follow
+          </>
+        )}
+      </button>
+      <dialog ref={popupRef} className={"modal"}>
+        <form method={"dialog"} className={"modal-box text-center"}>
+          <p className={"py-4"}>
+            Are you sure that you want to{" "}
+            {currentFollowStatus === 1 ? `unfollow` : "cancel follow request"}?
+          </p>
+          <div className={"modal-action justify-center"}>
+            {/* if there is a button in form, it will close the modal */}
+            <button
+              className={"btn"}
+              onClick={() => followUser(userId).then(setCurrentFollowStatus)}
+            >
+              Yes
+            </button>
+            <button className={"btn btn-ghost"}>Cancel</button>
+          </div>
+        </form>
+      </dialog>
+    </>
   )
 }
 
