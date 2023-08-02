@@ -8,7 +8,6 @@ import { useMe } from "@/api/auth/hooks"
 import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
-import Avatar from "@/components/Avatar"
 import { UserInfo } from "@/components/profiles/UserInfo"
 
 /* TODO: add placeholders */
@@ -26,29 +25,7 @@ const UserPage: NextPage = () => {
 
   return (
     <>
-      <div className={"hero"}>
-        <div className={"hero-content px-0"}>
-          <div
-            className={
-              "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3"
-            }
-          >
-            <div className={"card-body sm:flex-row sm:gap-5"}>
-              <Avatar user={user} size={50} className={"w-24 sm:w-52 self-center p-1"} />
-              <div className={"self-center text-sm"}>
-                <UserInfo user={user} />
-              </div>
-            </div>
-
-            {user.bio && (
-              <div className={"mb-5 text-center"}>
-                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
-                <div className={"text-sm"}>{user.bio}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <UserInfo user={user} isOwnProfile />
 
       <div className={"text-center m-3"}>
         <Link href={"/create"} className={"button"}>

@@ -7,7 +7,8 @@ import { SWRConfig } from "swr"
 
 import { Post, User } from "@/custom"
 import { PostList } from "@/components/posts/list"
-import Avatar from "@/components/Avatar"
+import { UserInfo } from "@/components/profiles/UserInfo"
+import { useUser } from "@/api/users/hooks"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   return (
@@ -18,30 +19,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
         },
       }}
     >
-      <div className={"hero"}>
-        <div className={"hero-content px-0"}>
-          <div
-            className={
-              "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3"
-            }
-          >
-            <div className={"card-body sm:flex-row sm:gap-5"}>
-              <Avatar user={user} size={200} className={"w-24 sm:w-48 m-auto self-center"} />
-              <div className={"self-center font-light text-center sm:text-left"}>
-                {/* TODO: add user info if they follows you */}
-                {"Hey! I'm "}
-                <p className={"text-4xl text-primary font-Yesteryear mx-1"}>{user.username}</p>
-              </div>
-            </div>
-            {user.bio && (
-              <div className={"mb-5 text-center"}>
-                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
-                <div className={"text-sm"}>{user.bio}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <UserInfoWrapper userId={user.id} />
 
       <ChatButton userId={user.id} />
 
@@ -56,6 +34,14 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
       </div>
     </SWRConfig>
   )
+}
+
+const UserInfoWrapper: FC<{ userId: number }> = ({ userId }) => {
+  const { user } = useUser(userId)
+
+  if (!user) return null
+
+  return <UserInfo user={user} />
 }
 
 const ChatButton: FC<{ userId: number }> = ({ userId }) => {
