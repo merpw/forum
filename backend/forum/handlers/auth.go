@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/mail"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -71,10 +72,13 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody.Username = strings.TrimSpace(requestBody.Username)
-	if len(requestBody.Username) < MinUsernameLength {
+	if len(requestBody.Username) == 0 {
+		requestBody.Username = "User" + strconv.Itoa(h.DB.GetLastUserId()+1)
+	} else if len(requestBody.Username) < MinUsernameLength {
 		http.Error(w, "Username is too short", http.StatusBadRequest)
 		return
 	}
+
 	if len(requestBody.Username) > MaxUsernameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
 		return
