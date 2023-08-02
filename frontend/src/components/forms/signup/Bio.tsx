@@ -5,6 +5,7 @@ const Bio: FC = () => {
     <div className={"form-control"}>
       <label className={"label"}>
         <span className={"label-text"}>Bio</span>
+        <span className={"label-text-alt"}>optional</span>
       </label>
       <textarea
         name={"bio"}
