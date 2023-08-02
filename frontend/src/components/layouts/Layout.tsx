@@ -13,7 +13,7 @@ import { Provider } from "react-redux"
 import Link from "next/link"
 
 import { useMe } from "@/api/auth/hooks"
-import Navbar from "@/components/navbar"
+import Navbar from "@/components/layouts/Navbar"
 import store from "@/store/store"
 import ChatsSection from "@/components/chats/section/ChatSection"
 

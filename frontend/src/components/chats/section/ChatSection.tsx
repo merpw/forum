@@ -3,7 +3,7 @@
 import { FC, useCallback, useContext, useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 
-import { ChatSectionCollapsedContext } from "@/components/layout"
+import { ChatSectionCollapsedContext } from "@/components/layouts/Layout"
 import { useChatIds } from "@/api/chats/chats"
 import ChatList from "@/components/chats/section/ChatList"
 import UserList from "@/components/chats/section/UserList"
