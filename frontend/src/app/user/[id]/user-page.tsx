@@ -1,6 +1,9 @@
+"use client"
+
 import { NextPage } from "next"
 import { FC } from "react"
 import Link from "next/link"
+import { SWRConfig } from "swr"
 
 import { Post, User } from "@/custom"
 import { PostList } from "@/components/posts/list"
@@ -8,7 +11,13 @@ import Avatar from "@/components/Avatar"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   return (
-    <>
+    <SWRConfig
+      value={{
+        fallback: {
+          [`/api/users/${user.id}`]: user,
+        },
+      }}
+    >
       <div className={"hero"}>
         <div className={"hero-content px-0"}>
           <div
@@ -45,7 +54,7 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
         </div>
         <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
       </div>
-    </>
+    </SWRConfig>
   )
 }
 
