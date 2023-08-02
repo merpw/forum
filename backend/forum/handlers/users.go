@@ -10,7 +10,7 @@ import (
 // usersAll returns all userIds in alphabetical order.
 //
 // GET /api/users
-func (h *Handlers) usersAll(w http.ResponseWriter, r *http.Request) {
+func (h *Handlers) usersAll(w http.ResponseWriter) {
 	userIds := h.DB.GetAllUserIds()
 
 	server.SendObject(w, userIds)

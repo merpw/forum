@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"net/mail"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -34,6 +33,7 @@ const (
 	MinEmailLength = 3
 	MaxEmailLength = 254
 
+	MinBioLength = 0
 	MaxBioLength = 200
 )
 
@@ -62,8 +62,10 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		LastName  string `json:"last_name"`
 		DoB       string `json:"dob"`
 		Gender    string `json:"gender"`
+		Bio       string `json:"bio"`
 		Avatar    string `json:"avatar"`
 		Bio       string `json:"bio"`
+		Privacy   int    `json:"privacy"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -92,6 +94,17 @@ skipLengthCheck:
 
 	if len(requestBody.Username) > MaxUsernameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
+		return
+	}
+
+	if !AvatarRegex.MatchString(requestBody.Avatar) {
+		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
+		return
+	}
+
+	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
+	if len(requestBody.Bio) < MinBioLength || len(requestBody.Bio) > MaxBioLength {
+		http.Error(w, "Bio length is invalid", http.StatusBadRequest)
 		return
 	}
 
@@ -154,6 +167,7 @@ skipLengthCheck:
 	}
 
 	requestBody.Email = strings.TrimSpace(strings.ToLower(requestBody.Email))
+	// check if email is a valid email
 	_, err = mail.ParseAddress(requestBody.Email)
 
 	if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) {
@@ -213,6 +227,11 @@ skipAvatarCheck:
 		return
 	}
 
+	if requestBody.Privacy < 0 || requestBody.Privacy > 2 {
+		http.Error(w, "Privacy is invalid", http.StatusBadRequest)
+		return
+	}
+
 	id := h.DB.AddUser(
 		requestBody.Username,
 		requestBody.Email,
@@ -223,6 +242,7 @@ skipAvatarCheck:
 		sql.NullString{String: requestBody.Gender, Valid: true},
 		avatar,
 		bio,
+		requestBody.Privacy,
 	)
 
 	external.RevalidateURL(fmt.Sprintf("/user/%d", id))

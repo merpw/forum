@@ -12,4 +12,5 @@ var Migrations = migrate.Migrations{
 	v004,
 	v005,
 	v006,
+	v007,
 }

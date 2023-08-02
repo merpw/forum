@@ -75,6 +75,7 @@ func (h *Handlers) Handler() http.Handler {
 		// method GET endpoints
 		server.NewRoute(http.MethodGet, `/api/me`, h.me),
 
+		server.NewRoute(http.MethodGet, `/api/me/privacy`, h.mePrivacy),
 		server.NewRoute(http.MethodGet, `/api/me/posts`, h.mePosts),
 		server.NewRoute(http.MethodGet, `/api/me/posts/liked`, h.mePostsLiked),
 

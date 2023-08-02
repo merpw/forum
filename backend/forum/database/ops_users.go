@@ -91,7 +91,7 @@ func (db DB) GetUserByLogin(login string) *User {
 	var user User
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -101,6 +101,34 @@ func (db DB) GetUserByLogin(login string) *User {
 	}
 
 	return &user
+}
+
+func (db DB) UpdateUserPrivacy(privacy, id int) bool {
+	_, err := db.Exec("UPDATE users SET privacy = ? WHERE id = ?", privacy, id)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return privacy == 1
+}
+
+func (db DB) GetUserPrivacy(id int) int {
+	query, err := db.Query("SELECT privacy FROM users WHERE id = ? COLLATE NOCASE", id)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var privacy int
+	err = query.Scan(&privacy)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
+
+	return privacy
 }
 
 // AddUser adds user to database, returns id of new user
