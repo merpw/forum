@@ -82,6 +82,45 @@ func TestMe(t *testing.T) {
 	})
 }
 
+func TestMePrivacy(t *testing.T) {
+	testServer := NewTestServer(t)
+
+	t.Run("Unauthorized", func(t *testing.T) {
+		cli := testServer.TestClient()
+		cli.TestPost(t, "/api/me/privacy", nil, http.StatusUnauthorized)
+	})
+
+	t.Run("Valid", func(t *testing.T) {
+		cli := testServer.TestClient()
+		cli.TestAuth(t)
+
+		t.Run("Private to public", func(t *testing.T) {
+			var privacy bool
+			_, response := cli.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
+			err := json.Unmarshal(response, &privacy)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if privacy != false {
+				t.Fatalf("invalid privacy, expected %t, got %t", false, privacy)
+			}
+		})
+
+		t.Run("Public to private", func(t *testing.T) {
+			var privacy bool
+			_, response := cli.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
+			err := json.Unmarshal(response, &privacy)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if privacy != true {
+				t.Fatalf("invalid privacy, expected %t, got %t", true, privacy)
+			}
+		})
+	})
+
+}
+
 func TestMePosts(t *testing.T) {
 	testServer := NewTestServer(t)
 

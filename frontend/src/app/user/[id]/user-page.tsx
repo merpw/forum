@@ -1,40 +1,31 @@
-import { NextPage } from "next"
-import { FC } from "react"
-import Link from "next/link"
+"use client"
 
-import { Post, User } from "@/custom"
+import { NextPage } from "next"
+import { FC, useRef, useState } from "react"
+import Link from "next/link"
+import { SWRConfig } from "swr"
+
+import { FollowStatus, Post, User } from "@/custom"
 import { PostList } from "@/components/posts/list"
-import Avatar from "@/components/Avatar"
+import { UserInfo } from "@/components/profiles/UserInfo"
+import { followUser, useUser } from "@/api/users/hooks"
 
 const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
   return (
-    <>
-      <div className={"hero"}>
-        <div className={"hero-content px-0"}>
-          <div
-            className={
-              "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3"
-            }
-          >
-            <div className={"card-body sm:flex-row sm:gap-5"}>
-              <Avatar user={user} size={200} className={"w-24 sm:w-48 m-auto self-center"} />
-              <div className={"self-center font-light text-center sm:text-left"}>
-                {/* TODO: add user info if they follows you */}
-                {"Hey! I'm "}
-                <p className={"text-4xl text-primary font-Yesteryear mx-1"}>{user.username}</p>
-              </div>
-            </div>
-            {user.bio && (
-              <div className={"mb-5 text-center"}>
-                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
-                <div className={"text-sm"}>{user.bio}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+    <SWRConfig
+      value={{
+        fallback: {
+          [`/api/users/${user.id}`]: user,
+        },
+      }}
+    >
+      <UserInfoWrapper userId={user.id} />
 
-      <ChatButton userId={user.id} />
+      <div className={"flex flex-wrap justify-center gap-3"}>
+        <FollowButton userId={user.id} followStatus={user.followStatus} />
+
+        <ChatButton userId={user.id} />
+      </div>
 
       <div className={"mt-5"}>
         <div className={"text-center"}>
@@ -45,37 +36,127 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
         </div>
         <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
       </div>
-    </>
+    </SWRConfig>
   )
+}
+
+const UserInfoWrapper: FC<{ userId: number }> = ({ userId }) => {
+  const { user } = useUser(userId)
+
+  if (!user) return null
+
+  return <UserInfo user={user} />
 }
 
 const ChatButton: FC<{ userId: number }> = ({ userId }) => {
   return (
-    <div className={"text-center m-3"}>
-      <Link href={`/chat/u${userId}`}>
-        <button className={"button"}>
-          <span className={"my-auto"}>
+    <Link href={`/chat/u${userId}`}>
+      <button className={"button"}>
+        <span className={"my-auto"}>
+          <svg
+            xmlns={"http://www.w3.org/2000/svg"}
+            fill={"none"}
+            viewBox={"0 0 24 24"}
+            strokeWidth={1.5}
+            stroke={"currentColor"}
+            className={"w-5 h-5 scale-x-[-1]"}
+          >
+            <path
+              strokeLinecap={"round"}
+              strokeLinejoin={"round"}
+              d={
+                "M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+              }
+            />
+          </svg>
+        </span>
+        <span className={"text-xs"}>{"Let's chat!"}</span>
+      </button>
+    </Link>
+  )
+}
+
+const FollowButton: FC<{ userId: number; followStatus: FollowStatus | undefined }> = ({
+  userId,
+  followStatus,
+}) => {
+  const [currentFollowStatus, setCurrentFollowStatus] = useState(followStatus)
+
+  const popupRef = useRef<HTMLDialogElement>(null)
+
+  return (
+    <>
+      <button
+        className={"button"}
+        onClick={() => {
+          if (currentFollowStatus) {
+            popupRef.current?.showModal()
+            return
+          }
+          followUser(userId).then(setCurrentFollowStatus)
+        }}
+      >
+        {currentFollowStatus ? (
+          <>
             <svg
               xmlns={"http://www.w3.org/2000/svg"}
               fill={"none"}
               viewBox={"0 0 24 24"}
               strokeWidth={1.5}
               stroke={"currentColor"}
-              className={"w-5 h-5 scale-x-[-1]"}
+              className={"w-5 h-5"}
             >
               <path
                 strokeLinecap={"round"}
                 strokeLinejoin={"round"}
                 d={
-                  "M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                  "M22 10.5h-6m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
                 }
               />
             </svg>
-          </span>
-          <span className={"text-xs"}>{"Let's chat!"}</span>
-        </button>
-      </Link>
-    </div>
+            {currentFollowStatus === 1 ? "Unfollow" : "Cancel request"}
+          </>
+        ) : (
+          <>
+            <svg
+              xmlns={"http://www.w3.org/2000/svg"}
+              fill={"none"}
+              viewBox={"0 0 24 24"}
+              strokeWidth={1.5}
+              stroke={"currentColor"}
+              className={"w-5 h-5"}
+            >
+              <path
+                strokeLinecap={"round"}
+                strokeLinejoin={"round"}
+                d={
+                  "M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z"
+                }
+              />
+            </svg>
+            Follow
+          </>
+        )}
+      </button>
+      <dialog ref={popupRef} className={"modal"}>
+        <form method={"dialog"} className={"modal-box text-center"}>
+          <p className={"py-4"}>
+            Are you sure that you want to{" "}
+            {currentFollowStatus === 1 ? `unfollow` : "cancel follow request"}?
+          </p>
+          <div className={"modal-action justify-center"}>
+            {/* if there is a button in form, it will close the modal */}
+            <button
+              className={"btn"}
+              onClick={() => followUser(userId).then(setCurrentFollowStatus)}
+            >
+              Yes
+            </button>
+            <button className={"btn btn-ghost"}>Cancel</button>
+          </div>
+        </form>
+      </dialog>
+    </>
   )
 }
 

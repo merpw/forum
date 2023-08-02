@@ -82,8 +82,15 @@ func (h *Handlers) Handler() http.Handler {
 
 		server.NewRoute(http.MethodGet, `/api/posts/(\d+)/comment/(\d+)/reaction`, h.postsIdCommentIdReaction),
 
+		server.NewRoute(http.MethodGet, `/api/invitations`, h.invitations),
+		server.NewRoute(http.MethodGet, `/api/invitations/(/id+)`, h.invitationsId),
+
 		// method POST endpoints
 		server.NewRoute(http.MethodPost, `/api/logout`, h.logout),
+
+		server.NewRoute(http.MethodPost, `/api/me/privacy`, h.mePrivacy),
+
+		server.NewRoute(http.MethodPost, `/api/users/(\d+)/follow`, h.usersIdFollow),
 
 		server.NewRoute(http.MethodPost, `/api/posts/create`, h.postsCreate),
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/like`, h.postsIdLike),
@@ -93,6 +100,8 @@ func (h *Handlers) Handler() http.Handler {
 
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/comment/(\d+)/like`, h.postsIdCommentIdLike),
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/comment/(\d+)/dislike`, h.postsIdCommentIdDislike),
+
+		server.NewRoute(http.MethodPost, `/api/invitations/(/id+)/respond`, h.invitationsIdRespond),
 	}
 
 	var internalRoutes = []server.Route{

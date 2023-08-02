@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useLogOut, useMe } from "@/api/auth/hooks"
 import Avatar from "@/components/Avatar"
 
-const UserInfo = () => {
+const NavUserInfo = () => {
   const { user, isError, isLoading, isLoggedIn } = useMe()
   const logOut = useLogOut()
 
@@ -69,4 +69,4 @@ const UserInfo = () => {
   )
 }
 
-export default UserInfo
+export default NavUserInfo

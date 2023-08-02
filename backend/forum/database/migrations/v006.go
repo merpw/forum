@@ -5,7 +5,7 @@ import (
 	"database/sql"
 )
 
-// v004 adds first_name, last_name, dob and gender to the users table
+// v006 adds 'avatar' and 'bio' columns to 'users' table
 var v006 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`

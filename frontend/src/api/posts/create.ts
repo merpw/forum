@@ -7,7 +7,7 @@ export const CreatePost = async (postData: {
   categories: string[]
 }) =>
   axios
-    .post<number>("/api/posts/create", postData, { withCredentials: true })
+    .post<number>("/api/posts/create", postData)
     .then((res) => res.data)
     .catch((err) => {
       throw new Error(err.response?.data?.length < 200 ? err.response.data : "Unexpected error")

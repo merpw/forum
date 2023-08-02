@@ -15,14 +15,19 @@ export type Post = {
 export type User = {
   username: string
   id: number
-  email: string
+  email?: string
   first_name?: string
   last_name?: string
   dob?: string
   gender?: string
   avatar?: string
   bio?: string
+  privacy?: boolean
+  followStatus?: FollowStatus
 }
+
+/** 0 - not following, 1 - following, 2 - requested */
+export type FollowStatus = 0 | 1 | 2
 
 export type Comment = {
   id: number
