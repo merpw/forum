@@ -7,7 +7,7 @@ const Username: FC = () => {
     <div className={"form-control mt-3"}>
       <label className={"label pt-0"}>
         <span className={"label-text"}>Username</span>
-        <span className={"label-text-alt"}>optional</span>
+        <span className={"label-text-alt text-neutral"}>optional</span>
       </label>
       <input
         type={"text"}
@@ -15,7 +15,7 @@ const Username: FC = () => {
         name={"username"}
         minLength={3}
         maxLength={15}
-        placeholder={"u123456"}
+        placeholder={"username"}
         onInput={(e) => {
           const updatedValue = e.currentTarget.value.replace(/\W/g, "")
           if (updatedValue !== e.currentTarget.value) {
