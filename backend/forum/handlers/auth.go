@@ -182,15 +182,30 @@ skipLengthCheck:
 		return
 	}
 
-	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
+	requestBody.Avatar = strings.TrimSpace(requestBody.Avatar)
+	var avatar sql.NullString
+
+	if len(requestBody.Avatar) == 0 {
+		avatar = sql.NullString{String: "", Valid: false}
+		goto skipAvatarCheck
+	} else {
+		avatar = sql.NullString{String: requestBody.Avatar, Valid: true}
+	}
 
 	if !AvatarRegex.MatchString(requestBody.Avatar) {
 		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
 		return
 	}
 
+skipAvatarCheck:
+
+	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
+	var bio sql.NullString
+
 	if len(requestBody.Bio) == 0 {
-		requestBody.Bio = sql.NullString{String: "", Valid: false}.String
+		bio = sql.NullString{String: "", Valid: false}
+	} else {
+		bio = sql.NullString{String: requestBody.Bio, Valid: true}
 	}
 
 	if len(requestBody.Bio) > MaxBioLength {
@@ -206,8 +221,8 @@ skipLengthCheck:
 		sql.NullString{String: requestBody.LastName, Valid: true},
 		sql.NullString{String: requestBody.DoB, Valid: true},
 		sql.NullString{String: requestBody.Gender, Valid: true},
-		sql.NullString{String: requestBody.Avatar, Valid: true},
-		sql.NullString{String: requestBody.Bio, Valid: true},
+		avatar,
+		bio,
 	)
 
 	external.RevalidateURL(fmt.Sprintf("/user/%d", id))
