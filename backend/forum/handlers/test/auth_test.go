@@ -12,15 +12,33 @@ func TestSignUp(t *testing.T) {
 	testServer := NewTestServer(t)
 
 	t.Run("Valid", func(t *testing.T) {
-		cli := testServer.TestClient()
-		client := NewClientData()
-		cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		t.Run("Full", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
 
-		client.Email = "another@email.com"
-		client.Username = ""
-		client.Bio = ""
-		client.Avatar = ""
-		cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		})
+
+		t.Run("Without username", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			client.Username = ""
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		})
+
+		t.Run("Without bio", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			client.Bio = ""
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		})
+
+		t.Run("Without avatar", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			client.Avatar = ""
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		})
 
 	})
 
@@ -237,7 +255,7 @@ func TestLogout(t *testing.T) {
 
 	cli := testServer.TestClient()
 
-	// cli.TestPost(t, "/api/logout", nil, http.StatusUnauthorized)
+	cli.TestPost(t, "/api/logout", nil, http.StatusUnauthorized)
 
 	cli.TestAuth(t)
 

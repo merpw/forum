@@ -118,8 +118,8 @@ func (db DB) AddUser(
 		lastName.String,
 		dob.String,
 		gender.String,
-		avatar.String,
-		bio.String,
+		avatar,
+		bio,
 	)
 	if err != nil {
 		log.Panic(err)
