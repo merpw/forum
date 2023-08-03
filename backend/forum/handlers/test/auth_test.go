@@ -2,7 +2,9 @@ package server_test
 
 import (
 	. "backend/forum/handlers/test/server"
+	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -19,6 +21,7 @@ func TestSignUp(t *testing.T) {
 		client.Email = "another@email.com"
 		client.Username = ""
 		client.Bio = ""
+		client.Avatar = ""
 		cli.TestPost(t, "/api/signup", client, http.StatusOK)
 
 	})
@@ -139,7 +142,7 @@ func TestSignUp(t *testing.T) {
 		t.Run("Avatar", func(t *testing.T) {
 			badClientData := NewClientData()
 
-			badClientData.Bio = strings.Repeat("a", 1000)
+			badClientData.Avatar = strconv.Itoa(rand.Intn(10)) + ".png"
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 		})
 

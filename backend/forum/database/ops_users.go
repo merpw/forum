@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 )
 
@@ -50,8 +49,6 @@ func (db DB) GetUserById(id int) *User {
 	if err = query.Close(); err != nil {
 		log.Panic(err)
 	}
-
-	fmt.Println("User in GetUserById", user)
 
 	return &user
 }
