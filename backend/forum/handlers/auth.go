@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/mail"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -32,10 +33,14 @@ const (
 
 	MinEmailLength = 3
 	MaxEmailLength = 254
+
+	MaxBioLength = 200
 )
 
 var (
-	UsernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+	UsernameRegex   = regexp.MustCompile(`^[a-zA-Z0-9_]+$`)
+	IdUsernameRegex = regexp.MustCompile(`^u\d+$`)
+	AvatarRegex     = regexp.MustCompile(`^[0-9]\.jpg$`)
 
 	MinLoginLength = int(math.Min(MinUsernameLength, MinEmailLength))
 	MaxLoginLength = int(math.Max(MaxUsernameLength, MaxEmailLength))
@@ -57,6 +62,8 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		LastName  string `json:"last_name"`
 		DoB       string `json:"dob"`
 		Gender    string `json:"gender"`
+		Avatar    string `json:"avatar"`
+		Bio       string `json:"bio"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -65,10 +72,24 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody.Username = strings.TrimSpace(requestBody.Username)
+
+	if IdUsernameRegex.MatchString(requestBody.Username) {
+		http.Error(w, "Username format is not allowed", http.StatusBadRequest)
+		return
+	}
+
+	if len(requestBody.Username) == 0 {
+		requestBody.Username = "u" + strconv.Itoa(h.DB.GetLastUserId()+1)
+		goto skipLengthCheck
+	}
+
 	if len(requestBody.Username) < MinUsernameLength {
 		http.Error(w, "Username is too short", http.StatusBadRequest)
 		return
 	}
+
+skipLengthCheck:
+
 	if len(requestBody.Username) > MaxUsernameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
 		return
@@ -84,20 +105,25 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Username is already in use", http.StatusBadRequest)
 		return
 	}
+
 	requestBody.FirstName = strings.TrimSpace(requestBody.FirstName)
+
 	if len(requestBody.FirstName) < MinFirstNameLength {
 		http.Error(w, "First name is not valid", http.StatusBadRequest)
 		return
 	}
+
 	if len(requestBody.FirstName) > MaxFirstNameLength {
 		http.Error(w, "First name is too long", http.StatusBadRequest)
 		return
 	}
+
 	requestBody.LastName = strings.TrimSpace(requestBody.LastName)
 	if len(requestBody.LastName) < MinLastNameLength {
 		http.Error(w, "Last name is not valid", http.StatusBadRequest)
 		return
 	}
+
 	if len(requestBody.LastName) > MaxLastNameLength {
 		http.Error(w, "Last name is too long", http.StatusBadRequest)
 		return
@@ -113,6 +139,7 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
 		return
 	}
+
 	now := time.Now()
 	minDoB := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
 
@@ -127,8 +154,8 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody.Email = strings.TrimSpace(strings.ToLower(requestBody.Email))
-	// check if email is a valid email
 	_, err = mail.ParseAddress(requestBody.Email)
+
 	if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) {
 		http.Error(w, "Email is not valid", http.StatusBadRequest)
 		return
@@ -155,6 +182,37 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	requestBody.Avatar = strings.TrimSpace(requestBody.Avatar)
+	var avatar sql.NullString
+
+	if len(requestBody.Avatar) == 0 {
+		avatar = sql.NullString{String: "", Valid: false}
+		goto skipAvatarCheck
+	} else {
+		avatar = sql.NullString{String: requestBody.Avatar, Valid: true}
+	}
+
+	if !AvatarRegex.MatchString(requestBody.Avatar) {
+		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
+		return
+	}
+
+skipAvatarCheck:
+
+	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
+	var bio sql.NullString
+
+	if len(requestBody.Bio) == 0 {
+		bio = sql.NullString{String: "", Valid: false}
+	} else {
+		bio = sql.NullString{String: requestBody.Bio, Valid: true}
+	}
+
+	if len(requestBody.Bio) > MaxBioLength {
+		http.Error(w, "Bio is too long", http.StatusBadRequest)
+		return
+	}
+
 	id := h.DB.AddUser(
 		requestBody.Username,
 		requestBody.Email,
@@ -163,6 +221,8 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		sql.NullString{String: requestBody.LastName, Valid: true},
 		sql.NullString{String: requestBody.DoB, Valid: true},
 		sql.NullString{String: requestBody.Gender, Valid: true},
+		avatar,
+		bio,
 	)
 
 	external.RevalidateURL(fmt.Sprintf("/user/%d", id))
@@ -185,7 +245,8 @@ func (h *Handlers) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(requestBody.Login) < MinLoginLength || len(requestBody.Login) > MaxLoginLength ||
+	if len(requestBody.Login) < MinLoginLength && !IdUsernameRegex.MatchString(requestBody.Login) ||
+		len(requestBody.Login) > MaxLoginLength ||
 		len(requestBody.Password) < MinPasswordLength || len(requestBody.Password) > MaxPasswordLength {
 		http.Error(w, "Invalid login or password", http.StatusBadRequest)
 		return
