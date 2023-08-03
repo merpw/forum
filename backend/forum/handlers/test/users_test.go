@@ -26,6 +26,8 @@ func TestUser(t *testing.T) {
 		var responseData struct {
 			Id       int    `json:"id"`
 			Username string `json:"username"`
+			Avatar   string `json:"avatar"`
+			Bio      string `json:"bio"`
 		}
 
 		_, respBody := cli1.TestGet(t, "/api/users/1", http.StatusOK)
@@ -42,6 +44,14 @@ func TestUser(t *testing.T) {
 
 			if responseData.Username != cli1.Username {
 				t.Fatalf("invalid username, expected %s, got %s", cli1.Username, responseData.Username)
+			}
+
+			if responseData.Bio != cli1.Bio {
+				t.Fatalf("invalid bio, expected %s, got %s", cli1.Bio, responseData.Bio)
+			}
+
+			if responseData.Avatar != cli1.Avatar {
+				t.Fatalf("invalid avatar, expected %s, got %s", cli1.Avatar, responseData.Avatar)
 			}
 		}
 
