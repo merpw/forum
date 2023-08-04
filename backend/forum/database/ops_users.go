@@ -42,7 +42,7 @@ func (db DB) GetUserById(id int) *User {
 	}
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio, &user.Privacy)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -91,7 +91,7 @@ func (db DB) GetUserByLogin(login string) *User {
 	var user User
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio, &user.Privacy)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -118,6 +118,10 @@ func (db DB) GetUserPrivacy(id int) int {
 		log.Panic(err)
 	}
 
+	if !query.Next() {
+		return -1
+	}
+
 	var privacy int
 	err = query.Scan(&privacy)
 	if err != nil {
@@ -138,7 +142,7 @@ func (db DB) AddUser(
 
 	result, err := db.Exec(
 		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar, privacy)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		username,
 		email,
 		password,

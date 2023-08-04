@@ -82,29 +82,15 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 
 	if len(requestBody.Username) == 0 {
 		requestBody.Username = "u" + strconv.Itoa(h.DB.GetLastUserId()+1)
-		goto skipLengthCheck
 	}
 
-	if len(requestBody.Username) < MinUsernameLength {
+	if len(requestBody.Username) < MinUsernameLength && !IdUsernameRegex.MatchString(requestBody.Username) {
 		http.Error(w, "Username is too short", http.StatusBadRequest)
 		return
 	}
 
-skipLengthCheck:
-
 	if len(requestBody.Username) > MaxUsernameLength {
 		http.Error(w, "Username is too long", http.StatusBadRequest)
-		return
-	}
-
-	if !AvatarRegex.MatchString(requestBody.Avatar) {
-		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
-		return
-	}
-
-	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
-	if len(requestBody.Bio) < MinBioLength || len(requestBody.Bio) > MaxBioLength {
-		http.Error(w, "Bio length is invalid", http.StatusBadRequest)
 		return
 	}
 
@@ -201,17 +187,14 @@ skipLengthCheck:
 
 	if len(requestBody.Avatar) == 0 {
 		avatar = sql.NullString{String: "", Valid: false}
-		goto skipAvatarCheck
 	} else {
 		avatar = sql.NullString{String: requestBody.Avatar, Valid: true}
 	}
 
-	if !AvatarRegex.MatchString(requestBody.Avatar) {
+	if !AvatarRegex.MatchString(requestBody.Avatar) && len(requestBody.Avatar) != 0 {
 		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
 		return
 	}
-
-skipAvatarCheck:
 
 	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
 	var bio sql.NullString
