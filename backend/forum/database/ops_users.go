@@ -1,7 +1,6 @@
 package database
 
 import (
-	"backend/forum/handlers"
 	"database/sql"
 	"log"
 )
@@ -110,7 +109,7 @@ func (db DB) UpdateUserPrivacy(privacy, id int) bool {
 		log.Panic(err)
 	}
 
-	return privacy == handlers.PRIVATE
+	return privacy == 1
 }
 
 func (db DB) GetUserPrivacy(id int) int {
@@ -135,10 +134,10 @@ func (db DB) GetUserPrivacy(id int) int {
 // AddUser adds user to database, returns id of new user
 func (db DB) AddUser(
 	username, email, password string,
-	firstName, lastName, dob, gender, bio, avatar sql.NullString) int {
+	firstName, lastName, dob, gender, bio, avatar sql.NullString, privacy int) int {
 
 	result, err := db.Exec(
-		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar)
+		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar, privacy)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		username,
 		email,
@@ -149,6 +148,7 @@ func (db DB) AddUser(
 		gender.String,
 		avatar,
 		bio,
+		privacy,
 	)
 	if err != nil {
 		log.Panic(err)

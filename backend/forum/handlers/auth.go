@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/mail"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -64,7 +65,6 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		Gender    string `json:"gender"`
 		Bio       string `json:"bio"`
 		Avatar    string `json:"avatar"`
-		Bio       string `json:"bio"`
 		Privacy   int    `json:"privacy"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -227,7 +227,7 @@ skipAvatarCheck:
 		return
 	}
 
-	if requestBody.Privacy < 0 || requestBody.Privacy > 2 {
+	if requestBody.Privacy < 0 || requestBody.Privacy > 1 {
 		http.Error(w, "Privacy is invalid", http.StatusBadRequest)
 		return
 	}
