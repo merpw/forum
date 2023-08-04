@@ -9,7 +9,7 @@ import (
 var v007 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
-		CREATE TABLE followers (
+		CREATE TABLE IF NOT EXISTS followers (
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL,
 			follower_id INTEGER NOT NULL,
@@ -32,7 +32,7 @@ var v007 = migrate.Migration{
 
 		_, err := db.Exec(`
 		ALTER TABLE users DROP COLUMN privacy;
-		DROP TABLE followers;
+		DROP TABLE IF EXISTS followers;
 		VACUUM;
 `)
 		if err != nil {
