@@ -10,13 +10,14 @@ import (
 // usersAll returns all userIds in alphabetical order.
 //
 // GET /api/users
-func (h *Handlers) usersAll(w http.ResponseWriter) {
+func (h *Handlers) usersAll(w http.ResponseWriter, r *http.Request) {
 	userIds := h.DB.GetAllUserIds()
 
 	server.SendObject(w, userIds)
 }
 
 // usersId returns the info of the user with the given id
+// If profile is Private, send only SafeUser, else, send entire user.
 //
 //	GET /api/users/:id
 func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
@@ -35,12 +36,36 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	server.SendObject(w, SafeUser{
-		Id:       user.Id,
-		Username: user.Username,
-		Avatar:   user.Avatar.String,
-		Bio:      user.Bio.String,
-	})
+	response := struct {
+		SafeUser
+		Email     string `json:"email"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+		DoB       string `json:"dob,omitempty"`
+		Gender    string `json:"gender,omitempty"`
+		Avatar    string `json:"avatar,omitempty"`
+		Bio       string `json:"bio,omitempty"`
+	}{
+		SafeUser: SafeUser{
+			Id:       user.Id,
+			Username: user.Username,
+			Avatar:   user.Avatar.String,
+			Bio:      user.Bio.String,
+		},
+		Email:     user.Email,
+		FirstName: user.FirstName.String,
+		LastName:  user.LastName.String,
+		DoB:       user.DoB.String,
+		Gender:    user.Gender.String,
+		Avatar:    user.Avatar.String,
+		Bio:       user.Bio.String,
+	}
+
+	if h.DB.GetUserPrivacy(userId) == PRIVATE {
+		server.SendObject(w, response.SafeUser)
+	} else {
+		server.SendObject(w, response)
+	}
 }
 
 // usersIdPosts Returns the posts of the user with the given id.

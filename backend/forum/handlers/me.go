@@ -5,11 +5,6 @@ import (
 	"net/http"
 )
 
-const (
-	PUBLIC = iota
-	PRIVATE
-)
-
 // me returns the currently logged-in user's information.
 func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)

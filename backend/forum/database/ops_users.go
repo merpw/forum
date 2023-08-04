@@ -1,6 +1,7 @@
 package database
 
 import (
+	"backend/forum/handlers"
 	"database/sql"
 	"log"
 )
@@ -109,7 +110,7 @@ func (db DB) UpdateUserPrivacy(privacy, id int) bool {
 		log.Panic(err)
 	}
 
-	return privacy == 1
+	return privacy == handlers.PRIVATE
 }
 
 func (db DB) GetUserPrivacy(id int) int {

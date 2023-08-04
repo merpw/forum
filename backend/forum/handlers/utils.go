@@ -1,5 +1,10 @@
 package handlers
 
+const (
+	PUBLIC = iota
+	PRIVATE
+)
+
 type SafeUser struct {
 	Id       int    `json:"id"`
 	Username string `json:"username"`
