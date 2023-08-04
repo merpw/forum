@@ -8,9 +8,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"net/mail"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -73,77 +71,33 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestBody.Username = strings.TrimSpace(requestBody.Username)
-
-	if IdUsernameRegex.MatchString(requestBody.Username) {
-		http.Error(w, "Username format is not allowed", http.StatusBadRequest)
+	username, usernameError := h.checkUserName(requestBody.Username)
+	if usernameError != nil {
+		http.Error(w, usernameError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if len(requestBody.Username) == 0 {
-		requestBody.Username = "u" + strconv.Itoa(h.DB.GetLastUserId()+1)
-	}
-
-	if len(requestBody.Username) < MinUsernameLength && !IdUsernameRegex.MatchString(requestBody.Username) {
-		http.Error(w, "Username is too short", http.StatusBadRequest)
+	firstName, firstNameError := h.checkFirstName(requestBody.FirstName)
+	if firstNameError != nil {
+		http.Error(w, firstNameError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if len(requestBody.Username) > MaxUsernameLength {
-		http.Error(w, "Username is too long", http.StatusBadRequest)
+	lastName, lastNameError := h.checkLastName(requestBody.LastName)
+	if lastNameError != nil {
+		http.Error(w, lastNameError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if !UsernameRegex.MatchString(requestBody.Username) {
-		http.Error(w, "Username is not valid, only letters, numbers and underscores are allowed",
-			http.StatusBadRequest)
+	dob, dobError := h.checkDoB(requestBody.DoB)
+	if dobError != nil {
+		http.Error(w, dobError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if h.DB.IsNameTaken(requestBody.Username) {
-		http.Error(w, "Username is already in use", http.StatusBadRequest)
-		return
-	}
-
-	requestBody.FirstName = strings.TrimSpace(requestBody.FirstName)
-
-	if len(requestBody.FirstName) < MinFirstNameLength {
-		http.Error(w, "First name is not valid", http.StatusBadRequest)
-		return
-	}
-
-	if len(requestBody.FirstName) > MaxFirstNameLength {
-		http.Error(w, "First name is too long", http.StatusBadRequest)
-		return
-	}
-
-	requestBody.LastName = strings.TrimSpace(requestBody.LastName)
-	if len(requestBody.LastName) < MinLastNameLength {
-		http.Error(w, "Last name is not valid", http.StatusBadRequest)
-		return
-	}
-
-	if len(requestBody.LastName) > MaxLastNameLength {
-		http.Error(w, "Last name is too long", http.StatusBadRequest)
-		return
-	}
-
-	if requestBody.DoB == "" {
-		http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
-		return
-	}
-
-	dob, err := time.Parse("2006-01-02", requestBody.DoB)
-	if err != nil {
-		http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
-		return
-	}
-
-	now := time.Now()
-	minDoB := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
-
-	if dob.After(now) || dob.Before(minDoB) {
-		http.Error(w, "Date of birth is not valid", http.StatusBadRequest)
+	email, emailError := h.checkEmail(requestBody.Email)
+	if emailError != nil {
+		http.Error(w, emailError.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -152,61 +106,21 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	requestBody.Email = strings.TrimSpace(strings.ToLower(requestBody.Email))
-	// check if email is a valid email
-	_, err = mail.ParseAddress(requestBody.Email)
-
-	if err != nil || requestBody.Email != strings.TrimSpace(requestBody.Email) {
-		http.Error(w, "Email is not valid", http.StatusBadRequest)
+	password, passwordError := h.checkPassword(requestBody.Password)
+	if passwordError != nil {
+		http.Error(w, passwordError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if h.DB.IsEmailTaken(requestBody.Email) {
-		http.Error(w, "Email is already taken", http.StatusBadRequest)
+	avatar, avatarError := h.checkAvatar(requestBody.Avatar)
+	if avatarError != nil {
+		http.Error(w, avatarError.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if len(requestBody.Password) < MinPasswordLength {
-		http.Error(w, "Password is too short", http.StatusBadRequest)
-		return
-	}
-
-	if len(requestBody.Password) > MaxPasswordLength {
-		http.Error(w, "Password is too long", http.StatusBadRequest)
-		return
-	}
-
-	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(requestBody.Password), 10)
-	if err != nil {
-		http.Error(w, "Password is not valid", http.StatusBadRequest)
-		return
-	}
-
-	requestBody.Avatar = strings.TrimSpace(requestBody.Avatar)
-	var avatar sql.NullString
-
-	if len(requestBody.Avatar) == 0 {
-		avatar = sql.NullString{String: "", Valid: false}
-	} else {
-		avatar = sql.NullString{String: requestBody.Avatar, Valid: true}
-	}
-
-	if !AvatarRegex.MatchString(requestBody.Avatar) && len(requestBody.Avatar) != 0 {
-		http.Error(w, "Avatar file string is not valid", http.StatusBadRequest)
-		return
-	}
-
-	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
-	var bio sql.NullString
-
-	if len(requestBody.Bio) == 0 {
-		bio = sql.NullString{String: "", Valid: false}
-	} else {
-		bio = sql.NullString{String: requestBody.Bio, Valid: true}
-	}
-
-	if len(requestBody.Bio) > MaxBioLength {
-		http.Error(w, "Bio is too long", http.StatusBadRequest)
+	bio, bioError := h.checkBio(requestBody.Bio)
+	if bioError != nil {
+		http.Error(w, bioError.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -216,12 +130,12 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := h.DB.AddUser(
-		requestBody.Username,
-		requestBody.Email,
-		string(encryptedPassword),
-		sql.NullString{String: requestBody.FirstName, Valid: true},
-		sql.NullString{String: requestBody.LastName, Valid: true},
-		sql.NullString{String: requestBody.DoB, Valid: true},
+		username,
+		email,
+		password,
+		sql.NullString{String: firstName, Valid: true},
+		sql.NullString{String: lastName, Valid: true},
+		sql.NullString{String: dob, Valid: true},
 		sql.NullString{String: requestBody.Gender, Valid: true},
 		avatar,
 		bio,
