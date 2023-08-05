@@ -1,5 +1,6 @@
 import useSWR from "swr"
-import axios from "axios"
+
+import { dummyFetcher } from "@/api/invitations/dummy"
 
 export type Invitation = {
   id: number
@@ -12,7 +13,7 @@ export type Invitation = {
 /** 0-following,1-group invitation, 2-group join, 3-event */
 export type InvitationType = 0 | 1 | 2 | 3
 
-const fetcher = (url: string) => axios.get(url).then((res) => res.data)
+const fetcher = dummyFetcher
 
 export const useInvitations = () => {
   const { data, error, mutate } = useSWR<number[]>("/api/invitations", fetcher, {
