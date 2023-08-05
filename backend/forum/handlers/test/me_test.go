@@ -38,6 +38,10 @@ func TestMe(t *testing.T) {
 			Email     string `json:"email"`
 			FirstName string `json:"first_name"`
 			LastName  string `json:"last_name"`
+			DoB       string `json:"dob"`
+			Gender    string `json:"gender"`
+			Avatar    string `json:"avatar"`
+			Bio       string `json:"bio"`
 		}
 		err := json.Unmarshal(respBody, &respData)
 		if err != nil {
@@ -58,6 +62,22 @@ func TestMe(t *testing.T) {
 
 		if respData.LastName != cli.LastName {
 			t.Fatalf("invalid last name, expected %s, got %s", cli.LastName, respData.LastName)
+		}
+
+		if respData.DoB != cli.DoB {
+			t.Fatalf("invalid DoB, expected %s, got %s", cli.DoB, respData.DoB)
+		}
+
+		if respData.Gender != cli.Gender {
+			t.Fatalf("invalid gender, expected %s, got %s", cli.Gender, respData.Gender)
+		}
+
+		if respData.Avatar != cli.Avatar {
+			t.Fatalf("invalid avatar, expected %s, got %s", cli.Avatar, respData.Avatar)
+		}
+
+		if respData.Bio != cli.Bio {
+			t.Fatalf("invalid bio, expected %s, got %s", cli.Bio, respData.Bio)
 		}
 	})
 }

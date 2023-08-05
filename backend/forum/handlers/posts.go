@@ -15,11 +15,16 @@ func (h *Handlers) posts(w http.ResponseWriter, _ *http.Request) {
 	for _, post := range posts {
 		postAuthor := h.DB.GetUserById(post.AuthorId)
 		response = append(response, SafePost{
-			Id:            post.Id,
-			Title:         post.Title,
-			Description:   post.Description,
-			Date:          post.Date,
-			Author:        SafeUser{Id: postAuthor.Id, Username: postAuthor.Username},
+			Id:          post.Id,
+			Title:       post.Title,
+			Description: post.Description,
+			Date:        post.Date,
+			Author: SafeUser{
+				Id:       postAuthor.Id,
+				Username: postAuthor.Username,
+				Avatar:   postAuthor.Avatar.String,
+				Bio:      postAuthor.Bio.String,
+			},
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,
 			DislikesCount: post.DislikesCount,

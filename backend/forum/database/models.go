@@ -24,6 +24,8 @@ type User struct {
 	LastName  sql.NullString
 	DoB       sql.NullString
 	Gender    sql.NullString
+	Avatar    sql.NullString
+	Bio       sql.NullString
 }
 
 type Comment struct {

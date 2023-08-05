@@ -27,11 +27,16 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 
 	postAuthor := h.DB.GetUserById(post.AuthorId)
 	safePost := SafePost{
-		Id:            post.Id,
-		Title:         post.Title,
-		Content:       post.Content,
-		Description:   post.Description,
-		Author:        SafeUser{Id: postAuthor.Id, Username: postAuthor.Username},
+		Id:          post.Id,
+		Title:       post.Title,
+		Content:     post.Content,
+		Description: post.Description,
+		Author: SafeUser{
+			Id:       postAuthor.Id,
+			Username: postAuthor.Username,
+			Avatar:   postAuthor.Avatar.String,
+			Bio:      postAuthor.Bio.String,
+		},
 		Date:          post.Date,
 		CommentsCount: post.CommentsCount,
 		LikesCount:    post.LikesCount,

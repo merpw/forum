@@ -20,7 +20,9 @@ func (db DB) GetAllUserIds() (userIds []int) {
 		}
 		userIds = append(userIds, userId)
 	}
-	query.Close()
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return
 }
@@ -40,13 +42,38 @@ func (db DB) GetUserById(id int) *User {
 	}
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
 	if err != nil {
 		log.Panic(err)
 	}
-	query.Close()
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return &user
+}
+
+func (db DB) GetLastUserId() int {
+	query, err := db.Query("SELECT id FROM users ORDER BY id DESC LIMIT 1")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if !query.Next() {
+		return 0
+	}
+
+	var userId int
+	err = query.Scan(&userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
+
+	return userId
 }
 
 // GetUserByLogin returns user with specified login
@@ -64,21 +91,36 @@ func (db DB) GetUserByLogin(login string) *User {
 	var user User
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
 	if err != nil {
 		log.Panic(err)
 	}
-	query.Close()
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return &user
 }
 
 // AddUser adds user to database, returns id of new user
-func (db DB) AddUser(username, email, password string, firstName, lastName, dob, gender sql.NullString) int {
+func (db DB) AddUser(
+	username, email, password string,
+	firstName, lastName, dob, gender, bio, avatar sql.NullString) int {
+
 	result, err := db.Exec(
-		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender)
-		VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		username, email, password, firstName.String, lastName.String, dob.String, gender.String)
+		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		username,
+		email,
+		password,
+		firstName.String,
+		lastName.String,
+		dob.String,
+		gender.String,
+		avatar,
+		bio,
+	)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -97,7 +139,9 @@ func (db DB) IsEmailTaken(email string) bool {
 		log.Panic(err)
 	}
 	isTaken := query.Next()
-	query.Close()
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return isTaken
 }
@@ -110,7 +154,10 @@ func (db DB) IsNameTaken(username string) bool {
 		log.Panic(err)
 	}
 	isTaken := query.Next()
-	query.Close()
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
 
 	return isTaken
 }

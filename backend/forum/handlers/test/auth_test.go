@@ -12,9 +12,34 @@ func TestSignUp(t *testing.T) {
 	testServer := NewTestServer(t)
 
 	t.Run("Valid", func(t *testing.T) {
-		cli := testServer.TestClient()
+		t.Run("Full", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
 
-		cli.TestPost(t, "/api/signup", NewClientData(), http.StatusOK)
+		})
+
+		t.Run("Without username", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			client.Username = ""
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		})
+
+		t.Run("Without bio", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			client.Bio = ""
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		})
+
+		t.Run("Without avatar", func(t *testing.T) {
+			cli := testServer.TestClient()
+			client := NewClientData()
+			client.Avatar = ""
+			cli.TestPost(t, "/api/signup", client, http.StatusOK)
+		})
+
 	})
 
 	t.Run("Invalid", func(t *testing.T) {
@@ -37,7 +62,7 @@ func TestSignUp(t *testing.T) {
 		t.Run("Username", func(t *testing.T) {
 			badClientData := NewClientData()
 
-			badClientData.Username = ""
+			badClientData.Username = "u123"
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 
 			badClientData.Username = "E"
@@ -120,6 +145,20 @@ func TestSignUp(t *testing.T) {
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 
 			badClientData.Gender = "AH-64 Apache attack helicopter"
+			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
+		})
+
+		t.Run("Bio", func(t *testing.T) {
+			badClientData := NewClientData()
+
+			badClientData.Bio = strings.Repeat("a", 1000)
+			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
+		})
+
+		t.Run("Avatar", func(t *testing.T) {
+			badClientData := NewClientData()
+
+			badClientData.Avatar = "incorrectAvatar"
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 		})
 

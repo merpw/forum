@@ -19,7 +19,12 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		DoB       string `json:"dob,omitempty"`
 		Gender    string `json:"gender,omitempty"`
 	}{
-		SafeUser:  SafeUser{Id: user.Id, Username: user.Username},
+		SafeUser: SafeUser{
+			Id:       user.Id,
+			Username: user.Username,
+			Avatar:   user.Avatar.String,
+			Bio:      user.Bio.String,
+		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
 		LastName:  user.LastName.String,
@@ -45,10 +50,15 @@ func (h *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 	for _, post := range posts {
 		response = append(response, Response{
 			SafePost: SafePost{
-				Id:            post.Id,
-				Title:         post.Title,
-				Description:   post.Description,
-				Author:        SafeUser{Id: user.Id, Username: user.Username},
+				Id:          post.Id,
+				Title:       post.Title,
+				Description: post.Description,
+				Author: SafeUser{
+					Id:       user.Id,
+					Username: user.Username,
+					Avatar:   user.Avatar.String,
+					Bio:      user.Bio.String,
+				},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
 				LikesCount:    post.LikesCount,
@@ -77,10 +87,15 @@ func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 		author := h.DB.GetUserById(post.AuthorId)
 		response = append(response, Response{
 			SafePost: SafePost{
-				Id:            post.Id,
-				Title:         post.Title,
-				Description:   post.Description,
-				Author:        SafeUser{Id: author.Id, Username: author.Username},
+				Id:          post.Id,
+				Title:       post.Title,
+				Description: post.Description,
+				Author: SafeUser{
+					Id:       author.Id,
+					Username: author.Username,
+					Avatar:   author.Avatar.String,
+					Bio:      author.Bio.String,
+				},
 				Date:          post.Date,
 				CommentsCount: post.CommentsCount,
 				LikesCount:    post.LikesCount,

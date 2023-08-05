@@ -20,6 +20,8 @@ export type User = {
   last_name?: string
   dob?: string
   gender?: string
+  avatar?: string
+  bio?: string
 }
 
 export type Comment = {

@@ -35,7 +35,12 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	server.SendObject(w, SafeUser{Id: user.Id, Username: user.Username})
+	server.SendObject(w, SafeUser{
+		Id:       user.Id,
+		Username: user.Username,
+		Avatar:   user.Avatar.String,
+		Bio:      user.Bio.String,
+	})
 }
 
 // usersIdPosts Returns the posts of the user with the given id.
@@ -63,10 +68,15 @@ func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 	response := make([]SafePost, 0)
 	for _, post := range posts {
 		response = append(response, SafePost{
-			Id:            post.Id,
-			Title:         post.Title,
-			Description:   post.Description,
-			Author:        SafeUser{user.Id, user.Username},
+			Id:          post.Id,
+			Title:       post.Title,
+			Description: post.Description,
+			Author: SafeUser{
+				Id:       user.Id,
+				Username: user.Username,
+				Avatar:   user.Avatar.String,
+				Bio:      user.Bio.String,
+			},
 			Date:          post.Date,
 			CommentsCount: post.CommentsCount,
 			LikesCount:    post.LikesCount,

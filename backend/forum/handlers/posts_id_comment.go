@@ -196,9 +196,14 @@ func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 	for _, comment := range comments {
 		user := h.DB.GetUserById(comment.AuthorId)
 		response = append(response, SafeComment{
-			Id:            comment.Id,
-			Content:       comment.Content,
-			Author:        SafeUser{user.Id, user.Username},
+			Id:      comment.Id,
+			Content: comment.Content,
+			Author: SafeUser{
+				Id:       user.Id,
+				Username: user.Username,
+				Avatar:   user.Avatar.String,
+				Bio:      user.Bio.String,
+			},
 			Date:          comment.Date,
 			LikesCount:    comment.LikesCount,
 			DislikesCount: comment.DislikesCount,

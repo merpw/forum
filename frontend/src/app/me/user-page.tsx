@@ -38,11 +38,18 @@ const UserPage: NextPage = () => {
             }
           >
             <div className={"card-body sm:flex-row sm:gap-5"}>
-              <Avatar userId={user.id} className={"w-24 sm:w-52 self-center"} />
+              <Avatar user={user} size={50} className={"w-24 sm:w-52 self-center p-1"} />
               <div className={"self-center text-sm"}>
                 <UserInfo user={user} />
               </div>
             </div>
+
+            {user.bio && (
+              <div className={"mb-5 text-center"}>
+                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
+                <div className={"text-sm"}>{user.bio}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>

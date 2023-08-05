@@ -41,7 +41,7 @@ const UserInfo = () => {
     <div className={"flex gap-1 my-auto"}>
       <div className={"dropdown dropdown-end"}>
         <div tabIndex={0} className={"btn min-w-full btn-ghost btn-circle"}>
-          <Avatar userId={user.id} className={"w-9"} />
+          <Avatar user={user} size={40} className={"w-9"} />
         </div>
 
         <ul

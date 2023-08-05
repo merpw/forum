@@ -17,13 +17,19 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
             }
           >
             <div className={"card-body sm:flex-row sm:gap-5"}>
-              <Avatar userId={user.id} className={"w-24 sm:w-48 m-auto self-center"} />
+              <Avatar user={user} size={200} className={"w-24 sm:w-48 m-auto self-center"} />
               <div className={"self-center font-light text-center sm:text-left"}>
                 {/* TODO: add user info if they follows you */}
                 {"Hey! I'm "}
                 <p className={"text-4xl text-primary font-Yesteryear mx-1"}>{user.username}</p>
               </div>
             </div>
+            {user.bio && (
+              <div className={"mb-5 text-center"}>
+                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
+                <div className={"text-sm"}>{user.bio}</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
