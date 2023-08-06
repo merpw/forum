@@ -3,23 +3,25 @@ package handlers
 import (
 	"database/sql"
 	"errors"
-	"golang.org/x/crypto/bcrypt"
 	"net/mail"
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
-	PUBLIC = iota
-	PRIVATE
+	public = iota
+	private
 )
 
 type SafeUser struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
-	Avatar   string `json:"avatar,omitempty"`
-	Bio      string `json:"bio,omitempty"`
+	Id           int    `json:"id"`
+	Username     string `json:"username"`
+	Avatar       string `json:"avatar,omitempty"`
+	Bio          string `json:"bio,omitempty"`
+	FollowStatus int    `json:"followStatus"`
 }
 
 type SafePost struct {

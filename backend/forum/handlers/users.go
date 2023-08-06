@@ -21,6 +21,7 @@ func (h *Handlers) usersAll(w http.ResponseWriter, r *http.Request) {
 //
 //	GET /api/users/:id
 func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
+	meId := h.getUserId(w, r)
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	// /api/users/1 -> 1
 
@@ -47,10 +48,11 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		Bio       string `json:"bio,omitempty"`
 	}{
 		SafeUser: SafeUser{
-			Id:       user.Id,
-			Username: user.Username,
-			Avatar:   user.Avatar.String,
-			Bio:      user.Bio.String,
+			Id:           user.Id,
+			Username:     user.Username,
+			Avatar:       user.Avatar.String,
+			Bio:          user.Bio.String,
+			FollowStatus: h.DB.GetFollowStatus(meId, userId),
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
@@ -61,10 +63,46 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		Bio:       user.Bio.String,
 	}
 
-	if h.DB.GetUserPrivacy(userId) == PRIVATE {
+	if user.Privacy == private {
 		server.SendObject(w, response.SafeUser)
 	} else {
 		server.SendObject(w, response)
+	}
+}
+
+func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
+	meId := h.getUserId(w, r)
+	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
+	userIdStr = strings.TrimSuffix(userIdStr, "/follow")
+	// /api/users/1/ -> 1
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	user := h.DB.GetUserById(userId)
+
+	if user == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	switch h.DB.GetFollowStatus(meId, userId) {
+	case 0:
+		if user.Privacy == private {
+			server.SendObject(w, h.DB.RequestToFollow())
+		} else {
+			server.SendObject(w, h.DB.Follow(meId, userId))
+		}
+
+	case 1:
+		server.SendObject(w, h.DB.Unfollow(meId, userId))
+		/*
+			case 2:
+				server.SendObject(w, h.DB.AbortRequestToFollow())
+		*/
 	}
 }
 

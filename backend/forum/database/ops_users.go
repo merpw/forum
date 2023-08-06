@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"log"
+	"time"
 )
 
 // GetAllUserIds returns slice of all users ids
@@ -108,37 +109,13 @@ func (db DB) UpdateUserPrivacy(privacy, id int) bool {
 	if err != nil {
 		log.Panic(err)
 	}
-
 	return privacy == 1
-}
-
-func (db DB) GetUserPrivacy(id int) int {
-	query, err := db.Query("SELECT privacy FROM users WHERE id = ? COLLATE NOCASE", id)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	if !query.Next() {
-		return -1
-	}
-
-	var privacy int
-	err = query.Scan(&privacy)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
-
-	return privacy
 }
 
 // AddUser adds user to database, returns id of new user
 func (db DB) AddUser(
 	username, email, password string,
-	firstName, lastName, dob, gender, bio, avatar sql.NullString, privacy int) int {
+	firstName, lastName, dob, gender, bio, avatar sql.NullString) int {
 
 	result, err := db.Exec(
 		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar, privacy)
@@ -152,7 +129,7 @@ func (db DB) AddUser(
 		gender.String,
 		avatar,
 		bio,
-		privacy,
+		1,
 	)
 	if err != nil {
 		log.Panic(err)
@@ -194,3 +171,63 @@ func (db DB) IsNameTaken(username string) bool {
 
 	return isTaken
 }
+
+const (
+	notFollowing = iota
+	following
+	requestToFollow
+)
+
+func (db DB) GetFollowStatus(meId, userId int) int {
+	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? COLLATE NOCASE", userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	var followerId int = -2
+	if query.Next() {
+		err = query.Scan(&followerId)
+		if err != nil {
+			log.Panic(err)
+		}
+	}
+
+	if err = query.Close(); err != nil {
+		log.Panic(err)
+	}
+
+	if followerId == meId {
+		return following
+	} else {
+		return notFollowing
+	}
+}
+
+func (db DB) Unfollow(followerId, userId int) int {
+	_, err := db.Exec("DELETE FROM followers WHERE user_id = ? AND follower_id = ?", userId, followerId)
+	if err != nil {
+		log.Panic(err)
+	}
+	return notFollowing
+}
+
+func (db DB) Follow(followerId, userId int) int {
+	_, err := db.Exec(`INSERT INTO followers 
+    	(user_id, follower_id,timestamp)
+		VALUES (?, ?, ?)`,
+		userId, followerId, time.Now().Format(time.RFC3339))
+	if err != nil {
+		log.Panic(err)
+	}
+	return following
+}
+
+func (db DB) RequestToFollow() int {
+	return requestToFollow
+}
+
+/*
+func (db DB) AbortRequestToFollow() int {
+	return notFollowing
+}
+*/

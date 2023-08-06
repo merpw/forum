@@ -19,7 +19,6 @@ type TestClientData struct {
 	Gender    string `json:"gender"`
 	Avatar    string `json:"avatar"`
 	Bio       string `json:"bio"`
-	Privacy   int    `json:"privacy"`
 }
 
 // NewClientData returns random TestClientData
@@ -36,7 +35,6 @@ func NewClientData() TestClientData {
 		Gender:    genders[rand.Intn(3)], //nolint:gosec // it's ok for tests
 		Avatar:    strconv.Itoa(rand.Intn(10)) + ".jpg",
 		Bio:       "t" + uuid.Must(uuid.NewV4()).String()[0:8],
-		Privacy:   1,
 	}
 }
 

@@ -162,12 +162,6 @@ func TestSignUp(t *testing.T) {
 			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
 		})
 
-		t.Run("Privacy", func(t *testing.T) {
-			badClientData := NewClientData()
-			badClientData.Privacy = 2
-			cli.TestPost(t, "/api/signup", badClientData, http.StatusBadRequest)
-		})
-
 		t.Run("User already exists", func(t *testing.T) {
 			cli := testServer.TestClient()
 

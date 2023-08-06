@@ -24,42 +24,105 @@ func TestUser(t *testing.T) {
 
 	t.Run("Valid", func(t *testing.T) {
 		var responseData struct {
-			Id       int    `json:"id"`
-			Username string `json:"username"`
-			Avatar   string `json:"avatar"`
-			Bio      string `json:"bio"`
+			Id        int    `json:"id"`
+			Username  string `json:"username"`
+			Email     string `json:"email"`
+			FirstName string `json:"first_name"`
+			LastName  string `json:"last_name"`
+			DoB       string `json:"dob"`
+			Gender    string `json:"gender"`
+			Avatar    string `json:"avatar"`
+			Bio       string `json:"bio"`
+			Privacy   bool   `json:"privacy"`
 		}
+		t.Run("Private", func(t *testing.T) {
 
-		_, respBody := cli1.TestGet(t, "/api/users/1", http.StatusOK)
+			_, respBody := cli1.TestGet(t, "/api/users/1", http.StatusOK)
 
-		checkRespBody := func() {
-			err := json.Unmarshal(respBody, &responseData)
-			if err != nil {
-				t.Fatal(err)
+			checkRespBody := func() {
+				err := json.Unmarshal(respBody, &responseData)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if responseData.Id != 1 {
+					t.Fatalf("invalid id, expected 1, got %d", responseData.Id)
+				}
+
+				if responseData.Username != cli1.Username {
+					t.Fatalf("invalid username, expected %s, got %s", cli1.Username, responseData.Username)
+				}
+
+				if responseData.Bio != cli1.Bio {
+					t.Fatalf("invalid bio, expected %s, got %s", cli1.Bio, responseData.Bio)
+				}
+
+				if responseData.Avatar != cli1.Avatar {
+					t.Fatalf("invalid avatar, expected %s, got %s", cli1.Avatar, responseData.Avatar)
+				}
 			}
+			checkRespBody()
 
-			if responseData.Id != 1 {
-				t.Fatalf("invalid id, expected 1, got %d", responseData.Id)
+			_, respBody = cliAnon.TestGet(t, "/api/users/1", http.StatusOK)
+
+			checkRespBody()
+
+		})
+		t.Run("Public", func(t *testing.T) {
+			cli1.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
+
+			_, respBody := cli1.TestGet(t, "/api/users/1", http.StatusOK)
+
+			checkRespBody := func() {
+				err := json.Unmarshal(respBody, &responseData)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if responseData.Id != 1 {
+					t.Fatalf("invalid id, expected 1, got %d", responseData.Id)
+				}
+
+				if responseData.Username != cli1.Username {
+					t.Fatalf("invalid username, expected %s, got %s", cli1.Username, responseData.Username)
+				}
+
+				if responseData.Bio != cli1.Bio {
+					t.Fatalf("invalid bio, expected %s, got %s", cli1.Bio, responseData.Bio)
+				}
+
+				if responseData.Avatar != cli1.Avatar {
+					t.Fatalf("invalid avatar, expected %s, got %s", cli1.Avatar, responseData.Avatar)
+				}
+
+				if responseData.Email != cli1.Email {
+					t.Fatalf("invalid email, expected %s, got %s", cli1.Email, responseData.Email)
+				}
+
+				if responseData.FirstName != cli1.FirstName {
+					t.Fatalf("invalid first name, expected %s, got %s", cli1.FirstName, responseData.FirstName)
+				}
+
+				if responseData.LastName != cli1.LastName {
+					t.Fatalf("invalid last name, expected %s, got %s", cli1.LastName, responseData.LastName)
+				}
+
+				if responseData.DoB != cli1.DoB {
+					t.Fatalf("invalid dob, expected %s, got %s", cli1.DoB, responseData.DoB)
+				}
+
+				if responseData.Gender != cli1.Gender {
+					t.Fatalf("invalid gender, expected %s, got %s", cli1.Gender, responseData.Gender)
+				}
 			}
+			checkRespBody()
 
-			if responseData.Username != cli1.Username {
-				t.Fatalf("invalid username, expected %s, got %s", cli1.Username, responseData.Username)
-			}
+			_, respBody = cliAnon.TestGet(t, "/api/users/1", http.StatusOK)
 
-			if responseData.Bio != cli1.Bio {
-				t.Fatalf("invalid bio, expected %s, got %s", cli1.Bio, responseData.Bio)
-			}
+			checkRespBody()
 
-			if responseData.Avatar != cli1.Avatar {
-				t.Fatalf("invalid avatar, expected %s, got %s", cli1.Avatar, responseData.Avatar)
-			}
-		}
+		})
 
-		checkRespBody()
-
-		_, respBody = cliAnon.TestGet(t, "/api/users/1", http.StatusOK)
-
-		checkRespBody()
 	})
 }
 
@@ -98,6 +161,110 @@ func TestUserPosts(t *testing.T) {
 			t.Fatalf("responses mismatch, expected %s, got %s", string(respBody), string(resp2Body))
 		}
 	})
+}
+
+func TestUserFollow(t *testing.T) {
+	testServer := NewTestServer(t)
+
+	cli1 := testServer.TestClient()
+	cli1.TestAuth(t)
+
+	cli2 := testServer.TestClient()
+	cli2.TestAuth(t)
+
+	t.Run("Not found", func(t *testing.T) {
+		cli1.TestPost(t, "/api/users/100/follow", nil, http.StatusNotFound)
+		cli1.TestPost(t, "/api/users/214748364712312214748364712312/follow",
+			nil, http.StatusNotFound)
+	})
+
+	t.Run("Valid", func(t *testing.T) {
+		var followStatus int
+
+		var responseData struct {
+			Id           int    `json:"id"`
+			Username     string `json:"username"`
+			Email        string `json:"email"`
+			FirstName    string `json:"first_name"`
+			LastName     string `json:"last_name"`
+			DoB          string `json:"dob"`
+			Gender       string `json:"gender"`
+			Avatar       string `json:"avatar"`
+			Bio          string `json:"bio"`
+			Privacy      bool   `json:"privacy"`
+			FollowStatus int    `json:"followStatus"`
+		}
+
+		t.Run("Request to follow", func(t *testing.T) {
+			_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
+
+			err := json.Unmarshal(response, &followStatus)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if followStatus != 2 {
+				t.Fatalf("invalid followStatus, expected %d, got %d", 2, followStatus)
+			}
+		})
+		/*
+			t.Run("Abort request to follow", func(t *testing.T) {
+				_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusNotFound)
+				err := json.Unmarshal(response, &followStatus)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if followStatus != 2 {
+					t.Fatalf("invalid followStatus, expected %d, got %d", 2, followStatus)
+				}
+			})
+		*/
+		t.Run("Follow", func(t *testing.T) {
+			cli2.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
+			_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
+
+			err := json.Unmarshal(response, &followStatus)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if followStatus != 1 {
+				t.Fatalf("invalid followStatus, expected %d, got %d", 1, followStatus)
+			}
+
+			_, respBody := cli1.TestGet(t, "/api/users/2", http.StatusOK)
+			err = json.Unmarshal(respBody, &responseData)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if responseData.FollowStatus != 1 {
+				t.Errorf("invalid followStatus, expected %d, got %d", 1, responseData.FollowStatus)
+			}
+
+		})
+
+		t.Run("Unfollow", func(t *testing.T) {
+			_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
+
+			err := json.Unmarshal(response, &followStatus)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if followStatus != 0 {
+				t.Fatalf("invalid followStatus, expected %d, got %d", 0, followStatus)
+			}
+
+			_, respBody := cli1.TestGet(t, "/api/users/2", http.StatusOK)
+			err = json.Unmarshal(respBody, &responseData)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if responseData.FollowStatus != 0 {
+				t.Errorf("invalid followStatus, expected %d, got %d", 0, responseData.FollowStatus)
+			}
+		})
+	})
+
 }
 
 const UsersCount = 5

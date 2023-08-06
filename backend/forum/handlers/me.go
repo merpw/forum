@@ -34,7 +34,7 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		Gender:    user.Gender.String,
 		Avatar:    user.Avatar.String,
 		Bio:       user.Bio.String,
-		Privacy:   user.Privacy == 1,
+		Privacy:   user.Privacy == private,
 	}
 
 	server.SendObject(w, response)
@@ -42,16 +42,13 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) mePrivacy(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
-	privacy := h.DB.GetUserPrivacy(userId)
-	var response bool
+	user := h.DB.GetUserById(userId)
 
-	if privacy == PUBLIC {
-		response = h.DB.UpdateUserPrivacy(userId, PRIVATE)
+	if user.Privacy == private {
+		server.SendObject(w, h.DB.UpdateUserPrivacy(public, userId))
 	} else {
-		response = h.DB.UpdateUserPrivacy(userId, PUBLIC)
+		server.SendObject(w, h.DB.UpdateUserPrivacy(private, userId))
 	}
-
-	server.SendObject(w, response)
 }
 
 // mePosts returns the posts of the logged-in user.
@@ -123,6 +120,5 @@ func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 	}
-
 	server.SendObject(w, response)
 }

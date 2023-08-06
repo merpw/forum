@@ -63,7 +63,6 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		Gender    string `json:"gender"`
 		Bio       string `json:"bio"`
 		Avatar    string `json:"avatar"`
-		Privacy   int    `json:"privacy"`
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
@@ -124,11 +123,6 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if requestBody.Privacy < 0 || requestBody.Privacy > 1 {
-		http.Error(w, "Privacy is invalid", http.StatusBadRequest)
-		return
-	}
-
 	id := h.DB.AddUser(
 		username,
 		email,
@@ -139,7 +133,6 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		sql.NullString{String: requestBody.Gender, Valid: true},
 		avatar,
 		bio,
-		requestBody.Privacy,
 	)
 
 	external.RevalidateURL(fmt.Sprintf("/user/%d", id))
