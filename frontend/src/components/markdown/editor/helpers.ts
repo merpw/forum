@@ -1,24 +1,51 @@
-export const wrapWith = (textAreaRef: HTMLTextAreaElement, before: string, after: string) => {
+export const wrapWith = (
+  textAreaRef: HTMLTextAreaElement,
+  before: string,
+  after: string,
+  autoSelect: "word" | "line" = "word"
+) => {
   let { selectionStart, selectionEnd } = textAreaRef
 
+  const backupSelectionStart = selectionStart
+  const backupSelectionEnd = selectionEnd
+
   if (selectionStart === selectionEnd) {
-    // select word
-    while (selectionStart > 0 && textAreaRef.value[selectionStart - 1] !== " ") {
-      selectionStart--
+    if (autoSelect === "line") {
+      // select line
+      while (selectionStart > 0 && textAreaRef.value[selectionStart - 1] !== "\n") {
+        selectionStart--
+      }
+      while (selectionEnd < textAreaRef.value.length && textAreaRef.value[selectionEnd] !== "\n") {
+        selectionEnd++
+      }
     }
-    while (selectionEnd < textAreaRef.value.length && textAreaRef.value[selectionEnd] !== " ") {
-      selectionEnd++
+    if (autoSelect === "word") {
+      // select word
+      while (selectionStart > 0 && textAreaRef.value[selectionStart - 1].match(/\S/)) {
+        selectionStart--
+      }
+      while (
+        selectionEnd < textAreaRef.value.length &&
+        textAreaRef.value[selectionEnd].match(/\S/)
+      ) {
+        selectionEnd++
+      }
     }
+
+    textAreaRef.select()
+    textAreaRef.setSelectionRange(selectionStart, selectionEnd)
   }
 
-  const beforeText = textAreaRef.value.slice(0, selectionStart)
-  const afterText = textAreaRef.value.slice(selectionEnd)
-  const selected = textAreaRef.value.slice(selectionStart, selectionEnd)
+  const selectedText = textAreaRef.value.substring(selectionStart, selectionEnd)
 
-  textAreaRef.value = beforeText + before + selected + after + afterText
+  // This is deprecated but the only way to insert text at a specific position without breaking Undo
+  // Still works in all browsers
+  document.execCommand("insertText", false, before + selectedText + after)
 
-  textAreaRef.selectionStart = textAreaRef.selectionEnd =
-    beforeText.length + selected.length + before.length
+  textAreaRef.setSelectionRange(
+    backupSelectionStart + before.length,
+    backupSelectionEnd + before.length
+  )
 
   textAreaRef.focus()
 }

@@ -52,6 +52,7 @@ const MarkdownEditor: FC<
         {!isPreview && <ToolBar textareaRef={ref} />}
       </div>
       <ReactTextAreaAutosize
+        contentEditable={true}
         {...props}
         ref={ref}
         className={isPreview ? "hidden" : props.className}

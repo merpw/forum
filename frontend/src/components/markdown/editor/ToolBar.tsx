@@ -1,4 +1,4 @@
-import { MdFormatBold, MdFormatItalic, MdFormatQuote, MdLink } from "react-icons/md"
+import { MdFormatBold, MdFormatItalic, MdFormatQuote, MdImage, MdLink } from "react-icons/md"
 import { IconType } from "react-icons"
 import { FC, RefObject } from "react"
 
@@ -29,7 +29,7 @@ const buttons: Button[] = [
     icon: MdFormatQuote,
     text: "Quote",
     onClick: (textAreaRef) => {
-      wrapWith(textAreaRef, "> ", "")
+      wrapWith(textAreaRef, "> ", "", "line")
     },
   },
   {
@@ -37,6 +37,13 @@ const buttons: Button[] = [
     text: "Link",
     onClick: (textAreaRef) => {
       wrapWith(textAreaRef, "[", "](url)")
+    },
+  },
+  {
+    icon: MdImage,
+    text: "Image",
+    onClick: (textAreaRef) => {
+      wrapWith(textAreaRef, "![", "](url)")
     },
   },
 ]
