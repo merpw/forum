@@ -5,7 +5,7 @@ import { FC, useEffect, useRef, useState } from "react"
 import { useMe } from "@/api/auth/hooks"
 import { CreateComment, useComments } from "@/api/posts/comment"
 import { FormError } from "@/components/error"
-import MarkdownEditor from "@/components/markdown/editor"
+import MarkdownEditor from "@/components/markdown/editor/Editor"
 
 const CommentForm: FC<{ postId: number }> = ({ postId }) => {
   const { isLoggedIn, isLoading } = useMe()

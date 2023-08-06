@@ -1,6 +1,8 @@
 import { FC, lazy, RefObject, Suspense, useRef, useState } from "react"
 import ReactTextAreaAutosize, { TextareaAutosizeProps } from "react-textarea-autosize"
 
+import ToolBar from "@/components/markdown/editor/ToolBar"
+
 const Markdown = lazy(() => import("@/components/markdown/markdown"))
 
 const MarkdownEditor: FC<
@@ -10,7 +12,7 @@ const MarkdownEditor: FC<
 > = (props) => {
   const [isPreview, setIsPreview] = useState(false)
 
-  const fallbackRef = useRef(null)
+  const fallbackRef = useRef<HTMLTextAreaElement>(null)
 
   const ref = props.ref || fallbackRef
 
@@ -29,6 +31,7 @@ const MarkdownEditor: FC<
         >
           Preview
         </span>
+        {!isPreview && <ToolBar textareaRef={ref} />}
       </div>
       <ReactTextAreaAutosize
         {...props}
@@ -39,7 +42,7 @@ const MarkdownEditor: FC<
         <div className={"min-h-16"}>
           <Suspense fallback={<div className={"prose bg-base-100 p-5 rounded-b"}>Loading...</div>}>
             <Markdown
-              content={props.value || "Nothing to preview"}
+              content={ref.current?.value || "Nothing to preview"}
               className={"bg-base-100 p-5 rounded-b"}
             />
           </Suspense>

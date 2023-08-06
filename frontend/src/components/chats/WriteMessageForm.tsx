@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux"
 import throttle from "@/helpers/throttle"
 import wsActions from "@/store/ws/actions"
 import { useAppSelector } from "@/store/hooks"
-import MarkdownEditor from "@/components/markdown/editor"
+import MarkdownEditor from "@/components/markdown/editor/Editor"
 
 const WriteMessageForm: FC<{
   sendMessage: (content: string) => void
