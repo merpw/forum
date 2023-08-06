@@ -6,7 +6,7 @@ import "highlight.js/styles/github-dark.css"
 
 import RenderMarkdown from "@/components/markdown/render"
 
-const Markdown: FC<{ content: string; className?: string; fallback?: string }> = ({ content }) => {
+const Markdown: FC<{ content: string; className?: string }> = ({ content, className }) => {
   const [html, setHtml] = useState<string>()
 
   useEffect(() => {
@@ -21,7 +21,7 @@ const Markdown: FC<{ content: string; className?: string; fallback?: string }> =
 
   return (
     <div
-      className={"prose dark:prose-invert max-w-full"}
+      className={"prose dark:prose-invert max-w-full" + " " + (className || "")}
       dangerouslySetInnerHTML={{ __html: html }}
     />
   )
