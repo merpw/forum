@@ -1,10 +1,10 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react"
-import ReactTextAreaAutosize from "react-textarea-autosize"
 import { useDispatch } from "react-redux"
 
 import throttle from "@/helpers/throttle"
 import wsActions from "@/store/ws/actions"
 import { useAppSelector } from "@/store/hooks"
+import MarkdownEditor from "@/components/markdown/editor"
 
 const WriteMessageForm: FC<{
   sendMessage: (content: string) => void
@@ -53,7 +53,7 @@ const WriteMessageForm: FC<{
   return (
     <form
       ref={formRef}
-      className={"my-1 relative"}
+      className={"my-1 relative bg-base-200 p-2 rounded"}
       onSubmit={async (e) => {
         e.preventDefault()
         sendMessage(input)
@@ -64,7 +64,7 @@ const WriteMessageForm: FC<{
         sendTypingStatus(false)
       }}
     >
-      <ReactTextAreaAutosize
+      <MarkdownEditor
         ref={inputRef}
         className={"input input-bordered border-primary bg-base-100 p-2 pr-10 w-full"}
         onChange={(e) => {
@@ -88,7 +88,11 @@ const WriteMessageForm: FC<{
         required
       />
       <button
-        className={"absolute z-10 clickable disabled:opacity-50 right-2.5 bottom-3.5"}
+        className={
+          "absolute z-10 clickable disabled:opacity-50 right-3 bottom-5" +
+          " " +
+          (input === "" ? " btn-disabled opacity-50" : "")
+        }
         type={"submit"}
       >
         <svg

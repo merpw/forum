@@ -4,14 +4,12 @@ import { useRouter } from "next/navigation"
 import { FC, useEffect, useId, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import Select from "react-select"
-import dynamic from "next/dynamic"
 
 import { CreatePost, generateDescription } from "@/api/posts/create"
 import { FormError } from "@/components/error"
 import { Capitalize } from "@/helpers/text"
 import { MarkdownToPlain } from "@/components/markdown/render"
-
-const Markdown = dynamic(() => import("@/components/markdown/markdown"))
+import MarkdownEditor from "@/components/markdown/editor"
 
 const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
   categories,
@@ -77,7 +75,7 @@ const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
       }}
     >
       <div className={"max-w-3xl mx-auto flex-col"}>
-        <div className={"card flex-shrink-0 bg-neutral shadow-md"}>
+        <div className={"card flex-shrink-0 bg-base-200 shadow-md"}>
           <div className={"card-body"}>
             <div className={"my-2 font-Yesteryear text-3xl text-primary opacity-50 text-center"}>
               <span className={"text-neutral-content"}> {"What's on your mind?"}</span>
@@ -95,7 +93,7 @@ const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
               />
             </div>
             <div className={"form-control"}>
-              <ReactTextAreaAutosize
+              <MarkdownEditor
                 title={
                   "Content input field. Press ESC and then TAB to move the focus to the next field"
                 }
@@ -121,7 +119,7 @@ const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
                   }
                 }}
                 name={"content"}
-                className={"textarea textarea-bordered"}
+                className={"textarea textarea-bordered w-full"}
                 rows={5}
                 minRows={5}
                 placeholder={"Content"}
@@ -131,9 +129,6 @@ const CreatePostPage: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
               />
             </div>
 
-            <div className={"mb-3 border border-base-100 rounded-xl mt-3 px-4"} id={"preview"}>
-              <Markdown content={formFields.content} />
-            </div>
             <ReactTextAreaAutosize
               name={"description"}
               className={"textarea textarea-bordered"}
