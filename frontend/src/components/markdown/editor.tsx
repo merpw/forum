@@ -1,10 +1,12 @@
-import { FC, lazy, Ref, Suspense, useRef, useState } from "react"
+import { FC, lazy, RefObject, Suspense, useRef, useState } from "react"
 import ReactTextAreaAutosize, { TextareaAutosizeProps } from "react-textarea-autosize"
 
 const Markdown = lazy(() => import("@/components/markdown/markdown"))
 
 const MarkdownEditor: FC<
-  TextareaAutosizeProps & { value: string; ref?: Ref<HTMLTextAreaElement> }
+  TextareaAutosizeProps & {
+    ref?: RefObject<HTMLTextAreaElement>
+  }
 > = (props) => {
   const [isPreview, setIsPreview] = useState(false)
 
