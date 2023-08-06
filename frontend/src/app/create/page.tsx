@@ -2,7 +2,7 @@ import { Metadata } from "next"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
-import CreatePostPage from "@/app/create/create-page"
+import CreatePostForm from "@/components/forms/create-post/CreatePostForm"
 import { getCategoriesLocal } from "@/api/posts/edge"
 import checkSession from "@/api/auth/edge"
 
@@ -23,7 +23,7 @@ const Page = async () => {
   }
 
   return (
-    <CreatePostPage categories={categories} isAIEnabled={Boolean(process.env.OPENAI_API_KEY)} />
+    <CreatePostForm categories={categories} isAIEnabled={Boolean(process.env.OPENAI_API_KEY)} />
   )
 }
 
