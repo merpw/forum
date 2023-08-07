@@ -2,6 +2,11 @@ import { FC, lazy, RefObject, Suspense, useEffect, useRef, useState } from "reac
 import ReactTextAreaAutosize, { TextareaAutosizeProps } from "react-textarea-autosize"
 
 import ToolBar from "@/components/markdown/editor/ToolBar"
+import uploadFile from "@/api/attachments/upload"
+
+const ImageTypeRegex = /^image\/(png|jpe?g|gif|webp)$/
+
+const MaxImageSize = 1024 * 1024 * 20 // 20 MB
 
 const Markdown = lazy(() => import("@/components/markdown/markdown"))
 
@@ -17,6 +22,8 @@ const MarkdownEditor: FC<
   const ref = props.ref || fallbackRef
 
   const selectionBackup = useRef<{ selectionStart: number; selectionEnd: number } | null>(null)
+
+  const [uploadError, setUploadError] = useState<string | null>(null)
 
   useEffect(() => {
     const textarea = ref.current as HTMLTextAreaElement
@@ -55,7 +62,39 @@ const MarkdownEditor: FC<
         contentEditable={true}
         {...props}
         ref={ref}
+        onChange={(e) => {
+          props.onChange?.(e)
+          setUploadError(null)
+        }}
         className={isPreview ? "hidden" : props.className}
+        onDrop={(e) => {
+          console.log(e)
+        }}
+        onPaste={(e) => {
+          if (e.clipboardData.files.length > 0) {
+            e.preventDefault()
+            const file = e.clipboardData.files[0]
+
+            if (file.size > MaxImageSize) {
+              setUploadError("File too large")
+              return
+            }
+
+            if (!ImageTypeRegex.test(file.type)) {
+              setUploadError("Invalid file type, only images are allowed")
+              return
+            }
+
+            uploadFile(file)
+              .then((url) => {
+                document.execCommand("insertText", false, `![${file.name}](${url})`)
+              })
+              .catch((e) => {
+                console.error(e)
+                setUploadError("Failed to upload image")
+              })
+          }
+        }}
       />
       {isPreview && (
         <div className={"min-h-16"}>
@@ -66,6 +105,9 @@ const MarkdownEditor: FC<
             />
           </Suspense>
         </div>
+      )}
+      {uploadError && (
+        <div className={"bg-error text-error-content rounded p-1"}>{uploadError}</div>
       )}
     </div>
   )
