@@ -11,8 +11,8 @@ var v008 = migrate.Migration{
 		_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS invitations (
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,
+		    type INTEGER NOT NULL,
 			user_id INTEGER NOT NULL,
-			type INTEGER NOT NULL,
 			associated_id INTEGER NOT NULL,
 			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 		    FOREIGN KEY (user_id) REFERENCES users(id)            

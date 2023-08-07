@@ -47,12 +47,22 @@ func (db DB) Follow(followerId, userId int) FollowStatus {
 	return Following
 }
 
-func (db DB) RequestToFollow() FollowStatus {
+func (db DB) RequestToFollow(associatedId, userId int) FollowStatus {
+	_, err := db.Exec(`INSERT INTO invitations 
+    	(type, associated_id, user_id ,timestamp)
+		VALUES (?, ?, ?, ?)`,
+		0, associatedId, userId, time.Now().Format(time.RFC3339))
+	if err != nil {
+		log.Panic(err)
+	}
 	return RequestToFollow
 }
 
-/*
-func (db DB) AbortRequestToFollow() int {
-	return notFollowing
+func (db DB) AbortRequestToFollow(associatedId, userId int) FollowStatus {
+	_, err := db.Exec("DELETE FROM invitations WHERE user_id = ? AND associated_id = ?", userId, associatedId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return NotFollowing
 }
-*/

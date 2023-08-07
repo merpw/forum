@@ -97,17 +97,16 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 	switch h.DB.GetFollowStatus(meId, userId) {
 	case 0:
 		if user.Privacy == database.Private {
-			server.SendObject(w, h.DB.RequestToFollow())
+			server.SendObject(w, h.DB.RequestToFollow(meId, userId))
 		} else {
 			server.SendObject(w, h.DB.Follow(meId, userId))
 		}
 
 	case 1:
 		server.SendObject(w, h.DB.Unfollow(meId, userId))
-		/*
-			case 2:
-				server.SendObject(w, h.DB.AbortRequestToFollow())
-		*/
+
+	case 2:
+		server.SendObject(w, h.DB.AbortRequestToFollow(meId, userId))
 	}
 }
 
