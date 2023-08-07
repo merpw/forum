@@ -12,8 +12,8 @@ var v008 = migrate.Migration{
 		CREATE TABLE IF NOT EXISTS invitations (
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,
 		    type INTEGER NOT NULL,
+		    associated_id INTEGER NOT NULL,
 			user_id INTEGER NOT NULL,
-			associated_id INTEGER NOT NULL,
 			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 		    FOREIGN KEY (user_id) REFERENCES users(id)            
 		);

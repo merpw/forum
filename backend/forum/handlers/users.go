@@ -76,7 +76,6 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
-	meId := h.getUserId(w, r)
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	userIdStr = strings.TrimSuffix(userIdStr, "/follow")
 	// /api/users/1/ -> 1
@@ -94,19 +93,21 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	meId := h.getUserId(w, r)
 	switch h.DB.GetFollowStatus(meId, userId) {
-	case 0:
+	case database.NotFollowing:
+
 		if user.Privacy == database.Private {
 			server.SendObject(w, h.DB.RequestToFollow(meId, userId))
 		} else {
 			server.SendObject(w, h.DB.Follow(meId, userId))
 		}
 
-	case 1:
+	case database.Following:
 		server.SendObject(w, h.DB.Unfollow(meId, userId))
 
-	case 2:
-		server.SendObject(w, h.DB.AbortRequestToFollow(meId, userId))
+	case database.RequestToFollow:
+		server.SendObject(w, h.DB.RevokeInvitation(meId, userId))
 	}
 }
 

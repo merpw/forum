@@ -12,11 +12,6 @@ import (
 func (h *Handlers) invitations(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
-
 	server.SendObject(w, h.DB.GetAllInvitations(userId))
 }
 
@@ -37,10 +32,24 @@ func (h *Handlers) invitationsId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	server.SendObject(w, invitation)
+	respBody := struct {
+		Id           int    `json:"id"`
+		Type         int    `json:"type"`
+		AssociatedId int    `json:"associated_id"`
+		UserId       int    `json:"user_id"`
+		TimeStamp    string `json:"timestamp"`
+	}{
+		Id:           invitation.Id,
+		Type:         invitation.Type,
+		AssociatedId: invitation.AssociatedId,
+		UserId:       invitation.UserId,
+		TimeStamp:    invitation.TimeStamp,
+	}
+
+	server.SendObject(w, respBody)
 }
 
-// GET /api/invitations/(/d+)/respond
+// POST /api/invitations/(/d+)/respond
 func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) {
 	invitationIdStr := strings.TrimPrefix(r.URL.Path, "/api/invitations/")
 	invitationIdStr = strings.TrimSuffix(invitationIdStr, "/respond")
@@ -67,7 +76,8 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
-	if requestBody.Response {
+
+	if requestBody.Response == true {
 		h.DB.Follow(invitation.AssociatedId, invitation.UserId)
 	}
 
