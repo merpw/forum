@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
+	"backend/forum/database"
 	"net/http"
 	"strconv"
 	"strings"
@@ -21,7 +22,6 @@ func (h *Handlers) usersAll(w http.ResponseWriter, r *http.Request) {
 //
 //	GET /api/users/:id
 func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
-	meId := h.getUserId(w, r)
 	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
 	// /api/users/1 -> 1
 
@@ -48,11 +48,10 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		Bio       string `json:"bio,omitempty"`
 	}{
 		SafeUser: SafeUser{
-			Id:           user.Id,
-			Username:     user.Username,
-			Avatar:       user.Avatar.String,
-			Bio:          user.Bio.String,
-			FollowStatus: h.DB.GetFollowStatus(meId, userId),
+			Id:       user.Id,
+			Username: user.Username,
+			Avatar:   user.Avatar.String,
+			Bio:      user.Bio.String,
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
@@ -63,11 +62,17 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		Bio:       user.Bio.String,
 	}
 
-	if user.Privacy == private {
-		server.SendObject(w, response.SafeUser)
-	} else {
-		server.SendObject(w, response)
+	meId := h.getUserId(w, r)
+	if meId != -1 {
+		response.SafeUser.FollowStatus = h.DB.GetFollowStatus(meId, userId)
 	}
+
+	if user.Privacy == database.Public || response.FollowStatus == database.Following {
+		server.SendObject(w, response)
+	} else {
+		server.SendObject(w, response.SafeUser)
+	}
+
 }
 
 func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
@@ -91,7 +96,7 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 
 	switch h.DB.GetFollowStatus(meId, userId) {
 	case 0:
-		if user.Privacy == private {
+		if user.Privacy == database.Private {
 			server.SendObject(w, h.DB.RequestToFollow())
 		} else {
 			server.SendObject(w, h.DB.Follow(meId, userId))
@@ -147,6 +152,5 @@ func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 			Categories:    post.Categories,
 		})
 	}
-
 	server.SendObject(w, response)
 }

@@ -182,17 +182,7 @@ func TestUserFollow(t *testing.T) {
 		var followStatus int
 
 		var responseData struct {
-			Id           int    `json:"id"`
-			Username     string `json:"username"`
-			Email        string `json:"email"`
-			FirstName    string `json:"first_name"`
-			LastName     string `json:"last_name"`
-			DoB          string `json:"dob"`
-			Gender       string `json:"gender"`
-			Avatar       string `json:"avatar"`
-			Bio          string `json:"bio"`
-			Privacy      bool   `json:"privacy"`
-			FollowStatus int    `json:"followStatus"`
+			Gender string `json:"gender"`
 		}
 
 		t.Run("Request to follow", func(t *testing.T) {
@@ -219,48 +209,58 @@ func TestUserFollow(t *testing.T) {
 			})
 		*/
 		t.Run("Follow", func(t *testing.T) {
-			cli2.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
-			_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
 
-			err := json.Unmarshal(response, &followStatus)
-			if err != nil {
-				t.Fatal(err)
-			}
-			if followStatus != 1 {
-				t.Fatalf("invalid followStatus, expected %d, got %d", 1, followStatus)
-			}
+			t.Run("Make public", func(t *testing.T) {
+				cli2.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
+				_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
 
-			_, respBody := cli1.TestGet(t, "/api/users/2", http.StatusOK)
-			err = json.Unmarshal(respBody, &responseData)
-			if err != nil {
-				t.Fatal(err)
-			}
+				err := json.Unmarshal(response, &followStatus)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if followStatus != 1 {
+					t.Fatalf("invalid followStatus, expected %d, got %d", 1, followStatus)
+				}
+			})
 
-			if responseData.FollowStatus != 1 {
-				t.Errorf("invalid followStatus, expected %d, got %d", 1, responseData.FollowStatus)
-			}
+			t.Run("Make private", func(t *testing.T) {
+				cli2.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
+				_, respBody := cli1.TestGet(t, "/api/users/2", http.StatusOK)
+				err := json.Unmarshal(respBody, &responseData)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if responseData.Gender != cli2.Gender {
+					t.Errorf("invalid gender, expected %s, got %s", cli2.Gender, responseData.Gender)
+				}
+
+			})
 
 		})
 
 		t.Run("Unfollow", func(t *testing.T) {
+
 			_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
 
 			err := json.Unmarshal(response, &followStatus)
 			if err != nil {
 				t.Fatal(err)
 			}
+
 			if followStatus != 0 {
 				t.Fatalf("invalid followStatus, expected %d, got %d", 0, followStatus)
 			}
 
+			// Reset the gender (part of public/followed profile).
+			responseData.Gender = ""
 			_, respBody := cli1.TestGet(t, "/api/users/2", http.StatusOK)
 			err = json.Unmarshal(respBody, &responseData)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			if responseData.FollowStatus != 0 {
-				t.Errorf("invalid followStatus, expected %d, got %d", 0, responseData.FollowStatus)
+			if len(responseData.Gender) != 0 {
+				t.Errorf("invalid gender, expected %s, got %s", "", responseData.Gender)
 			}
 		})
 	})

@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"net/mail"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -70,33 +72,81 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username, usernameError := h.checkUserName(requestBody.Username)
-	if usernameError != nil {
-		http.Error(w, usernameError.Error(), http.StatusBadRequest)
+	username := strings.TrimSpace(requestBody.Username)
+	if len(username) == 0 {
+		username = "u" + strconv.Itoa(h.DB.GetLastUserId()+1)
+		goto skipUserNameCheck
+	}
+	if IdUsernameRegex.MatchString(username) {
+		http.Error(w, "invalid username format", http.StatusBadRequest)
+		return
+	}
+	if len(username) < MinUsernameLength {
+		http.Error(w, "username is too short", http.StatusBadRequest)
+		return
+	}
+	if len(username) > MaxUsernameLength {
+		http.Error(w, "username is too long", http.StatusBadRequest)
+		return
+	}
+	if !UsernameRegex.MatchString(username) {
+		http.Error(w, "username is not valid, only letters, numbers and underscores are allowed", http.StatusBadRequest)
+		return
+	}
+	if h.DB.IsNameTaken(username) {
+		http.Error(w, "username is already in use", http.StatusBadRequest)
 		return
 	}
 
-	firstName, firstNameError := h.checkFirstName(requestBody.FirstName)
-	if firstNameError != nil {
-		http.Error(w, firstNameError.Error(), http.StatusBadRequest)
+skipUserNameCheck:
+
+	firstName := strings.TrimSpace(requestBody.FirstName)
+	if len(firstName) < MinFirstNameLength {
+		http.Error(w, "first name is too short", http.StatusBadRequest)
+		return
+	}
+	if len(firstName) > MaxFirstNameLength {
+		http.Error(w, "first name is too long", http.StatusBadRequest)
 		return
 	}
 
-	lastName, lastNameError := h.checkLastName(requestBody.LastName)
-	if lastNameError != nil {
-		http.Error(w, lastNameError.Error(), http.StatusBadRequest)
+	lastName := strings.TrimSpace(requestBody.LastName)
+	if len(lastName) < MinLastNameLength {
+		http.Error(w, "last name is too short", http.StatusBadRequest)
+		return
+	}
+	if len(lastName) > MaxLastNameLength {
+		http.Error(w, "last name is too long", http.StatusBadRequest)
 		return
 	}
 
-	dob, dobError := h.checkDoB(requestBody.DoB)
-	if dobError != nil {
-		http.Error(w, dobError.Error(), http.StatusBadRequest)
+	if requestBody.DoB == "" {
+		http.Error(w, "date of birth is invalid", http.StatusBadRequest)
 		return
 	}
 
-	email, emailError := h.checkEmail(requestBody.Email)
-	if emailError != nil {
-		http.Error(w, emailError.Error(), http.StatusBadRequest)
+	dob, dobErr := time.Parse("2006-01-02", requestBody.DoB)
+	if dobErr != nil {
+		http.Error(w, "date of birth is invalid", http.StatusBadRequest)
+		return
+	}
+
+	now := time.Now()
+	mindate := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
+
+	if dob.After(now) || dob.Before(mindate) {
+		http.Error(w, "date of birth is invalid", http.StatusBadRequest)
+		return
+	}
+
+	email := strings.TrimSpace(strings.ToLower(requestBody.Email))
+	_, err = mail.ParseAddress(email)
+	if err != nil || email != strings.TrimSpace(email) {
+		http.Error(w, "email is invalid", http.StatusBadRequest)
+		return
+	}
+	if h.DB.IsEmailTaken(email) {
+		http.Error(w, "email is already taken", http.StatusBadRequest)
 		return
 	}
 
@@ -105,31 +155,56 @@ func (h *Handlers) signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	password, passwordError := h.checkPassword(requestBody.Password)
-	if passwordError != nil {
-		http.Error(w, passwordError.Error(), http.StatusBadRequest)
+	if len(requestBody.Password) < MinPasswordLength {
+		http.Error(w, "password is too short", http.StatusBadRequest)
 		return
 	}
 
-	avatar, avatarError := h.checkAvatar(requestBody.Avatar)
-	if avatarError != nil {
-		http.Error(w, avatarError.Error(), http.StatusBadRequest)
+	if len(requestBody.Password) > MaxPasswordLength {
+		http.Error(w, "password is too long", http.StatusBadRequest)
 		return
 	}
 
-	bio, bioError := h.checkBio(requestBody.Bio)
-	if bioError != nil {
-		http.Error(w, bioError.Error(), http.StatusBadRequest)
+	encryptedPassword, err := bcrypt.GenerateFromPassword([]byte(requestBody.Password), 10)
+	if err != nil {
+		http.Error(w, "invalid password", http.StatusBadRequest)
 		return
+	}
+
+	var avatar sql.NullString
+	requestBody.Avatar = strings.TrimSpace(requestBody.Avatar)
+
+	if !AvatarRegex.MatchString(requestBody.Avatar) && len(requestBody.Avatar) != 0 {
+		http.Error(w, "avatar file is invalid", http.StatusBadRequest)
+		return
+	}
+
+	if len(requestBody.Avatar) == 0 {
+		avatar = sql.NullString{String: "", Valid: false}
+	} else {
+		avatar = sql.NullString{String: requestBody.Avatar, Valid: true}
+	}
+
+	var bio sql.NullString
+	requestBody.Bio = strings.TrimSpace(requestBody.Bio)
+
+	if len(requestBody.Bio) > MaxBioLength {
+		http.Error(w, "bio is too long", http.StatusBadRequest)
+	}
+
+	if len(requestBody.Bio) == MinBioLength {
+		bio = sql.NullString{String: "", Valid: false}
+	} else {
+		bio = sql.NullString{String: requestBody.Bio, Valid: true}
 	}
 
 	id := h.DB.AddUser(
 		username,
 		email,
-		password,
+		string(encryptedPassword),
 		sql.NullString{String: firstName, Valid: true},
 		sql.NullString{String: lastName, Valid: true},
-		sql.NullString{String: dob, Valid: true},
+		sql.NullString{String: requestBody.DoB, Valid: true},
 		sql.NullString{String: requestBody.Gender, Valid: true},
 		avatar,
 		bio,

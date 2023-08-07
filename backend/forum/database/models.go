@@ -1,6 +1,23 @@
 package database
 
-import "database/sql"
+import (
+	"database/sql"
+)
+
+type FollowStatus uint8
+
+const (
+	NotFollowing FollowStatus = iota
+	Following
+	RequestToFollow
+)
+
+type Privacy uint8
+
+const (
+	Public Privacy = iota
+	Private
+)
 
 type Post struct {
 	Id            int
@@ -26,7 +43,7 @@ type User struct {
 	Gender    sql.NullString
 	Avatar    sql.NullString
 	Bio       sql.NullString
-	Privacy   int
+	Privacy   Privacy
 }
 
 type Comment struct {

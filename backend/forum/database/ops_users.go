@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"log"
-	"time"
 )
 
 // GetAllUserIds returns slice of all users ids
@@ -21,9 +20,8 @@ func (db DB) GetAllUserIds() (userIds []int) {
 		}
 		userIds = append(userIds, userId)
 	}
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+
+	query.Close()
 
 	return
 }
@@ -47,9 +45,7 @@ func (db DB) GetUserById(id int) *User {
 	if err != nil {
 		log.Panic(err)
 	}
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return &user
 }
@@ -70,9 +66,7 @@ func (db DB) GetLastUserId() int {
 		log.Panic(err)
 	}
 
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return userId
 }
@@ -97,19 +91,17 @@ func (db DB) GetUserByLogin(login string) *User {
 		log.Panic(err)
 	}
 
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return &user
 }
 
-func (db DB) UpdateUserPrivacy(privacy, id int) bool {
+func (db DB) UpdateUserPrivacy(privacy Privacy, id int) bool {
 	_, err := db.Exec("UPDATE users SET privacy = ? WHERE id = ?", privacy, id)
 	if err != nil {
 		log.Panic(err)
 	}
-	return privacy == 1
+	return privacy == Private
 }
 
 // AddUser adds user to database, returns id of new user
@@ -135,9 +127,10 @@ func (db DB) AddUser(
 		log.Panic(err)
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		log.Panic(err)
+	id, newErr := result.LastInsertId()
+
+	if newErr != nil {
+		log.Panic(newErr)
 	}
 	return int(id)
 }
@@ -149,9 +142,8 @@ func (db DB) IsEmailTaken(email string) bool {
 		log.Panic(err)
 	}
 	isTaken := query.Next()
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+
+	query.Close()
 
 	return isTaken
 }
@@ -165,69 +157,7 @@ func (db DB) IsNameTaken(username string) bool {
 	}
 	isTaken := query.Next()
 
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return isTaken
 }
-
-const (
-	notFollowing = iota
-	following
-	requestToFollow
-)
-
-func (db DB) GetFollowStatus(meId, userId int) int {
-	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? COLLATE NOCASE", userId)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	var followerId int = -2
-	if query.Next() {
-		err = query.Scan(&followerId)
-		if err != nil {
-			log.Panic(err)
-		}
-	}
-
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
-
-	if followerId == meId {
-		return following
-	} else {
-		return notFollowing
-	}
-}
-
-func (db DB) Unfollow(followerId, userId int) int {
-	_, err := db.Exec("DELETE FROM followers WHERE user_id = ? AND follower_id = ?", userId, followerId)
-	if err != nil {
-		log.Panic(err)
-	}
-	return notFollowing
-}
-
-func (db DB) Follow(followerId, userId int) int {
-	_, err := db.Exec(`INSERT INTO followers 
-    	(user_id, follower_id,timestamp)
-		VALUES (?, ?, ?)`,
-		userId, followerId, time.Now().Format(time.RFC3339))
-	if err != nil {
-		log.Panic(err)
-	}
-	return following
-}
-
-func (db DB) RequestToFollow() int {
-	return requestToFollow
-}
-
-/*
-func (db DB) AbortRequestToFollow() int {
-	return notFollowing
-}
-*/
