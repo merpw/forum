@@ -196,18 +196,18 @@ func TestUserFollow(t *testing.T) {
 				t.Fatalf("invalid followStatus, expected %d, got %d", 2, followStatus)
 			}
 		})
-		/*
-			t.Run("Abort request to follow", func(t *testing.T) {
-				_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusNotFound)
-				err := json.Unmarshal(response, &followStatus)
-				if err != nil {
-					t.Fatal(err)
-				}
-				if followStatus != 2 {
-					t.Fatalf("invalid followStatus, expected %d, got %d", 2, followStatus)
-				}
-			})
-		*/
+
+		t.Run("Abort request to follow", func(t *testing.T) {
+			_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
+			err := json.Unmarshal(response, &followStatus)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if followStatus != 0 {
+				t.Fatalf("invalid followStatus, expected %d, got %d", 0, followStatus)
+			}
+		})
+
 		t.Run("Follow", func(t *testing.T) {
 
 			t.Run("Make public", func(t *testing.T) {
@@ -240,6 +240,7 @@ func TestUserFollow(t *testing.T) {
 
 		t.Run("Unfollow", func(t *testing.T) {
 
+			// Unfollow here
 			_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
 
 			err := json.Unmarshal(response, &followStatus)
