@@ -1,28 +1,26 @@
 "use client"
 
 import { NextPage } from "next"
-import { FC, useRef, useState } from "react"
+import { FC, useRef } from "react"
 import Link from "next/link"
 import { SWRConfig } from "swr"
 
-import { FollowStatus, Post, User } from "@/custom"
+import { Post, User } from "@/custom"
 import { PostList } from "@/components/posts/list"
-import { UserInfo } from "@/components/profiles/UserInfo"
 import { followUser, useUser } from "@/api/users/hooks"
+import { UserInfo } from "@/components/profiles/UserInfo"
 
-const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
+const UserPage: FC<{ userId: number; posts: Post[] }> = ({ userId, posts }) => {
+  const { user } = useUser(userId)
+
+  if (!user) return null
+
   return (
-    <SWRConfig
-      value={{
-        fallback: {
-          [`/api/users/${user.id}`]: user,
-        },
-      }}
-    >
-      <UserInfoWrapper userId={user.id} />
+    <>
+      <UserInfo user={user} />
 
       <div className={"flex flex-wrap justify-center gap-3"}>
-        <FollowButton userId={user.id} followStatus={user.followStatus} />
+        <FollowButton userId={user.id} />
 
         <ChatButton userId={user.id} />
       </div>
@@ -36,16 +34,8 @@ const UserPage: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
         </div>
         <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
       </div>
-    </SWRConfig>
+    </>
   )
-}
-
-const UserInfoWrapper: FC<{ userId: number }> = ({ userId }) => {
-  const { user } = useUser(userId)
-
-  if (!user) return null
-
-  return <UserInfo user={user} />
 }
 
 const ChatButton: FC<{ userId: number }> = ({ userId }) => {
@@ -76,27 +66,33 @@ const ChatButton: FC<{ userId: number }> = ({ userId }) => {
   )
 }
 
-const FollowButton: FC<{ userId: number; followStatus: FollowStatus | undefined }> = ({
-  userId,
-  followStatus,
-}) => {
-  const [currentFollowStatus, setCurrentFollowStatus] = useState(followStatus)
+const FollowButton: FC<{ userId: number }> = ({ userId }) => {
+  const { user, mutate } = useUser(userId)
 
   const popupRef = useRef<HTMLDialogElement>(null)
+
+  const followStatus = user?.followStatus
+
+  if (!user || followStatus === undefined) return null
+
+  const handleFollow = () =>
+    followUser(userId).then((value) => {
+      mutate({ ...user, followStatus: value })
+    })
 
   return (
     <>
       <button
         className={"button"}
         onClick={() => {
-          if (currentFollowStatus) {
+          if (followStatus >= 1) {
             popupRef.current?.showModal()
             return
           }
-          followUser(userId).then(setCurrentFollowStatus)
+          handleFollow()
         }}
       >
-        {currentFollowStatus ? (
+        {followStatus ? (
           <>
             <svg
               xmlns={"http://www.w3.org/2000/svg"}
@@ -114,7 +110,7 @@ const FollowButton: FC<{ userId: number; followStatus: FollowStatus | undefined 
                 }
               />
             </svg>
-            {currentFollowStatus === 1 ? "Unfollow" : "Cancel request"}
+            {followStatus === 1 ? "Unfollow" : "Cancel request"}
           </>
         ) : (
           <>
@@ -142,14 +138,11 @@ const FollowButton: FC<{ userId: number; followStatus: FollowStatus | undefined 
         <form method={"dialog"} className={"modal-box text-center"}>
           <p className={"py-4"}>
             Are you sure that you want to{" "}
-            {currentFollowStatus === 1 ? `unfollow` : "cancel follow request"}?
+            {followStatus === 1 ? `unfollow` : "cancel follow request"}?
           </p>
           <div className={"modal-action justify-center"}>
             {/* if there is a button in form, it will close the modal */}
-            <button
-              className={"btn"}
-              onClick={() => followUser(userId).then(setCurrentFollowStatus)}
-            >
+            <button className={"btn"} onClick={handleFollow}>
               Yes
             </button>
             <button className={"btn btn-ghost"}>Cancel</button>
@@ -160,4 +153,18 @@ const FollowButton: FC<{ userId: number; followStatus: FollowStatus | undefined 
   )
 }
 
-export default UserPage
+const UserPageWrapper: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
+  return (
+    <SWRConfig
+      value={{
+        fallback: {
+          [`/api/users/${user.id}`]: user,
+        },
+      }}
+    >
+      <UserPage userId={user.id} posts={posts} />
+    </SWRConfig>
+  )
+}
+
+export default UserPageWrapper
