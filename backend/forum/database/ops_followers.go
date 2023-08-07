@@ -5,13 +5,18 @@ import (
 	"time"
 )
 
-func (db DB) GetFollowStatus(meId, userId int) FollowStatus {
+func (db DB) GetFollowStatus(meId, userId int) *FollowStatus {
+	if meId == userId {
+		return nil
+	}
+
 	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? COLLATE NOCASE", userId)
 	if err != nil {
 		log.Panic(err)
 	}
 
 	var followerId = -2
+
 	if query.Next() {
 		err = query.Scan(&followerId)
 		if err != nil {
@@ -21,15 +26,19 @@ func (db DB) GetFollowStatus(meId, userId int) FollowStatus {
 
 	query.Close()
 
+	var followStatus = new(FollowStatus)
 	if followerId == meId {
-		return Following
+		*followStatus = Following
+		return followStatus
 	}
 
 	if db.CheckIfInvitationExists(meId, userId) {
-		return RequestToFollow
+		*followStatus = RequestToFollow
+	} else {
+		*followStatus = NotFollowing
 	}
 
-	return NotFollowing
+	return followStatus
 }
 
 func (db DB) Unfollow(followerId, userId int) FollowStatus {
@@ -48,5 +57,6 @@ func (db DB) Follow(followerId, userId int) FollowStatus {
 	if err != nil {
 		log.Panic(err)
 	}
+
 	return Following
 }

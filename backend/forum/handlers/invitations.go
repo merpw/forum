@@ -77,7 +77,7 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	if requestBody.Response == true {
+	if requestBody.Response {
 		h.DB.Follow(invitation.AssociatedId, invitation.UserId)
 	}
 

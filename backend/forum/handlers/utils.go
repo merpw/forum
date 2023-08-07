@@ -5,11 +5,11 @@ import (
 )
 
 type SafeUser struct {
-	Id           int                   `json:"id"`
-	Username     string                `json:"username"`
-	Avatar       string                `json:"avatar,omitempty"`
-	Bio          string                `json:"bio,omitempty"`
-	FollowStatus database.FollowStatus `json:"followStatus,omitempty"`
+	Id           int                    `json:"id"`
+	Username     string                 `json:"username"`
+	Avatar       string                 `json:"avatar,omitempty"`
+	Bio          string                 `json:"bio,omitempty"`
+	FollowStatus *database.FollowStatus `json:"followStatus,omitempty"`
 }
 
 type SafePost struct {
