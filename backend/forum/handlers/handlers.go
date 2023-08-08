@@ -76,6 +76,7 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodGet, `/api/me`, h.me),
 
 		server.NewRoute(http.MethodGet, `/api/me/followers`, h.meFollowers),
+		server.NewRoute(http.MethodGet, `/api/me/following`, h.meFollowing),
 
 		server.NewRoute(http.MethodGet, `/api/me/posts`, h.mePosts),
 		server.NewRoute(http.MethodGet, `/api/me/posts/liked`, h.mePostsLiked),

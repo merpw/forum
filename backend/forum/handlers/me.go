@@ -57,6 +57,12 @@ func (h *Handlers) meFollowers(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, h.DB.GetUserFollowers(userId))
 }
 
+func (h *Handlers) meFollowing(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value(userIdCtxKey).(int)
+
+	server.SendObject(w, h.DB.GetUsersFollowed(userId))
+}
+
 // mePosts returns the posts of the logged-in user.
 func (h *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)

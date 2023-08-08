@@ -11,6 +11,7 @@ func (db DB) GetUserFollowers(userId int) (followerIds []int) {
 		log.Panic(err)
 	}
 
+	followerIds = make([]int, 0)
 	for query.Next() {
 		var followerId int
 		err = query.Scan(&followerId)
@@ -18,6 +19,27 @@ func (db DB) GetUserFollowers(userId int) (followerIds []int) {
 			log.Panic(err)
 		}
 		followerIds = append(followerIds, followerId)
+	}
+
+	query.Close()
+	return
+}
+
+func (db DB) GetUsersFollowed(userId int) (userIds []int) {
+	query, err := db.Query("SELECT user_id FROM followers WHERE follower_id = ? ORDER BY timestamp", userId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	userIds = make([]int, 0)
+
+	for query.Next() {
+		var followerId int
+		err = query.Scan(&followerId)
+		if err != nil {
+			log.Panic(err)
+		}
+		userIds = append(userIds, followerId)
 	}
 
 	query.Close()
