@@ -4,8 +4,9 @@ import Link from "next/link"
 
 import { useLogOut, useMe } from "@/api/auth/hooks"
 import Avatar from "@/components/Avatar"
+import InvitationsBell from "@/components/invitations/NavbarBell"
 
-const UserInfo = () => {
+const NavUserInfo = () => {
   const { user, isError, isLoading, isLoggedIn } = useMe()
   const logOut = useLogOut()
 
@@ -39,6 +40,7 @@ const UserInfo = () => {
   }
   return (
     <div className={"flex gap-1 my-auto"}>
+      <InvitationsBell />
       <div className={"dropdown dropdown-end"}>
         <div tabIndex={0} className={"btn min-w-full btn-ghost btn-circle"}>
           <Avatar user={user} size={40} className={"w-9"} />
@@ -69,4 +71,4 @@ const UserInfo = () => {
   )
 }
 
-export default UserInfo
+export default NavUserInfo

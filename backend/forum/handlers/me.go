@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
+	"backend/forum/database"
 	"net/http"
 )
 
@@ -10,7 +11,6 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
 	user := h.DB.GetUserById(userId)
-
 	response := struct {
 		SafeUser
 		Email     string `json:"email"`
@@ -18,21 +18,52 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		LastName  string `json:"last_name,omitempty"`
 		DoB       string `json:"dob,omitempty"`
 		Gender    string `json:"gender,omitempty"`
+		Privacy   bool   `json:"privacy"`
 	}{
 		SafeUser: SafeUser{
-			Id:       user.Id,
-			Username: user.Username,
-			Avatar:   user.Avatar.String,
-			Bio:      user.Bio.String,
+			Id:        user.Id,
+			Username:  user.Username,
+			Avatar:    user.Avatar.String,
+			Bio:       user.Bio.String,
+			Followers: len(h.DB.GetUserFollowers(user.Id)),
+			Following: len(h.DB.GetUsersFollowed(user.Id)),
+			Privacy:   user.Privacy == database.Private,
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
 		LastName:  user.LastName.String,
 		DoB:       user.DoB.String,
 		Gender:    user.Gender.String,
+		Privacy:   user.Privacy == database.Private,
 	}
 
 	server.SendObject(w, response)
+}
+
+// mePrivacy toggles privacy and sends current privacy status
+func (h *Handlers) mePrivacy(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value(userIdCtxKey).(int)
+	user := h.DB.GetUserById(userId)
+
+	if user.Privacy == database.Private {
+		server.SendObject(w, h.DB.UpdateUserPrivacy(database.Public, userId))
+	} else {
+		server.SendObject(w, h.DB.UpdateUserPrivacy(database.Private, userId))
+	}
+}
+
+// meFollowers sends all followers as IDs in an array
+// /api/me/followers -> [followerIds]
+func (h *Handlers) meFollowers(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value(userIdCtxKey).(int)
+
+	server.SendObject(w, h.DB.GetUserFollowers(userId))
+}
+
+func (h *Handlers) meFollowing(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value(userIdCtxKey).(int)
+
+	server.SendObject(w, h.DB.GetUsersFollowed(userId))
 }
 
 // mePosts returns the posts of the logged-in user.
@@ -104,6 +135,5 @@ func (h *Handlers) mePostsLiked(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 	}
-
 	server.SendObject(w, response)
 }

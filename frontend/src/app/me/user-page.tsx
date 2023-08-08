@@ -1,58 +1,29 @@
 "use client"
 
-/* eslint-disable import/no-named-as-default-member */
-/* https://github.com/iamkun/dayjs/issues/1242 */
-import dayjs from "dayjs"
 import Link from "next/link"
 import { NextPage } from "next/types"
-import { FC, useState } from "react"
-import relativeTime from "dayjs/plugin/relativeTime"
+import { useState } from "react"
 
 import { useMe } from "@/api/auth/hooks"
 import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
-import { User } from "@/custom"
-import Avatar from "@/components/Avatar"
+import { UserInfo } from "@/components/profiles/UserInfo"
+import { UserCard } from "@/components/UserList"
+import { useFollowing, useFollowers } from "@/api/followers/hooks"
 
 /* TODO: add placeholders */
 
 const UserPage: NextPage = () => {
   const { user, isLoading } = useMe()
 
-  const tabs = [
-    { title: "Your posts", component: <UserPosts /> },
-    { title: "Your liked posts", component: <UserLikedPosts /> },
-  ]
   const [activeTab, setActiveTab] = useState(0)
 
   if (isLoading || !user) return <div className={"text-info text-center mt-5 mb-7"}>Loading...</div>
 
   return (
     <>
-      <div className={"hero"}>
-        <div className={"hero-content px-0"}>
-          <div
-            className={
-              "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3"
-            }
-          >
-            <div className={"card-body sm:flex-row sm:gap-5"}>
-              <Avatar user={user} size={50} className={"w-24 sm:w-52 self-center p-1"} />
-              <div className={"self-center text-sm"}>
-                <UserInfo user={user} />
-              </div>
-            </div>
-
-            {user.bio && (
-              <div className={"mb-5 text-center"}>
-                <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
-                <div className={"text-sm"}>{user.bio}</div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <UserInfo user={user} isOwnProfile />
 
       <div className={"text-center m-3"}>
         <Link href={"/create"} className={"button"}>
@@ -100,62 +71,6 @@ const UserPage: NextPage = () => {
   )
 }
 
-/* "2000-01-24" -> "23 years"
- * "2021-01-24" -> "baby 👶"
- */
-const calculateAge = (dob: string): string | null => {
-  dayjs.extend(relativeTime)
-
-  const parsedDob = dayjs(dob, "YYYY-MM-DD")
-  if (!parsedDob.isValid()) return null
-
-  const age = parsedDob.fromNow(true)
-  return age.includes("year") ? age + " old" : "baby 👶"
-}
-
-const UserInfo: FC<{ user: User }> = ({ user }) => {
-  const age = user.dob ? calculateAge(user.dob) : null
-  return (
-    <>
-      <div
-        className={"flex flex-col self-center font-light mb-5 text-center sm:text-left text-info"}
-      >
-        {"Hey, "}
-        <span className={"text-3xl sm:text-4xl text-primary font-Yesteryear mx-1"}>
-          {user.username}
-        </span>
-        {"Forgot who you are?"}
-      </div>
-      <div className={"font-light"}>
-        {user.first_name || user.last_name ? (
-          <p>
-            <span className={"font-light text-info"}>{"Full name"}</span>
-            <span
-              className={"font-normal start-dot"}
-            >{`${user.first_name} ${user.last_name}`}</span>
-          </p>
-        ) : null}
-        {age ? (
-          <p>
-            <span className={"font-light text-info"}>{"Age"}</span>
-            <span className={"font-normal start-dot"}>{age}</span>
-          </p>
-        ) : null}
-        {user.gender ? (
-          <p>
-            <span className={"font-light text-info"}>{"Gender"}</span>
-            <span className={"font-normal start-dot"}>{user.gender}</span>
-          </p>
-        ) : null}
-        <p>
-          <span className={"font-light text-info"}>{"Email"}</span>
-          <span className={"font-normal start-dot"}>{user.email}</span>
-        </p>
-      </div>
-    </>
-  )
-}
-
 const UserPosts = () => {
   const { posts } = useMyPosts()
 
@@ -181,5 +96,48 @@ const UserLikedPosts = () => {
 
   return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
 }
+
+const UserFollowers = () => {
+  const { followers } = useFollowers()
+
+  if (!followers) return null
+
+  if (followers.length == 0)
+    return (
+      <div className={"text-info text-center mt-5 mb-7"}>{"You don't have any followers yet"}</div>
+    )
+
+  return (
+    <div className={"w-96 m-5 mx-auto"}>
+      {followers.map((follower) => (
+        <UserCard id={follower} key={follower} />
+      ))}
+    </div>
+  )
+}
+
+const UserFollowed = () => {
+  const { following } = useFollowing()
+
+  if (!following) return null
+
+  if (following.length == 0)
+    return <div className={"text-info text-center mt-5 mb-7"}>{"You don't follow anyone yet"}</div>
+
+  return (
+    <div className={"w-96 m-5 mx-auto"}>
+      {following.map((userId) => (
+        <UserCard id={userId} key={userId} />
+      ))}
+    </div>
+  )
+}
+
+const tabs = [
+  { title: "Your posts", component: <UserPosts /> },
+  { title: "Liked posts", component: <UserLikedPosts /> },
+  { title: "Your followers", component: <UserFollowers /> },
+  { title: "Users you follow", component: <UserFollowed /> },
+]
 
 export default UserPage

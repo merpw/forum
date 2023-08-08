@@ -37,9 +37,7 @@ type ReactionResponse = {
 export const getPostReaction = (path: string) =>
   document.cookie.includes("forum-token")
     ? axios
-        .get<ReactionResponse>(path, {
-          withCredentials: true,
-        })
+        .get<ReactionResponse>(path)
         .then((res) => res.data)
         .catch(() => undefined)
     : undefined
@@ -47,41 +45,31 @@ export const getPostReaction = (path: string) =>
 export const getCommentReaction = (path: string) =>
   document.cookie.includes("forum-token")
     ? axios
-        .get<ReactionResponse>(path, {
-          withCredentials: true,
-        })
+        .get<ReactionResponse>(path)
         .then((res) => res.data)
         .catch(() => undefined)
     : undefined
 
 export const dislikePost = (postID: number) =>
   document.cookie.includes("forum-token")
-    ? axios
-        .post<number>(`/api/posts/${postID}/dislike`, null, { withCredentials: true })
-        .then((res) => res.data)
+    ? axios.post<number>(`/api/posts/${postID}/dislike`, null).then((res) => res.data)
     : Promise.resolve(0)
 
 export const likePost = (postID: number) =>
   document.cookie.includes("forum-token")
-    ? axios
-        .post<number>(`/api/posts/${postID}/like`, null, { withCredentials: true })
-        .then((res) => res.data)
+    ? axios.post<number>(`/api/posts/${postID}/like`, null).then((res) => res.data)
     : Promise.resolve(0)
 
 export const likeComment = (postID: number, commentID: number) =>
   document.cookie.includes("forum-token")
     ? axios
-        .post<number>(`/api/posts/${postID}/comment/${commentID}/like`, null, {
-          withCredentials: true,
-        })
+        .post<number>(`/api/posts/${postID}/comment/${commentID}/like`, null)
         .then((res) => res.data)
     : Promise.resolve(0)
 
 export const dislikeComment = (postID: number, commentID: number) =>
   document.cookie.includes("forum-token")
     ? axios
-        .post<number>(`/api/posts/${postID}/comment/${commentID}/dislike`, null, {
-          withCredentials: true,
-        })
+        .post<number>(`/api/posts/${postID}/comment/${commentID}/dislike`, null)
         .then((res) => res.data)
     : Promise.resolve(0)

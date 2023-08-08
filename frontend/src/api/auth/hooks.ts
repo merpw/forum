@@ -23,7 +23,7 @@ export const useMe = () => {
 const getMe = async () =>
   document.cookie.includes("forum-token")
     ? axios
-        .get<User>("/api/me", { withCredentials: true })
+        .get<User>("/api/me")
         .then((res) => {
           return { user: res.data }
         })
@@ -33,7 +33,7 @@ const getMe = async () =>
     : { user: null }
 
 export const logIn = async (login: string, password: string) =>
-  axios.post("/api/login", { login, password }, { withCredentials: true }).catch((err) => {
+  axios.post("/api/login", { login, password }).catch((err) => {
     throw new Error(err.response?.data?.length < 200 ? err.response.data : "Unexpected error")
   })
 
@@ -43,7 +43,7 @@ export const useLogOut = () => {
   const dispatch = useDispatch()
 
   return async () => {
-    await axios.post("/api/logout", {}, { withCredentials: true })
+    await axios.post("/api/logout")
     await mutate({ user: null }, false)
     dispatch(chatActions.reset())
     dispatch(wsActions.close())
@@ -60,6 +60,6 @@ export const SignUp = async (data: {
   dob: string
   gender: string
 }) =>
-  axios.post("/api/signup", data, { withCredentials: true }).catch((err) => {
+  axios.post("/api/signup", data).catch((err) => {
     throw new Error(err.response?.data?.length < 200 ? err.response.data : "Unexpected error")
   })

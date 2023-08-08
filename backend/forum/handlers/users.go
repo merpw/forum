@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
+	"backend/forum/database"
 	"net/http"
 	"strconv"
 	"strings"
@@ -17,6 +18,7 @@ func (h *Handlers) usersAll(w http.ResponseWriter, r *http.Request) {
 }
 
 // usersId returns the info of the user with the given id
+// If profile is Private, send only SafeUser, else, send entire user.
 //
 //	GET /api/users/:id
 func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
@@ -35,12 +37,97 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	server.SendObject(w, SafeUser{
-		Id:       user.Id,
-		Username: user.Username,
-		Avatar:   user.Avatar.String,
-		Bio:      user.Bio.String,
-	})
+	response := struct {
+		SafeUser
+		Email     string `json:"email"`
+		FirstName string `json:"first_name,omitempty"`
+		LastName  string `json:"last_name,omitempty"`
+		DoB       string `json:"dob,omitempty"`
+		Gender    string `json:"gender,omitempty"`
+	}{
+		SafeUser: SafeUser{
+			Id:           user.Id,
+			Username:     user.Username,
+			Avatar:       user.Avatar.String,
+			Bio:          user.Bio.String,
+			FollowStatus: nil,
+			Followers:    len(h.DB.GetUserFollowers(user.Id)),
+			Following:    len(h.DB.GetUsersFollowed(user.Id)),
+			Privacy:      user.Privacy == database.Private,
+		},
+		Email:     user.Email,
+		FirstName: user.FirstName.String,
+		LastName:  user.LastName.String,
+		DoB:       user.DoB.String,
+		Gender:    user.Gender.String,
+	}
+
+	meId := h.getUserId(w, r)
+	if meId != -1 {
+		response.SafeUser.FollowStatus = h.DB.GetFollowStatus(meId, userId)
+	} else {
+		response.SafeUser.FollowStatus = nil
+	}
+	if response.SafeUser.FollowStatus == nil && user.Privacy == database.Public {
+		server.SendObject(w, response)
+		return
+	}
+	if response.SafeUser.FollowStatus == nil && user.Privacy == database.Private {
+		server.SendObject(w, response.SafeUser)
+		return
+	}
+	if user.Privacy == database.Public || *response.SafeUser.FollowStatus == database.Following {
+		server.SendObject(w, response)
+	} else {
+		server.SendObject(w, response.SafeUser)
+	}
+}
+
+func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
+	userIdStr := strings.TrimPrefix(r.URL.Path, "/api/users/")
+	userIdStr = strings.TrimSuffix(userIdStr, "/follow")
+	// /api/users/1/ -> 1
+
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	user := h.DB.GetUserById(userId)
+
+	if user == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	meId := h.getUserId(w, r)
+
+	if meId == userId {
+		server.ErrorResponse(w, http.StatusBadRequest)
+		return
+	}
+
+	followStatus := h.DB.GetFollowStatus(meId, userId)
+
+	switch *followStatus {
+	case database.NotFollowing:
+		if user.Privacy == database.Private {
+			server.SendObject(w, h.DB.AddFollowInvitation(meId, userId))
+			return
+		}
+
+		server.SendObject(w, h.DB.AddFollower(meId, userId))
+		return
+
+	case database.Following:
+		server.SendObject(w, h.DB.RemoveFollower(meId, userId))
+		return
+
+	case database.RequestToFollow:
+		server.SendObject(w, h.DB.DeleteFollowInvitation(meId, userId))
+		return
+	}
 }
 
 // usersIdPosts Returns the posts of the user with the given id.
@@ -84,6 +171,5 @@ func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 			Categories:    post.Categories,
 		})
 	}
-
 	server.SendObject(w, response)
 }

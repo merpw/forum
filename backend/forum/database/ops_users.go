@@ -20,9 +20,8 @@ func (db DB) GetAllUserIds() (userIds []int) {
 		}
 		userIds = append(userIds, userId)
 	}
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+
+	query.Close()
 
 	return
 }
@@ -42,13 +41,11 @@ func (db DB) GetUserById(id int) *User {
 	}
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio, &user.Privacy)
 	if err != nil {
 		log.Panic(err)
 	}
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return &user
 }
@@ -69,9 +66,7 @@ func (db DB) GetLastUserId() int {
 		log.Panic(err)
 	}
 
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return userId
 }
@@ -91,16 +86,22 @@ func (db DB) GetUserByLogin(login string) *User {
 	var user User
 	err = query.Scan(
 		&user.Id, &user.Username, &user.Email, &user.Password,
-		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio)
+		&user.FirstName, &user.LastName, &user.DoB, &user.Gender, &user.Avatar, &user.Bio, &user.Privacy)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return &user
+}
+
+func (db DB) UpdateUserPrivacy(privacy Privacy, id int) bool {
+	_, err := db.Exec("UPDATE users SET privacy = ? WHERE id = ?", privacy, id)
+	if err != nil {
+		log.Panic(err)
+	}
+	return privacy == Private
 }
 
 // AddUser adds user to database, returns id of new user
@@ -109,8 +110,8 @@ func (db DB) AddUser(
 	firstName, lastName, dob, gender, bio, avatar sql.NullString) int {
 
 	result, err := db.Exec(
-		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		`INSERT INTO users (username, email, password, first_name, last_name, dob, gender, bio, avatar, privacy)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		username,
 		email,
 		password,
@@ -120,14 +121,16 @@ func (db DB) AddUser(
 		gender.String,
 		avatar,
 		bio,
+		1,
 	)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		log.Panic(err)
+	id, newErr := result.LastInsertId()
+
+	if newErr != nil {
+		log.Panic(newErr)
 	}
 	return int(id)
 }
@@ -139,9 +142,8 @@ func (db DB) IsEmailTaken(email string) bool {
 		log.Panic(err)
 	}
 	isTaken := query.Next()
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+
+	query.Close()
 
 	return isTaken
 }
@@ -155,9 +157,7 @@ func (db DB) IsNameTaken(username string) bool {
 	}
 	isTaken := query.Next()
 
-	if err = query.Close(); err != nil {
-		log.Panic(err)
-	}
+	query.Close()
 
 	return isTaken
 }

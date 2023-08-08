@@ -1,10 +1,18 @@
 package handlers
 
+import (
+	"backend/forum/database"
+)
+
 type SafeUser struct {
-	Id       int    `json:"id"`
-	Username string `json:"username"`
-	Avatar   string `json:"avatar,omitempty"`
-	Bio      string `json:"bio,omitempty"`
+	Id           int                    `json:"id"`
+	Username     string                 `json:"username"`
+	Avatar       string                 `json:"avatar,omitempty"`
+	Bio          string                 `json:"bio,omitempty"`
+	FollowStatus *database.FollowStatus `json:"follow_status,omitempty"`
+	Followers    int                    `json:"followers_count"`
+	Following    int                    `json:"following_count"`
+	Privacy      bool                   `json:"privacy"`
 }
 
 type SafePost struct {

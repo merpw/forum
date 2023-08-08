@@ -1,9 +1,7 @@
 import { NextComponentType } from "next"
 import Link from "next/link"
 
-import UserInfo from "@/components/userInfo"
-
-// TODO: fix hydration error
+import NavUserInfo from "@/components/layouts/NavUserInfo"
 
 const Navbar: NextComponentType = () => {
   return (
@@ -17,7 +15,7 @@ const Navbar: NextComponentType = () => {
           </Link>
         </div>
         <div className={"my-auto"}>
-          <UserInfo />
+          <NavUserInfo />
         </div>
       </nav>
     </div>

@@ -4,7 +4,7 @@ import { Alatsi, Yesteryear } from "next/font/google"
 
 import "@/styles/globals.css"
 
-import Layout from "@/components/layout"
+import Layout from "@/components/layouts/Layout"
 
 const alatsi = Alatsi({
   subsets: ["latin"],
