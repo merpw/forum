@@ -6,7 +6,7 @@ import (
 )
 
 func (db DB) GetAllFollowersById(id int) (followerIds []int) {
-	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? COLLATE NOCASE", id)
+	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? ORDER BY timestamp", id)
 	if err != nil {
 		log.Panic(err)
 	}
