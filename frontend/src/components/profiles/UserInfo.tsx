@@ -37,10 +37,8 @@ export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isO
                       Forgot who you are?
                       <PrivacyToggle user={user} />
                     </>
-                  ) : user.privacy ? (
-                    <span className={"badge badge-outline"}>private</span>
                   ) : (
-                    <span className={"badge badge-outline badge-secondary"}>public</span>
+                    user.privacy && <span className={"badge badge-outline"}>private</span>
                   )}
                 </div>
                 <div className={"font-light"}>
