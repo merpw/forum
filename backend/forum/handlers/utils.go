@@ -9,7 +9,7 @@ type SafeUser struct {
 	Username     string                 `json:"username"`
 	Avatar       string                 `json:"avatar,omitempty"`
 	Bio          string                 `json:"bio,omitempty"`
-	FollowStatus *database.FollowStatus `json:"followStatus,omitempty"`
+	FollowStatus *database.FollowStatus `json:"follow_status,omitempty"`
 }
 
 type SafePost struct {

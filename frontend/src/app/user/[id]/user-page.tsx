@@ -71,13 +71,13 @@ const FollowButton: FC<{ userId: number }> = ({ userId }) => {
 
   const popupRef = useRef<HTMLDialogElement>(null)
 
-  const followStatus = user?.followStatus
+  const followStatus = user?.follow_status
 
   if (!user || followStatus === undefined) return null
 
   const handleFollow = () =>
     followUser(userId).then((value) => {
-      mutate({ ...user, followStatus: value })
+      mutate({ ...user, follow_status: value })
     })
 
   return (

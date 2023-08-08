@@ -23,7 +23,7 @@ export type User = {
   avatar?: string
   bio?: string
   privacy?: boolean
-  followStatus?: FollowStatus
+  follow_status?: FollowStatus
 }
 
 /** 0 - not following, 1 - following, 2 - requested */
