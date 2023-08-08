@@ -205,12 +205,12 @@ func TestMeLikedPosts(t *testing.T) {
 func TestMeFollowers(t *testing.T) {
 	testServer := NewTestServer(t)
 	cli1 := testServer.TestClient()
-	cli2 := testServer.TestClient()
 
 	t.Run("Unauthorized", func(t *testing.T) {
 		cli1.TestGet(t, "/api/me/followers", http.StatusUnauthorized)
 	})
 
+	cli2 := testServer.TestClient()
 	cli1.TestAuth(t)
 	cli2.TestAuth(t)
 
@@ -253,7 +253,7 @@ func TestMeFollowing(t *testing.T) {
 	cli2 := testServer.TestClient()
 
 	t.Run("Unauthorized", func(t *testing.T) {
-		cli1.TestGet(t, "/api/me/followers", http.StatusUnauthorized)
+		cli1.TestGet(t, "/api/me/following", http.StatusUnauthorized)
 	})
 
 	cli1.TestAuth(t)
