@@ -44,8 +44,6 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		LastName  string `json:"last_name,omitempty"`
 		DoB       string `json:"dob,omitempty"`
 		Gender    string `json:"gender,omitempty"`
-		Avatar    string `json:"avatar,omitempty"`
-		Bio       string `json:"bio,omitempty"`
 	}{
 		SafeUser: SafeUser{
 			Id:           user.Id,
@@ -55,14 +53,13 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 			FollowStatus: nil,
 			Followers:    len(h.DB.GetUserFollowers(user.Id)),
 			Following:    len(h.DB.GetUsersFollowed(user.Id)),
+			Privacy:      user.Privacy == database.Private,
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
 		LastName:  user.LastName.String,
 		DoB:       user.DoB.String,
 		Gender:    user.Gender.String,
-		Avatar:    user.Avatar.String,
-		Bio:       user.Bio.String,
 	}
 
 	meId := h.getUserId(w, r)

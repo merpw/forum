@@ -27,6 +27,7 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 			Bio:       user.Bio.String,
 			Followers: len(h.DB.GetUserFollowers(user.Id)),
 			Following: len(h.DB.GetUsersFollowed(user.Id)),
+			Privacy:   user.Privacy == database.Private,
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,

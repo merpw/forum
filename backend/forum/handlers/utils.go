@@ -12,6 +12,7 @@ type SafeUser struct {
 	FollowStatus *database.FollowStatus `json:"follow_status,omitempty"`
 	Followers    int                    `json:"followers_count"`
 	Following    int                    `json:"following_count"`
+	Privacy      bool                   `json:"privacy"`
 }
 
 type SafePost struct {
