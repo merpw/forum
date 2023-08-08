@@ -60,6 +60,10 @@ func TestUser(t *testing.T) {
 				if responseData.Avatar != cli1.Avatar {
 					t.Fatalf("invalid avatar, expected %s, got %s", cli1.Avatar, responseData.Avatar)
 				}
+
+				if responseData.Privacy != true {
+					t.Fatalf("invalid privacy, expected true, got %t", responseData.Privacy)
+				}
 			}
 			checkRespBody()
 
@@ -113,6 +117,10 @@ func TestUser(t *testing.T) {
 
 				if responseData.Gender != cli1.Gender {
 					t.Fatalf("invalid gender, expected %s, got %s", cli1.Gender, responseData.Gender)
+				}
+
+				if responseData.Privacy != false {
+					t.Fatalf("invalid privacy, expected false, got %t", responseData.Privacy)
 				}
 			}
 			checkRespBody()
