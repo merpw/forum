@@ -201,3 +201,48 @@ func TestMeLikedPosts(t *testing.T) {
 		t.Fatalf("invalid number of liked posts, expected 0, got %d", len(likedPosts))
 	}
 }
+
+func TestMeFollowers(t *testing.T) {
+	testServer := NewTestServer(t)
+	cli1 := testServer.TestClient()
+	cli2 := testServer.TestClient()
+
+	t.Run("Unauthorized", func(t *testing.T) {
+		cli1.TestGet(t, "/api/me/followers", http.StatusUnauthorized)
+	})
+
+	cli1.TestAuth(t)
+	cli2.TestAuth(t)
+
+	t.Run("Valid", func(t *testing.T) {
+
+		t.Run("No followers", func(t *testing.T) {
+			_, respData := cli1.TestGet(t, "/api/me/followers", http.StatusOK)
+			var followers []int
+			err := json.Unmarshal(respData, &followers)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if len(followers) != 0 {
+				t.Errorf("invalid followers, expected %d, got %d", 0, len(followers))
+			}
+		})
+
+		t.Run("With followers", func(t *testing.T) {
+			cli1.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
+			cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+
+			_, respData := cli1.TestGet(t, "/api/me/followers", http.StatusOK)
+			var followers []int
+			err := json.Unmarshal(respData, &followers)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if len(followers) != 1 {
+				t.Errorf("invalid followers, expected %d, got %d", 1, len(followers))
+			}
+		})
+	})
+}

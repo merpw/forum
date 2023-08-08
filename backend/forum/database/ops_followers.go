@@ -5,38 +5,55 @@ import (
 	"time"
 )
 
+func (db DB) GetAllFollowersById(id int) (followerIds []int) {
+	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? COLLATE NOCASE", id)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	for query.Next() {
+		var followerId int
+		err = query.Scan(&followerId)
+		if err != nil {
+			log.Panic(err)
+		}
+		followerIds = append(followerIds, followerId)
+	}
+
+	query.Close()
+	return
+}
+
 func (db DB) GetFollowStatus(meId, userId int) *FollowStatus {
 	if meId == userId {
 		return nil
 	}
 
-	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? COLLATE NOCASE", userId)
+	query, err := db.Query("SELECT id FROM followers WHERE follower_id = ? AND user_id = ? COLLATE NOCASE",
+		meId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	var followerId = -2
+	var followStatus = new(FollowStatus)
 
 	if query.Next() {
-		err = query.Scan(&followerId)
 		if err != nil {
 			log.Panic(err)
 		}
+		*followStatus = Following
+		query.Close()
+		return followStatus
 	}
 
 	query.Close()
 
-	var followStatus = new(FollowStatus)
-	if followerId == meId {
-		*followStatus = Following
+	if db.CheckIfInvitationExists(meId, userId) {
+		*followStatus = RequestToFollow
 		return followStatus
 	}
 
-	if db.CheckIfInvitationExists(meId, userId) {
-		*followStatus = RequestToFollow
-	} else {
-		*followStatus = NotFollowing
-	}
+	*followStatus = NotFollowing
 
 	return followStatus
 }

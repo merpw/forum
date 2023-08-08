@@ -210,6 +210,10 @@ func TestUserFollow(t *testing.T) {
 
 		t.Run("Follow", func(t *testing.T) {
 
+			t.Run("Follow self", func(t *testing.T) {
+				cli1.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+			})
+
 			t.Run("Make public", func(t *testing.T) {
 				cli2.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
 				_, response := cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)

@@ -3,7 +3,6 @@ package handlers
 import (
 	"backend/common/server"
 	"backend/forum/database"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -70,23 +69,19 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 	} else {
 		response.SafeUser.FollowStatus = nil
 	}
-
 	if response.SafeUser.FollowStatus == nil && user.Privacy == database.Public {
 		server.SendObject(w, response)
 		return
 	}
-
 	if response.SafeUser.FollowStatus == nil && user.Privacy == database.Private {
 		server.SendObject(w, response.SafeUser)
 		return
 	}
-
 	if user.Privacy == database.Public || *response.SafeUser.FollowStatus == database.Following {
 		server.SendObject(w, response)
 	} else {
 		server.SendObject(w, response.SafeUser)
 	}
-
 }
 
 func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
@@ -108,9 +103,14 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 	}
 
 	meId := h.getUserId(w, r)
-	followStatus := *h.DB.GetFollowStatus(meId, userId)
-	fmt.Println("followStatus", followStatus)
-	switch followStatus {
+
+	followStatus := h.DB.GetFollowStatus(meId, userId)
+
+	if followStatus == nil {
+		return
+	}
+
+	switch *followStatus {
 	case database.NotFollowing:
 		if user.Privacy == database.Private {
 			server.SendObject(w, h.DB.RequestToFollow(meId, userId))

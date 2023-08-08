@@ -37,6 +37,7 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, response)
 }
 
+// mePrivacy toggles privacy and sends current privacy status
 func (h *Handlers) mePrivacy(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 	user := h.DB.GetUserById(userId)
@@ -46,6 +47,14 @@ func (h *Handlers) mePrivacy(w http.ResponseWriter, r *http.Request) {
 	} else {
 		server.SendObject(w, h.DB.UpdateUserPrivacy(database.Private, userId))
 	}
+}
+
+// meFollowers sends all followers as IDs in an array
+// /api/me/followers -> [followerIds]
+func (h *Handlers) meFollowers(w http.ResponseWriter, r *http.Request) {
+	userId := r.Context().Value(userIdCtxKey).(int)
+
+	server.SendObject(w, h.DB.GetAllFollowersById(userId))
 }
 
 // mePosts returns the posts of the logged-in user.
