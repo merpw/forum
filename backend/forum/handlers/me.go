@@ -54,7 +54,7 @@ func (h *Handlers) mePrivacy(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) meFollowers(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
-	server.SendObject(w, h.DB.GetAllFollowersById(userId))
+	server.SendObject(w, h.DB.GetUserFollowers(userId))
 }
 
 // mePosts returns the posts of the logged-in user.

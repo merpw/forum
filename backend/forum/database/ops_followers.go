@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-func (db DB) GetAllFollowersById(id int) (followerIds []int) {
-	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? ORDER BY timestamp", id)
+func (db DB) GetUserFollowers(userId int) (followerIds []int) {
+	query, err := db.Query("SELECT follower_id FROM followers WHERE user_id = ? ORDER BY timestamp", userId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -24,41 +24,31 @@ func (db DB) GetAllFollowersById(id int) (followerIds []int) {
 	return
 }
 
-func (db DB) GetFollowStatus(meId, userId int) *FollowStatus {
-	if meId == userId {
-		return nil
-	}
+func (db DB) GetFollowStatus(followerId, userId int) *FollowStatus {
+	row := db.QueryRow(`
+    SELECT CASE 
+    WHEN (
+       SELECT 1 FROM followers WHERE user_id = ? AND follower_id = ?) THEN 1
+    ELSE (
+        SELECT CASE 
+        WHEN (
+        	SELECT 1 FROM invitations WHERE from_user_id = ? AND to_user_id = ?) THEN 2
+        ELSE 0
+    	END
+    )
+    END 
+    AS follow_status
+    `, userId, followerId, followerId, userId)
 
-	query, err := db.Query("SELECT id FROM followers WHERE follower_id = ? AND user_id = ? COLLATE NOCASE",
-		meId, userId)
+	var followStatus = new(FollowStatus)
+	err := row.Scan(followStatus)
 	if err != nil {
 		log.Panic(err)
 	}
-
-	var followStatus = new(FollowStatus)
-
-	if query.Next() {
-		if err != nil {
-			log.Panic(err)
-		}
-		*followStatus = Following
-		query.Close()
-		return followStatus
-	}
-
-	query.Close()
-
-	if db.CheckIfInvitationExists(meId, userId) {
-		*followStatus = RequestToFollow
-		return followStatus
-	}
-
-	*followStatus = NotFollowing
-
 	return followStatus
 }
 
-func (db DB) Unfollow(followerId, userId int) FollowStatus {
+func (db DB) RemoveFollower(followerId, userId int) FollowStatus {
 	_, err := db.Exec("DELETE FROM followers WHERE user_id = ? AND follower_id = ?", userId, followerId)
 	if err != nil {
 		log.Panic(err)
@@ -66,7 +56,7 @@ func (db DB) Unfollow(followerId, userId int) FollowStatus {
 	return NotFollowing
 }
 
-func (db DB) Follow(followerId, userId int) FollowStatus {
+func (db DB) AddFollower(followerId, userId int) FollowStatus {
 	_, err := db.Exec(`INSERT INTO followers 
     	(user_id, follower_id, timestamp)
 		VALUES (?, ?, ?)`,

@@ -211,7 +211,7 @@ func TestUserFollow(t *testing.T) {
 		t.Run("Follow", func(t *testing.T) {
 
 			t.Run("Follow self", func(t *testing.T) {
-				cli1.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+				cli1.TestPost(t, "/api/users/1/follow", nil, http.StatusBadRequest)
 			})
 
 			t.Run("Make public", func(t *testing.T) {

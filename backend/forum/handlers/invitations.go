@@ -12,7 +12,7 @@ import (
 func (h *Handlers) invitations(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 
-	server.SendObject(w, h.DB.GetAllInvitations(userId))
+	server.SendObject(w, h.DB.GetUserInvitations(userId))
 }
 
 // GET /api/invitations/(/d+)
@@ -78,8 +78,8 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if requestBody.Response {
-		h.DB.Follow(invitation.FromUserId, invitation.ToUserId)
+		h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
 	}
 
-	h.DB.RespondToInvitation(invitation.Id)
+	h.DB.DeleteInvitation(invitation.Id)
 }

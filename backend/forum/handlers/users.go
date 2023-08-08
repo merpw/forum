@@ -104,28 +104,29 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 
 	meId := h.getUserId(w, r)
 
-	followStatus := h.DB.GetFollowStatus(meId, userId)
-
-	if followStatus == nil {
+	if meId == userId {
+		server.ErrorResponse(w, http.StatusBadRequest)
 		return
 	}
+
+	followStatus := h.DB.GetFollowStatus(meId, userId)
 
 	switch *followStatus {
 	case database.NotFollowing:
 		if user.Privacy == database.Private {
-			server.SendObject(w, h.DB.RequestToFollow(meId, userId))
+			server.SendObject(w, h.DB.AddFollowInvitation(meId, userId))
 			return
 		}
 
-		server.SendObject(w, h.DB.Follow(meId, userId))
+		server.SendObject(w, h.DB.AddFollower(meId, userId))
 		return
 
 	case database.Following:
-		server.SendObject(w, h.DB.Unfollow(meId, userId))
+		server.SendObject(w, h.DB.RemoveFollower(meId, userId))
 		return
 
 	case database.RequestToFollow:
-		server.SendObject(w, h.DB.RevokeInvitation(meId, userId))
+		server.SendObject(w, h.DB.DeleteFollowInvitation(meId, userId))
 		return
 	}
 }
