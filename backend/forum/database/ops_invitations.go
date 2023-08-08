@@ -6,8 +6,8 @@ import (
 )
 
 // GetAllInvitations returns slice of all users ids
-func (db DB) GetAllInvitations(id int) (invitationIds []int) {
-	query, err := db.Query("SELECT id FROM invitations WHERE user_id = ? ORDER BY timestamp DESC", id)
+func (db DB) GetAllInvitations(toUserId int) (invitationIds []int) {
+	query, err := db.Query("SELECT id FROM invitations WHERE to_user_id = ? ORDER BY timestamp DESC", toUserId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -42,7 +42,7 @@ func (db DB) GetInvitationById(id int) *Invitation {
 	var invitation Invitation
 
 	err = query.Scan(&invitation.Id, &invitation.Type,
-		&invitation.AssociatedId, &invitation.UserId, &invitation.TimeStamp)
+		&invitation.FromUserId, &invitation.ToUserId, &invitation.TimeStamp)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -60,9 +60,9 @@ func (db DB) RespondToInvitation(id int) {
 	}
 }
 
-func (db DB) CheckIfInvitationExists(associatedId, userId int) bool {
-	query, err := db.Query("SELECT * FROM invitations WHERE associated_id = ? AND user_id = ?",
-		associatedId, userId)
+func (db DB) CheckIfInvitationExists(fromUserId, toUserId int) bool {
+	query, err := db.Query("SELECT * FROM invitations WHERE from_user_id = ? AND to_user_id = ?",
+		fromUserId, toUserId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -80,19 +80,19 @@ func (db DB) CheckIfInvitationExists(associatedId, userId int) bool {
 
 }
 
-func (db DB) RequestToFollow(associatedId, userId int) FollowStatus {
+func (db DB) RequestToFollow(fromUserId, toUserId int) FollowStatus {
 	_, err := db.Exec(`INSERT INTO invitations 
-    	(type, associated_id, user_id, timestamp)
+    	(type, from_user_id, to_user_id, timestamp)
 		VALUES (?, ?, ?, ?)`,
-		0, associatedId, userId, time.Now().Format(time.RFC3339))
+		0, fromUserId, toUserId, time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
 	}
 	return RequestToFollow
 }
 
-func (db DB) RevokeInvitation(associatedId, userId int) FollowStatus {
-	_, err := db.Exec("DELETE FROM invitations WHERE associated_id = ? AND user_id = ?", associatedId, userId)
+func (db DB) RevokeInvitation(fromUserId, toUserId int) FollowStatus {
+	_, err := db.Exec("DELETE FROM invitations WHERE from_user_id = ? AND to_user_id = ?", fromUserId, toUserId)
 	if err != nil {
 		log.Panic(err)
 	}

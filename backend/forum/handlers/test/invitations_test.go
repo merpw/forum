@@ -53,11 +53,11 @@ func TestInvitationsId(t *testing.T) {
 
 	t.Run("Valid", func(t *testing.T) {
 		respBody := struct {
-			Id           int    `json:"id"`
-			Type         int    `json:"type"`
-			AssociatedId int    `json:"associated_id"`
-			UserId       int    `json:"user_id"`
-			TimeStamp    string `json:"timestamp"`
+			Id         int    `json:"id"`
+			Type       int    `json:"type"`
+			FromUserId int    `json:"from_user_id"`
+			ToUserId   int    `json:"to_user_id"`
+			TimeStamp  string `json:"timestamp"`
 		}{}
 
 		var invitations []int
@@ -77,12 +77,12 @@ func TestInvitationsId(t *testing.T) {
 				t.Errorf("invalid type, expected %d, got %d", 0, respBody.Type)
 			}
 
-			if respBody.AssociatedId != 2 {
-				t.Errorf("invalid associated id, expected %d, got %d", 2, respBody.AssociatedId)
+			if respBody.FromUserId != 2 {
+				t.Errorf("invalid from_user_id, expected %d, got %d", 2, respBody.FromUserId)
 			}
 
-			if respBody.UserId != 1 {
-				t.Errorf("invalid user id, expected %d, got %d", 1, respBody.UserId)
+			if respBody.ToUserId != 1 {
+				t.Errorf("invalid to_user_id, expected %d, got %d", 1, respBody.ToUserId)
 			}
 		})
 		t.Run("Revoke invitation", func(t *testing.T) {

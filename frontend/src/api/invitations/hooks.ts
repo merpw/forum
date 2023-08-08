@@ -4,8 +4,8 @@ import axios from "axios"
 export type Invitation = {
   id: number
   type: InvitationType
-  associated_id: number
-  user_id: number
+  from_user_id: number
+  to_user_id: number
   timestamp: string
 }
 

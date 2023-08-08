@@ -64,9 +64,9 @@ type Session struct {
 }
 
 type Invitation struct {
-	Id           int
-	Type         int
-	AssociatedId int
-	UserId       int
-	TimeStamp    string
+	Id         int
+	Type       int
+	FromUserId int
+	ToUserId   int
+	TimeStamp  string
 }
