@@ -3,6 +3,7 @@
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
 import { FC, useState } from "react"
+import pluralize from "pluralize"
 
 import { User } from "@/custom"
 import Avatar from "@/components/Avatar"
@@ -72,6 +73,14 @@ export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isO
                 </div>
               </div>
             </div>
+            <div className={"flex gap-2 justify-center mb-2"}>
+              <span className={"text-primary"}>
+                {user.followers_count} {pluralize("follower", user.followers_count)}
+              </span>
+              <span>•</span>
+              <span className={"text-secondary"}>{user.following_count} following</span>
+            </div>
+
             {user.bio && (
               <div className={"mb-5 text-center"}>
                 <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>

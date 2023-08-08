@@ -24,6 +24,9 @@ export type User = {
   bio?: string
   privacy?: boolean
   follow_status?: FollowStatus
+
+  followers_count?: number
+  following_count?: number
 }
 
 /** 0 - not following, 1 - following, 2 - requested */
