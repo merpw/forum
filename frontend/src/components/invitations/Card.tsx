@@ -23,13 +23,13 @@ const Card: FC<{ id: number }> = ({ id }) => {
 }
 
 const FollowingCard: FC<{ invitation: Invitation }> = ({ invitation }) => {
-  const { user } = useUser(invitation.userId)
+  const { user } = useUser(invitation.user_id)
 
   if (!user) return null
 
   return (
     <div className={"flex flex-col"}>
-      <Link href={`/user/${invitation.userId}`} className={"flex gap-2 items-center"}>
+      <Link href={`/user/${invitation.user_id}`} className={"flex gap-2 items-center"}>
         <span className={"w-12"}>
           <Avatar user={user} size={10} className={""} />
         </span>
