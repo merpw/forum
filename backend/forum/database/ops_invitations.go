@@ -12,6 +12,8 @@ func (db DB) GetAllInvitations(id int) (invitationIds []int) {
 		log.Panic(err)
 	}
 
+	invitationIds = make([]int, 0)
+
 	for query.Next() {
 		var invitationId int
 		err = query.Scan(&invitationId)
