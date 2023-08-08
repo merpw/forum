@@ -15,13 +15,13 @@ export const useFollowers = () => {
   }
 }
 
-export const useFollowed = () => {
-  const { data, error, mutate } = useSWR<number[]>("/api/me/followed", fetcher)
+export const useFollowing = () => {
+  const { data, error, mutate } = useSWR<number[]>("/api/me/following", fetcher)
 
   const loading = !data && !error
 
   return {
-    followed: data,
+    following: data,
     loading,
     error,
     mutate,

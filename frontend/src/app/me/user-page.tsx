@@ -10,7 +10,7 @@ import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
 import { UserInfo } from "@/components/profiles/UserInfo"
 import { UserCard } from "@/components/UserList"
-import { useFollowed, useFollowers } from "@/api/followers/hooks"
+import { useFollowing, useFollowers } from "@/api/followers/hooks"
 
 /* TODO: add placeholders */
 
@@ -117,16 +117,16 @@ const UserFollowers = () => {
 }
 
 const UserFollowed = () => {
-  const { followed } = useFollowed()
+  const { following } = useFollowing()
 
-  if (!followed) return null
+  if (!following) return null
 
-  if (followed.length == 0)
+  if (following.length == 0)
     return <div className={"text-info text-center mt-5 mb-7"}>{"You don't follow anyone yet"}</div>
 
   return (
     <div className={"w-96 m-5 mx-auto"}>
-      {followed.map((userId) => (
+      {following.map((userId) => (
         <UserCard id={userId} key={userId} />
       ))}
     </div>
