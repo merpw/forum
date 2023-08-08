@@ -17,7 +17,7 @@ export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isO
         <div className={"hero-content px-0"}>
           <div
             className={
-              "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3"
+              "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3 pb-5"
             }
           >
             <div className={"card-body sm:flex-row sm:gap-5"}>
@@ -38,7 +38,27 @@ export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isO
                       <PrivacyToggle user={user} />
                     </>
                   ) : (
-                    user.privacy && <span className={"badge badge-outline"}>private</span>
+                    user.privacy && (
+                      <span className={"badge badge-outline"}>
+                        <svg
+                          xmlns={"http://www.w3.org/2000/svg"}
+                          fill={"none"}
+                          viewBox={"0 0 24 24"}
+                          strokeWidth={1.5}
+                          stroke={"currentColor"}
+                          className={"w-3.5 h-3.5 mr-1"}
+                        >
+                          <path
+                            strokeLinecap={"round"}
+                            strokeLinejoin={"round"}
+                            d={
+                              "M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                            }
+                          />
+                        </svg>
+                        private
+                      </span>
+                    )
                   )}
                 </div>
                 <div className={"font-light"}>
@@ -71,16 +91,16 @@ export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isO
                 </div>
               </div>
             </div>
-            <div className={"flex gap-2 justify-center mb-2"}>
+            <div className={"flex gap-2 justify-center"}>
               <span className={"text-primary"}>
                 {user.followers_count} {pluralize("follower", user.followers_count)}
               </span>
-              <span>•</span>
+              <span className={"text-info"}>•</span>
               <span className={"text-secondary"}>{user.following_count} following</span>
             </div>
 
             {user.bio && (
-              <div className={"mb-5 text-center"}>
+              <div className={"mt-2 text-center"}>
                 <div className={"font-light text-info start-dot end-dot mb-1"}>About me</div>
                 <div className={"text-sm"}>{user.bio}</div>
               </div>
