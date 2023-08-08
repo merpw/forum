@@ -41,7 +41,7 @@ const buttons: Button[] = [
   },
   {
     icon: MdImage,
-    text: "Image",
+    text: "External Image",
     onClick: (textAreaRef) => {
       wrapWith(textAreaRef, "![", "](url)")
     },
