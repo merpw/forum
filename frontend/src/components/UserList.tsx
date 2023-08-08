@@ -55,7 +55,7 @@ const MeCard: FC<{ user: User }> = ({ user }) => {
   )
 }
 
-const UserCard: FC<{ id: number }> = ({ id }) => {
+export const UserCard: FC<{ id: number }> = ({ id }) => {
   const { user } = useUser(id)
 
   const collapseIfMobile = useCollapseIfMobile()

@@ -9,16 +9,14 @@ import { useMyPosts } from "@/api/posts/my_posts"
 import { useMyPostsLiked } from "@/api/posts/my_posts_liked"
 import { PostList } from "@/components/posts/list"
 import { UserInfo } from "@/components/profiles/UserInfo"
+import { UserCard } from "@/components/UserList"
+import { useFollowed, useFollowers } from "@/api/followers/hooks"
 
 /* TODO: add placeholders */
 
 const UserPage: NextPage = () => {
   const { user, isLoading } = useMe()
 
-  const tabs = [
-    { title: "Your posts", component: <UserPosts /> },
-    { title: "Your liked posts", component: <UserLikedPosts /> },
-  ]
   const [activeTab, setActiveTab] = useState(0)
 
   if (isLoading || !user) return <div className={"text-info text-center mt-5 mb-7"}>Loading...</div>
@@ -98,5 +96,48 @@ const UserLikedPosts = () => {
 
   return <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
 }
+
+const UserFollowers = () => {
+  const { followers } = useFollowers()
+
+  if (!followers) return null
+
+  if (followers.length == 0)
+    return (
+      <div className={"text-info text-center mt-5 mb-7"}>{"You don't have any followers yet"}</div>
+    )
+
+  return (
+    <div className={"w-96 m-5 mx-auto"}>
+      {followers.map((follower) => (
+        <UserCard id={follower} key={follower} />
+      ))}
+    </div>
+  )
+}
+
+const UserFollowed = () => {
+  const { followed } = useFollowed()
+
+  if (!followed) return null
+
+  if (followed.length == 0)
+    return <div className={"text-info text-center mt-5 mb-7"}>{"You don't follow anyone yet"}</div>
+
+  return (
+    <div className={"w-96 m-5 mx-auto"}>
+      {followed.map((userId) => (
+        <UserCard id={userId} key={userId} />
+      ))}
+    </div>
+  )
+}
+
+const tabs = [
+  { title: "Your posts", component: <UserPosts /> },
+  { title: "Liked posts", component: <UserLikedPosts /> },
+  { title: "Your followers", component: <UserFollowers /> },
+  { title: "Users you follow", component: <UserFollowed /> },
+]
 
 export default UserPage
