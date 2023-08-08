@@ -3,6 +3,7 @@
 import { FC, useEffect, useRef } from "react"
 import Link from "next/link"
 import dayjs from "dayjs"
+import pluralize from "pluralize"
 
 import { useChat } from "@/api/chats/chats"
 import { useUser } from "@/api/users/hooks"
@@ -18,7 +19,9 @@ import { useCollapseIfMobile } from "@/components/chats/section/ChatSection"
 const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
   return (
     <div>
-      <h1 className={"text-info text-sm my-1"}>Total: {chatIds.length} chats</h1>
+      <h1 className={"text-info text-sm my-1"}>
+        Total: {chatIds.length} {pluralize("chat", chatIds.length)}
+      </h1>
       <ul className={"flex flex-col gap-2"}>
         {chatIds.map((chatId) => (
           <li key={chatId} className={"w-full"}>

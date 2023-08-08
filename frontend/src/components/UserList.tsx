@@ -1,5 +1,6 @@
 import { FC } from "react"
 import Link from "next/link"
+import pluralize from "pluralize"
 
 import { useUser, useUsers, useUsersOnline } from "@/api/users/hooks"
 import { useMe } from "@/api/auth/hooks"
@@ -19,7 +20,9 @@ const UserList = () => {
 
   return (
     <>
-      <h1 className={"text-info text-sm my-1"}>Total: {users.length} users</h1>
+      <h1 className={"text-info text-sm my-1"}>
+        Total: {users.length} {pluralize("user", users.length)}
+      </h1>
       <div className={"flex flex-col mt-3 ml-1 gap-3"}>
         <div className={"mt-1"}>
           <MeCard user={reqUser} />
