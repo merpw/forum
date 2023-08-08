@@ -53,6 +53,8 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 			Avatar:       user.Avatar.String,
 			Bio:          user.Bio.String,
 			FollowStatus: nil,
+			Followers:    len(h.DB.GetUserFollowers(user.Id)),
+			Following:    len(h.DB.GetUsersFollowed(user.Id)),
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,

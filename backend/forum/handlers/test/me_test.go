@@ -227,6 +227,17 @@ func TestMeFollowers(t *testing.T) {
 			if len(followers) != 0 {
 				t.Errorf("invalid followers, expected %d, got %d", 0, len(followers))
 			}
+
+			_, respData = cli1.TestGet(t, "/api/me/following", http.StatusOK)
+			var following []int
+			err = json.Unmarshal(respData, &following)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if len(following) != 0 {
+				t.Errorf("invalid following, expected %d, got %d", 0, len(following))
+			}
 		})
 
 		t.Run("With followers", func(t *testing.T) {
@@ -239,48 +250,16 @@ func TestMeFollowers(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
 			if len(followers) != 1 {
 				t.Errorf("invalid followers, expected %d, got %d", 1, len(followers))
 			}
-		})
-	})
-}
 
-func TestMeFollowing(t *testing.T) {
-	testServer := NewTestServer(t)
-	cli1 := testServer.TestClient()
-	cli2 := testServer.TestClient()
-
-	t.Run("Unauthorized", func(t *testing.T) {
-		cli1.TestGet(t, "/api/me/following", http.StatusUnauthorized)
-	})
-
-	cli1.TestAuth(t)
-	cli2.TestAuth(t)
-
-	t.Run("Valid", func(t *testing.T) {
-
-		t.Run("No followers", func(t *testing.T) {
-			_, respData := cli1.TestGet(t, "/api/me/following", http.StatusOK)
-			var following []int
-			err := json.Unmarshal(respData, &following)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if len(following) != 0 {
-				t.Errorf("invalid following, expected %d, got %d", 0, len(following))
-			}
-		})
-
-		t.Run("With followed user", func(t *testing.T) {
 			cli2.TestPost(t, "/api/me/privacy", nil, http.StatusOK)
 			cli1.TestPost(t, "/api/users/2/follow", nil, http.StatusOK)
 
-			_, respData := cli1.TestGet(t, "/api/me/following", http.StatusOK)
+			_, respData = cli1.TestGet(t, "/api/me/following", http.StatusOK)
 			var following []int
-			err := json.Unmarshal(respData, &following)
+			err = json.Unmarshal(respData, &following)
 			if err != nil {
 				t.Fatal(err)
 			}

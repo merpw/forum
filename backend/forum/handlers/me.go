@@ -21,10 +21,12 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 		Privacy   bool   `json:"privacy"`
 	}{
 		SafeUser: SafeUser{
-			Id:       user.Id,
-			Username: user.Username,
-			Avatar:   user.Avatar.String,
-			Bio:      user.Bio.String,
+			Id:        user.Id,
+			Username:  user.Username,
+			Avatar:    user.Avatar.String,
+			Bio:       user.Bio.String,
+			Followers: len(h.DB.GetUserFollowers(user.Id)),
+			Following: len(h.DB.GetUsersFollowed(user.Id)),
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,

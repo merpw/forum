@@ -10,6 +10,8 @@ type SafeUser struct {
 	Avatar       string                 `json:"avatar,omitempty"`
 	Bio          string                 `json:"bio,omitempty"`
 	FollowStatus *database.FollowStatus `json:"follow_status,omitempty"`
+	Followers    int                    `json:"followers_count"`
+	Following    int                    `json:"following_count"`
 }
 
 type SafePost struct {
