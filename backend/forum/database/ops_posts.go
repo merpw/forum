@@ -19,7 +19,8 @@ func (db DB) GetAllPosts() []Post {
 	for query.Next() {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-			&post.LikesCount, &post.DislikesCount, &post.CommentsCount, &post.Categories, &post.Description)
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
+			&post.Categories, &post.Description, &post.GroupId)
 		if err != nil {
 			log.Panic(err)
 		}
