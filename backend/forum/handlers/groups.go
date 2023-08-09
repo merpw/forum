@@ -71,6 +71,7 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
+		return
 	}
 
 	requestBody := struct {
@@ -84,10 +85,19 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
+
 	groupId := h.DB.AddGroup(userId, requestBody.Title, requestBody.Description)
 
 	for _, id := range requestBody.Invite {
-		server.SendObject(w, h.DB.AddGroupInvitation(userId, id))
+		if id == userId {
+			server.ErrorResponse(w, http.StatusBadRequest)
+			return
+		}
+		if h.DB.GetUserById(id) == nil {
+			server.ErrorResponse(w, http.StatusNotFound)
+			return
+		}
+		h.DB.AddGroupInvitation(1, userId, id)
 	}
 
 	server.SendObject(w, groupId)

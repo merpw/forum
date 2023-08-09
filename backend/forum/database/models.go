@@ -38,6 +38,7 @@ type Post struct {
 	CommentsCount int
 	Categories    string
 	Description   string
+	GroupId       *int
 }
 
 type User struct {

@@ -42,6 +42,7 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 		LikesCount:    post.LikesCount,
 		DislikesCount: post.DislikesCount,
 		Categories:    post.Categories,
+		GroupId:       post.GroupId,
 	}
 
 	server.SendObject(w, safePost)

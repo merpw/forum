@@ -26,6 +26,7 @@ type SafePost struct {
 	LikesCount    int      `json:"likes_count"`
 	DislikesCount int      `json:"dislikes_count"`
 	Categories    string   `json:"categories"`
+	GroupId       *int     `json:"group_id,omitempty"`
 }
 
 type SafeComment struct {

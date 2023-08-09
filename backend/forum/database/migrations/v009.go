@@ -26,7 +26,7 @@ var v009 = migrate.Migration{
 			FOREIGN KEY (user_id) REFERENCES users(id)
 		);
 		ALTER TABLE posts 
-		ADD COLUMN group_id INTEGER REFERENCES groups(id);
+		ADD COLUMN group_id INTEGER REFERENCES groups(id) DEFAULT NULL;
 	`)
 		if err != nil {
 			return err

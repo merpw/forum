@@ -21,7 +21,12 @@ func (db DB) AddGroup(creatorId int, title, description string) (groupId int64) 
 }
 
 func (db DB) GetGroupIdsByMembers() (groupIds []int) {
-	query, err := db.Query("SELECT id FROM groups ORDER BY members DESC")
+	query, err := db.Query(`
+	SELECT id, COUNT(id) AS occurrence
+	FROM group_members 
+	GROUP BY group_id
+	ORDER BY occurrence DESC;
+	`)
 	if err != nil {
 		log.Panic(err)
 	}
