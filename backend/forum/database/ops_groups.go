@@ -108,3 +108,11 @@ func (db DB) DeleteGroupMembership(groupId, userId int) MemberStatus {
 	}
 	return NotMember
 }
+
+func (db DB) AddMembership(groupId, userId int) MemberStatus {
+	_, err := db.Exec("INSERT INTO group_members WHERE group_id = ? AND userId = ?", groupId, userId)
+	if err != nil {
+		log.Panic(err)
+	}
+	return Member
+}

@@ -86,17 +86,21 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groupId := h.DB.AddGroup(userId, requestBody.Title, requestBody.Description)
-
 	for _, id := range requestBody.Invite {
 		if id == userId {
 			server.ErrorResponse(w, http.StatusBadRequest)
 			return
 		}
+	}
+	groupId := h.DB.AddGroup(userId, requestBody.Title, requestBody.Description)
+	h.DB.AddMembership(int(groupId), userId)
+
+	for _, id := range requestBody.Invite {
 		if h.DB.GetUserById(id) == nil {
 			server.ErrorResponse(w, http.StatusNotFound)
 			return
 		}
+
 		h.DB.AddGroupInvitation(1, userId, id)
 	}
 
