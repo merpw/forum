@@ -65,6 +65,34 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, h.DB.GetGroupPostsById(groupId))
 }
 
+// Groups POST endpoints
+
+func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
+	userId := h.getUserId(w, r)
+	if userId == -1 {
+		server.ErrorResponse(w, http.StatusUnauthorized)
+	}
+
+	requestBody := struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Invite      []int  `json:"invite"`
+	}{}
+
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	if err != nil {
+		http.Error(w, "Body is not valid", http.StatusBadRequest)
+		return
+	}
+	groupId := h.DB.AddGroup(userId, requestBody.Title, requestBody.Description)
+
+	for _, id := range requestBody.Invite {
+		server.SendObject(w, h.DB.AddGroupInvitation(userId, id))
+	}
+
+	server.SendObject(w, groupId)
+}
+
 func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
 	groupIdStr = strings.TrimSuffix(r.URL.Path, "/join")

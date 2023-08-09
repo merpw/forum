@@ -110,6 +110,7 @@ func (h *Handlers) Handler() http.Handler {
 
 		server.NewRoute(http.MethodPost, `/api/invitations/(\d+)/respond`, h.invitationsIdRespond),
 
+		server.NewRoute(http.MethodPost, `/api/groups/create`, h.groupsCreate),
 		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/join`, h.groupsIdJoin),
 		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/invite`, h.groupsIdJoin),
 		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/leave`, h.groupsIdLeave),

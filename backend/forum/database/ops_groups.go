@@ -1,6 +1,24 @@
 package database
 
-import "log"
+import (
+	"log"
+	"time"
+)
+
+func (db DB) AddGroup(creatorId int, title, description string) (groupId int64) {
+	result, err := db.Exec(`INSERT INTO groups 
+    	(creator_id, title, description, timestamp)
+		VALUES (?, ?, ?, ?)`,
+		creatorId, title, description, time.Now().Format(time.RFC3339))
+	if err != nil {
+		log.Panic(err)
+	}
+	groupId, err = result.LastInsertId()
+	if err != nil {
+		log.Panic(err)
+	}
+	return
+}
 
 func (db DB) GetGroupIdsByMembers() (groupIds []int) {
 	query, err := db.Query("SELECT id FROM groups ORDER BY members DESC")
