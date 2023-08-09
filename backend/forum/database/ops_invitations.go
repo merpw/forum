@@ -76,11 +76,11 @@ func (db DB) DeleteInvitationByUserId(fromUserId, toUserId int) FollowStatus {
 	return NotFollowing
 }
 
-func (db DB) AddGroupInvitation(fromUserId, toUserId int) MemberStatus {
+func (db DB) AddGroupInvitation(inviteType, fromUserId, toUserId int) MemberStatus {
 	_, err := db.Exec(`INSERT INTO invitations 
     	(type, from_user_id, to_user_id, timestamp)
 		VALUES (?, ?, ?, ?)`,
-		1, fromUserId, toUserId, time.Now().Format(time.RFC3339))
+		inviteType, fromUserId, toUserId, time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
 	}

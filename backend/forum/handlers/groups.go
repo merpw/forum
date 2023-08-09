@@ -112,7 +112,7 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
 	case database.NotMember:
-		server.SendObject(w, h.DB.AddGroupInvitation(userId, groupId))
+		server.SendObject(w, h.DB.AddGroupInvitation(2, userId, groupId))
 	case database.RequestedMembership:
 		server.SendObject(w, h.DB.DeleteInvitationByUserId(userId, groupId))
 	case database.Member:
@@ -152,7 +152,7 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 
 	switch *h.DB.GetGroupMemberStatus(groupId, user.Id) {
 	case database.NotMember:
-		server.SendObject(w, h.DB.AddGroupInvitation(groupId, user.Id))
+		server.SendObject(w, h.DB.AddGroupInvitation(1, groupId, user.Id))
 	case database.RequestedMembership:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	case database.Member:
