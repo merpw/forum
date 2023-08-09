@@ -13,7 +13,8 @@ export type Group = {
   creator_id: number
 }
 
-type GroupMemberStatus = 0 | 1 | 2
+/* 0-not member, 1-member, 2-requested */
+export type GroupMemberStatus = 0 | 1 | 2
 
 export const useGroups = () => {
   const { data, error, mutate } = useSWR<number[]>("/api/groups", () =>
