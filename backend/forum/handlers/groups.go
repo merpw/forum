@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
-	"backend/forum/database"
+	. "backend/forum/database"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -31,11 +31,11 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 
 	userId := h.getUserId(w, r)
 	responseBody := struct {
-		Id           int                    `json:"id"`
-		Title        string                 `json:"title"`
-		Description  string                 `json:"description"`
-		MemberStatus *database.MemberStatus `json:"member_Status"`
-		Members      int                    `json:"members"`
+		Id           int           `json:"id"`
+		Title        string        `json:"title"`
+		Description  string        `json:"description"`
+		MemberStatus *InviteStatus `json:"member_Status"`
+		Members      int           `json:"members"`
 	}{
 		Id:           group.Id,
 		Title:        group.Title,
@@ -101,7 +101,7 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		h.DB.AddGroupInvitation(1, userId, id)
+		h.DB.AddInvitation(GroupInvite, userId, id)
 	}
 
 	server.SendObject(w, groupId)
@@ -125,11 +125,11 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
-	case database.NotMember:
-		server.SendObject(w, h.DB.AddGroupInvitation(2, userId, groupId))
-	case database.RequestedMembership:
-		server.SendObject(w, h.DB.DeleteInvitationByUserId(userId, groupId))
-	case database.Member:
+	case Inactive:
+		server.SendObject(w, h.DB.AddInvitation(GroupJoin, userId, groupId))
+	case Pending:
+		server.SendObject(w, h.DB.DeleteInvitationByUserId(GroupJoin, userId, groupId))
+	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
 }
@@ -165,11 +165,12 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch *h.DB.GetGroupMemberStatus(groupId, user.Id) {
-	case database.NotMember:
-		server.SendObject(w, h.DB.AddGroupInvitation(1, groupId, user.Id))
-	case database.RequestedMembership:
-		server.ErrorResponse(w, http.StatusBadRequest)
-	case database.Member:
+	case Inactive:
+		server.SendObject(w, h.DB.AddInvitation(GroupInvite, groupId, user.Id))
+	case Pending:
+		server.SendObject(w, h.DB.DeleteInvitationByUserId(GroupInvite, groupId, user.Id))
+		// Perhaps ErrorResponse here
+	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
 }
@@ -196,11 +197,11 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
-	case database.NotMember:
+	case Inactive:
 		server.ErrorResponse(w, http.StatusBadRequest)
-	case database.RequestedMembership:
+	case Pending:
 		server.ErrorResponse(w, http.StatusBadRequest)
-	case database.Member:
+	case Accepted:
 		server.SendObject(w, h.DB.DeleteGroupMembership(groupId, userId))
 	}
 }

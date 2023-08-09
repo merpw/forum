@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
-	"backend/forum/database"
+	. "backend/forum/database"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -34,11 +34,11 @@ func (h *Handlers) invitationsId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respBody := struct {
-		Id         int                 `json:"id"`
-		Type       database.InviteType `json:"type"`
-		FromUserId int                 `json:"from_user_id"`
-		ToUserId   int                 `json:"to_user_id"`
-		TimeStamp  string              `json:"timestamp"`
+		Id         int        `json:"id"`
+		Type       InviteType `json:"type"`
+		FromUserId int        `json:"from_user_id"`
+		ToUserId   int        `json:"to_user_id"`
+		TimeStamp  string     `json:"timestamp"`
 	}{
 		Id:         invitation.Id,
 		Type:       invitation.Type,
@@ -80,11 +80,11 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 
 	if requestBody.Response {
 		switch invitation.Type {
-		case database.FollowUser:
+		case FollowUser:
 			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
-		case database.GroupInvite:
+		case GroupInvite:
 			h.DB.AddMembership(invitation.FromUserId, invitation.ToUserId)
-		case database.GroupJoin:
+		case GroupJoin:
 			h.DB.AddMembership(invitation.ToUserId, invitation.FromUserId)
 		}
 

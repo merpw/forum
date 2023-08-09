@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
-	"backend/forum/database"
+	. "backend/forum/database"
 	"net/http"
 )
 
@@ -27,14 +27,13 @@ func (h *Handlers) me(w http.ResponseWriter, r *http.Request) {
 			Bio:       user.Bio.String,
 			Followers: len(h.DB.GetUserFollowers(user.Id)),
 			Following: len(h.DB.GetUsersFollowed(user.Id)),
-			Privacy:   user.Privacy == database.Private,
+			Privacy:   user.Privacy == Private,
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
 		LastName:  user.LastName.String,
 		DoB:       user.DoB.String,
 		Gender:    user.Gender.String,
-		Privacy:   user.Privacy == database.Private,
 	}
 
 	server.SendObject(w, response)
@@ -45,10 +44,10 @@ func (h *Handlers) mePrivacy(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 	user := h.DB.GetUserById(userId)
 
-	if user.Privacy == database.Private {
-		server.SendObject(w, h.DB.UpdateUserPrivacy(database.Public, userId))
+	if user.Privacy == Private {
+		server.SendObject(w, h.DB.UpdateUserPrivacy(Public, userId))
 	} else {
-		server.SendObject(w, h.DB.UpdateUserPrivacy(database.Private, userId))
+		server.SendObject(w, h.DB.UpdateUserPrivacy(Private, userId))
 	}
 }
 

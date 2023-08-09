@@ -1,6 +1,7 @@
 package database
 
 import (
+	"fmt"
 	"log"
 	"time"
 )
@@ -34,10 +35,12 @@ func (db DB) GetGroupIdsByMembers() (groupIds []int) {
 	groupIds = make([]int, 0)
 	for query.Next() {
 		var groupId int
-		err = query.Scan(&groupId)
+		var test any
+		err = query.Scan(&groupId, &test)
 		if err != nil {
 			log.Panic(err)
 		}
+		fmt.Println(groupId, test)
 		groupIds = append(groupIds, groupId)
 	}
 	query.Close()
@@ -56,7 +59,7 @@ func (db DB) GetGroupById(groupId int) *Group {
 	return &group
 }
 
-func (db DB) GetGroupMemberStatus(groupId, userId int) *InviteType {
+func (db DB) GetGroupMemberStatus(groupId, userId int) *InviteStatus {
 	row := db.QueryRow(`
 	SELECT CASE
 	WHEN (
@@ -72,7 +75,7 @@ func (db DB) GetGroupMemberStatus(groupId, userId int) *InviteType {
 	AS member_status
 	`, groupId, userId, userId, groupId)
 
-	var memberStatus = new(InviteType)
+	var memberStatus = new(InviteStatus)
 	err := row.Scan(&memberStatus)
 	if err != nil {
 		log.Panic(err)

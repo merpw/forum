@@ -56,8 +56,9 @@ func (db DB) DeleteInvitationById(id int) {
 	}
 }
 
-func (db DB) DeleteInvitationByUserId(fromUserId, toUserId int) InviteStatus {
-	_, err := db.Exec("DELETE FROM invitations WHERE from_user_id = ? AND to_user_id = ?", fromUserId, toUserId)
+func (db DB) DeleteInvitationByUserId(inviteType InviteType, fromUserId, toUserId int) InviteStatus {
+	_, err := db.Exec(`DELETE FROM invitations
+       						WHERE type = ? AND from_user_id = ? AND to_user_id = ?`, inviteType, fromUserId, toUserId)
 	if err != nil {
 		log.Panic(err)
 	}

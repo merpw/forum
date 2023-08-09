@@ -11,7 +11,7 @@ type DB struct {
 	*sql.DB
 }
 
-func New(db *sql.DB) *DB {
+func NewDB(db *sql.DB) *DB {
 	return &DB{
 		DB: db,
 	}

@@ -30,7 +30,7 @@ type Handlers struct {
 // New connects database to Handlers
 func New(db *sql.DB) *Handlers {
 
-	h := &Handlers{DB: database.New(db)}
+	h := &Handlers{DB: database.NewDB(db)}
 
 	h.revokeSession = make(chan string)
 	h.revokeSessionSubscribers = make([]*chan string, 0)
