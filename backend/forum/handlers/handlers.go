@@ -88,6 +88,7 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodGet, `/api/invitations`, h.invitations),
 		server.NewRoute(http.MethodGet, `/api/invitations/(\d+)`, h.invitationsId),
 
+		server.NewRoute(http.MethodGet, `/api/groups`, h.groups),
 		server.NewRoute(http.MethodGet, `/api/groups/(\d+)`, h.groupsId),
 		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/posts`, h.groupsIdPosts),
 
@@ -110,6 +111,8 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodPost, `/api/invitations/(\d+)/respond`, h.invitationsIdRespond),
 
 		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/join`, h.groupsIdJoin),
+		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/invite`, h.groupsIdJoin),
+		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/leave`, h.groupsIdLeave),
 	}
 
 	var internalRoutes = []server.Route{

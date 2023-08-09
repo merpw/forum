@@ -2,6 +2,26 @@ package database
 
 import "log"
 
+func (db DB) GetGroupIdsByMembers() (groupIds []int) {
+	query, err := db.Query("SELECT id FROM groups ORDER BY members DESC")
+	if err != nil {
+		log.Panic(err)
+	}
+
+	groupIds = make([]int, 0)
+	for query.Next() {
+		var groupId int
+		err = query.Scan(&groupId)
+		if err != nil {
+			log.Panic(err)
+		}
+		groupIds = append(groupIds, groupId)
+	}
+	query.Close()
+
+	return
+}
+
 func (db DB) GetGroupById(groupId int) *Group {
 	row := db.QueryRow("SELECT * FROM groups WHERE id = ?", groupId)
 	var group Group
@@ -56,4 +76,12 @@ func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 
 	query.Close()
 	return
+}
+
+func (db DB) DeleteGroupMembership(groupId, userId int) MemberStatus {
+	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND userId = ?", groupId, userId)
+	if err != nil {
+		log.Panic(err)
+	}
+	return NotMember
 }
