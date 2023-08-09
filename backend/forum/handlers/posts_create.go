@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/common/server"
 	"backend/forum/external"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -30,6 +31,7 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		Content     string   `json:"content"`
 		Description string   `json:"description"`
 		Categories  []string `json:"categories"`
+		GroupId     *int64   `json:"group_id"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -96,8 +98,21 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.DB.AddPost(requestBody.Title, requestBody.Content, requestBody.Description,
-		userId, strings.Join(requestBody.Categories, ","))
+	var groupId sql.NullInt64
+
+	if requestBody.GroupId == nil {
+		groupId = sql.NullInt64{Valid: false}
+	} else {
+		groupId = sql.NullInt64{Int64: *requestBody.GroupId, Valid: true}
+	}
+
+	id := h.DB.AddPost(
+		requestBody.Title,
+		requestBody.Content,
+		requestBody.Description,
+		userId,
+		strings.Join(requestBody.Categories, ","),
+		groupId)
 	server.SendObject(w, id)
 
 	external.RevalidateURL(fmt.Sprintf("/post/%v", id))

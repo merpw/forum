@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"log"
 	"time"
 )
@@ -51,11 +52,11 @@ func (db DB) GetPostById(id int) *Post {
 }
 
 // AddPost adds post to database, returns id of new post
-func (db DB) AddPost(title, content, description string, authorId int, categories string) int {
+func (db DB) AddPost(title, content, description string, authorId int, categories string, groupId sql.NullInt64) int {
 	result, err := db.Exec(`INSERT INTO posts 
-    	(title, content, author, date, likes_count, dislikes_count, comments_count, categories, description)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categories, description)
+    	(title, content, author, date, likes_count, dislikes_count, comments_count, categories, description, groupId)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categories, description, groupId)
 	if err != nil {
 		log.Panic(err)
 	}
