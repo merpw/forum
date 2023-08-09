@@ -81,5 +81,5 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
 	}
 
-	h.DB.DeleteInvitation(invitation.Id)
+	h.DB.DeleteInvitationById(invitation.Id)
 }

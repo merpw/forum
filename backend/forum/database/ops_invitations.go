@@ -49,7 +49,7 @@ func (db DB) GetInvitationById(id int) *Invitation {
 }
 
 // DeleteInvitation deletes invitation row in invitations table
-func (db DB) DeleteInvitation(id int) {
+func (db DB) DeleteInvitationById(id int) {
 	_, err := db.Exec("DELETE FROM invitations WHERE id = ?", id)
 	if err != nil {
 		log.Panic(err)
@@ -67,11 +67,22 @@ func (db DB) AddFollowInvitation(fromUserId, toUserId int) FollowStatus {
 	return RequestToFollow
 }
 
-func (db DB) DeleteFollowInvitation(fromUserId, toUserId int) FollowStatus {
+func (db DB) DeleteInvitationByUserId(fromUserId, toUserId int) FollowStatus {
 	_, err := db.Exec("DELETE FROM invitations WHERE from_user_id = ? AND to_user_id = ?", fromUserId, toUserId)
 	if err != nil {
 		log.Panic(err)
 	}
 
 	return NotFollowing
+}
+
+func (db DB) AddGroupInvitation(fromUserId, toUserId int) MemberStatus {
+	_, err := db.Exec(`INSERT INTO invitations 
+    	(type, from_user_id, to_user_id, timestamp)
+		VALUES (?, ?, ?, ?)`,
+		1, fromUserId, toUserId, time.Now().Format(time.RFC3339))
+	if err != nil {
+		log.Panic(err)
+	}
+	return RequestedMembership
 }

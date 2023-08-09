@@ -108,6 +108,8 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/comment/(\d+)/dislike`, h.postsIdCommentIdDislike),
 
 		server.NewRoute(http.MethodPost, `/api/invitations/(\d+)/respond`, h.invitationsIdRespond),
+
+		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/join`, h.groupsIdJoin),
 	}
 
 	var internalRoutes = []server.Route{

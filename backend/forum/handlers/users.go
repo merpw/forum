@@ -125,7 +125,7 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case database.RequestToFollow:
-		server.SendObject(w, h.DB.DeleteFollowInvitation(meId, userId))
+		server.SendObject(w, h.DB.DeleteInvitationByUserId(meId, userId))
 		return
 	}
 }
