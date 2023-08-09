@@ -9,7 +9,7 @@ import (
 )
 
 func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
-	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups")
+	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
 	groupId, err := strconv.Atoi(groupIdStr)
 	if err != nil {
 		http.Error(w, "group not found", http.StatusNotFound)
@@ -38,4 +38,22 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	server.SendObject(w, responseBody)
+}
+
+func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
+	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
+	groupIdStr = strings.TrimSuffix(r.URL.Path, "/posts")
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		http.Error(w, "group not found", http.StatusNotFound)
+		return
+	}
+
+	group := h.DB.GetGroupById(groupId)
+	if group == nil {
+		http.Error(w, "group not found", http.StatusNotFound)
+		return
+	}
+
+	server.SendObject(w, h.DB.GetGroupPostsById(groupId))
 }

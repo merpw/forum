@@ -89,6 +89,7 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodGet, `/api/invitations/(\d+)`, h.invitationsId),
 
 		server.NewRoute(http.MethodGet, `/api/groups/(\d+)`, h.groupsId),
+		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/posts`, h.groupsIdPosts),
 
 		// method POST endpoints
 		server.NewRoute(http.MethodPost, `/api/logout`, h.logout),
