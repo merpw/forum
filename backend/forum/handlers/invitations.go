@@ -78,7 +78,12 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 	}
 
 	if requestBody.Response {
-		h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
+		switch invitation.Type {
+		case 0:
+			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
+		case 1:
+			h.DB.AddMembership(invitation.FromUserId, invitation.ToUserId)
+		}
 	}
 
 	h.DB.DeleteInvitationById(invitation.Id)
