@@ -12,6 +12,14 @@ const (
 	RequestToFollow
 )
 
+type MemberStatus uint8
+
+const (
+	NotMember MemberStatus = iota
+	Member
+	RequestedMembership
+)
+
 type Privacy uint8
 
 const (
@@ -69,4 +77,11 @@ type Invitation struct {
 	FromUserId int
 	ToUserId   int
 	TimeStamp  string
+}
+
+type Group struct {
+	Id          int
+	Title       string
+	Description string
+	Members     int
 }
