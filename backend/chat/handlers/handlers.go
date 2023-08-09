@@ -3,8 +3,8 @@ package handlers
 
 import (
 	"backend/chat/database"
-	"backend/chat/external"
 	"backend/chat/ws"
+	"backend/common/external"
 	"database/sql"
 	"encoding/json"
 	"log"
