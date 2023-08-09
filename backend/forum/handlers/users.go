@@ -76,7 +76,7 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 		server.SendObject(w, response.SafeUser)
 		return
 	}
-	if user.Privacy == database.Public || *response.SafeUser.FollowStatus == database.Following {
+	if user.Privacy == database.Public || *response.SafeUser.FollowStatus == database.Accepted {
 		server.SendObject(w, response)
 	} else {
 		server.SendObject(w, response.SafeUser)
@@ -111,20 +111,20 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 	followStatus := h.DB.GetFollowStatus(meId, userId)
 
 	switch *followStatus {
-	case database.NotFollowing:
+	case database.Inactive:
 		if user.Privacy == database.Private {
-			server.SendObject(w, h.DB.AddFollowInvitation(meId, userId))
+			server.SendObject(w, h.DB.AddInvitation(database.FollowUser, meId, userId))
 			return
 		}
 
 		server.SendObject(w, h.DB.AddFollower(meId, userId))
 		return
 
-	case database.Following:
+	case database.Accepted:
 		server.SendObject(w, h.DB.RemoveFollower(meId, userId))
 		return
 
-	case database.RequestToFollow:
+	case database.Pending:
 		server.SendObject(w, h.DB.DeleteInvitationByUserId(meId, userId))
 		return
 	}

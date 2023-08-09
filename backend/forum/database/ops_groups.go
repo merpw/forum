@@ -56,7 +56,7 @@ func (db DB) GetGroupById(groupId int) *Group {
 	return &group
 }
 
-func (db DB) GetGroupMemberStatus(groupId, userId int) *MemberStatus {
+func (db DB) GetGroupMemberStatus(groupId, userId int) *InviteType {
 	row := db.QueryRow(`
 	SELECT CASE
 	WHEN (
@@ -72,7 +72,7 @@ func (db DB) GetGroupMemberStatus(groupId, userId int) *MemberStatus {
 	AS member_status
 	`, groupId, userId, userId, groupId)
 
-	var memberStatus = new(MemberStatus)
+	var memberStatus = new(InviteType)
 	err := row.Scan(&memberStatus)
 	if err != nil {
 		log.Panic(err)
@@ -101,18 +101,21 @@ func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	return
 }
 
-func (db DB) DeleteGroupMembership(groupId, userId int) MemberStatus {
-	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND userId = ?", groupId, userId)
+func (db DB) DeleteGroupMembership(groupId, userId int) InviteStatus {
+	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", groupId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
-	return NotMember
+	return Inactive
 }
 
-func (db DB) AddMembership(groupId, userId int) MemberStatus {
-	_, err := db.Exec("INSERT INTO group_members WHERE group_id = ? AND userId = ?", groupId, userId)
+func (db DB) AddMembership(groupId, userId int) InviteStatus {
+	_, err := db.Exec(`INSERT INTO group_members 
+    	(group_id, user_id, timestamp)
+		VALUES (?, ?, ?)`,
+		groupId, userId, time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
 	}
-	return Member
+	return Accepted
 }

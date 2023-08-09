@@ -56,27 +56,16 @@ func (db DB) DeleteInvitationById(id int) {
 	}
 }
 
-func (db DB) AddFollowInvitation(fromUserId, toUserId int) FollowStatus {
-	_, err := db.Exec(`INSERT INTO invitations 
-    	(type, from_user_id, to_user_id, timestamp)
-		VALUES (?, ?, ?, ?)`,
-		0, fromUserId, toUserId, time.Now().Format(time.RFC3339))
-	if err != nil {
-		log.Panic(err)
-	}
-	return RequestToFollow
-}
-
-func (db DB) DeleteInvitationByUserId(fromUserId, toUserId int) FollowStatus {
+func (db DB) DeleteInvitationByUserId(fromUserId, toUserId int) InviteStatus {
 	_, err := db.Exec("DELETE FROM invitations WHERE from_user_id = ? AND to_user_id = ?", fromUserId, toUserId)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return NotFollowing
+	return Inactive
 }
 
-func (db DB) AddGroupInvitation(inviteType, fromUserId, toUserId int) MemberStatus {
+func (db DB) AddInvitation(inviteType InviteType, fromUserId, toUserId int) InviteStatus {
 	_, err := db.Exec(`INSERT INTO invitations 
     	(type, from_user_id, to_user_id, timestamp)
 		VALUES (?, ?, ?, ?)`,
@@ -84,5 +73,5 @@ func (db DB) AddGroupInvitation(inviteType, fromUserId, toUserId int) MemberStat
 	if err != nil {
 		log.Panic(err)
 	}
-	return RequestedMembership
+	return Pending
 }

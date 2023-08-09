@@ -46,7 +46,7 @@ func (db DB) GetUsersFollowed(userId int) (userIds []int) {
 	return
 }
 
-func (db DB) GetFollowStatus(followerId, userId int) *FollowStatus {
+func (db DB) GetFollowStatus(followerId, userId int) *InviteStatus {
 	row := db.QueryRow(`
     SELECT CASE 
     WHEN (
@@ -62,7 +62,7 @@ func (db DB) GetFollowStatus(followerId, userId int) *FollowStatus {
     AS follow_status
     `, userId, followerId, followerId, userId)
 
-	var followStatus = new(FollowStatus)
+	var followStatus = new(InviteStatus)
 	err := row.Scan(followStatus)
 	if err != nil {
 		log.Panic(err)
@@ -70,15 +70,15 @@ func (db DB) GetFollowStatus(followerId, userId int) *FollowStatus {
 	return followStatus
 }
 
-func (db DB) RemoveFollower(followerId, userId int) FollowStatus {
+func (db DB) RemoveFollower(followerId, userId int) InviteStatus {
 	_, err := db.Exec("DELETE FROM followers WHERE user_id = ? AND follower_id = ?", userId, followerId)
 	if err != nil {
 		log.Panic(err)
 	}
-	return NotFollowing
+	return Inactive
 }
 
-func (db DB) AddFollower(followerId, userId int) FollowStatus {
+func (db DB) AddFollower(followerId, userId int) InviteStatus {
 	_, err := db.Exec(`INSERT INTO followers 
     	(user_id, follower_id, timestamp)
 		VALUES (?, ?, ?)`,
@@ -87,5 +87,5 @@ func (db DB) AddFollower(followerId, userId int) FollowStatus {
 		log.Panic(err)
 	}
 
-	return Following
+	return Accepted
 }

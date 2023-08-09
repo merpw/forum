@@ -4,20 +4,21 @@ import (
 	"database/sql"
 )
 
-type FollowStatus uint8
+type InviteStatus uint8
 
 const (
-	NotFollowing FollowStatus = iota
-	Following
-	RequestToFollow
+	Inactive InviteStatus = iota
+	Accepted
+	Pending
 )
 
-type MemberStatus uint8
+type InviteType uint8
 
 const (
-	NotMember MemberStatus = iota
-	Member
-	RequestedMembership
+	FollowUser InviteType = iota
+	GroupInvite
+	GroupJoin
+	Event
 )
 
 type Privacy uint8
@@ -74,7 +75,7 @@ type Session struct {
 
 type Invitation struct {
 	Id         int
-	Type       int
+	Type       InviteType
 	FromUserId int
 	ToUserId   int
 	TimeStamp  string
