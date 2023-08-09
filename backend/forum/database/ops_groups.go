@@ -57,6 +57,31 @@ func (db DB) GetGroupMemberCount(groupId int) (memberCount int) {
 	return memberCount
 }
 
+func (db DB) GetGroupIdsByMembers() (groupIds []int) {
+	query, err := db.Query(`
+	SELECT id, COUNT(id) AS occurrence
+	FROM group_members 
+	GROUP BY group_id
+	ORDER BY occurrence DESC;
+	`)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	groupIds = make([]int, 0)
+	for query.Next() {
+		var groupId int
+		err = query.Scan(&groupId)
+		if err != nil {
+			log.Panic(err)
+		}
+		groupIds = append(groupIds, groupId)
+	}
+	query.Close()
+
+	return
+}
+
 func (db DB) GetGroupById(groupId int) *Group {
 	group := &Group{
 		Id: groupId,
@@ -141,6 +166,17 @@ func (db DB) GetGroupMembers(groupId int, withPending bool) (members []int) {
 	return members
 }
 
+func (db DB) GetGroupCreatorId(groupId int) *int {
+	var creatorId int
+	err := db.QueryRow("SELECT creator_id FROM groups WHERE id = ?", groupId).Scan(&creatorId)
+	if err != nil {
+		return nil
+	}
+
+	return &creatorId
+
+}
+
 func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	query, err := db.Query("SELECT id FROM posts WHERE group_id = ? ORDER BY id DESC", groupId)
 	if err != nil {
@@ -176,4 +212,20 @@ func (db DB) AddMembership(groupId, userId int) {
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func (db DB) DeleteGroupMembership(groupId, userId int) MemberStatus {
+	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND userId = ?", groupId, userId)
+	if err != nil {
+		log.Panic(err)
+	}
+	return NotMember
+}
+
+func (db DB) AddMembership(groupId, userId int) MemberStatus {
+	_, err := db.Exec("INSERT INTO group_members WHERE group_id = ? AND userId = ?", groupId, userId)
+	if err != nil {
+		log.Panic(err)
+	}
+	return Member
 }

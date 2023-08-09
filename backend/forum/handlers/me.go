@@ -69,7 +69,7 @@ func (h *Handlers) mePosts(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
 	user := h.DB.GetUserById(userId)
-	posts := h.DB.GetUserPosts(userId)
+	posts := h.DB.GetMePosts(userId)
 
 	type Response struct {
 		SafePost

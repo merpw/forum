@@ -26,6 +26,7 @@ type Privacy uint8
 const (
 	Public Privacy = iota
 	Private
+	SuperPrivate
 )
 
 type Post struct {

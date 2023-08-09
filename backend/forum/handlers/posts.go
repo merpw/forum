@@ -8,8 +8,10 @@ import (
 var categories = []string{"facts", "rumors", "other"}
 
 // posts returns a json list of all posts from the database
-func (h *Handlers) posts(w http.ResponseWriter, _ *http.Request) {
-	posts := h.DB.GetAllPosts()
+func (h *Handlers) posts(w http.ResponseWriter, r *http.Request) {
+	requestingUser := h.getUserId(w, r)
+
+	posts := h.DB.GetAllPosts(requestingUser)
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {
