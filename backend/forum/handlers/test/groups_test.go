@@ -9,7 +9,7 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-type Group struct {
+type TestGroup struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Invite      []int  `json:"invite"`
@@ -18,8 +18,8 @@ type Group struct {
 	MemberCount  int `json:"member_count"`
 }
 
-func CreateGroup(title, desc string, invites []int) *Group {
-	return &Group{
+func CreateGroup(title, desc string, invites []int) *TestGroup {
+	return &TestGroup{
 		Title:       title,
 		Description: desc,
 		Invite:      invites,

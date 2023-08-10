@@ -32,7 +32,7 @@ func (h *Handlers) postsCategoriesName(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts := h.DB.GetCategoryPosts(categoryName)
+	posts := h.DB.GetCategoryPosts(categoryName, h.getUserId(w, r))
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {

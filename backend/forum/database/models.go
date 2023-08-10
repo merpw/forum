@@ -21,11 +21,20 @@ const (
 	Event
 )
 
+type MemberStatus uint8
+
+const (
+	NotMember MemberStatus = iota
+	Member
+	RequestedMembership
+)
+
 type Privacy uint8
 
 const (
 	Public Privacy = iota
 	Private
+	SuperPrivate
 )
 
 type Post struct {
@@ -39,6 +48,7 @@ type Post struct {
 	CommentsCount int
 	Categories    string
 	Description   string
+	Privacy       Privacy
 	GroupId       *int
 }
 
@@ -88,4 +98,11 @@ type Group struct {
 	Description string
 	Members     int
 	CreatorId   int
+}
+
+type Group struct {
+	Id          int
+	Title       string
+	Description string
+	Members     int
 }

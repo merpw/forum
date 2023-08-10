@@ -32,6 +32,11 @@ func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	if post := h.DB.GetPostById(comment.PostId, userId); post == nil {
+		server.ErrorResponse(w, http.StatusBadRequest)
+		return
+	}
+
 	reaction := h.DB.GetCommentReaction(commentId, userId)
 
 	switch reaction {
@@ -70,6 +75,11 @@ func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Reques
 	comment := h.DB.GetCommentById(commentId)
 	if comment == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	if post := h.DB.GetPostById(comment.PostId, userId); post == nil {
+		server.ErrorResponse(w, http.StatusBadRequest)
 		return
 	}
 
@@ -115,6 +125,11 @@ func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	if post := h.DB.GetPostById(comment.PostId, userId); post == nil {
+		server.ErrorResponse(w, http.StatusBadRequest)
+		return
+	}
+
 	reaction := h.DB.GetCommentReaction(commentId, userId)
 	server.SendObject(w,
 		SafeReaction{
@@ -137,8 +152,8 @@ func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) 
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
-	post := h.DB.GetPostById(postId)
-	if post == nil {
+
+	if post := h.DB.GetPostById(postId, userId); post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
@@ -182,9 +197,8 @@ func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
-
-	post := h.DB.GetPostById(postId)
-	if post == nil {
+	userId := h.getUserId(w, r)
+	if post := h.DB.GetPostById(postId, userId); post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
