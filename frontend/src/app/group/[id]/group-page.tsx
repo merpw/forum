@@ -8,6 +8,7 @@ import { Group, useGroup } from "@/api/groups/hooks"
 import GroupInfo from "@/components/groups/GroupInfo"
 import { PostList } from "@/components/posts/list"
 import { useGroupPosts } from "@/api/groups/posts"
+import { usePostList } from "@/api/posts/hooks"
 
 const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
   const { group } = useGroup(groupId)
@@ -59,7 +60,10 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
 }
 
 const GroupPosts: FC<{ groupId: number }> = ({ groupId }) => {
-  const { posts } = useGroupPosts(groupId)
+  const { posts: postIds } = useGroupPosts(groupId)
+
+  const { posts } = usePostList(postIds || [])
+
   if (!posts) return null
 
   return <PostList posts={posts} />
