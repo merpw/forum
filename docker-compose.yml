@@ -24,6 +24,20 @@ services:
     depends_on:
       - backend-forum
     platform: linux/amd64
+  backend-attachments:
+    build:
+      context: backend
+      args:
+        - SERVICE_NAME=attachments
+    command: "server --port 8080 --dir /app/attachments"
+    environment:
+      - AUTH_BASE_URL=http://backend-forum:8080
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
+    volumes:
+      - attachments:/app/attachments
+    depends_on:
+      - backend-forum
+    platform: linux/amd64
   frontend:
     build:
       context: frontend
@@ -50,3 +64,4 @@ services:
 volumes:
   db:
   cache:
+  attachments:

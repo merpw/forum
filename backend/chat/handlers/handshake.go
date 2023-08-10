@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"backend/chat/external"
 	"backend/chat/ws"
+	"backend/common/external"
 	"encoding/json"
 	"log"
 )

@@ -4,5 +4,7 @@ services:
     image: ghcr.io/merpw/forum/backend-forum:${FORUM_TAG-main}
   backend-chat:
     image: ghcr.io/merpw/forum/backend-chat:${CHAT_TAG-main}
+  backend-attachments:
+    image: ghcr.io/merpw/forum/backend-attachments:${ATTACHMENTS_TAG-main}
   frontend:
     image: ghcr.io/merpw/forum/frontend:${FRONTEND_TAG-main}

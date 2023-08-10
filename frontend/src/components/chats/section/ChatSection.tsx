@@ -8,11 +8,12 @@ import { useChatIds } from "@/api/chats/chats"
 import ChatList from "@/components/chats/section/ChatList"
 import UserList from "@/components/UserList"
 import { useAppSelector } from "@/store/hooks"
+import GroupList from "@/components/groups/List"
 
 const ChatsSection = () => {
   const { chatIds } = useChatIds()
 
-  const [tab, setTab] = useState<"chats" | "users">("chats")
+  const [tab, setTab] = useState<"chats" | "users" | "groups">("chats")
 
   useEffect(() => {
     if (chatIds && chatIds.length === 0) {
@@ -59,9 +60,21 @@ const ChatsSection = () => {
                 Users
               </button>
             </li>
+            <li>
+              <button
+                type={"button"}
+                className={
+                  "tab tab-bordered space-y-5" + " " + (tab === "groups" ? "tab-active" : "")
+                }
+                onClick={() => setTab("groups")}
+              >
+                Groups
+              </button>
+            </li>
           </ul>
           {tab === "chats" && chatIds && <ChatList chatIds={chatIds} />}
           {tab === "users" && <UserList />}
+          {tab === "groups" && <GroupList />}
         </div>
       )}
     </>

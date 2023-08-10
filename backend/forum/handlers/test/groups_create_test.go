@@ -105,7 +105,7 @@ func TestCreateGroup(t *testing.T) {
 			Id           int    `json:"id"`
 			Title        string `json:"title"`
 			Description  string `json:"description"`
-			MemberStatus int    `json:"member_Status"`
+			MemberStatus int    `json:"member_status"`
 			Members      int    `json:"members"`
 		}{}
 
