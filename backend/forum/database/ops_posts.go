@@ -148,8 +148,25 @@ func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 }
 
 func (db DB) GetUserPostsLiked(userId int) []Post {
-	query, err := db.Query(`SELECT * FROM posts WHERE id IN 
-	(SELECT post_id FROM post_reactions WHERE author_id = ? AND reaction = 1)`, userId)
+	query, err := db.Query(`
+		SELECT * FROM posts
+		WHERE id IN (
+			SELECT post_id
+			FROM post_reactions
+			WHERE author_id = ? AND reaction = 1
+		)
+		AND (
+			privacy = 0
+			OR (
+				privacy = 1
+				AND author IN (
+					SELECT user_id
+					FROM followers
+					WHERE follower_id = ?
+				)
+			)
+		)
+	`, userId, userId)
 
 	if err != nil {
 		log.Panic(err)
