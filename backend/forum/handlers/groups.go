@@ -4,6 +4,7 @@ import (
 	"backend/common/server"
 	. "backend/forum/database"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -35,14 +36,14 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 		Id           int           `json:"id"`
 		Title        string        `json:"title"`
 		Description  string        `json:"description"`
-		MemberStatus *InviteStatus `json:"member_Status"`
+		MemberStatus *InviteStatus `json:"member_Status,omitempty"`
 		Members      int           `json:"members"`
 	}{
 		Id:           group.Id,
 		Title:        group.Title,
 		Description:  group.Description,
 		MemberStatus: h.DB.GetGroupMemberStatus(group.Id, userId),
-		Members:      group.Members,
+		Members:      h.DB.GetGroupMembersByGroupId(group.Id),
 	}
 
 	server.SendObject(w, responseBody)
@@ -51,15 +52,15 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 // GET /api/groups/id/posts -> []int{...postIds}
 func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
-	groupIdStr = strings.TrimSuffix(r.URL.Path, "/posts")
+	groupIdStr = strings.TrimSuffix(groupIdStr, "/posts")
 	// /api/groups/1/posts -> 1
 
+	fmt.Println("id", groupIdStr)
 	groupId, err := strconv.Atoi(groupIdStr)
 	if err != nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
-
 	group := h.DB.GetGroupById(groupId)
 	if group == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
@@ -74,7 +75,7 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 // POST /api/groups/id/join -> InviteStatus
 func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
-	groupIdStr = strings.TrimSuffix(r.URL.Path, "/join")
+	groupIdStr = strings.TrimSuffix(groupIdStr, "/join")
 	// /api/groups/1/join -> 1
 
 	groupId, err := strconv.Atoi(groupIdStr)
@@ -104,7 +105,7 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 // POST /api/groups/id/invite -> InviteStatus
 func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
-	groupIdStr = strings.TrimSuffix(r.URL.Path, "/invite")
+	groupIdStr = strings.TrimSuffix(groupIdStr, "/invite")
 	// /api/groups/1/invite -> 1
 
 	groupId, err := strconv.Atoi(groupIdStr)
@@ -132,14 +133,14 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 	user := h.DB.GetUserById(requestBody.UserId)
 	if user == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
+		return
 	}
 
 	switch *h.DB.GetGroupMemberStatus(groupId, user.Id) {
 	case Inactive:
 		server.SendObject(w, h.DB.AddInvitation(GroupInvite, groupId, user.Id))
 	case Pending:
-		server.SendObject(w, h.DB.DeleteInvitationByUserId(GroupInvite, groupId, user.Id))
-		// Perhaps ErrorResponse here
+		server.ErrorResponse(w, http.StatusBadRequest)
 	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
@@ -148,7 +149,7 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 // POST /api/groups/id/leave -> no response
 func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
-	groupIdStr = strings.TrimSuffix(r.URL.Path, "/leave")
+	groupIdStr = strings.TrimSuffix(groupIdStr, "/leave")
 	// /api/groups/1/leave -> 1
 
 	groupId, err := strconv.Atoi(groupIdStr)

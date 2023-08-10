@@ -48,44 +48,53 @@ func (db DB) GetGroupIdsByMembers() (groupIds []int) {
 	return
 }
 
+func (db DB) GetGroupMembersByGroupId(groupId int) (members int) {
+	err := db.QueryRow(`
+						SELECT COUNT(*) 
+						FROM group_members 
+						WHERE group_id = ?`, groupId).Scan(&members)
+	if err != nil {
+		log.Panic(err)
+	}
+	return
+}
+
 func (db DB) GetGroupById(groupId int) *Group {
-	row := db.QueryRow("SELECT * FROM groups WHERE id = ?", groupId)
-	var group Group
-	err := row.Scan(&group)
+	var t, d string
+	err := db.QueryRow(`SELECT title, description FROM groups WHERE id = ?`, groupId).Scan(&t, &d)
 	if err != nil {
 		return nil
 	}
 
-	return &group
+	return &Group{
+		Id:          groupId,
+		Title:       t,
+		Description: d,
+	}
 }
 
-func (db DB) GetGroupMemberStatus(groupId, userId int) *InviteStatus {
-	row := db.QueryRow(`
-	SELECT CASE
-	WHEN (
-	    SELECT 1 FROM group_members WHERE group_id ? AND user_id = ?) THEN 1
-	ELSE (
-		SELECT CASE
-		WHEN (
-			SELECT 1 FROM invitations WHERE from_user_id = ? AND to_user_id = ?) THEN 2
-		ELSE 0
-		END
-		)
-	END
-	AS member_status
-	`, groupId, userId, userId, groupId)
-
-	var memberStatus = new(InviteStatus)
-	err := row.Scan(&memberStatus)
+func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStatus) {
+	fmt.Println("g, u:", groupId, userId)
+	err := db.QueryRow(`SELECT CASE
+    WHEN (SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?) THEN 1
+    ELSE (
+        SELECT CASE
+            WHEN (SELECT 1 FROM invitations WHERE type = 1 AND from_user_id = ? AND to_user_id = ?) THEN 2
+            WHEN (SELECT 1 FROM invitations WHERE type = 2 AND from_user_id = ? AND to_user_id = ?) THEN 2
+            ELSE 0
+        END
+    )
+		END AS member_status
+	`, groupId, userId, groupId, userId, userId, groupId).Scan(&memberStatus)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return memberStatus
+	return
 }
 
 func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
-	query, err := db.Query("SELECT id FROM posts WHERE group_id = ? ORDER BY timestamp", groupId)
+	query, err := db.Query("SELECT id FROM posts WHERE group_id = ? ORDER BY id DESC", groupId)
 	if err != nil {
 		log.Panic(err)
 	}

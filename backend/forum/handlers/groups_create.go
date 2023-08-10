@@ -11,10 +11,6 @@ import (
 // POST /api/groups/create -> group_id
 func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
 
 	requestBody := struct {
 		Title       string `json:"title"`
@@ -57,16 +53,16 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 			server.ErrorResponse(w, http.StatusBadRequest)
 			return
 		}
+
+		if h.DB.GetUserById(id) == nil {
+			server.ErrorResponse(w, http.StatusNotFound)
+			return
+		}
 	}
 	groupId := h.DB.AddGroup(userId, requestBody.Title, requestBody.Description)
 	h.DB.AddMembership(int(groupId), userId)
 
 	for _, id := range requestBody.Invite {
-		if h.DB.GetUserById(id) == nil {
-			server.ErrorResponse(w, http.StatusNotFound)
-			return
-		}
-
 		h.DB.AddInvitation(GroupInvite, userId, id)
 	}
 

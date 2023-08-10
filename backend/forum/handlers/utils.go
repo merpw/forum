@@ -44,6 +44,9 @@ type SafeReaction struct {
 	DislikesCount int `json:"dislikes_count"`
 }
 
+type SafeGroup struct {
+}
+
 func isPresent(slice []string, item string) bool {
 	for _, s := range slice {
 		if s == item {

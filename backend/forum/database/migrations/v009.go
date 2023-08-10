@@ -12,7 +12,7 @@ var v009 = migrate.Migration{
 		CREATE TABLE IF NOT EXISTS groups (
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,
 		    title TEXT NOT NULL,
-		    description TEXT,
+		    description TEXT NOT NULL,
 		    creator_id INTEGER NOT NULL,
 			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 		    FOREIGN KEY (creator_id) REFERENCES users(id)
