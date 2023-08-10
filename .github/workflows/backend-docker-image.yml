@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: ["forum", "chat"]
+        service: ["forum", "chat", "attachments"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
