@@ -3,7 +3,6 @@ package server_test
 import (
 	. "backend/forum/handlers/test/server"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -90,7 +89,6 @@ func TestGroups(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		fmt.Println(groupIds)
 		var groupId = 3
 
 		for _, id := range groupIds {
