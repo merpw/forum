@@ -3,6 +3,7 @@ package server_test
 import (
 	. "backend/forum/handlers/test/server"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"testing"
@@ -10,32 +11,36 @@ import (
 
 func TestInvitationsAll(t *testing.T) {
 	testServer := NewTestServer(t)
-	cli1 := testServer.TestClient()
-	cli2 := testServer.TestClient()
-	cli1.TestAuth(t)
-	t.Run("Unauthorized", func(t *testing.T) {
-		cli2.TestGet(t, "/api/invitations", http.StatusUnauthorized)
-	})
 
 	t.Run("Valid", func(t *testing.T) {
-		cli2.TestAuth(t)
+		cli1 := testServer.TestClient()
+		cli1.TestAuth(t)
+
+		for i := 0; i < 10; i++ {
+			client := testServer.TestClient()
+			client.TestAuth(t)
+			client.TestPost(t, `/api/users/1/follow`, nil, http.StatusOK)
+		}
 		var invitations []int
 
-		t.Run("All invitations", func(t *testing.T) {
-			cli2.TestPost(t, `/api/users/1/follow`, nil, http.StatusOK)
+		_, response := cli1.TestGet(t, "/api/invitations", http.StatusOK)
 
-			_, response := cli1.TestGet(t, "/api/invitations", http.StatusOK)
+		err := json.Unmarshal(response, &invitations)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-			err := json.Unmarshal(response, &invitations)
-			if err != nil {
-				t.Fatal(err)
+		if len(invitations) != 10 {
+			t.Errorf("invalid invitations amount, expected %d, got %d", 1, len(invitations))
+		}
+
+		for i := 0; i < 10; i++ {
+			if 10-i != invitations[i] {
+				t.Errorf("incorrect id, expected %d, got %d", 10-i, invitations[i])
 			}
-
-			if len(invitations) != 1 {
-				t.Errorf("invalid invitations amount, expected %d, got %d", 1, len(invitations))
-			}
-		})
+		}
 	})
+
 }
 
 func TestInvitationsId(t *testing.T) {
@@ -63,7 +68,7 @@ func TestInvitationsId(t *testing.T) {
 
 		var invitations []int
 		t.Run("Request to follow", func(t *testing.T) {
-			cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+			addFollowRequest(t, cli2, 1)
 			_, resp := cli1.TestGet(t, "/api/invitations/1", http.StatusOK)
 			err := json.Unmarshal(resp, &respBody)
 			if err != nil {
@@ -114,7 +119,6 @@ func TestInvitationsId(t *testing.T) {
 }
 
 func TestInvitationsIdRespond(t *testing.T) {
-
 	t.Run("Invalid", func(t *testing.T) {
 		testServer := NewTestServer(t)
 		cli1 := testServer.TestClient()
@@ -139,36 +143,40 @@ func TestInvitationsIdRespond(t *testing.T) {
 				http.StatusBadRequest)
 		})
 
-		t.Run("Valid", func(t *testing.T) {
-			testServer := NewTestServer(t)
-			cli1 := testServer.TestClient()
-			cli2 := testServer.TestClient()
-			cli1.TestAuth(t)
-			cli2.TestAuth(t)
-
-			responseBody := struct {
-				Response bool `json:"response"`
-			}{
-				Response: false,
-			}
-
-			t.Run("Reject invite", func(t *testing.T) {
-				cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
-				cli1.TestPost(t,
-					"/api/invitations/1/respond",
-					responseBody,
-					http.StatusOK)
-			})
-
-			t.Run("Accept invite", func(t *testing.T) {
-				cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
-				responseBody.Response = true
-				cli1.TestPost(t,
-					"/api/invitations/2/respond",
-					responseBody,
-					http.StatusOK)
-			})
-
-		})
 	})
+	t.Run("Valid", func(t *testing.T) {
+		testServer := NewTestServer(t)
+		cli1 := testServer.TestClient()
+		cli2 := testServer.TestClient()
+		cli1.TestAuth(t)
+		cli2.TestAuth(t)
+
+		t.Run("Reject invite", func(t *testing.T) {
+			followAndRespond(t, cli1, cli2, 1, 1, false)
+		})
+
+		t.Run("Accept invite", func(t *testing.T) {
+			followAndRespond(t, cli1, cli2, 1, 2, true)
+		})
+
+	})
+}
+
+// user in this case is user being followed, and follower is the user following
+func followAndRespond(t *testing.T, toUser, fromUser *TestClient, toUserId, invId int, response bool) {
+	addFollowRequest(t, fromUser, toUserId)
+	invitationIdRespond(t, toUser, invId, response)
+}
+
+func addFollowRequest(t *testing.T, follower *TestClient, toId int) {
+	follower.TestPost(t, fmt.Sprintf("/api/users/%d/follow", toId), nil, http.StatusOK)
+}
+
+func invitationIdRespond(t *testing.T, user *TestClient, invId int, response bool) {
+	responseBody := struct {
+		Response bool `json:"response"`
+	}{
+		Response: response,
+	}
+	user.TestPost(t, fmt.Sprintf("/api/invitations/%d/respond", invId), responseBody, http.StatusOK)
 }

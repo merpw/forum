@@ -131,20 +131,19 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fromUserId := h.getUserId(w, r)
-	toUserId := h.DB.GetGroupCreatorId(groupId)
 
 	switch *h.DB.GetGroupMemberStatus(groupId, fromUserId) {
 	case Inactive:
 		server.SendObject(w, h.DB.AddInvitation(
 			GroupJoin,
 			fromUserId,
-			*toUserId,
+			group.CreatorId,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Pending:
 		server.SendObject(w, h.DB.DeleteInvitationByUserId(
 			GroupJoin,
 			fromUserId,
-			*toUserId,
+			group.CreatorId,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
@@ -220,7 +219,7 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userId := h.getUserId(w, r)
-	if userId == *h.DB.GetGroupCreatorId(groupId) {
+	if userId == group.CreatorId {
 		http.Error(w, "Creator can't leave group", http.StatusBadRequest)
 		return
 	}
@@ -239,7 +238,7 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) groupsIdEvents(w http.ResponseWriter, r *http.Request) {
 	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
 	groupIdStr = strings.TrimSuffix(groupIdStr, "/events")
-	// /api/groups/1/leave -> 1
+	// /api/groups/1/events -> 1
 
 	groupId, err := strconv.Atoi(groupIdStr)
 	if err != nil {

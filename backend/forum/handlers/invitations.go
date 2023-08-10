@@ -65,7 +65,7 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 
 	invitation := h.DB.GetInvitationById(invitationId)
 	if invitation == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
+		http.Error(w, "Invitation not found", http.StatusNotFound)
 		return
 	}
 
@@ -78,16 +78,26 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
-	groupId := int(invitation.AssociatedId.Int64)
+	associatedId := int(invitation.AssociatedId.Int64)
 
 	if requestBody.Response {
 		switch invitation.Type {
 		case FollowUser:
 			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
 		case GroupInvite:
-			h.DB.AddMembership(groupId, invitation.ToUserId)
+			if *h.DB.GetGroupMemberStatus(associatedId, invitation.ToUserId) != Accepted {
+				h.DB.AddMembership(associatedId, invitation.ToUserId)
+			} else {
+				server.ErrorResponse(w, http.StatusBadRequest)
+			}
 		case GroupJoin:
-			h.DB.AddMembership(groupId, invitation.FromUserId)
+			if *h.DB.GetGroupMemberStatus(associatedId, invitation.FromUserId) != Accepted {
+				h.DB.AddMembership(associatedId, invitation.FromUserId)
+			} else {
+				server.ErrorResponse(w, http.StatusBadRequest)
+			}
+		case Event:
+			h.DB.AddEventMember(associatedId, invitation.ToUserId)
 		}
 
 	}

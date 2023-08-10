@@ -4,6 +4,7 @@ import (
 	"backend/common/server"
 	. "backend/forum/database"
 	"backend/forum/external"
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -64,8 +65,10 @@ func (h *Handlers) eventsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id := h.DB.AddEvent(groupId, h.getUserId(w, r), event.Title, event.Description, event.TimeAndDate)
+	userId := h.getUserId(w, r)
+	id := h.DB.AddEvent(groupId, userId, event.Title, event.Description, event.TimeAndDate)
 
+	h.DB.AddInvitation(Event, userId, userId, sql.NullInt64{Int64: int64(id), Valid: true})
 	server.SendObject(w, id)
 
 	external.RevalidateURL(fmt.Sprintf("/groups/%d/events/%d", groupId, id))

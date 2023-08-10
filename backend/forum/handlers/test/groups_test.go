@@ -135,7 +135,7 @@ func TestGroupsId(t *testing.T) {
 			cli := testServer.TestClient()
 			cli.TestAuth(t)
 
-			var group Group
+			var group TestGroup
 			_, resp := cli.TestGet(t, "/api/groups/1", http.StatusOK)
 
 			if err := json.Unmarshal(resp, &group); err != nil {
@@ -159,7 +159,7 @@ func TestGroupsId(t *testing.T) {
 			cli := testServer.TestClient()
 			cli.TestAuth(t)
 
-			var group Group
+			var group TestGroup
 
 			cli.TestPost(t, "/api/groups/1/join", nil, http.StatusOK)
 

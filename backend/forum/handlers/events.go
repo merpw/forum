@@ -18,6 +18,11 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if group := h.DB.GetGroupById(groupId); group == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
 	eventIdStr := strings.Split(r.URL.Path, "/")[5]
 	// /api/groups/1/events/2 -> 2
 
@@ -27,16 +32,14 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
-		server.ErrorResponse(w, http.StatusForbidden)
+	userId := h.getUserId(w, r)
+
+	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
+		server.ErrorResponse(w, code)
 		return
 	}
 
 	event := h.DB.GetEventById(eventId)
-	if event == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
 
 	var responseBody = SafeEvent{
 		Id:          event.Id,
@@ -49,7 +52,64 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	server.SendObject(w, responseBody)
+}
 
+func (h *Handlers) eventsIdUsers(w http.ResponseWriter, r *http.Request) {
+	groupIdStr := strings.Split(r.URL.Path, "/")[3]
+	// /api/groups/1/events/2/users -> 1
+
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	eventIdStr := strings.Split(r.URL.Path, "/")[5]
+	// /api/groups/1/events/2/users -> 2
+
+	eventId, err := strconv.Atoi(eventIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	userId := h.getUserId(w, r)
+
+	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
+		server.ErrorResponse(w, code)
+		return
+	}
+
+	server.SendObject(w, h.DB.GetEventMembers(eventId))
+}
+
+func (h *Handlers) eventsIdLeave(w http.ResponseWriter, r *http.Request) {
+	groupIdStr := strings.Split(r.URL.Path, "/")[3]
+	// /api/groups/1/events/2/leave -> 1
+
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	eventIdStr := strings.Split(r.URL.Path, "/")[5]
+	// /api/groups/1/events/2/leave -> 2
+
+	eventId, err := strconv.Atoi(eventIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	userId := h.getUserId(w, r)
+
+	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
+		server.ErrorResponse(w, code)
+		return
+	}
+
+	h.DB.DeleteEventMember(eventId, userId)
 }
 
 func (h *Handlers) eventsIdGoing(w http.ResponseWriter, r *http.Request) {
@@ -71,45 +131,28 @@ func (h *Handlers) eventsIdGoing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
-		server.ErrorResponse(w, http.StatusForbidden)
+	userId := h.getUserId(w, r)
+
+	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
+		server.ErrorResponse(w, code)
 		return
 	}
 
-	server.SendObject(w, h.DB.GetEventUserIds(eventId))
-
+	h.DB.AddEventMember(eventId, userId)
 }
 
-func (h *Handlers) eventsIdLeave(w http.ResponseWriter, r *http.Request) {
-	groupIdStr := strings.Split(r.URL.Path, "/")[3]
-	// /api/groups/1/events/2/going -> 1
-
-	groupId, err := strconv.Atoi(groupIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
+func (h *Handlers) validateEventsId(groupId, eventId, userId int) int {
+	if group := h.DB.GetGroupById(groupId); group == nil {
+		return http.StatusNotFound
 	}
 
-	eventIdStr := strings.Split(r.URL.Path, "/")[5]
-	// /api/groups/1/events/2/going -> 2
-
-	eventId, err := strconv.Atoi(eventIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
+	if event := h.DB.GetEventById(eventId); event == nil {
+		return http.StatusNotFound
 	}
 
-	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
-		server.ErrorResponse(w, http.StatusForbidden)
-		return
+	if *h.DB.GetGroupMemberStatus(groupId, userId) != Accepted {
+		return http.StatusForbidden
 	}
 
-	userId := h.getUserId(w, r)
-	if !h.DB.GetEventStatusById(eventId, userId) {
-		server.ErrorResponse(w, http.StatusForbidden)
-		return
-	}
-
-	h.DB.DeleteEventMember(eventId, userId)
-
+	return http.StatusOK
 }
