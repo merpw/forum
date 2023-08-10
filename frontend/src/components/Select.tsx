@@ -32,7 +32,7 @@ const Select: ReactSelect = (props) => {
         clearIndicator: () => "p-2",
 
         valueContainer: () => "flex gap-1",
-        multiValue: () => "bg-neutral text-base-content rounded-md",
+        multiValue: () => "bg-base-300 text-base-content rounded-md",
         multiValueLabel: () => "m-2 my-1",
         multiValueRemove: () => "hover:bg-error px-2 rounded-md",
       }}
