@@ -140,7 +140,7 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 	case Inactive:
 		server.SendObject(w, h.DB.AddInvitation(GroupInvite, groupId, user.Id))
 	case Pending:
-		server.ErrorResponse(w, http.StatusBadRequest)
+		server.SendObject(w, h.DB.DeleteInvitationByUserId(GroupInvite, groupId, user.Id))
 	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
@@ -165,11 +165,6 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userId := h.getUserId(w, r)
-	if userId == -1 {
-		server.ErrorResponse(w, http.StatusUnauthorized)
-		return
-	}
-
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
 	case Inactive:
 		server.ErrorResponse(w, http.StatusBadRequest)

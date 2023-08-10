@@ -1,8 +1,6 @@
 package database
 
 import (
-	"database/sql"
-	"errors"
 	"log"
 	"time"
 )
@@ -32,20 +30,13 @@ func (db DB) GetUserInvitations(toUserId int) (invitationIds []int) {
 
 // GetInvitationById returns slice of all users ids
 func (db DB) GetInvitationById(id int) *Invitation {
-	row := db.QueryRow("SELECT * FROM invitations WHERE id = ?", id)
-
-	var invitation Invitation
-	err := row.Scan(&invitation.Id, &invitation.Type,
-		&invitation.FromUserId, &invitation.ToUserId, &invitation.TimeStamp)
-
+	inv := &Invitation{}
+	err := db.QueryRow("SELECT * FROM invitations WHERE id = ?", id).Scan(
+		&inv.Id, &inv.Type, &inv.FromUserId, &inv.ToUserId, &inv.TimeStamp)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil
-		}
-		log.Panic(err)
+		return nil
 	}
-
-	return &invitation
+	return inv
 }
 
 // DeleteInvitation deletes invitation row in invitations table
@@ -56,9 +47,9 @@ func (db DB) DeleteInvitationById(id int) {
 	}
 }
 
-func (db DB) DeleteInvitationByUserId(inviteType InviteType, fromUserId, toUserId int) InviteStatus {
+func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId int) InviteStatus {
 	_, err := db.Exec(`DELETE FROM invitations
-       						WHERE type = ? AND from_user_id = ? AND to_user_id = ?`, inviteType, fromUserId, toUserId)
+       						WHERE type = ? AND from_user_id = ? AND to_user_id = ?`, invType, fromUserId, toUserId)
 	if err != nil {
 		log.Panic(err)
 	}

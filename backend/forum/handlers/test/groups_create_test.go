@@ -14,7 +14,7 @@ func TestCreateGroup(t *testing.T) {
 
 	cli1 := testServer.TestClient()
 
-	invalidBody := createGroup("test title", "test desc", []int{1})
+	invalidBody := CreateGroup("test title", "test desc", []int{1})
 
 	t.Run("Invalid", func(t *testing.T) {
 
@@ -71,7 +71,7 @@ func TestCreateGroup(t *testing.T) {
 	}
 
 	// Creates a group with valid title, description, and with 6 users in it
-	validBody := createGroup("test title", "test desc", invites)
+	validBody := CreateGroup("test title", "test desc", invites)
 
 	t.Run("Valid", func(t *testing.T) {
 		t.Run("Create", func(t *testing.T) {

@@ -1,7 +1,6 @@
 package database
 
 import (
-	"fmt"
 	"log"
 	"time"
 )
@@ -36,11 +35,10 @@ func (db DB) GetGroupIdsByMembers() (groupIds []int) {
 	for query.Next() {
 		var groupId int
 		var test any
-		err = query.Scan(&groupId, &test)
+		err = query.Scan(&test, &groupId)
 		if err != nil {
 			log.Panic(err)
 		}
-		fmt.Println(groupId, test)
 		groupIds = append(groupIds, groupId)
 	}
 	query.Close()
@@ -74,7 +72,6 @@ func (db DB) GetGroupById(groupId int) *Group {
 }
 
 func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStatus) {
-	fmt.Println("g, u:", groupId, userId)
 	err := db.QueryRow(`SELECT CASE
     WHEN (SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?) THEN 1
     ELSE (

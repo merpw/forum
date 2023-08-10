@@ -16,7 +16,7 @@ type Group struct {
 	Invite      []int  `json:"invite"`
 }
 
-func createGroup(title, desc string, invites []int) *Group {
+func CreateGroup(title, desc string, invites []int) *Group {
 	return &Group{
 		Title:       title,
 		Description: desc,
@@ -24,7 +24,7 @@ func createGroup(title, desc string, invites []int) *Group {
 	}
 }
 
-type GroupPostData struct {
+type GroupPost struct {
 	Id          int    `json:"id"`
 	Title       string `json:"title"`
 	Description string `json:"description"`
@@ -35,8 +35,8 @@ type GroupPostData struct {
 	GroupId    int         `json:"group_id"`
 }
 
-func groupPostData(groupId int) *GroupPostData {
-	return &GroupPostData{
+func GroupPostData(groupId int) *GroupPost {
+	return &GroupPost{
 		Title:       uuid.Must(uuid.NewV4()).String()[0:8],
 		Content:     "content",
 		Description: "description",
@@ -45,12 +45,74 @@ func groupPostData(groupId int) *GroupPostData {
 	}
 }
 
+func TestGroups(t *testing.T) {
+	testServer := NewTestServer(t)
+	cli := testServer.TestClient()
+	cli.TestAuth(t)
+
+	var clients []*TestClient
+
+	// Create four more users
+	for i := 2; i <= 3; i++ {
+		client := testServer.TestClient()
+		client.TestAuth(t)
+		clients = append(clients, client)
+	}
+
+	t.Run("Create groups", func(t *testing.T) {
+		response := struct {
+			Response bool `json:"response"`
+		}{
+			Response: true,
+		}
+
+		// Create group with 1 user
+		group1 := CreateGroup("test", "test", []int{})
+		cli.TestPost(t, "/api/groups/create", group1, http.StatusOK)
+
+		// Create group with 2 users
+		group2 := CreateGroup("test", "test", []int{2})
+		cli.TestPost(t, "/api/groups/create", group2, http.StatusOK)
+		clients[0].TestPost(t, "/api/invitations/1/respond", response, http.StatusOK)
+
+		// Create group with 3 users
+		group3 := CreateGroup("test", "test", []int{2, 3})
+		cli.TestPost(t, "/api/groups/create", group3, http.StatusOK)
+
+		for i := 0; i < 2; i++ {
+			endpoint := fmt.Sprintf("/api/invitations/%d/respond", i+2)
+			clients[i].TestPost(t, endpoint, response, http.StatusOK)
+		}
+	})
+
+	t.Run("Check order of groups", func(t *testing.T) {
+		var groupIds []int
+		_, resp := cli.TestGet(t, "/api/groups", http.StatusOK)
+
+		if err := json.Unmarshal(resp, &groupIds); err != nil {
+			t.Fatal(err)
+		}
+
+		var groupId = 3
+		fmt.Println(groupIds)
+
+		for _, id := range groupIds {
+			if groupId != id {
+				t.Errorf("unexpected id, expected %d, got %d", groupId, id)
+			}
+			groupId--
+		}
+
+	})
+
+}
+
 func TestGroupsId(t *testing.T) {
 	testServer := NewTestServer(t)
 	cli1 := testServer.TestClient()
 	cli1.TestAuth(t)
 
-	group := createGroup("test", "test", []int{})
+	group := CreateGroup("test", "test", []int{})
 	// Create a group to test with
 	cli1.TestPost(t, "/api/groups/create", group, http.StatusOK)
 
@@ -86,10 +148,10 @@ func TestGroupsIdPosts(t *testing.T) {
 	t.Run("Valid", func(t *testing.T) {
 
 		// create a group, and create a post
-		group := createGroup("test", "test", []int{})
+		group := CreateGroup("test", "test", []int{})
 		cli.TestPost(t, "/api/groups/create", group, http.StatusOK)
 
-		post := groupPostData(1)
+		post := GroupPostData(1)
 		cli.TestPost(t, "/api/posts/create", post, http.StatusOK)
 
 		var postIds []int
@@ -107,138 +169,5 @@ func TestGroupsIdPosts(t *testing.T) {
 		if postIds[0] != 1 {
 			t.Errorf("invalid post id, expected %d, got %d", 1, postIds[0])
 		}
-	})
-}
-
-func TestGroupIdJoin(t *testing.T) {
-	testServer := NewTestServer(t)
-	cli1 := testServer.TestClient()
-	cli2 := testServer.TestClient()
-	cli1.TestAuth(t)
-	cli2.TestAuth(t)
-
-	group := createGroup("test", "test", []int{})
-	cli1.TestPost(t, "/api/groups/create", group, http.StatusOK)
-
-	t.Run("Not found", func(t *testing.T) {
-		cli1.TestPost(t, "/api/groups/2/join", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/999999999999999999999999999999/join", nil, http.StatusNotFound)
-	})
-
-	t.Run("Bad request", func(t *testing.T) {
-		cli1.TestPost(t, "/api/groups/1/join", nil, http.StatusBadRequest)
-	})
-
-	t.Run("Valid", func(t *testing.T) {
-		var status int
-		t.Run("Request to join", func(t *testing.T) {
-			_, resp := cli2.TestPost(t, "/api/groups/1/join", nil, http.StatusOK)
-			if err := json.Unmarshal(resp, &status); err != nil {
-				t.Fatal(err)
-			}
-			if status != 2 {
-				t.Errorf("unexpected status, expected %d, got %d", 2, status)
-			}
-		})
-		t.Run("Abort request", func(t *testing.T) {
-			_, resp := cli2.TestPost(t, "/api/groups/1/join", nil, http.StatusOK)
-			if err := json.Unmarshal(resp, &status); err != nil {
-				t.Fatal(err)
-			}
-			if status != 0 {
-				t.Errorf("unexpected status, expected %d, got %d", 2, status)
-			}
-		})
-
-	})
-}
-
-func TestGroupIdInviteLeave(t *testing.T) {
-	testServer := NewTestServer(t)
-	cli1 := testServer.TestClient()
-	cli2 := testServer.TestClient()
-	cli1.TestAuth(t)
-	cli2.TestAuth(t)
-
-	group := createGroup("test", "test", []int{})
-	cli1.TestPost(t, "/api/groups/create", group, http.StatusOK)
-	invalidBody := struct {
-		UserId int `json:"user_id"`
-	}{
-		UserId: 666,
-	}
-	t.Run("Not found", func(t *testing.T) {
-		cli1.TestPost(t, "/api/groups/1/invite", invalidBody, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/10/leave", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/10/invite", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/999999999999999999999999999999/invite", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/999999999999999999999999999999/leave", nil, http.StatusNotFound)
-	})
-
-	t.Run("Bad request", func(t *testing.T) {
-		cli2.TestPost(t, "/api/groups/1/leave", nil, http.StatusBadRequest)
-		cli2.TestPost(t, "/api/groups/1/join", nil, http.StatusOK)
-		cli2.TestPost(t, "/api/groups/1/leave", nil, http.StatusBadRequest)
-		cli1.TestPost(t, "/api/groups/1/invite", "invalid", http.StatusBadRequest)
-	})
-
-	t.Run("Valid", func(t *testing.T) {
-		var status int
-		requestBody := struct {
-			UserId int `json:"user_id"`
-		}{
-			UserId: 2,
-		}
-
-		t.Run("Invite request", func(t *testing.T) {
-			_, resp := cli1.TestPost(t, "/api/groups/1/invite", requestBody, http.StatusOK)
-			if err := json.Unmarshal(resp, &status); err != nil {
-				t.Fatal(err)
-			}
-			if status != 2 {
-				t.Errorf("unexpected status, expected %d, got %d", 2, status)
-			}
-		})
-		t.Run("Abort request", func(t *testing.T) {
-			_, resp := cli2.TestPost(t, "/api/groups/1/invite", requestBody, http.StatusOK)
-			if err := json.Unmarshal(resp, &status); err != nil {
-				t.Fatal(err)
-			}
-			if status != 0 {
-				t.Errorf("unexpected status, expected %d, got %d", 2, status)
-			}
-		})
-
-		response := struct {
-			Response bool `json:"response"`
-		}{
-			Response: true,
-		}
-
-		t.Run("Invite, respond, then leave", func(t *testing.T) {
-			_, resp := cli1.TestPost(t, "/api/groups/1/invite", requestBody, http.StatusOK)
-			if err := json.Unmarshal(resp, &status); err != nil {
-				t.Fatal(err)
-			}
-			if status != 2 {
-				t.Errorf("unexpected status, expected %d, got %d", 2, status)
-			}
-
-			var invites []int
-
-			_, resp = cli2.TestGet(t, "/api/invitations", http.StatusOK)
-			if err := json.Unmarshal(resp, &invites); err != nil {
-				t.Fatal(err)
-			}
-
-			if len(invites) != 1 {
-				t.Errorf("Invalid length of invites, expected %d, got %d", 1, len(invites))
-			}
-
-			endpoint := fmt.Sprintf("/api/invitations/%d/respond", invites[0])
-			cli2.TestPost(t, endpoint, response, http.StatusOK)
-
-		})
-
 	})
 }

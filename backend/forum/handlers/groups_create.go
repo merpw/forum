@@ -63,7 +63,9 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 	h.DB.AddMembership(int(groupId), userId)
 
 	for _, id := range requestBody.Invite {
-		h.DB.AddInvitation(GroupInvite, userId, id)
+		if Accepted != *h.DB.GetGroupMemberStatus(int(groupId), id) {
+			h.DB.AddInvitation(GroupInvite, int(groupId), id)
+		}
 	}
 
 	server.SendObject(w, groupId)
