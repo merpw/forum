@@ -23,41 +23,6 @@ body {
 }
 
 @layer components {
-  /* TODO: improve when design concept will be ready */
-  .react-select-container .react-select__control {
-    @apply select-bordered bg-base-100 rounded-lg px-2 py-1 text-sm;
-  }
-
-  .react-select-container .react-select__control--is-focused {
-    @apply select-bordered border-base-300;
-  }
-
-  .react-select-container .react-select__menu {
-    @apply bg-base-300;
-  }
-
-  .react-select-container .react-select__option {
-    @apply bg-base-300;
-  }
-
-  .react-select-container .react-select__option--is-focused {
-    @apply bg-base-100;
-  }
-
-  .react-select-container .react-select__input-container,
-  .react-select-container .react-select__placeholder,
-  .react-select-container .react-select__single-value {
-    @apply text-gray-400 font-light;
-  }
-
-  .react-select-container .react-select__multi-value {
-    @apply bg-primary rounded-md text-neutral;
-  }
-
-  .react-select-container .react-select__multi-value__label {
-    @apply text-white ml-1;
-  }
-
   /* Inline code */
   .prose code:not(.prose pre code) {
     @apply bg-gray-200 dark:bg-gray-800 p-1 px-2 rounded;

@@ -18,6 +18,13 @@ const nextConfig = {
       })
     }
 
+    if (process.env.DEV_FORUM_ATTACHMENTS_REWRITE_URL) {
+      rewrites.push({
+        source: "/api/attachments/:path*",
+        destination: `${process.env.DEV_FORUM_ATTACHMENTS_REWRITE_URL}/api/attachments/:path*`,
+      })
+    }
+
     if (process.env.DEV_FORUM_BACKEND_REWRITE_URL) {
       rewrites.push({
         source: "/api/:path*",

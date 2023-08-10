@@ -2,8 +2,8 @@ import { FC } from "react"
 
 import { Comment, Post } from "@/custom"
 import { Category, ReactionsButtons } from "@/components/posts/reactions"
-import CommentForm from "@/app/post/[id]/CommentForm"
-import Comments from "@/app/post/[id]/Comments"
+import CommentForm from "@/components/posts/CommentForm"
+import Comments from "@/components/posts/Comments"
 import AutoDate from "@/components/AutoDate"
 import UserLink from "@/components/UserLink"
 

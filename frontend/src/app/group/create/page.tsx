@@ -2,16 +2,14 @@ import { Metadata } from "next"
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
-import CreatePostForm from "@/components/forms/create-post/CreatePostForm"
-import { getCategoriesLocal } from "@/api/posts/edge"
 import checkSession from "@/api/auth/edge"
+import CreateGroupForm from "@/components/forms/create-group/CreateGroupForm"
 
 export const metadata: Metadata = {
-  title: "Create a new post",
+  title: "Create a new group",
 }
 
 const Page = async () => {
-  const categories = await getCategoriesLocal()
   const token = cookies().get("forum-token")?.value
   if (!token) {
     return redirect("/login")
@@ -22,9 +20,7 @@ const Page = async () => {
     return redirect("/login")
   }
 
-  return (
-    <CreatePostForm categories={categories} isAIEnabled={Boolean(process.env.OPENAI_API_KEY)} />
-  )
+  return <CreateGroupForm />
 }
 
 export default Page

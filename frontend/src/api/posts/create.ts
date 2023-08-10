@@ -5,6 +5,7 @@ export const CreatePost = async (postData: {
   content: string
   description: string
   categories: string[]
+  group_id?: number
 }) =>
   axios
     .post<number>("/api/posts/create", postData)
