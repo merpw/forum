@@ -8,7 +8,7 @@ import (
 
 // GetUserInvitations returns slice of all users ids
 func (db DB) GetUserInvitations(toUserId int) (invitationIds []int) {
-	query, err := db.Query("SELECT id FROM invitations WHERE to_user_id = ? ORDER BY timestamp DESC", toUserId)
+	query, err := db.Query("SELECT id FROM invitations WHERE to_user_id = ? ORDER BY id DESC", toUserId)
 	if err != nil {
 		log.Panic(err)
 	}

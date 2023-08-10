@@ -25,8 +25,10 @@ var v011 = migrate.Migration{
 		    user_id INTEGER NOT NULL,
 		    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
 		    FOREIGN KEY (event_id) REFERENCES events(id),
-		    FOREIGN KEY (user_id) REFERENCES users(id));
-		    
+		    FOREIGN KEY (user_id) REFERENCES users(id),
+		    CONSTRAINT unique_member UNIQUE(event_id, user_id)
+		    );
+	
 	`)
 		if err != nil {
 			return err

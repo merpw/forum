@@ -40,8 +40,8 @@ type Post struct {
 	CommentsCount int
 	Categories    string
 	Description   string
-	Privacy       Privacy
 	GroupId       *int
+	Privacy       Privacy
 }
 
 type User struct {
