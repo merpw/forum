@@ -6,7 +6,7 @@ export const createGroup = async (
   invite: number[]
 ): Promise<number | undefined> =>
   axios
-    .post<number>(`/api/groups`, { title, description, invite })
+    .post<number>(`/api/groups/create`, { title, description, invite })
     .then((res) => res.data)
     .catch((err) => {
       throw new Error(err.response?.data?.length < 200 ? err.response.data : "Unexpected error")

@@ -1,6 +1,6 @@
 import useSWR from "swr"
 
-import { DUMMY_GROUPS } from "@/api/groups/dummy"
+import fetcher from "@/api/fetcher"
 
 export type Group = {
   id: number
@@ -17,9 +17,7 @@ export type Group = {
 export type GroupMemberStatus = 0 | 1 | 2
 
 export const useGroups = () => {
-  const { data, error, mutate } = useSWR<number[]>("/api/groups", () =>
-    DUMMY_GROUPS.map((group) => group.id)
-  )
+  const { data, error, mutate } = useSWR<number[]>("/api/groups", fetcher)
 
   return {
     groups: data,
@@ -30,9 +28,7 @@ export const useGroups = () => {
 }
 
 export const useGroup = (id: number) => {
-  const { data, error, mutate } = useSWR<Group | undefined>(`/api/groups/${id}`, () =>
-    DUMMY_GROUPS.find((group) => group.id === id)
-  )
+  const { data, error, mutate } = useSWR<Group | undefined>(`/api/groups/${id}`, fetcher)
 
   return {
     group: data,

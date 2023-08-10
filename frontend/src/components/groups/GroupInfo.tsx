@@ -1,10 +1,12 @@
 import { FC } from "react"
 import pluralize from "pluralize"
 import { MdGroupAdd, MdGroupRemove } from "react-icons/md"
+import { useSWRConfig } from "swr"
 
 import { Group } from "@/api/groups/hooks"
 import GroupAvatar from "@/components/groups/Avatar"
 import { useMe } from "@/api/auth/hooks"
+import { joinGroup, leaveGroup } from "@/api/groups/invite"
 
 const GroupInfo: FC<{ group: Group }> = ({ group }) => {
   return (
@@ -53,13 +55,22 @@ const GroupInfo: FC<{ group: Group }> = ({ group }) => {
 
 const MembershipButton: FC<{ group: Group }> = ({ group }) => {
   const { user } = useMe()
+
+  const { mutate } = useSWRConfig()
+
+  const mutateMemberStatus = (status: number) =>
+    mutate(`/api/groups/${group.id}`, { ...group, member_status: status })
+
   if (!user || user.id === group.creator_id) return null
 
   // group.member_status = 1
 
   if (group.member_status === 0) {
     return (
-      <button className={"button w-fit px-7"}>
+      <button
+        className={"button w-fit px-7"}
+        onClick={() => joinGroup(group.id).then(mutateMemberStatus).catch(console.error)}
+      >
         <MdGroupAdd size={20} />
         Join
       </button>
@@ -67,7 +78,14 @@ const MembershipButton: FC<{ group: Group }> = ({ group }) => {
   }
 
   return (
-    <button className={"btn btn-ghost text-info btn-neutral btn-sm"}>
+    <button
+      className={"btn btn-ghost text-info btn-neutral btn-sm"}
+      onClick={() =>
+        (group.member_status === 1 ? leaveGroup : joinGroup)(group.id)
+          .then(mutateMemberStatus)
+          .catch(console.error)
+      }
+    >
       <MdGroupRemove size={20} />
       {group.member_status === 1 ? "Leave" : "Cancel"}
     </button>
