@@ -4,7 +4,7 @@
 package ws
 
 import (
-	"backend/chat/external"
+	"backend/common/external"
 	"encoding/json"
 	"log"
 	"net/http"
