@@ -18,8 +18,7 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Get the post from the database
-	post := h.DB.GetPostById(id)
+	post := h.DB.GetPostById(id, h.getUserId(w, r))
 	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
@@ -64,7 +63,7 @@ func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 		server.ErrorResponse(w, http.StatusNotFound)
 	}
 
-	post := h.DB.GetPostById(postId)
+	post := h.DB.GetPostById(postId, userId)
 	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
@@ -110,7 +109,7 @@ func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 		server.ErrorResponse(w, http.StatusNotFound)
 	}
 
-	post := h.DB.GetPostById(postId)
+	post := h.DB.GetPostById(postId, userId)
 	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
@@ -156,7 +155,7 @@ func (h *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post := h.DB.GetPostById(postId)
+	post := h.DB.GetPostById(postId, userId)
 	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return

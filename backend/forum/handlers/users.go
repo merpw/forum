@@ -139,8 +139,6 @@ func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 	userIdStr = strings.TrimSuffix(userIdStr, "/posts")
 	// /api/users/1/posts -> 1
 
-	requestingUserId := h.getUserId(w, r)
-
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
 		server.ErrorResponse(w, http.StatusNotFound)
@@ -153,7 +151,7 @@ func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts := h.DB.GetUserPosts(userId, requestingUserId)
+	posts := h.DB.GetPostsByUserId(userId, h.getUserId(w, r))
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {
