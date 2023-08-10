@@ -28,13 +28,13 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
 	requestBody := struct {
-		Title       string   `json:"title"`
-		Content     string   `json:"content"`
-		Description string   `json:"description"`
-		Categories  []string `json:"categories"`
-		GroupId     *int64   `json:"group_id"`
-		Privacy     Privacy `json:"privacy"`
-		PostFollowers []int            `json:"post_followers"`
+		Title         string   `json:"title"`
+		Content       string   `json:"content"`
+		Description   string   `json:"description"`
+		Categories    []string `json:"categories"`
+		Privacy       int      `json:"privacy"`
+		PostFollowers []int    `json:"post_followers"`
+		GroupId       *int64   `json:"group_id"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -101,21 +101,27 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	switch requestBody.Privacy {
-	case Public:
-		fallthrough
-	case Private:
-		if len(requestBody.PostFollowers) > 0 {
-			http.Error(w, "followers in non-super private post", http.StatusBadRequest)
-			return
-		}
-	case SuperPrivate:
-		if len(requestBody.PostFollowers) == 0 {
-			http.Error(w, "no followers in super private Post", http.StatusBadRequest)
-			return
-		}
+	if requestBody.Privacy == int(SuperPrivate) && len(requestBody.PostFollowers) == 0 {
+		http.Error(w, "no followers in super private Post", http.StatusBadRequest)
+		return
+	}
 
-	default:
+	for _, follower := range requestBody.PostFollowers {
+		if requestBody.Privacy != int(SuperPrivate) {
+			http.Error(w, "followers in non super-private post", http.StatusBadRequest)
+			return
+		}
+		if follower == userId {
+			http.Error(w, "can't follow your own post", http.StatusBadRequest)
+			return
+		}
+		if *h.DB.GetFollowStatus(follower, userId) != Accepted {
+			http.Error(w, "user is not following you", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if requestBody.Privacy > 2 {
 		http.Error(w, "invalid privacy", http.StatusBadRequest)
 		return
 	}
@@ -134,10 +140,10 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		requestBody.Description,
 		userId,
 		strings.Join(requestBody.Categories, ","),
-		groupId,
-		requestBody.Privacy)
+		Privacy(requestBody.Privacy),
+		groupId)
 
-	if requestBody.Privacy == SuperPrivate {
+	if requestBody.Privacy == int(SuperPrivate) {
 		for _, follower := range requestBody.PostFollowers {
 			if !h.DB.GetPostFollowStatus(id, follower) &&
 				*h.DB.GetFollowStatus(userId, follower) == Accepted {
