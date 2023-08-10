@@ -74,11 +74,12 @@ type Session struct {
 }
 
 type Invitation struct {
-	Id         int
-	Type       InviteType
-	FromUserId int
-	ToUserId   int
-	TimeStamp  string
+	Id           int
+	Type         InviteType
+	FromUserId   int
+	ToUserId     int
+	AssociatedId sql.NullInt64
+	TimeStamp    string
 }
 
 type Group struct {

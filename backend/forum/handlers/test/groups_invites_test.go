@@ -67,8 +67,6 @@ func TestGroupIdJoin(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			fmt.Println(invites)
-
 			if len(invites) != 1 {
 				t.Errorf("Invalid length of invites, expected %d, got %d", 1, len(invites))
 			}
@@ -171,8 +169,6 @@ func TestGroupIdInviteLeave(t *testing.T) {
 			if err := json.Unmarshal(resp, &invites); err != nil {
 				t.Fatal(err)
 			}
-
-			fmt.Println(invites)
 
 			if len(invites) != 1 {
 				t.Errorf("Invalid length of invites, expected %d, got %d", 1, len(invites))

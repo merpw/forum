@@ -90,6 +90,17 @@ func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStat
 	return
 }
 
+func (db DB) GetGroupCreatorId(groupId int) *int {
+	var creatorId int
+	err := db.QueryRow("SELECT creator_id FROM groups WHERE id = ?", groupId).Scan(&creatorId)
+	if err != nil {
+		return nil
+	}
+
+	return &creatorId
+
+}
+
 func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	query, err := db.Query("SELECT id FROM posts WHERE group_id = ? ORDER BY id DESC", groupId)
 	if err != nil {

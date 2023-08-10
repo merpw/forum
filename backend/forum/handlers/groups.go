@@ -3,8 +3,8 @@ package handlers
 import (
 	"backend/common/server"
 	. "backend/forum/database"
+	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -37,7 +37,7 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 		Title        string        `json:"title"`
 		Description  string        `json:"description"`
 		MemberStatus *InviteStatus `json:"member_status,omitempty"`
-		Members      int           `json:"members"`
+		Members      int           `json:"member_count"`
 	}{
 		Id:           group.Id,
 		Title:        group.Title,
@@ -55,7 +55,6 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 	groupIdStr = strings.TrimSuffix(groupIdStr, "/posts")
 	// /api/groups/1/posts -> 1
 
-	fmt.Println("id", groupIdStr)
 	groupId, err := strconv.Atoi(groupIdStr)
 	if err != nil {
 		server.ErrorResponse(w, http.StatusNotFound)
@@ -90,13 +89,26 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId := h.getUserId(w, r)
+	fromUserId := h.getUserId(w, r)
 
-	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
+	toUserId := h.DB.GetGroupCreatorId(groupId)
+	if toUserId == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+	}
+
+	switch *h.DB.GetGroupMemberStatus(groupId, fromUserId) {
 	case Inactive:
-		server.SendObject(w, h.DB.AddInvitation(GroupJoin, userId, groupId))
+		server.SendObject(w, h.DB.AddInvitation(
+			GroupJoin,
+			fromUserId,
+			*toUserId,
+			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Pending:
-		server.SendObject(w, h.DB.DeleteInvitationByUserId(GroupJoin, userId, groupId))
+		server.SendObject(w, h.DB.DeleteInvitationByUserId(
+			GroupJoin,
+			fromUserId,
+			*toUserId,
+			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
@@ -130,17 +142,27 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := h.DB.GetUserById(requestBody.UserId)
-	if user == nil {
+	toUser := h.DB.GetUserById(requestBody.UserId)
+	if toUser == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	switch *h.DB.GetGroupMemberStatus(groupId, user.Id) {
+	fromUserId := h.getUserId(w, r)
+
+	switch *h.DB.GetGroupMemberStatus(groupId, toUser.Id) {
 	case Inactive:
-		server.SendObject(w, h.DB.AddInvitation(GroupInvite, groupId, user.Id))
+		server.SendObject(w, h.DB.AddInvitation(
+			GroupInvite,
+			fromUserId,
+			toUser.Id,
+			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Pending:
-		server.SendObject(w, h.DB.DeleteInvitationByUserId(GroupInvite, groupId, user.Id))
+		server.SendObject(w, h.DB.DeleteInvitationByUserId(
+			GroupInvite,
+			fromUserId,
+			toUser.Id,
+			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}

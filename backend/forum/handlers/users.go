@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/common/server"
 	. "backend/forum/database"
+	"database/sql"
 	"net/http"
 	"strconv"
 	"strings"
@@ -113,7 +114,7 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 	switch *followStatus {
 	case Inactive:
 		if user.Privacy == Private {
-			server.SendObject(w, h.DB.AddInvitation(FollowUser, meId, userId))
+			server.SendObject(w, h.DB.AddInvitation(FollowUser, meId, userId, sql.NullInt64{Valid: false}))
 			return
 		} else {
 			server.SendObject(w, h.DB.AddFollower(meId, userId))
@@ -125,7 +126,7 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case Pending:
-		server.SendObject(w, h.DB.DeleteInvitationByUserId(FollowUser, meId, userId))
+		server.SendObject(w, h.DB.DeleteInvitationByUserId(FollowUser, meId, userId, sql.NullInt64{Valid: false}))
 		return
 	}
 }

@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/common/server"
 	. "backend/forum/database"
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -34,19 +35,20 @@ func (h *Handlers) invitationsId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respBody := struct {
-		Id         int        `json:"id"`
-		Type       InviteType `json:"type"`
-		FromUserId int        `json:"from_user_id"`
-		ToUserId   int        `json:"to_user_id"`
-		TimeStamp  string     `json:"timestamp"`
+		Id           int           `json:"id"`
+		Type         InviteType    `json:"type"`
+		FromUserId   int           `json:"from_user_id"`
+		ToUserId     int           `json:"to_user_id"`
+		AssociatedId sql.NullInt64 `json:"associated_id,omitempty"`
+		TimeStamp    string        `json:"timestamp"`
 	}{
-		Id:         invitation.Id,
-		Type:       invitation.Type,
-		FromUserId: invitation.FromUserId,
-		ToUserId:   invitation.ToUserId,
-		TimeStamp:  invitation.TimeStamp,
+		Id:           invitation.Id,
+		Type:         invitation.Type,
+		FromUserId:   invitation.FromUserId,
+		ToUserId:     invitation.ToUserId,
+		AssociatedId: invitation.AssociatedId,
+		TimeStamp:    invitation.TimeStamp,
 	}
-
 	server.SendObject(w, respBody)
 }
 

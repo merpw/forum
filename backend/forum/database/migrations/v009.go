@@ -27,6 +27,9 @@ var v009 = migrate.Migration{
 		);
 		ALTER TABLE posts 
 		ADD COLUMN group_id INTEGER REFERENCES groups(id) DEFAULT NULL;
+
+		ALTER TABLE invitations
+		ADD COLUMN associated_id INTEGER DEFAULT NULL
 	`)
 		if err != nil {
 			return err
@@ -40,6 +43,7 @@ var v009 = migrate.Migration{
 		DROP TABLE IF EXISTS groups;
 		DROP TABLE IF EXISTS group_members;
 		ALTER TABLE posts DROP COLUMN group_id;
+		ALTER TABLE invitations DROP COLUMN associated_id;
 		VACUUM;
 `)
 		if err != nil {

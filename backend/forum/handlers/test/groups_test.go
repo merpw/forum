@@ -94,7 +94,6 @@ func TestGroups(t *testing.T) {
 		}
 
 		var groupId = 3
-		fmt.Println(groupIds)
 
 		for _, id := range groupIds {
 			if groupId != id {

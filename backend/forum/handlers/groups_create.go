@@ -3,15 +3,16 @@ package handlers
 import (
 	"backend/common/server"
 	. "backend/forum/database"
+	"backend/forum/external"
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 )
 
 // POST /api/groups/create -> group_id
 func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
-	userId := h.getUserId(w, r)
-
 	requestBody := struct {
 		Title       string `json:"title"`
 		Description string `json:"description"`
@@ -48,6 +49,7 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	userId := h.getUserId(w, r)
 	for _, id := range requestBody.Invite {
 		if id == userId {
 			server.ErrorResponse(w, http.StatusBadRequest)
@@ -55,18 +57,26 @@ func (h *Handlers) groupsCreate(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if h.DB.GetUserById(id) == nil {
-			server.ErrorResponse(w, http.StatusNotFound)
+			server.ErrorResponse(w, http.StatusBadRequest)
 			return
 		}
 	}
 	groupId := h.DB.AddGroup(userId, requestBody.Title, requestBody.Description)
 	h.DB.AddMembership(int(groupId), userId)
 
-	for _, id := range requestBody.Invite {
-		if Accepted != *h.DB.GetGroupMemberStatus(int(groupId), id) {
-			h.DB.AddInvitation(GroupInvite, int(groupId), id)
+	for _, toUserId := range requestBody.Invite {
+		if Accepted != *h.DB.GetGroupMemberStatus(int(groupId), toUserId) {
+			h.DB.AddInvitation(
+				GroupInvite,
+				userId,
+				toUserId,
+				sql.NullInt64{Int64: groupId, Valid: true})
 		}
 	}
 
 	server.SendObject(w, groupId)
+
+	external.RevalidateURL(fmt.Sprintf("/groups/%d", groupId))
+
+	external.RevalidateURL("/")
 }

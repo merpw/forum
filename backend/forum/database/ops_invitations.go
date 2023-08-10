@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"log"
 	"time"
 )
@@ -47,9 +48,13 @@ func (db DB) DeleteInvitationById(id int) {
 	}
 }
 
-func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId int) InviteStatus {
+func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId int,
+	associatedId sql.NullInt64) InviteStatus {
 	_, err := db.Exec(`DELETE FROM invitations
-       						WHERE type = ? AND from_user_id = ? AND to_user_id = ?`, invType, fromUserId, toUserId)
+       						WHERE type = ?
+       						AND from_user_id = ? 
+       						AND to_user_id = ? 
+       						AND associated_id = ?`, invType, fromUserId, toUserId, associatedId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -57,11 +62,11 @@ func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId i
 	return Inactive
 }
 
-func (db DB) AddInvitation(inviteType InviteType, fromUserId, toUserId int) InviteStatus {
+func (db DB) AddInvitation(inviteType InviteType, fromUserId, toUserId int, associatedId sql.NullInt64) InviteStatus {
 	_, err := db.Exec(`INSERT INTO invitations 
-    	(type, from_user_id, to_user_id, timestamp)
-		VALUES (?, ?, ?, ?)`,
-		inviteType, fromUserId, toUserId, time.Now().Format(time.RFC3339))
+    	(type, from_user_id, to_user_id, associated_id timestamp)
+		VALUES (?, ?, ?, ?, ?)`,
+		inviteType, fromUserId, toUserId, associatedId, time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
 	}
