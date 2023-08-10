@@ -1,7 +1,7 @@
 import { FC } from "react"
 import Link from "next/link"
 import pluralize from "pluralize"
-import { MdGroupAdd, MdGroupRemove } from "react-icons/md"
+import { MdGroupAdd, MdGroupRemove, MdOutlineGroupAdd } from "react-icons/md"
 import { HiChatAlt2 } from "react-icons/hi"
 
 import { Group, useGroup, useGroups } from "@/api/groups/hooks"
@@ -12,6 +12,14 @@ const GroupList = () => {
 
   return (
     <div className={"flex flex-col gap-2"}>
+      <div className={"m-3"}>
+        <Link href={"/group/create"} className={"button"}>
+          <span className={"my-auto"}>
+            <MdOutlineGroupAdd size={20} />
+          </span>
+          <span className={"ml-1 text-xs"}>Create a new group</span>
+        </Link>
+      </div>
       <span className={"text-info text-sm my-1"}>
         Total: {groups.length} {pluralize("group", groups.length)}
       </span>
