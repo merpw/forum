@@ -36,8 +36,8 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 		Id           int           `json:"id"`
 		Title        string        `json:"title"`
 		Description  string        `json:"description"`
-		MemberStatus *InviteStatus `json:"member_Status,omitempty"`
-		Members      int           `json:"members"`
+		MemberStatus *InviteStatus `json:"member_status,omitempty"`
+		Members      int           `json:"member_count"`
 	}{
 		Id:           group.Id,
 		Title:        group.Title,

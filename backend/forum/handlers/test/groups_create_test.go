@@ -106,7 +106,7 @@ func TestCreateGroup(t *testing.T) {
 			Title        string `json:"title"`
 			Description  string `json:"description"`
 			MemberStatus int    `json:"member_Status"`
-			Members      int    `json:"members"`
+			Members      int    `json:"member_count"`
 		}{}
 
 		t.Run("Get group info", func(t *testing.T) {
