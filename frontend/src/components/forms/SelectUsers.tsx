@@ -61,6 +61,8 @@ const SelectUsers = (
 ) => {
   const { users } = useUserList(props.userIds)
 
+  console.log(users)
+
   if (!users) return null
 
   return <SelectUsersWithData {...props} users={users} />

@@ -38,7 +38,7 @@ export const useUserList = (userIds: number[]) => {
     () => Promise.all(userIds.map((id) => getUser(id)))
   )
 
-  return { users: data, error, mutate }
+  return { users: userIds.length > 0 ? data : [], error, mutate }
 }
 
 export const togglePrivacy = async (): Promise<boolean | undefined> =>
