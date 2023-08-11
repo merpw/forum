@@ -20,12 +20,14 @@ func (db DB) AddGroup(creatorId int, title, description string) (groupId int64) 
 	return
 }
 
-func (db DB) GetGroupIdsByMembers() (groupIds []int) {
+func (db DB) GetTopGroups() (groupIds []int) {
 	query, err := db.Query(`
-	SELECT id, COUNT(id) AS occurrence
-	FROM group_members 
-	GROUP BY group_id
-	ORDER BY occurrence DESC;
+SELECT id FROM groups 
+    INNER JOIN (
+    	SELECT group_id, COUNT(*) AS member_count FROM group_members
+		GROUP BY group_id
+	) ON group_id = id                
+ORDER BY member_count DESC
 	`)
 	if err != nil {
 		log.Panic(err)
@@ -34,8 +36,7 @@ func (db DB) GetGroupIdsByMembers() (groupIds []int) {
 	groupIds = make([]int, 0)
 	for query.Next() {
 		var groupId int
-		var test any
-		err = query.Scan(&test, &groupId)
+		err = query.Scan(&groupId)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -46,29 +47,27 @@ func (db DB) GetGroupIdsByMembers() (groupIds []int) {
 	return
 }
 
-func (db DB) GetGroupMembersByGroupId(groupId int) (members int) {
+func (db DB) GetGroupMemberCount(groupId int) (memberCount int) {
 	err := db.QueryRow(`
-						SELECT COUNT(*) 
-						FROM group_members 
-						WHERE group_id = ?`, groupId).Scan(&members)
+	SELECT COUNT(*) FROM group_members WHERE group_id = ?
+	`, groupId).Scan(&memberCount)
 	if err != nil {
 		log.Panic(err)
 	}
-	return
+	return memberCount
 }
 
 func (db DB) GetGroupById(groupId int) *Group {
-	var t, d string
-	err := db.QueryRow(`SELECT title, description FROM groups WHERE id = ?`, groupId).Scan(&t, &d)
+	group := &Group{
+		Id: groupId,
+	}
+	err := db.QueryRow(`SELECT title, description FROM groups WHERE id = ?`,
+		groupId).Scan(&group.Title, &group.Description)
 	if err != nil {
 		return nil
 	}
 
-	return &Group{
-		Id:          groupId,
-		Title:       t,
-		Description: d,
-	}
+	return group
 }
 
 func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStatus) {

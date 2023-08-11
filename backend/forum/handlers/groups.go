@@ -11,7 +11,7 @@ import (
 )
 
 func (h *Handlers) groups(w http.ResponseWriter, r *http.Request) {
-	groupIds := h.DB.GetGroupIdsByMembers()
+	groupIds := h.DB.GetTopGroups()
 
 	server.SendObject(w, groupIds)
 }
@@ -37,13 +37,13 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 		Title        string        `json:"title"`
 		Description  string        `json:"description"`
 		MemberStatus *InviteStatus `json:"member_status,omitempty"`
-		Members      int           `json:"member_count"`
+		MemberCount  int           `json:"member_count"`
 	}{
 		Id:           group.Id,
 		Title:        group.Title,
 		Description:  group.Description,
 		MemberStatus: h.DB.GetGroupMemberStatus(group.Id, userId),
-		Members:      h.DB.GetGroupMembersByGroupId(group.Id),
+		MemberCount:  h.DB.GetGroupMemberCount(group.Id),
 	}
 
 	server.SendObject(w, responseBody)
