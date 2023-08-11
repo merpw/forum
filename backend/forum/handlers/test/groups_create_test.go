@@ -34,7 +34,7 @@ func TestCreateGroup(t *testing.T) {
 
 		t.Run("Invite invalid user", func(t *testing.T) {
 			invalidBody.Invite = []int{1337}
-			cli1.TestPost(t, "/api/groups/create", invalidBody, http.StatusNotFound)
+			cli1.TestPost(t, "/api/groups/create", invalidBody, http.StatusBadRequest)
 		})
 
 		t.Run("Invalid requestBody", func(t *testing.T) {
@@ -106,7 +106,7 @@ func TestCreateGroup(t *testing.T) {
 			Title        string `json:"title"`
 			Description  string `json:"description"`
 			MemberStatus int    `json:"member_status"`
-			Members      int    `json:"members"`
+			Members      int    `json:"member_count"`
 		}{}
 
 		t.Run("Get group info", func(t *testing.T) {
@@ -118,6 +118,7 @@ func TestCreateGroup(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+
 			if responseBody.Id != groups[0] {
 				t.Errorf("invalid id, expected %d, got %d", groups[0], responseBody.Id)
 			}

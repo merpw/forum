@@ -53,7 +53,7 @@ func TestGroups(t *testing.T) {
 	var clients []*TestClient
 
 	// Create four more users
-	for i := 2; i <= 3; i++ {
+	for i := 0; i < 3; i++ {
 		client := testServer.TestClient()
 		client.TestAuth(t)
 		clients = append(clients, client)
@@ -78,11 +78,8 @@ func TestGroups(t *testing.T) {
 		// Create group with 3 users
 		group3 := CreateGroup("test", "test", []int{2, 3})
 		cli.TestPost(t, "/api/groups/create", group3, http.StatusOK)
-
-		for i := 0; i < 2; i++ {
-			endpoint := fmt.Sprintf("/api/invitations/%d/respond", i+2)
-			clients[i].TestPost(t, endpoint, response, http.StatusOK)
-		}
+		clients[1].TestPost(t, "/api/invitations/2/respond", response, http.StatusOK)
+		clients[2].TestPost(t, "/api/invitations/3/respond", response, http.StatusOK)
 	})
 
 	t.Run("Check order of groups", func(t *testing.T) {
@@ -93,6 +90,7 @@ func TestGroups(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		fmt.Println(groupIds)
 		var groupId = 3
 
 		for _, id := range groupIds {
