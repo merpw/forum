@@ -13,10 +13,8 @@ export const FollowingCard: FC<{ invitation: Invitation & { type: 0 } }> = ({ in
 
   return (
     <div className={"flex flex-col"}>
-      <Link href={`/user/${invitation.from_user_id}`} className={"flex gap-2 items-center"}>
-        <span className={"w-12"}>
-          <Avatar user={user} size={10} className={""} />
-        </span>
+      <Link href={`/user/${invitation.from_user_id}`} className={"flex gap-2 items-center mr-auto"}>
+        <Avatar user={user} size={10} className={"w-12"} />
         <span>
           <span className={"text-primary"}>{user.username}</span> wants to follow you
         </span>

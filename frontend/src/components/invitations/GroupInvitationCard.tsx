@@ -17,10 +17,8 @@ export const GroupInvitationCard: FC<{ invitation: Invitation & { type: 1 } }> =
 
   return (
     <div className={"flex flex-col"}>
-      <Link href={`/group/${group.id}`} className={"flex gap-2 items-center"}>
-        <span className={"w-12"}>
-          <Avatar user={user} size={10} className={""} />
-        </span>
+      <Link href={`/group/${group.id}`} className={"flex gap-2 items-center mr-auto"}>
+        <Avatar user={user} size={10} className={"w-12"} />
         <span>
           <span className={"text-primary"}>{user.username}</span> invited you to join their group{" "}
           <span className={"text-primary"}>{group.title}</span>
