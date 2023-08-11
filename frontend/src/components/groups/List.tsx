@@ -36,16 +36,18 @@ const GroupCard: FC<{ groupId: number }> = ({ groupId }) => {
   if (!group) return null
 
   return (
-    <div className={"w-full hover:bg-neutral hover:saturate-150 p-2 rounded-2xl"}>
-      <Link href={`/group/${groupId}`} className={"flex justify-between items-center"}>
-        <div>
-          <h3 className={"text-primary"}>{group.title}</h3>
-          <div className={"text-info"}>
-            {group.member_count} {pluralize("member", group.member_count)}
-          </div>
+    <div
+      className={
+        "w-full hover:bg-neutral hover:saturate-150 p-2 rounded-2xl flex justify-between items-center"
+      }
+    >
+      <Link href={`/group/${groupId}`} className={"grow"}>
+        <h3 className={"text-primary"}>{group.title}</h3>
+        <div className={"text-info"}>
+          {group.member_count} {pluralize("member", group.member_count)}
         </div>
-        <GroupCardButton group={group} />
       </Link>
+      <GroupCardButton group={group} />
     </div>
   )
 }
