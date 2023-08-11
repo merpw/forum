@@ -3,7 +3,7 @@ import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 
 import checkSession from "@/api/auth/edge"
-import CreateGroupForm from "@/components/forms/create-group/CreateGroupForm"
+import CreateGroupForm from "@/components/forms/groups/CreateGroupForm"
 
 export const metadata: Metadata = {
   title: "Create a new group",

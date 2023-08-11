@@ -37,3 +37,14 @@ export const useGroup = (id: number) => {
     mutate,
   }
 }
+
+export const useGroupMembers = (id: number) => {
+  const { data, error, mutate } = useSWR<number[]>(`/api/groups/${id}/members`, fetcher)
+
+  return {
+    members: data,
+    isLoading: !error && !data,
+    error,
+    mutate,
+  }
+}
