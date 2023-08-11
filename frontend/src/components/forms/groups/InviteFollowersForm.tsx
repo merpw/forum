@@ -8,7 +8,7 @@ import { useGroupMembers } from "@/api/groups/hooks"
 
 const InviteFollowersForm: FC<{ groupId: number }> = ({ groupId }) => {
   const { followers } = useFollowers()
-  const { members: alreadyMembers } = useGroupMembers(groupId)
+  const { members: alreadyMembers } = useGroupMembers(groupId, true)
 
   const [formError, setFormError] = useState<string | null>(null)
   const [members, setMembers] = useState<string[]>([])

@@ -38,8 +38,11 @@ export const useGroup = (id: number) => {
   }
 }
 
-export const useGroupMembers = (id: number) => {
-  const { data, error, mutate } = useSWR<number[]>(`/api/groups/${id}/members`, fetcher)
+export const useGroupMembers = (id: number, withPedning?: boolean) => {
+  const { data, error, mutate } = useSWR<number[]>(
+    `/api/groups/${id}/members${withPedning ? "?withPending" : ""}`,
+    fetcher
+  )
 
   return {
     members: data,
