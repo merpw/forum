@@ -5,8 +5,8 @@ import (
 	"database/sql"
 )
 
-// v010 adds groups and group_members tables
-var v010 = migrate.Migration{
+// v009 adds groups and group_members tables
+var v009 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS groups (
