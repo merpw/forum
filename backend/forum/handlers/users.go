@@ -126,7 +126,7 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 		return
 
 	case Pending:
-		server.SendObject(w, h.DB.DeleteInvitationByUserId(FollowUser, meId, userId, sql.NullInt64{Valid: false}))
+		server.SendObject(w, h.DB.DeleteFollowRequest(meId, userId))
 		return
 	}
 }

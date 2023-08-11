@@ -33,7 +33,7 @@ func (db DB) GetUserInvitations(toUserId int) (invitationIds []int) {
 func (db DB) GetInvitationById(id int) *Invitation {
 	inv := &Invitation{}
 	err := db.QueryRow("SELECT * FROM invitations WHERE id = ?", id).Scan(
-		&inv.Id, &inv.Type, &inv.FromUserId, &inv.ToUserId, &inv.TimeStamp)
+		&inv.Id, &inv.Type, &inv.FromUserId, &inv.ToUserId, &inv.TimeStamp, &inv.AssociatedId)
 	if err != nil {
 		return nil
 	}
@@ -46,6 +46,19 @@ func (db DB) DeleteInvitationById(id int) {
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func (db DB) DeleteFollowRequest(fromUserId, toUserId int) InviteStatus {
+	_, err := db.Exec(`
+		DELETE FROM invitations
+			WHERE type = 0
+			AND from_user_id = ? 
+			AND to_user_id = ?`, fromUserId, toUserId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return Inactive
 }
 
 func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId int,
@@ -64,7 +77,7 @@ func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId i
 
 func (db DB) AddInvitation(inviteType InviteType, fromUserId, toUserId int, associatedId sql.NullInt64) InviteStatus {
 	_, err := db.Exec(`INSERT INTO invitations 
-    	(type, from_user_id, to_user_id, associated_id timestamp)
+    	(type, from_user_id, to_user_id, associated_id, timestamp)
 		VALUES (?, ?, ?, ?, ?)`,
 		inviteType, fromUserId, toUserId, associatedId, time.Now().Format(time.RFC3339))
 	if err != nil {
