@@ -179,6 +179,10 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userId := h.getUserId(w, r)
+	if userId == *h.DB.GetGroupCreatorId(groupId) {
+		http.Error(w, "Creator can't leave group", http.StatusBadRequest)
+	}
+
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
 	case Inactive:
 		server.ErrorResponse(w, http.StatusBadRequest)

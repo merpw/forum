@@ -109,6 +109,7 @@ func TestGroupIdInviteLeave(t *testing.T) {
 	})
 
 	t.Run("Bad request", func(t *testing.T) {
+		cli1.TestPost(t, "/api/groups/1/leave", nil, http.StatusBadRequest)
 		cli2.TestPost(t, "/api/groups/1/leave", nil, http.StatusBadRequest)
 		cli1.TestPost(t, "/api/groups/1/invite", "invalid", http.StatusBadRequest)
 	})
