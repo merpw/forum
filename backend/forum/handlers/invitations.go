@@ -93,4 +93,6 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 	}
 
 	h.DB.DeleteInvitationById(invitation.Id)
+
+	server.SendObject(w, invitation.FromUserId)
 }
