@@ -106,3 +106,13 @@ type Group struct {
 	Description string
 	Members     int
 }
+
+type EventData struct {
+	Id          int
+	Title       string
+	Description string
+	TimeAndDate string
+	Timestamp   string
+	CreatedBy   int
+	GroupId     int
+}

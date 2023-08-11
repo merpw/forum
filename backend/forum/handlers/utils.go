@@ -44,7 +44,14 @@ type SafeReaction struct {
 	DislikesCount int `json:"dislikes_count"`
 }
 
-type SafeGroup struct {
+type SafeEvent struct {
+	Id          int    `json:"id"`
+	GroupId     int    `json:"group_id"`
+	CreatedBy   int    `json:"created_by"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	TimeAndDate string `json:"time_and_date"`
+	Timestamp   string `json:"timestamp"`
 }
 
 func isPresent(slice []string, item string) bool {

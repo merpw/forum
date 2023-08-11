@@ -68,6 +68,11 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
+		server.ErrorResponse(w, http.StatusBadRequest)
+		return
+	}
+
 	server.SendObject(w, h.DB.GetGroupPostsById(groupId))
 }
 
@@ -229,4 +234,31 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 		h.DB.DeleteGroupMembership(groupId, userId)
 		server.SendObject(w, Inactive)
 	}
+}
+
+func (h *Handlers) groupsIdEvents(w http.ResponseWriter, r *http.Request) {
+	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
+	groupIdStr = strings.TrimSuffix(groupIdStr, "/events")
+	// /api/groups/1/leave -> 1
+
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	group := h.DB.GetGroupById(groupId)
+	if group == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	userId := h.getUserId(w, r)
+	if *h.DB.GetGroupMemberStatus(groupId, userId) != Accepted {
+		server.ErrorResponse(w, http.StatusForbidden)
+		return
+	}
+
+	server.SendObject(w, h.DB.GetEventIdsByGroupId(groupId))
+
 }
