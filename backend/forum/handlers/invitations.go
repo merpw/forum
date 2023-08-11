@@ -79,15 +79,16 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
+	groupId := int(invitation.AssociatedId.Int64)
 
 	if requestBody.Response {
 		switch invitation.Type {
 		case FollowUser:
 			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
 		case GroupInvite:
-			h.DB.AddMembership(invitation.FromUserId, invitation.ToUserId)
+			h.DB.AddMembership(groupId, invitation.ToUserId)
 		case GroupJoin:
-			h.DB.AddMembership(invitation.ToUserId, invitation.FromUserId)
+			h.DB.AddMembership(groupId, invitation.FromUserId)
 		}
 
 	}

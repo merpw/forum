@@ -90,11 +90,7 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fromUserId := h.getUserId(w, r)
-
 	toUserId := h.DB.GetGroupCreatorId(groupId)
-	if toUserId == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-	}
 
 	switch *h.DB.GetGroupMemberStatus(groupId, fromUserId) {
 	case Inactive:
@@ -158,11 +154,7 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 			toUser.Id,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Pending:
-		server.SendObject(w, h.DB.DeleteInvitationByUserId(
-			GroupInvite,
-			fromUserId,
-			toUser.Id,
-			sql.NullInt64{Int64: int64(groupId), Valid: true}))
+		fallthrough
 	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
