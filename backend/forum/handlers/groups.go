@@ -189,6 +189,7 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	case Pending:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	case Accepted:
-		server.SendObject(w, h.DB.DeleteGroupMembership(groupId, userId))
+		h.DB.DeleteGroupMembership(groupId, userId)
+		server.SendObject(w, Inactive)
 	}
 }

@@ -17,7 +17,7 @@ func (db DB) AddGroup(creatorId int, title, description string) (groupId int64) 
 	if err != nil {
 		log.Panic(err)
 	}
-	return
+	return groupId
 }
 
 func (db DB) GetTopGroups() (groupIds []int) {
@@ -44,7 +44,7 @@ ORDER BY member_count DESC
 	}
 	query.Close()
 
-	return
+	return groupIds
 }
 
 func (db DB) GetGroupMemberCount(groupId int) (memberCount int) {
@@ -86,7 +86,7 @@ func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStat
 		log.Panic(err)
 	}
 
-	return
+	return memberStatus
 }
 
 func (db DB) GetGroupCreatorId(groupId int) *int {
@@ -97,7 +97,6 @@ func (db DB) GetGroupCreatorId(groupId int) *int {
 	}
 
 	return &creatorId
-
 }
 
 func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
@@ -117,18 +116,17 @@ func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	}
 
 	query.Close()
-	return
+	return postIds
 }
 
-func (db DB) DeleteGroupMembership(groupId, userId int) InviteStatus {
+func (db DB) DeleteGroupMembership(groupId, userId int) {
 	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", groupId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
-	return Inactive
 }
 
-func (db DB) AddMembership(groupId, userId int) InviteStatus {
+func (db DB) AddMembership(groupId, userId int) {
 	_, err := db.Exec(`INSERT INTO group_members 
     	(group_id, user_id, timestamp)
 		VALUES (?, ?, ?)`,
@@ -136,5 +134,4 @@ func (db DB) AddMembership(groupId, userId int) InviteStatus {
 	if err != nil {
 		log.Panic(err)
 	}
-	return Accepted
 }
