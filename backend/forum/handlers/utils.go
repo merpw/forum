@@ -1,18 +1,18 @@
 package handlers
 
 import (
-	"backend/forum/database"
+	. "backend/forum/database"
 )
 
 type SafeUser struct {
-	Id           int                    `json:"id"`
-	Username     string                 `json:"username"`
-	Avatar       string                 `json:"avatar,omitempty"`
-	Bio          string                 `json:"bio,omitempty"`
-	FollowStatus *database.FollowStatus `json:"follow_status,omitempty"`
-	Followers    int                    `json:"followers_count"`
-	Following    int                    `json:"following_count"`
-	Privacy      bool                   `json:"privacy"`
+	Id           int           `json:"id"`
+	Username     string        `json:"username"`
+	Avatar       string        `json:"avatar,omitempty"`
+	Bio          string        `json:"bio,omitempty"`
+	FollowStatus *InviteStatus `json:"follow_status,omitempty"`
+	Followers    int           `json:"followers_count"`
+	Following    int           `json:"following_count"`
+	Privacy      bool          `json:"privacy"`
 }
 
 type SafePost struct {
@@ -26,6 +26,7 @@ type SafePost struct {
 	LikesCount    int      `json:"likes_count"`
 	DislikesCount int      `json:"dislikes_count"`
 	Categories    string   `json:"categories"`
+	GroupId       *int     `json:"group_id,omitempty"`
 }
 
 type SafeComment struct {
@@ -41,6 +42,9 @@ type SafeReaction struct {
 	Reaction      int `json:"reaction"`
 	LikesCount    int `json:"likes_count"`
 	DislikesCount int `json:"dislikes_count"`
+}
+
+type SafeGroup struct {
 }
 
 func isPresent(slice []string, item string) bool {

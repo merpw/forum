@@ -30,7 +30,7 @@ type Handlers struct {
 // New connects database to Handlers
 func New(db *sql.DB) *Handlers {
 
-	h := &Handlers{DB: database.New(db)}
+	h := &Handlers{DB: database.NewDB(db)}
 
 	h.revokeSession = make(chan string)
 	h.revokeSessionSubscribers = make([]*chan string, 0)
@@ -88,6 +88,11 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodGet, `/api/invitations`, h.invitations),
 		server.NewRoute(http.MethodGet, `/api/invitations/(\d+)`, h.invitationsId),
 
+		server.NewRoute(http.MethodGet, `/api/groups`, h.groups),
+		server.NewRoute(http.MethodGet, `/api/groups/(\d+)`, h.groupsId),
+		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/members`, h.groupsIdMembers),
+		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/posts`, h.groupsIdPosts),
+
 		// method POST endpoints
 		server.NewRoute(http.MethodPost, `/api/logout`, h.logout),
 
@@ -105,6 +110,11 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodPost, `/api/posts/(\d+)/comment/(\d+)/dislike`, h.postsIdCommentIdDislike),
 
 		server.NewRoute(http.MethodPost, `/api/invitations/(\d+)/respond`, h.invitationsIdRespond),
+
+		server.NewRoute(http.MethodPost, `/api/groups/create`, h.groupsCreate),
+		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/join`, h.groupsIdJoin),
+		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/invite`, h.groupsIdInvite),
+		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/leave`, h.groupsIdLeave),
 	}
 
 	var internalRoutes = []server.Route{

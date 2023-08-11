@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"errors"
 	"log"
 	"time"
 )
@@ -32,46 +31,57 @@ func (db DB) GetUserInvitations(toUserId int) (invitationIds []int) {
 
 // GetInvitationById returns slice of all users ids
 func (db DB) GetInvitationById(id int) *Invitation {
-	row := db.QueryRow("SELECT * FROM invitations WHERE id = ?", id)
-
-	var invitation Invitation
-	err := row.Scan(&invitation.Id, &invitation.Type,
-		&invitation.FromUserId, &invitation.ToUserId, &invitation.TimeStamp)
-
+	inv := &Invitation{}
+	err := db.QueryRow("SELECT * FROM invitations WHERE id = ?", id).Scan(
+		&inv.Id, &inv.Type, &inv.FromUserId, &inv.ToUserId, &inv.TimeStamp, &inv.AssociatedId)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil
-		}
-		log.Panic(err)
+		return nil
 	}
-
-	return &invitation
+	return inv
 }
 
 // DeleteInvitation deletes invitation row in invitations table
-func (db DB) DeleteInvitation(id int) {
+func (db DB) DeleteInvitationById(id int) {
 	_, err := db.Exec("DELETE FROM invitations WHERE id = ?", id)
 	if err != nil {
 		log.Panic(err)
 	}
 }
 
-func (db DB) AddFollowInvitation(fromUserId, toUserId int) FollowStatus {
-	_, err := db.Exec(`INSERT INTO invitations 
-    	(type, from_user_id, to_user_id, timestamp)
-		VALUES (?, ?, ?, ?)`,
-		0, fromUserId, toUserId, time.Now().Format(time.RFC3339))
+func (db DB) DeleteFollowRequest(fromUserId, toUserId int) InviteStatus {
+	_, err := db.Exec(`
+		DELETE FROM invitations
+			WHERE type = 0
+			AND from_user_id = ? 
+			AND to_user_id = ?`, fromUserId, toUserId)
 	if err != nil {
 		log.Panic(err)
 	}
-	return RequestToFollow
+
+	return Inactive
 }
 
-func (db DB) DeleteFollowInvitation(fromUserId, toUserId int) FollowStatus {
-	_, err := db.Exec("DELETE FROM invitations WHERE from_user_id = ? AND to_user_id = ?", fromUserId, toUserId)
+func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId int,
+	associatedId sql.NullInt64) InviteStatus {
+	_, err := db.Exec(`DELETE FROM invitations
+       						WHERE type = ?
+       						AND from_user_id = ? 
+       						AND to_user_id = ? 
+       						AND associated_id = ?`, invType, fromUserId, toUserId, associatedId)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return NotFollowing
+	return Inactive
+}
+
+func (db DB) AddInvitation(inviteType InviteType, fromUserId, toUserId int, associatedId sql.NullInt64) InviteStatus {
+	_, err := db.Exec(`INSERT INTO invitations 
+    	(type, from_user_id, to_user_id, associated_id, timestamp)
+		VALUES (?, ?, ?, ?, ?)`,
+		inviteType, fromUserId, toUserId, associatedId, time.Now().Format(time.RFC3339))
+	if err != nil {
+		log.Panic(err)
+	}
+	return Pending
 }

@@ -4,12 +4,21 @@ import (
 	"database/sql"
 )
 
-type FollowStatus uint8
+type InviteStatus uint8
 
 const (
-	NotFollowing FollowStatus = iota
-	Following
-	RequestToFollow
+	Inactive InviteStatus = iota
+	Accepted
+	Pending
+)
+
+type InviteType uint8
+
+const (
+	FollowUser InviteType = iota
+	GroupInvite
+	GroupJoin
+	Event
 )
 
 type Privacy uint8
@@ -30,6 +39,7 @@ type Post struct {
 	CommentsCount int
 	Categories    string
 	Description   string
+	GroupId       *int
 }
 
 type User struct {
@@ -64,9 +74,17 @@ type Session struct {
 }
 
 type Invitation struct {
-	Id         int
-	Type       int
-	FromUserId int
-	ToUserId   int
-	TimeStamp  string
+	Id           int
+	Type         InviteType
+	FromUserId   int
+	ToUserId     int
+	AssociatedId sql.NullInt64
+	TimeStamp    string
+}
+
+type Group struct {
+	Id          int
+	Title       string
+	Description string
+	Members     int
 }
