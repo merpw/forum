@@ -61,8 +61,8 @@ func (db DB) GetGroupById(groupId int) *Group {
 	group := &Group{
 		Id: groupId,
 	}
-	err := db.QueryRow(`SELECT title, description FROM groups WHERE id = ?`,
-		groupId).Scan(&group.Title, &group.Description)
+	err := db.QueryRow(`SELECT title, description, creator_id FROM groups WHERE id = ?`,
+		groupId).Scan(&group.Title, &group.Description, &group.CreatorId)
 	if err != nil {
 		return nil
 	}

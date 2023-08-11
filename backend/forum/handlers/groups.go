@@ -38,10 +38,12 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 		Description  string        `json:"description"`
 		MemberStatus *InviteStatus `json:"member_status,omitempty"`
 		MemberCount  int           `json:"member_count"`
+		CreatorId    int           `json:"creator_id"`
 	}{
 		Id:           group.Id,
 		Title:        group.Title,
 		Description:  group.Description,
+		CreatorId:    group.CreatorId,
 		MemberStatus: h.DB.GetGroupMemberStatus(group.Id, userId),
 		MemberCount:  h.DB.GetGroupMemberCount(group.Id),
 	}
@@ -215,6 +217,7 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	userId := h.getUserId(w, r)
 	if userId == *h.DB.GetGroupCreatorId(groupId) {
 		http.Error(w, "Creator can't leave group", http.StatusBadRequest)
+		return
 	}
 
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {

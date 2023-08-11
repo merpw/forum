@@ -87,4 +87,5 @@ type Group struct {
 	Title       string
 	Description string
 	Members     int
+	CreatorId   int
 }
