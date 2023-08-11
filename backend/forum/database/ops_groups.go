@@ -99,8 +99,24 @@ func (db DB) GetGroupCreatorId(groupId int) *int {
 	return &creatorId
 }
 
-func (db DB) GetGroupMembers(groupId int) (members []int) {
-	query, err := db.Query("SELECT user_id FROM group_members WHERE group_id = ?", groupId)
+func (db DB) GetGroupMembers(groupId int, withPending bool) (members []int) {
+
+	var q string
+	if withPending {
+		q = `
+		SELECT user_id FROM group_members WHERE group_id = :groupId
+		                                  
+		UNION -- users invited to join -- 
+        SELECT to_user_id FROM invitations WHERE type = 1 AND associated_id = :groupId
+                                           
+		UNION -- users requested to join -- 
+		SELECT from_user_id FROM invitations WHERE type = 2 AND associated_id = :groupId
+        `
+	} else {
+		q = "SELECT user_id FROM group_members WHERE group_id = ?"
+	}
+
+	query, err := db.Query(q, groupId)
 	if err != nil {
 		log.Panic(err)
 	}

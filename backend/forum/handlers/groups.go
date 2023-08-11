@@ -87,12 +87,14 @@ func (h *Handlers) groupsIdMembers(w http.ResponseWriter, r *http.Request) {
 
 	userId := r.Context().Value(userIdCtxKey).(int)
 
+	withPending := r.URL.Query().Has("withPending")
+
 	if *h.DB.GetGroupMemberStatus(groupId, userId) != Accepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
 
-	server.SendObject(w, h.DB.GetGroupMembers(groupId))
+	server.SendObject(w, h.DB.GetGroupMembers(groupId, withPending))
 }
 
 // Groups POST endpoints

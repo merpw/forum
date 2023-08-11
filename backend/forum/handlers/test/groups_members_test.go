@@ -118,4 +118,27 @@ func TestGroupMembers(t *testing.T) {
 	if includes(members, cliMemberIds[0]) {
 		t.Fatal("expected member to not be in the group members")
 	}
+
+	t.Run("withPending", func(t *testing.T) {
+		cli := testServer.TestClient()
+		cli.TestAuth(t)
+
+		cliId := getId(t, cli)
+
+		cliCreator.TestPost(t, "/api/groups/create", CreateGroup("test", "test", []int{cliId}), 200)
+
+		members = getMembers(t, cliCreator, 3)
+
+		if includes(members, cliId) {
+			t.Fatal("expected pending member to not be in the group members")
+		}
+
+		acceptAllInvitations(t, cli)
+
+		members = getMembers(t, cliCreator, 3)
+
+		if !includes(members, cliId) {
+			t.Fatal("expected member to be in the group members")
+		}
+	})
 }
