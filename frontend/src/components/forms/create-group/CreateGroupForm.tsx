@@ -34,7 +34,7 @@ const CreateGroupForm: FC = () => {
         const formFields = {
           title: formData.get("title") as string,
           description: formData.get("description") as string,
-          invite: formData.getAll("invite") as string[],
+          invite: formData.getAll("invite").filter(Boolean) as string[],
         }
 
         if (formError != null) setFormError(null)
