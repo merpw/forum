@@ -99,6 +99,26 @@ func (db DB) GetGroupCreatorId(groupId int) *int {
 	return &creatorId
 }
 
+func (db DB) GetGroupMembers(groupId int) (members []int) {
+	query, err := db.Query("SELECT user_id FROM group_members WHERE group_id = ?", groupId)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	members = make([]int, 0)
+	for query.Next() {
+		var memberId int
+		err = query.Scan(&memberId)
+		if err != nil {
+			log.Panic(err)
+		}
+		members = append(members, memberId)
+	}
+	query.Close()
+
+	return members
+}
+
 func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	query, err := db.Query("SELECT id FROM posts WHERE group_id = ? ORDER BY id DESC", groupId)
 	if err != nil {

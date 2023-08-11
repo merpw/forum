@@ -69,6 +69,32 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, h.DB.GetGroupPostsById(groupId))
 }
 
+func (h *Handlers) groupsIdMembers(w http.ResponseWriter, r *http.Request) {
+	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
+	groupIdStr = strings.TrimSuffix(groupIdStr, "/members")
+	// /api/groups/1/members -> 1
+
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+	group := h.DB.GetGroupById(groupId)
+	if group == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	userId := r.Context().Value(userIdCtxKey).(int)
+
+	if *h.DB.GetGroupMemberStatus(groupId, userId) != Accepted {
+		server.ErrorResponse(w, http.StatusForbidden)
+		return
+	}
+
+	server.SendObject(w, h.DB.GetGroupMembers(groupId))
+}
+
 // Groups POST endpoints
 
 // POST /api/groups/id/join -> InviteStatus
