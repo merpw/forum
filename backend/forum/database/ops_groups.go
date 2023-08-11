@@ -72,16 +72,22 @@ func (db DB) GetGroupById(groupId int) *Group {
 
 func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStatus) {
 	err := db.QueryRow(`SELECT CASE
-    WHEN (SELECT 1 FROM group_members WHERE group_id = ? AND user_id = ?) THEN 1
+    WHEN (SELECT 1 FROM group_members WHERE group_id = :groupId AND user_id = :userId) THEN 1
     ELSE (
         SELECT CASE
-            WHEN (SELECT 1 FROM invitations WHERE type = 1 AND from_user_id = ? AND to_user_id = ?) THEN 2
-            WHEN (SELECT 1 FROM invitations WHERE type = 2 AND from_user_id = ? AND to_user_id = ?) THEN 2
+            -- user invited to join group --
+            WHEN (
+            SELECT 1 FROM invitations WHERE type = 1 AND to_user_id = :userId AND associated_id = :groupId
+					) THEN 2
+            -- user requested to join group --
+            WHEN (
+            SELECT 1 FROM invitations WHERE type = 2 AND from_user_id = :userId AND associated_id = :groupId
+                     ) THEN 2
             ELSE 0
         END
     )
 		END AS member_status
-	`, groupId, userId, groupId, userId, userId, groupId).Scan(&memberStatus)
+	`, groupId, userId).Scan(&memberStatus)
 	if err != nil {
 		log.Panic(err)
 	}

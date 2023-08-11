@@ -13,6 +13,9 @@ type Group struct {
 	Title       string `json:"title"`
 	Description string `json:"description"`
 	Invite      []int  `json:"invite"`
+
+	MemberStatus int `json:"member_status"`
+	MemberCount  int `json:"member_count"`
 }
 
 func CreateGroup(title, desc string, invites []int) *Group {
@@ -104,23 +107,89 @@ func TestGroups(t *testing.T) {
 
 func TestGroupsId(t *testing.T) {
 	testServer := NewTestServer(t)
-	cli1 := testServer.TestClient()
-	cli1.TestAuth(t)
+
+	// catch when admin id is not 1
+	testServer.TestClient().TestAuth(t)
+
+	cliCreator := testServer.TestClient()
+	cliCreator.TestAuth(t)
 
 	group := CreateGroup("test", "test", []int{})
 	// Create a group to test with
-	cli1.TestPost(t, "/api/groups/create", group, http.StatusOK)
-
-	cli2 := testServer.TestClient()
+	cliCreator.TestPost(t, "/api/groups/create", group, http.StatusOK)
 
 	t.Run("Invalid", func(t *testing.T) {
+		cli := testServer.TestClient()
 		t.Run("Unauthorized", func(t *testing.T) {
-			cli2.TestGet(t, "/api/groups/1", http.StatusUnauthorized)
+			cli.TestGet(t, "/api/groups/1", http.StatusUnauthorized)
 		})
 
 		t.Run("Not Found", func(t *testing.T) {
-			cli1.TestGet(t, "/api/groups/10", http.StatusNotFound)
-			cli1.TestGet(t, "/api/groups/999999999999999999999999999", http.StatusNotFound)
+			cliCreator.TestGet(t, "/api/groups/10", http.StatusNotFound)
+			cliCreator.TestGet(t, "/api/groups/999999999999999999999999999", http.StatusNotFound)
+		})
+	})
+
+	t.Run("Valid", func(t *testing.T) {
+		t.Run("Non_member", func(t *testing.T) {
+			cli := testServer.TestClient()
+			cli.TestAuth(t)
+
+			var group Group
+			_, resp := cli.TestGet(t, "/api/groups/1", http.StatusOK)
+
+			if err := json.Unmarshal(resp, &group); err != nil {
+				t.Fatal(err)
+			}
+
+			if group.Title != "test" {
+				t.Errorf("invalid title, expected %s, got %s", "test", group.Title)
+			}
+
+			if group.Description != "test" {
+				t.Errorf("invalid description, expected %s, got %s", "test", group.Description)
+			}
+
+			if group.MemberStatus != 0 {
+				t.Errorf("invalid member status, expected %d, got %d", 0, group.MemberStatus)
+			}
+		})
+
+		t.Run("Member", func(t *testing.T) {
+			cli := testServer.TestClient()
+			cli.TestAuth(t)
+
+			var group Group
+
+			cli.TestPost(t, "/api/groups/1/join", nil, http.StatusOK)
+
+			_, resp := cli.TestGet(t, "/api/groups/1", http.StatusOK)
+			if err := json.Unmarshal(resp, &group); err != nil {
+				t.Fatal(err)
+			}
+
+			if group.MemberStatus != 2 {
+				t.Errorf("invalid member status, expected 2 (pending), got %d", group.MemberStatus)
+			}
+
+			if group.MemberCount != 1 {
+				t.Errorf("invalid member count, expected 1, got %d", group.MemberCount)
+			}
+
+			AcceptAllInvitations(t, cliCreator)
+
+			_, resp = cli.TestGet(t, "/api/groups/1", http.StatusOK)
+			if err := json.Unmarshal(resp, &group); err != nil {
+				t.Fatal(err)
+			}
+
+			if group.MemberStatus != 1 {
+				t.Errorf("invalid member status, expected 1 (member), got %d", group.MemberStatus)
+			}
+
+			if group.MemberCount != 2 {
+				t.Errorf("invalid member count, expected 2, got %d", group.MemberCount)
+			}
 		})
 	})
 }

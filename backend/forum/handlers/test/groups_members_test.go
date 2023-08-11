@@ -38,7 +38,7 @@ func includes(arr []int, val int) bool {
 	return false
 }
 
-func acceptAllInvitations(t *testing.T, cli *TestClient) {
+func AcceptAllInvitations(t *testing.T, cli *TestClient) {
 	t.Helper()
 	var invitationIds []int
 	_, body := cli.TestGet(t, "/api/invitations", 200)
@@ -97,7 +97,7 @@ func TestGroupMembers(t *testing.T) {
 
 	cliCreator.TestPost(t, "/api/groups/create", CreateGroup("test", "test", cliMemberIds), 200)
 	for _, cliMember := range cliMembers {
-		acceptAllInvitations(t, cliMember)
+		AcceptAllInvitations(t, cliMember)
 	}
 
 	members = getMembers(t, cliCreator, 2)
@@ -133,7 +133,7 @@ func TestGroupMembers(t *testing.T) {
 			t.Fatal("expected pending member to not be in the group members")
 		}
 
-		acceptAllInvitations(t, cli)
+		AcceptAllInvitations(t, cli)
 
 		members = getMembers(t, cliCreator, 3)
 
