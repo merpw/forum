@@ -89,6 +89,12 @@ func (h *Handlers) groupsIdMembers(w http.ResponseWriter, r *http.Request) {
 
 	withPending := r.URL.Query().Has("withPending")
 
+	if userId == -1 {
+		// internal request
+		server.SendObject(w, h.DB.GetGroupMembers(groupId, withPending))
+		return
+	}
+
 	if *h.DB.GetGroupMemberStatus(groupId, userId) != Accepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return

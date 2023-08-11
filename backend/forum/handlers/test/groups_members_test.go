@@ -141,4 +141,12 @@ func TestGroupMembers(t *testing.T) {
 			t.Fatal("expected member to be in the group members")
 		}
 	})
+
+	t.Run("Internal request", func(t *testing.T) {
+		cli := testServer.TestClient()
+
+		req := GenerateInternalRequest(t, testServer, "/api/groups/1/members")
+
+		cli.TestRequest(t, req, 200)
+	})
 }
