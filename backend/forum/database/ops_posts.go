@@ -153,12 +153,12 @@ func (db DB) GetUserPostsLiked(userId int) []Post {
 		WHERE id IN (
 			SELECT post_id
 			FROM post_reactions
-			WHERE author_id = ? AND reaction = 1
+			WHERE reaction = 1
 		)
 		AND (
 			privacy = 0
 			OR (
-				privacy = 1
+				privacy = 1, 2
 				AND author IN (
 					SELECT user_id
 					FROM followers
