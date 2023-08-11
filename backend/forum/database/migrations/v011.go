@@ -10,12 +10,12 @@ var v011 = migrate.Migration{
 		_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS events (
 		    id INTEGER PRIMARY KEY AUTOINCREMENT,
+		    group_id INT NOT NULL,
+			creator_id INT NOT NULL,
 			title TEXT NOT NULL,
 			description TEXT NOT NULL,
 			time_and_date  TEXT NOT NULL,
 			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-			creator_id INT NOT NULL,
-			group_id INT NOT NULL,
 			FOREIGN KEY (creator_id) REFERENCES users(id),
 			FOREIGN KEY (group_id) REFERENCES groups(id)
 		);
