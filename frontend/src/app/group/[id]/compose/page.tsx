@@ -5,7 +5,7 @@ import { notFound, redirect } from "next/navigation"
 import { getCategoriesLocal } from "@/api/posts/edge"
 import checkSession from "@/api/auth/edge"
 import CreatePostForm from "@/components/forms/create-post/CreatePostForm"
-import { getGroupLocal } from "@/api/groups/edge"
+import { getGroupLocal, getGroupMembersLocal } from "@/api/groups/edge"
 
 type Props = { params: { id: string } }
 
@@ -31,17 +31,17 @@ const Page = async ({ params }: Props) => {
     return redirect("/groups")
   }
 
-  // TODO: add check if user is a member of the group
-
   const categories = await getCategoriesLocal()
   const token = cookies().get("forum-token")?.value
   if (!token) {
     return redirect("/login")
   }
-  try {
-    await checkSession(token)
-  } catch (error) {
-    return redirect("/login")
+
+  const userId = await checkSession(token).catch(notFound)
+
+  const groupMembers = await getGroupMembersLocal(group.id)
+  if (!groupMembers.includes(userId)) {
+    return redirect(`/group/${group.id}`)
   }
 
   return (
