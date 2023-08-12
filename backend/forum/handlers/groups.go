@@ -225,6 +225,13 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	groupPosts := h.DB.GetGroupPostsById(groupId)
+
+	for _, postId := range groupPosts {
+		post := h.DB.GetPostById(postId, userId)
+		h.DB.RemovePostAudience(postId, *h.DB.GetPostAudienceId(post.AuthorId, userId))
+	}
+
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
 	case Inactive:
 		server.ErrorResponse(w, http.StatusBadRequest)

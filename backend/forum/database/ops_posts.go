@@ -15,12 +15,14 @@ func (db DB) GetAllPosts(userId int) []Post {
 		LEFT JOIN post_audience ON posts.id = post_audience.post_id 
 		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = ?   
 		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = ?
+		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = ?
 		WHERE 
-			posts.privacy = 0 OR
+			posts.privacy = 0 AND posts.group_id IS NULL OR
 			posts.author = ? OR
 			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
-			(posts.privacy = 2 AND post_audience.id IS NOT NULL)
-	`, userId, userId, userId)
+			(posts.privacy = 2 AND post_audience.id IS NOT NULL) OR
+			(posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
+	`, userId, userId, userId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -44,17 +46,19 @@ func (db DB) GetAllPosts(userId int) []Post {
 // GetPostById reads post from database by post_id
 func (db DB) GetPostById(postId, userId int) *Post {
 	row := db.QueryRow(`
-		SELECT posts.* FROM posts
-		    LEFT JOIN post_audience ON post_audience.post_id = posts.id 
-			LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = ?   
-			LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = ?
-		WHERE posts.id = ? AND (
-			posts.privacy = 0 OR
-			posts.author = ? OR
-			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
-			(posts.privacy = 2 AND post_audience.id IS NOT NULL)
-		)
-	`, userId, userId, postId, userId)
+    SELECT posts.* FROM posts
+		LEFT JOIN post_audience ON post_audience.post_id = posts.id 
+		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = ?   
+		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = ?
+        LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = ?
+    WHERE posts.id = ? AND (
+        posts.privacy = 0 AND posts.group_id IS NULL OR
+        posts.author = ? OR
+        (posts.privacy = 1 AND f2.id IS NOT NULL) OR
+        (posts.privacy = 2 AND post_audience.id IS NOT NULL) OR
+        (posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
+    )
+`, userId, userId, userId, postId, userId)
 
 	var post Post
 	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
@@ -95,11 +99,26 @@ func (db DB) AddPostAudience(postId, followId int) {
 	}
 }
 
+func (db DB) RemovePostAudience(postId, followId int) {
+	_, err := db.Exec("DELETE FROM post_audience WHERE post_id = ? AND follow_id = ?", postId, followId)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+func (db DB) GetPostAudienceId(postId, followId int) (id *int) {
+	err := db.QueryRow("SELECT id FROM post_audience WHERE post_id = ? AND followId = ?").Scan(id)
+	if err != nil {
+		return nil
+	}
+	return
+}
+
 func (db DB) GetPostFollowStatus(postId, followId int) bool {
 	err := db.QueryRow(`
-			SELECT id FROM posts 
-          		WHERE post_audience.post_id = ? AND post_audience.follow_id = ?
-              `, postId, followId).Err()
+		SELECT id FROM post_audience 
+		    WHERE post_id = ? AND follow_id = ?
+		`, postId, followId).Err()
 	return err != nil
 }
 
@@ -157,11 +176,12 @@ func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 
 func (db DB) GetUserPostsLiked(userId int) []Post {
 	query, err := db.Query(`
-	SELECT posts.* FROM posts
-	LEFT JOIN followers ON author = user_id
-		WHERE posts.id IN (SELECT post_id FROM post_reactions WHERE reaction = 1 AND author_id = ?)
-		AND privacy = 0 OR followers.user_id = posts.author AND followers.follower_id = ? IS NOT NULL		
-	`, userId, userId)
+	SELECT * FROM posts WHERE id IN (SELECT post_id FROM post_reactions WHERE reaction = 1 AND author_id = ?) 
+		AND (
+		    privacy = 0 OR (
+		        author IN (SELECT user_id FROM followers WHERE follower_id = ?)
+	    )
+	)`, userId, userId)
 
 	if err != nil {
 		log.Panic(err)

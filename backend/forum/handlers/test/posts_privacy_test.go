@@ -12,7 +12,6 @@ func TestPrivatePost(t *testing.T) {
 	testServer := NewTestServer(t)
 	cli1 := testServer.TestClient()
 	cli2 := testServer.TestClient()
-
 	cli1.TestAuth(t)
 	cli2.TestAuth(t)
 
@@ -28,6 +27,7 @@ func TestPrivatePost(t *testing.T) {
 	cli1.TestPost(t, "/api/posts/create", validPost, http.StatusOK)
 
 	cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+
 	cli1.TestPost(t, "/api/invitations/1/respond", accept, http.StatusOK)
 
 	t.Run("Private post", func(t *testing.T) {
@@ -88,6 +88,7 @@ func TestPrivatePost(t *testing.T) {
 				t.Errorf("unexpected amount of liked posts, expected %d, got %d", 1, len(posts))
 			}
 
+			// unfollow
 			cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
 
 			_, respData = cli2.TestGet(t, "/api/me/posts/liked", http.StatusOK)
@@ -105,49 +106,72 @@ func TestPrivatePost(t *testing.T) {
 
 	})
 
+	cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+
+	cli1.TestPost(t, "/api/invitations/2/respond", accept, http.StatusOK)
+
 	t.Run("SuperPrivate post", func(t *testing.T) {
-		cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
-		cli1.TestPost(t, "/api/invitations/2/respond", accept, http.StatusOK)
-		validPost.Privacy = int(SuperPrivate)
-		validPost.PostFollowers = []int{2}
-
-		cli1.TestPost(t, "/api/posts/create", validPost, http.StatusOK)
-
-		var post Post
-		var posts []Post
-
-		_, resp := cli2.TestGet(t, "/api/posts/2", http.StatusOK)
-		if err := json.Unmarshal(resp, &post); err != nil {
-			t.Fatal(err)
-		}
-
-		_, resp = cli2.TestGet(t, "/api/posts", http.StatusOK)
-		if err := json.Unmarshal(resp, &posts); err != nil {
-			t.Fatal(err)
-		}
-
-		if post.Id != posts[1].Id {
-			t.Errorf("invalid post-id match, expected %t, got %t", true, false)
-		}
-
-		t.Run("Comments", func(t *testing.T) {
-			comment := generateComment()
-			cli2.TestPost(t, "/api/posts/2/comment", comment, http.StatusOK)
-
-			t.Run("Like", func(t *testing.T) {
-				cli2.TestPost(t, "/api/posts/2/comment/2/like", nil, http.StatusOK)
-			})
-
-			t.Run("Dislike", func(t *testing.T) {
-				cli2.TestPost(t, "/api/posts/2/comment/2/dislike", nil, http.StatusOK)
-			})
-
-			t.Run("Reaction", func(t *testing.T) {
-				cli2.TestGet(t, "/api/posts/2/comment/2/reaction", http.StatusOK)
-			})
-		})
 
 	})
+}
+
+func TestSuperPrivatePost(t *testing.T) {
+	testServer := NewTestServer(t)
+	cli1 := testServer.TestClient()
+	cli2 := testServer.TestClient()
+	cli1.TestAuth(t)
+	cli2.TestAuth(t)
+
+	accept := struct {
+		Response bool `json:"response"`
+	}{
+		Response: true,
+	}
+
+	validPost := generatePostData()
+	validPost.Privacy = int(SuperPrivate)
+	validPost.PostFollowers = []int{2}
+
+	cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+
+	cli1.TestPost(t, "/api/invitations/1/respond", accept, http.StatusOK)
+
+	cli1.TestPost(t, "/api/posts/create", validPost, http.StatusOK)
+
+	var post Post
+	var posts []Post
+
+	_, resp := cli2.TestGet(t, "/api/posts/1", http.StatusOK)
+	if err := json.Unmarshal(resp, &post); err != nil {
+		t.Fatal(err)
+	}
+
+	_, resp = cli2.TestGet(t, "/api/posts", http.StatusOK)
+	if err := json.Unmarshal(resp, &posts); err != nil {
+		t.Fatal(err)
+	}
+
+	if post.Id != posts[0].Id {
+		t.Errorf("invalid post-id match, expected %t, got %t", true, false)
+	}
+
+	t.Run("Comments", func(t *testing.T) {
+		comment := generateComment()
+		cli2.TestPost(t, "/api/posts/1/comment", comment, http.StatusOK)
+
+		t.Run("Like", func(t *testing.T) {
+			cli2.TestPost(t, "/api/posts/1/comment/1/like", nil, http.StatusOK)
+		})
+
+		t.Run("Dislike", func(t *testing.T) {
+			cli2.TestPost(t, "/api/posts/1/comment/1/dislike", nil, http.StatusOK)
+		})
+
+		t.Run("Reaction", func(t *testing.T) {
+			cli2.TestGet(t, "/api/posts/1/comment/1/reaction", http.StatusOK)
+		})
+	})
+
 }
 
 func TestInvalidPostPrivacy(t *testing.T) {

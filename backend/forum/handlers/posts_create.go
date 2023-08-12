@@ -106,6 +106,11 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if requestBody.Privacy > 2 {
+		http.Error(w, "invalid privacy", http.StatusBadRequest)
+		return
+	}
+
 	for _, follower := range requestBody.PostFollowers {
 		if requestBody.Privacy != int(SuperPrivate) {
 			http.Error(w, "followers in non super-private post", http.StatusBadRequest)
@@ -119,11 +124,6 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "user is not following you", http.StatusBadRequest)
 			return
 		}
-	}
-
-	if requestBody.Privacy > 2 {
-		http.Error(w, "invalid privacy", http.StatusBadRequest)
-		return
 	}
 
 	var groupId sql.NullInt64
@@ -145,11 +145,9 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 
 	if requestBody.Privacy == int(SuperPrivate) {
 		for _, follower := range requestBody.PostFollowers {
-			if *h.DB.GetFollowStatus(userId, follower) != Accepted {
-				continue
-			}
-			if !h.DB.GetPostFollowStatus(id, *h.DB.GetFollowId(follower, userId)) {
-				h.DB.AddPostAudience(id, follower)
+			followId := *h.DB.GetFollowId(follower, userId)
+			if !h.DB.GetPostFollowStatus(id, followId) {
+				h.DB.AddPostAudience(id, followId)
 			}
 		}
 	}

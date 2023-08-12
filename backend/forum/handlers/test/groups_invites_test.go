@@ -70,7 +70,6 @@ func TestGroupIdJoin(t *testing.T) {
 			if len(invites) != 1 {
 				t.Errorf("Invalid length of invites, expected %d, got %d", 1, len(invites))
 			}
-			fmt.Println(invites)
 
 			endpoint := fmt.Sprintf("/api/invitations/%d/respond", invites[0])
 			cli1.TestPost(t, endpoint, response, http.StatusOK)
