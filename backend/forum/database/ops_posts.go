@@ -99,21 +99,6 @@ func (db DB) AddPostAudience(postId, followId int) {
 	}
 }
 
-func (db DB) RemovePostAudience(postId, followId int) {
-	_, err := db.Exec("DELETE FROM post_audience WHERE post_id = ? AND follow_id = ?", postId, followId)
-	if err != nil {
-		log.Panic(err)
-	}
-}
-
-func (db DB) GetPostAudienceId(postId, followId int) (id *int) {
-	err := db.QueryRow("SELECT id FROM post_audience WHERE post_id = ? AND followId = ?").Scan(id)
-	if err != nil {
-		return nil
-	}
-	return
-}
-
 func (db DB) GetPostFollowStatus(postId, followId int) bool {
 	err := db.QueryRow(`
 		SELECT id FROM post_audience 

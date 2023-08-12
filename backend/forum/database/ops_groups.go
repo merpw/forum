@@ -120,18 +120,7 @@ func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStat
 	return memberStatus
 }
 
-func (db DB) GetGroupCreatorId(groupId int) *int {
-	var creatorId int
-	err := db.QueryRow("SELECT creator_id FROM groups WHERE id = ?", groupId).Scan(&creatorId)
-	if err != nil {
-		return nil
-	}
-
-	return &creatorId
-}
-
 func (db DB) GetGroupMembers(groupId int, withPending bool) (members []int) {
-
 	var q string
 	if withPending {
 		q = `
@@ -164,17 +153,6 @@ func (db DB) GetGroupMembers(groupId int, withPending bool) (members []int) {
 	query.Close()
 
 	return members
-}
-
-func (db DB) GetGroupCreatorId(groupId int) *int {
-	var creatorId int
-	err := db.QueryRow("SELECT creator_id FROM groups WHERE id = ?", groupId).Scan(&creatorId)
-	if err != nil {
-		return nil
-	}
-
-	return &creatorId
-
 }
 
 func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
@@ -212,20 +190,4 @@ func (db DB) AddMembership(groupId, userId int) {
 	if err != nil {
 		log.Panic(err)
 	}
-}
-
-func (db DB) DeleteGroupMembership(groupId, userId int) MemberStatus {
-	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND userId = ?", groupId, userId)
-	if err != nil {
-		log.Panic(err)
-	}
-	return NotMember
-}
-
-func (db DB) AddMembership(groupId, userId int) MemberStatus {
-	_, err := db.Exec("INSERT INTO group_members WHERE group_id = ? AND userId = ?", groupId, userId)
-	if err != nil {
-		log.Panic(err)
-	}
-	return Member
 }
