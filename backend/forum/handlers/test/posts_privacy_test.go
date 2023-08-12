@@ -72,34 +72,35 @@ func TestPrivatePost(t *testing.T) {
 				cli2.TestGet(t, "/api/posts/1/comment/1/reaction", http.StatusOK)
 			})
 
-			t.Run("Test me posts liked", func(t *testing.T) {
-				cli2.TestPost(t, "/api/posts/1/like", nil, http.StatusOK)
+		})
 
-				var posts []PostData
-				_, respData := cli2.TestGet(t, "/api/me/posts/liked", http.StatusOK)
-				err := json.Unmarshal(respData, &posts)
-				if err != nil {
-					t.Fatal(err)
-				}
+		t.Run("Test me posts liked", func(t *testing.T) {
+			cli2.TestPost(t, "/api/posts/1/like", nil, http.StatusOK)
 
-				if len(posts) != 1 {
-					t.Errorf("unexpected amount of liked posts, expected %d, got %d", 1, len(posts))
-				}
+			var posts []PostData
+			_, respData := cli2.TestGet(t, "/api/me/posts/liked", http.StatusOK)
+			err := json.Unmarshal(respData, &posts)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-				cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+			if len(posts) != 1 {
+				t.Errorf("unexpected amount of liked posts, expected %d, got %d", 1, len(posts))
+			}
 
-				_, respData = cli2.TestGet(t, "/api/me/posts/liked", http.StatusOK)
+			cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
 
-				err = json.Unmarshal(respData, &posts)
-				if err != nil {
-					t.Fatal(err)
-				}
+			_, respData = cli2.TestGet(t, "/api/me/posts/liked", http.StatusOK)
 
-				if len(posts) != 0 {
-					t.Errorf("unexpected amount of liked posts, expected %d, got %d", 0, len(posts))
-				}
+			err = json.Unmarshal(respData, &posts)
+			if err != nil {
+				t.Fatal(err)
+			}
 
-			})
+			if len(posts) != 0 {
+				t.Errorf("unexpected amount of liked posts, expected %d, got %d", 0, len(posts))
+			}
+
 		})
 
 	})
