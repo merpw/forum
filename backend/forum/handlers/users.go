@@ -2,7 +2,8 @@ package handlers
 
 import (
 	"backend/common/server"
-	"backend/forum/database"
+	. "backend/forum/database"
+	"database/sql"
 	"net/http"
 	"strconv"
 	"strings"
@@ -53,7 +54,7 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 			FollowStatus: nil,
 			Followers:    len(h.DB.GetUserFollowers(user.Id)),
 			Following:    len(h.DB.GetUsersFollowed(user.Id)),
-			Privacy:      user.Privacy == database.Private,
+			Privacy:      user.Privacy == Private,
 		},
 		Email:     user.Email,
 		FirstName: user.FirstName.String,
@@ -68,15 +69,15 @@ func (h *Handlers) usersId(w http.ResponseWriter, r *http.Request) {
 	} else {
 		response.SafeUser.FollowStatus = nil
 	}
-	if response.SafeUser.FollowStatus == nil && user.Privacy == database.Public {
+	if response.SafeUser.FollowStatus == nil && user.Privacy == Public {
 		server.SendObject(w, response)
 		return
 	}
-	if response.SafeUser.FollowStatus == nil && user.Privacy == database.Private {
+	if response.SafeUser.FollowStatus == nil && user.Privacy == Private {
 		server.SendObject(w, response.SafeUser)
 		return
 	}
-	if user.Privacy == database.Public || *response.SafeUser.FollowStatus == database.Following {
+	if user.Privacy == Public || *response.SafeUser.FollowStatus == Accepted {
 		server.SendObject(w, response)
 	} else {
 		server.SendObject(w, response.SafeUser)
@@ -111,21 +112,21 @@ func (h *Handlers) usersIdFollow(w http.ResponseWriter, r *http.Request) {
 	followStatus := h.DB.GetFollowStatus(meId, userId)
 
 	switch *followStatus {
-	case database.NotFollowing:
-		if user.Privacy == database.Private {
-			server.SendObject(w, h.DB.AddFollowInvitation(meId, userId))
+	case Inactive:
+		if user.Privacy == Private {
+			server.SendObject(w, h.DB.AddInvitation(FollowUser, meId, userId, sql.NullInt64{Valid: false}))
+			return
+		} else {
+			server.SendObject(w, h.DB.AddFollower(meId, userId))
 			return
 		}
 
-		server.SendObject(w, h.DB.AddFollower(meId, userId))
-		return
-
-	case database.Following:
+	case Accepted:
 		server.SendObject(w, h.DB.RemoveFollower(meId, userId))
 		return
 
-	case database.RequestToFollow:
-		server.SendObject(w, h.DB.DeleteFollowInvitation(meId, userId))
+	case Pending:
+		server.SendObject(w, h.DB.DeleteFollowRequest(meId, userId))
 		return
 	}
 }

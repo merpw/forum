@@ -14,7 +14,7 @@ export const UserInfo: FC<{ user: User; isOwnProfile?: boolean }> = ({ user, isO
   return (
     <>
       <div className={"hero"}>
-        <div className={"hero-content px-0"}>
+        <div className={"hero-content min-w-0 px-0"}>
           <div
             className={
               "card flex-shrink-0 w-full shadow-lg gradient-light dark:gradient-dark px-1 sm:px-3 pb-5"

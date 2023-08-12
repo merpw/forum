@@ -32,6 +32,15 @@ export const useUsersOnline = () => {
   return { usersOnline }
 }
 
+export const useUserList = (userIds: number[]) => {
+  const { data, error, mutate } = useSWR<User[]>(
+    userIds.map((id) => `/api/users/${id}`),
+    () => Promise.all(userIds.map((id) => getUser(id)))
+  )
+
+  return { users: userIds.length > 0 ? data : [], error, mutate }
+}
+
 export const togglePrivacy = async (): Promise<boolean | undefined> =>
   axios
     .post<boolean>(`/api/me/privacy`)

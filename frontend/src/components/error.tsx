@@ -6,7 +6,7 @@ export const FormError: FC<{ error: string | null }> = ({ error }) => (
     {error && (
       <motion.div
         className={
-          "transition ease-in-out -translate-y-1 px-3 py-2 my-1 mb-4 text-sm bg-error text-error-content rounded-lg"
+          "transition ease-in-out -translate-y-1 px-3 py-2 my-1 text-sm bg-error text-error-content rounded-lg"
         }
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

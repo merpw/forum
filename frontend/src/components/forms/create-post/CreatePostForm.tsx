@@ -11,10 +11,12 @@ import MarkdownEditor from "@/components/markdown/editor/Editor"
 import { trimInput } from "@/helpers/input"
 import { GenerateDescriptionButton } from "@/components/forms/create-post/GenerateDescriptionButton"
 import SelectCategories from "@/components/forms/create-post/SelectCategories"
+import { Group } from "@/api/groups/hooks"
 
-const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
+const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: Group }> = ({
   categories,
   isAIEnabled,
+  group,
 }) => {
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -42,6 +44,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
           content: formData.get("content") as string,
           description: formData.get("description") as string,
           categories: formData.getAll("categories") as string[],
+          group_id: group?.id,
         }
 
         if (formError != null) setFormError(null)
@@ -68,7 +71,15 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean }> = ({
         <div className={"card flex-shrink-0 bg-base-200 shadow-md"}>
           <div className={"card-body"}>
             <div className={"my-2 font-Yesteryear text-3xl text-primary opacity-50 text-center"}>
-              <span className={"text-neutral-content"}> {"What's on your mind?"}</span>
+              <span className={"text-neutral-content"}>
+                {group ? (
+                  <>
+                    Compose for group <span className={"text-primary"}>{group.title}</span>
+                  </>
+                ) : (
+                  "What's on your mind?"
+                )}
+              </span>
             </div>
 
             <div className={"form-control"}>

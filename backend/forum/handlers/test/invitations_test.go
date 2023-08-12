@@ -3,6 +3,7 @@ package server_test
 import (
 	. "backend/forum/handlers/test/server"
 	"encoding/json"
+	"log"
 	"net/http"
 	"testing"
 )
@@ -61,7 +62,7 @@ func TestInvitationsId(t *testing.T) {
 		}{}
 
 		var invitations []int
-		t.Run("Add invitation", func(t *testing.T) {
+		t.Run("Request to follow", func(t *testing.T) {
 			cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
 			_, resp := cli1.TestGet(t, "/api/invitations/1", http.StatusOK)
 			err := json.Unmarshal(resp, &respBody)
@@ -85,8 +86,17 @@ func TestInvitationsId(t *testing.T) {
 				t.Errorf("invalid to_user_id, expected %d, got %d", 1, respBody.ToUserId)
 			}
 		})
-		t.Run("Revoke invitation", func(t *testing.T) {
-			cli2.TestPost(t, `/api/users/1/follow`, nil, http.StatusOK)
+		t.Run("Revoke follow request", func(t *testing.T) {
+			var status int
+
+			_, resp := cli2.TestPost(t, `/api/users/1/follow`, nil, http.StatusOK)
+			if err := json.Unmarshal(resp, &status); err != nil {
+				log.Panic(err)
+			}
+
+			if status != 0 {
+				t.Errorf("expected %d, got %d", 0, status)
+			}
 
 			_, response := cli1.TestGet(t, "/api/invitations", http.StatusOK)
 

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
+	. "backend/forum/database"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -33,19 +34,20 @@ func (h *Handlers) invitationsId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	respBody := struct {
-		Id         int    `json:"id"`
-		Type       int    `json:"type"`
-		FromUserId int    `json:"from_user_id"`
-		ToUserId   int    `json:"to_user_id"`
-		TimeStamp  string `json:"timestamp"`
+		Id           int        `json:"id"`
+		Type         InviteType `json:"type"`
+		FromUserId   int        `json:"from_user_id"`
+		ToUserId     int        `json:"to_user_id"`
+		AssociatedId int        `json:"associated_id,omitempty"`
+		TimeStamp    string     `json:"timestamp"`
 	}{
-		Id:         invitation.Id,
-		Type:       invitation.Type,
-		FromUserId: invitation.FromUserId,
-		ToUserId:   invitation.ToUserId,
-		TimeStamp:  invitation.TimeStamp,
+		Id:           invitation.Id,
+		Type:         invitation.Type,
+		FromUserId:   invitation.FromUserId,
+		ToUserId:     invitation.ToUserId,
+		AssociatedId: int(invitation.AssociatedId.Int64),
+		TimeStamp:    invitation.TimeStamp,
 	}
-
 	server.SendObject(w, respBody)
 }
 
@@ -76,10 +78,19 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
 	}
+	groupId := int(invitation.AssociatedId.Int64)
 
 	if requestBody.Response {
-		h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
+		switch invitation.Type {
+		case FollowUser:
+			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
+		case GroupInvite:
+			h.DB.AddMembership(groupId, invitation.ToUserId)
+		case GroupJoin:
+			h.DB.AddMembership(groupId, invitation.FromUserId)
+		}
+
 	}
 
-	h.DB.DeleteInvitation(invitation.Id)
+	h.DB.DeleteInvitationById(invitation.Id)
 }

@@ -23,7 +23,7 @@ func TestCheckSession(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		req := generateInternalRequest(t, testServer, "/api/internal/check-session")
+		req := GenerateInternalRequest(t, testServer, "/api/internal/check-session")
 		err = os.Setenv("FORUM_BACKEND_SECRET", "secret has changed")
 		if err != nil {
 			t.Fatal(err)
@@ -37,10 +37,10 @@ func TestCheckSession(t *testing.T) {
 	}
 
 	t.Run("Invalid token", func(t *testing.T) {
-		req := generateInternalRequest(t, testServer, "/api/internal/check-session")
+		req := GenerateInternalRequest(t, testServer, "/api/internal/check-session")
 		cli.TestRequest(t, req, http.StatusBadRequest)
 
-		req = generateInternalRequest(t, testServer, "/api/internal/check-session?token=invalid")
+		req = GenerateInternalRequest(t, testServer, "/api/internal/check-session?token=invalid")
 		_, respBody := cli.TestRequest(t, req, http.StatusOK)
 
 		var errResp struct {
@@ -56,7 +56,7 @@ func TestCheckSession(t *testing.T) {
 	})
 
 	t.Run("Invalid method", func(t *testing.T) {
-		req := generateInternalRequest(t, testServer, "/api/internal/check-session?token=invalid")
+		req := GenerateInternalRequest(t, testServer, "/api/internal/check-session?token=invalid")
 		req.Method = http.MethodPost
 		cli.TestRequest(t, req, http.StatusMethodNotAllowed)
 	})
@@ -70,7 +70,7 @@ func TestCheckSession(t *testing.T) {
 		}
 
 		_, respBody := cli.TestRequest(t,
-			generateInternalRequest(t, testServer, "/api/internal/check-session?token="+token),
+			GenerateInternalRequest(t, testServer, "/api/internal/check-session?token="+token),
 			http.StatusOK)
 		userId, err := strconv.Atoi(string(respBody))
 		if err != nil {
@@ -94,7 +94,7 @@ func TestBypassAuth(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	req := generateInternalRequest(t, testServer, "/api/me")
+	req := GenerateInternalRequest(t, testServer, "/api/me")
 
 	cli.TestRequest(t, req, http.StatusInternalServerError)
 
@@ -132,7 +132,7 @@ func TestRevokedSessions(t *testing.T) {
 		}
 	}()
 
-	req := generateInternalRequest(t, testServer, "/api/internal/revoked-sessions")
+	req := GenerateInternalRequest(t, testServer, "/api/internal/revoked-sessions")
 	resp, err := cli.Do(req)
 	if err != nil {
 		t.Fatal(err)
@@ -151,12 +151,18 @@ func TestRevokedSessions(t *testing.T) {
 	}
 }
 
-func generateInternalRequest(t *testing.T, testServer TestServer, path string) *http.Request {
+func GenerateInternalRequest(t *testing.T, testServer TestServer, path string) *http.Request {
 	t.Helper()
 	req, err := http.NewRequest(http.MethodGet, testServer.URL+path, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Add("Internal-Auth", os.Getenv("FORUM_BACKEND_SECRET"))
+	var secret = os.Getenv("FORUM_BACKEND_SECRET")
+
+	if secret == "" {
+		secret = "super secret nobody knows"
+	}
+
+	req.Header.Add("Internal-Auth", secret)
 	return req
 }

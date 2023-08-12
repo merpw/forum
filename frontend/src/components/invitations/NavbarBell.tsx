@@ -60,7 +60,7 @@ const NavbarBell = () => {
 
       <ul
         className={
-          "mt-3 p-2 shadow z-50 menu menu-compact dropdown-content bg-base-100 rounded-box"
+          "mt-3 p-2 shadow z-50 menu menu-compact dropdown-content bg-base-100 rounded-box sm:min-w-[20rem]"
         }
       >
         <li className={"menu-title inline"}>
