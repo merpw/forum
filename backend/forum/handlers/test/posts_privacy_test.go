@@ -87,7 +87,9 @@ func TestPrivatePost(t *testing.T) {
 				}
 
 				cli2.TestPost(t, "/api/users/1/follow", nil, http.StatusOK)
+
 				_, respData = cli2.TestGet(t, "/api/me/posts/liked", http.StatusOK)
+
 				err = json.Unmarshal(respData, &posts)
 				if err != nil {
 					t.Fatal(err)

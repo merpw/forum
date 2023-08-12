@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"backend/common/server"
-	"backend/forum/external"
 	. "backend/forum/database"
+	"backend/forum/external"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -145,8 +145,10 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 
 	if requestBody.Privacy == int(SuperPrivate) {
 		for _, follower := range requestBody.PostFollowers {
-			if !h.DB.GetPostFollowStatus(id, follower) &&
-				*h.DB.GetFollowStatus(userId, follower) == Accepted {
+			if *h.DB.GetFollowStatus(userId, follower) != Accepted {
+				continue
+			}
+			if !h.DB.GetPostFollowStatus(id, *h.DB.GetFollowId(follower, userId)) {
 				h.DB.AddPostAudience(id, follower)
 			}
 		}

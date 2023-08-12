@@ -30,7 +30,7 @@ func (db DB) GetAllPosts(userId int) []Post {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
 			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-			&post.Categories, &post.Description, &post.Privacy, &post.GroupId)
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -59,12 +59,12 @@ func (db DB) GetPostById(postId, userId int) *Post {
 	var post Post
 	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
 		&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-		&post.Categories, &post.Description, &post.Privacy, &post.GroupId)
+		&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
 
 	if err != nil {
 		return nil
 	}
-	
+
 	return &post
 }
 
@@ -73,9 +73,9 @@ func (db DB) AddPost(title, content, description string,
 	authorId int, categories string, privacy Privacy, groupId sql.NullInt64) int {
 	result, err := db.Exec(`INSERT INTO posts 
     	(title, content, author, date, likes_count, dislikes_count, comments_count,
-    	 categories, description, privacy, group_id)
+    	 categories, description, group_id, privacy)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categories, description, privacy, groupId)
+		title, content, authorId, time.Now().Format(time.RFC3339), 0, 0, 0, categories, description, groupId, privacy)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -95,6 +95,14 @@ func (db DB) AddPostAudience(postId, followId int) {
 	}
 }
 
+func (db DB) GetPostFollowStatus(postId, followId int) bool {
+	err := db.QueryRow(`
+			SELECT id FROM posts 
+          		WHERE post_audience.post_id = ? AND post_audience.follow_id = ?
+              `, postId, followId).Err()
+	return err != nil
+}
+
 func (db DB) GetMePosts(userId int) []Post {
 	query, err := db.Query("SELECT * FROM posts WHERE author = ?", userId)
 	if err != nil {
@@ -106,7 +114,7 @@ func (db DB) GetMePosts(userId int) []Post {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
 			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-			&post.Categories, &post.Description, &post.Privacy, &post.GroupId)
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -136,7 +144,7 @@ func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
 			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-			&post.Categories, &post.Description, &post.Privacy, &post.GroupId)
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -149,20 +157,19 @@ func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 
 func (db DB) GetUserPostsLiked(userId int) []Post {
 	query, err := db.Query(`
-		SELECT * FROM posts
-		WHERE id IN (
+		SELECT posts.* FROM posts
+		    LEFT JOIN followers ON posts.author = followers.user_id
+		WHERE posts.id IN (
 			SELECT post_id
 			FROM post_reactions
-			WHERE reaction = 1
+			WHERE reaction = 1 AND author_id = ?
 		)
 		AND (
 			privacy = 0
 			OR (
-				privacy = 1, 2
-				AND author IN (
-					SELECT user_id
-					FROM followers
-					WHERE follower_id = ?
+				privacy = 1 OR privacy = 2
+				AND (
+				    posts.author = followers.user_id AND followers.follower_id = ? IS NOT NULL
 				)
 			)
 		)
@@ -177,7 +184,7 @@ func (db DB) GetUserPostsLiked(userId int) []Post {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
 			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-			&post.Categories, &post.Description, &post.Privacy, &post.GroupId)
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
 		if err != nil {
 			log.Panic(err)
 		}
@@ -212,7 +219,7 @@ func (db DB) GetCategoryPosts(category string, userId int) []Post {
 		var post Post
 		err = query.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
 			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-			&post.Categories, &post.Description, &post.Privacy, &post.GroupId)
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
 		if err != nil {
 			log.Panic(err)
 		}
