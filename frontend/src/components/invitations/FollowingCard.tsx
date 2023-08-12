@@ -19,7 +19,7 @@ export const FollowingCard: FC<{ invitation: Invitation & { type: 0 } }> = ({ in
           <span className={"text-primary"}>{user.username}</span> wants to follow you
         </span>
       </Link>
-      <ResponseButtons invitationId={invitation.id} />
+      <ResponseButtons invitation={invitation} />
     </div>
   )
 }

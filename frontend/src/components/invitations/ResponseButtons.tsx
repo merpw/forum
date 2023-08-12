@@ -2,12 +2,17 @@ import { FC } from "react"
 import { useSWRConfig } from "swr"
 
 import respondToInvitation from "@/api/invitations/respond"
+import { Invitation } from "@/api/invitations/hooks"
 
-export const ResponseButtons: FC<{ invitationId: number }> = ({ invitationId }) => {
+export const ResponseButtons: FC<{ invitation: Invitation }> = ({ invitation }) => {
   const { mutate } = useSWRConfig()
 
   const respond = (accept: boolean) =>
-    respondToInvitation(invitationId, accept)
+    respondToInvitation(invitation.id, accept)
+      .then(() => {
+        // group invitation, refetch group
+        if (invitation.type === 1) mutate(`/api/groups/${invitation.associated_id}`)
+      })
       .catch(console.error)
       .finally(() => mutate(`/api/invitations`))
 

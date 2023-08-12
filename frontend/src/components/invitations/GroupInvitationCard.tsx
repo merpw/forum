@@ -24,7 +24,7 @@ export const GroupInvitationCard: FC<{ invitation: Invitation & { type: 1 } }> =
           <span className={"text-primary"}>{group.title}</span>
         </span>
       </Link>
-      <ResponseButtons invitationId={invitation.id} />
+      <ResponseButtons invitation={invitation} />
     </div>
   )
 }

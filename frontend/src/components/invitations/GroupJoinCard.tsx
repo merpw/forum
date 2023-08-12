@@ -22,7 +22,7 @@ export const GroupJoinCard: FC<{ invitation: Invitation & { type: 2 } }> = ({ in
           <span className={"text-primary"}>{group.title}</span>
         </span>
       </Link>
-      <ResponseButtons invitationId={invitation.id} />
+      <ResponseButtons invitation={invitation} />
     </div>
   )
 }
