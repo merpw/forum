@@ -8,9 +8,10 @@ import (
 )
 
 type chatIdResponseData struct {
-	Id            int `json:"id"`
-	CompanionId   int `json:"companionId"`
-	LastMessageId int `json:"lastMessageId"`
+	Id            int  `json:"id"`
+	CompanionId   *int `json:"companionId,omitempty"`
+	GroupId       *int `json:"groupId,omitempty"`
+	LastMessageId int  `json:"lastMessageId"`
 }
 
 func (h *Handlers) chatId(message ws.Message, client *ws.Client) {
@@ -35,6 +36,7 @@ func (h *Handlers) chatId(message ws.Message, client *ws.Client) {
 		Id:            chatId,
 		LastMessageId: data.LastMessageId,
 		CompanionId:   data.CompanionId,
+		GroupId:       data.GroupId,
 	}
 	responseMessage := ws.BuildResponseMessage(message, responseData)
 

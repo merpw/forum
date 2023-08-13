@@ -32,22 +32,46 @@ func (db DB) GetUserChats(userId int) (chats []int) {
 
 type ChatData struct {
 	LastMessageId int
-	CompanionId   int
+	CompanionId   *int
+	GroupId       *int
 }
 
+// GetChatData returns data about a chat.
 func (db DB) GetChatData(userId, chatId int) ChatData {
 	row := db.QueryRow(`
-		SELECT messages.id, memberships.user_id
-		FROM messages 
-		INNER JOIN memberships 
-		ON memberships.chat_id = messages.chat_id
-		WHERE messages.chat_id = ? AND memberships.user_id != ?
-		ORDER BY messages.id DESC
-		LIMIT 1
-`, chatId, userId)
+SELECT last_message_id, companion_id, group_id
+FROM (SELECT id as last_message_id
+      FROM messages
+      WHERE chat_id = :chatId
+      ORDER BY id DESC
+      LIMIT 1),
+     (SELECT CASE
+         -- Private chat -- 
+                 WHEN type = 0
+                     THEN (SELECT user_id
+                           FROM memberships
+                           WHERE chat_id = :chatId
+                             and user_id != :userId
+                           LIMIT 1)
+                 ELSE (SELECT null)
+                 END as companion_id
+      FROM chats
+      WHERE id = :chatId),
+     (SELECT CASE
+         -- Group chat --
+                 WHEN type = 1
+                     THEN (SELECT group_id
+                           FROM chats
+                           WHERE id = :chatId
+                           LIMIT 1)
+                 ELSE (SELECT null)
+                 END as group_id
+      FROM chats
+      WHERE id = :chatId)
+`, sql.Named("chatId", chatId), sql.Named("userId", userId))
 
 	var data ChatData
-	err := row.Scan(&data.LastMessageId, &data.CompanionId)
+	err := row.Scan(&data.LastMessageId, &data.CompanionId, &data.GroupId)
 	if err != nil {
 		panic(err)
 	}
@@ -55,14 +79,14 @@ func (db DB) GetChatData(userId, chatId int) ChatData {
 	return data
 }
 
-// GetUsersChat returns an id of the chat between two users.
+// GetPrivateChat returns an id of the chat between two users.
 //
 // If there is no such chat, it returns -1.
-func (db DB) GetUsersChat(user1Id, user2Id int) int {
+func (db DB) GetPrivateChat(user1Id, user2Id int) (chatId *int) {
 
 	if user1Id == user2Id {
 		// TODO: maybe allow self-chats
-		return -1
+		return nil
 	}
 
 	row := db.QueryRow(`
@@ -72,11 +96,25 @@ func (db DB) GetUsersChat(user1Id, user2Id int) int {
 			WHERE user_id = ?
 		)`, user1Id, user2Id)
 
-	var chatId int
 	err := row.Scan(&chatId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return -1
+			return nil
+		}
+		panic(err)
+	}
+	return chatId
+}
+
+func (db DB) GetGroupChat(groupId int) (chatId *int) {
+	row := db.QueryRow(`
+		SELECT id FROM chats WHERE group_id = ?
+`, groupId)
+
+	err := row.Scan(&chatId)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil
 		}
 		panic(err)
 	}

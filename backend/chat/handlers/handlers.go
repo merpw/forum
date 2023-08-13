@@ -26,6 +26,8 @@ func (h *Handlers) PrimaryHandler() ws.MessageHandler {
 		newEvent("get", `/users/\d+/chat`, h.usersIdChat),
 		newEvent("get", `/users/online`, h.usersOnline),
 
+		newEvent("get", `/groups/\d+/chat`, h.groupsIdChat),
+
 		// method POST endpoints
 		newEvent("post", `/chat/create`, h.chatCreate),
 		newEvent("post", `/chat/\d+/message`, h.chatIdMessage),
