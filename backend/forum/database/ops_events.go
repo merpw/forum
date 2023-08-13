@@ -20,12 +20,7 @@ func (db DB) AddEvent(groupId, createdBy int, title, description, timeAndDate st
 		log.Panic(newErr)
 	}
 
-	_, insertErr := db.Exec(`
-			INSERT INTO event_members
-			(event_id, user_id, timestamp) VALUES (?, ?, ?)`, id, createdBy, time.Now().Format(time.RFC3339))
-	if insertErr != nil {
-		log.Panic(err)
-	}
+	db.AddUserToEvent(int(id), createdBy)
 
 	_, invitationErr := db.Exec(`
     INSERT INTO invitations
@@ -39,6 +34,25 @@ func (db DB) AddEvent(groupId, createdBy int, title, description, timeAndDate st
 		log.Panic(err)
 	}
 	return int(id)
+}
+
+func (db DB) DeleteAllEventInvites(groupId, userId int) {
+	_, err := db.Exec(`
+    DELETE * FROM invitations WHERE TYPE = 2 AND associated_id = ? AND to_user_id = ?`,
+		2, userId, groupId)
+
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+func (db DB) AddUserToEvent(eventId, userId int) {
+	_, err := db.Exec(`
+			INSERT INTO event_members
+			(event_id, user_id, timestamp) VALUES (?, ?, ?)`, eventId, userId, time.Now().Format(time.RFC3339))
+	if err != nil {
+		log.Panic(err)
+	}
 }
 
 func (db DB) GetEventById(eventId int) *EventData {

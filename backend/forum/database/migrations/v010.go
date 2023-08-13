@@ -1,3 +1,4 @@
+
 package migrations
 
 import (
@@ -5,45 +6,31 @@ import (
 	"database/sql"
 )
 
-// v010 adds groups and group_members tables
+// v010 adds 'privacy' column to 'posts' table
 var v010 = migrate.Migration{
 	Up: func(db *sql.DB) error {
 		_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS groups (
-		    id INTEGER PRIMARY KEY AUTOINCREMENT,
-		    title TEXT NOT NULL,
-		    description TEXT NOT NULL,
-		    creator_id INTEGER NOT NULL,
-			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-		    FOREIGN KEY (creator_id) REFERENCES users(id)
-		);
-		CREATE TABLE IF NOT EXISTS group_members (
+		ALTER TABLE posts ADD COLUMN privacy INT;
+		UPDATE posts
+			SET privacy = 1 WHERE privacy IS NULL;
+		CREATE TABLE IF NOT EXISTS post_audience (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			group_id INTEGER NOT NULL,
-			user_id INTEGER NOT NULL,
-			timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY (group_id) REFERENCES groups(id),
-			FOREIGN KEY (user_id) REFERENCES users(id)
+			post_id INTEGER NOT NULL,
+			follow_id INTEGER NOT NULL,
+			FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
+			FOREIGN KEY (follow_id) REFERENCES followers(id) ON DELETE CASCADE,
+		    UNIQUE (post_id, follow_id)
 		);
-		ALTER TABLE posts 
-		ADD COLUMN group_id INTEGER REFERENCES groups(id) DEFAULT NULL;
-
-		ALTER TABLE invitations
-		ADD COLUMN associated_id INTEGER DEFAULT NULL
-	`)
+`)
 		if err != nil {
 			return err
 		}
 		return nil
 	},
-
 	Down: func(db *sql.DB) error {
-
 		_, err := db.Exec(`
-		DROP TABLE IF EXISTS groups;
-		DROP TABLE IF EXISTS group_members;
-		ALTER TABLE posts DROP COLUMN group_id;
-		ALTER TABLE invitations DROP COLUMN associated_id;
+		ALTER TABLE posts DROP COLUMN privacy;
+		DROP TABLE IF EXISTS post_audience;
 		VACUUM;
 `)
 		if err != nil {

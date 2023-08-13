@@ -3,6 +3,7 @@ package handlers
 import (
 	"backend/common/server"
 	"backend/forum/external"
+	. "backend/forum/database"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -32,6 +33,8 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		Description string   `json:"description"`
 		Categories  []string `json:"categories"`
 		GroupId     *int64   `json:"group_id"`
+		Privacy     Privacy `json:"privacy"`
+		PostFollowers []int            `json:"post_followers"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -98,6 +101,25 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	switch requestBody.Privacy {
+	case Public:
+		fallthrough
+	case Private:
+		if len(requestBody.PostFollowers) > 0 {
+			http.Error(w, "followers in non-super private post", http.StatusBadRequest)
+			return
+		}
+	case SuperPrivate:
+		if len(requestBody.PostFollowers) == 0 {
+			http.Error(w, "no followers in super private Post", http.StatusBadRequest)
+			return
+		}
+
+	default:
+		http.Error(w, "invalid privacy", http.StatusBadRequest)
+		return
+	}
+
 	var groupId sql.NullInt64
 
 	if requestBody.GroupId == nil {
@@ -112,7 +134,18 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		requestBody.Description,
 		userId,
 		strings.Join(requestBody.Categories, ","),
-		groupId)
+		groupId,
+		requestBody.Privacy)
+
+	if requestBody.Privacy == SuperPrivate {
+		for _, follower := range requestBody.PostFollowers {
+			if !h.DB.GetPostFollowStatus(id, follower) &&
+				*h.DB.GetFollowStatus(userId, follower) == Accepted {
+				h.DB.AddPostAudience(id, follower)
+			}
+		}
+	}
+
 	server.SendObject(w, id)
 
 	external.RevalidateURL(fmt.Sprintf("/post/%v", id))

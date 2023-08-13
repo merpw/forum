@@ -166,6 +166,17 @@ func (db DB) GetGroupMembers(groupId int, withPending bool) (members []int) {
 	return members
 }
 
+func (db DB) GetGroupCreatorId(groupId int) *int {
+	var creatorId int
+	err := db.QueryRow("SELECT creator_id FROM groups WHERE id = ?", groupId).Scan(&creatorId)
+	if err != nil {
+		return nil
+	}
+
+	return &creatorId
+
+}
+
 func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	query, err := db.Query("SELECT id FROM posts WHERE group_id = ? ORDER BY id DESC", groupId)
 	if err != nil {
@@ -186,14 +197,25 @@ func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	return postIds
 }
 
-func (db DB) DeleteGroupMembership(groupId, userId int) {
+// Delete userId from group_members, also delete from
+func (db DB) DeleteGroupMembership(groupId, userId int) InviteStatus {
 	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", groupId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
+
+	_, err = db.Exec(`
+    DELETE * FROM invitations WHERE TYPE = 2 AND associated_id = ? AND to_user_id = ?`,
+		2, userId, groupId)
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return Inactive
 }
 
-func (db DB) AddMembership(groupId, userId int) {
+func (db DB) AddMembership(groupId, userId int) InviteStatus {
 	_, err := db.Exec(`INSERT INTO group_members 
     	(group_id, user_id, timestamp)
 		VALUES (?, ?, ?)`,
@@ -201,6 +223,20 @@ func (db DB) AddMembership(groupId, userId int) {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	_, err = db.Exec(`
+    INSERT INTO invitations
+        (type, from_user_id, to_user_id, associated_id)
+        SELECT 2, creator_id, :userId, :groupId
+        FROM events
+        WHERE group_id = :groupId
+        ON CONFLICT (from_user_id, to_user_id, associated_id) DO NOTHING`,
+		userId, groupId)
+
+	if err != nil {
+		log.Panic(err)
+	}
+	return Accepted
 }
 
 func (db DB) DeleteGroupMembership(groupId, userId int) MemberStatus {
