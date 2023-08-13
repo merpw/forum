@@ -110,7 +110,7 @@ const MarkdownMessage: FC<{ message: MessageType }> = ({ message }) => {
       >
         {shouldShowName && (
           <span className={"badge bg-base-300 text-white"}>
-            <UserName userId={user.id} />
+            <UserName userId={message.authorId} />
           </span>
         )}
         <div className={"flex flex-wrap"}>
