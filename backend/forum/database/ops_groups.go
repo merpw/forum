@@ -57,31 +57,6 @@ func (db DB) GetGroupMemberCount(groupId int) (memberCount int) {
 	return memberCount
 }
 
-func (db DB) GetGroupIdsByMembers() (groupIds []int) {
-	query, err := db.Query(`
-	SELECT id, COUNT(id) AS occurrence
-	FROM group_members 
-	GROUP BY group_id
-	ORDER BY occurrence DESC;
-	`)
-	if err != nil {
-		log.Panic(err)
-	}
-
-	groupIds = make([]int, 0)
-	for query.Next() {
-		var groupId int
-		err = query.Scan(&groupId)
-		if err != nil {
-			log.Panic(err)
-		}
-		groupIds = append(groupIds, groupId)
-	}
-	query.Close()
-
-	return
-}
-
 func (db DB) GetGroupById(groupId int) *Group {
 	group := &Group{
 		Id: groupId,

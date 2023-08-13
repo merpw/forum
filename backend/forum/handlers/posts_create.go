@@ -144,12 +144,10 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		Privacy(requestBody.Privacy),
 		groupId)
 
+	// Check for duplicates in PostFollowers array
 	if requestBody.Privacy == int(SuperPrivate) {
 		for _, follower := range requestBody.PostFollowers {
-			followId := *h.DB.GetFollowId(follower, userId)
-			if !h.DB.GetPostFollowStatus(id, followId) {
-				h.DB.AddPostAudience(id, followId)
-			}
+			h.DB.AddPostAudience(id, *h.DB.GetFollowId(follower, userId))
 		}
 	}
 

@@ -45,25 +45,24 @@ func (db DB) GetAllPosts(userId int) []Post {
 
 // GetPostById reads post from database by post_id
 func (db DB) GetPostById(postId, userId int) *Post {
-	row := db.QueryRow(`
+	var post Post
+	err := db.QueryRow(`
     SELECT posts.* FROM posts
 		LEFT JOIN post_audience ON post_audience.post_id = posts.id 
-		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = ?   
-		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = ?
-        LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = ?
-    WHERE posts.id = ? AND (
+		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId  
+		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
+        LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
+    WHERE posts.id = :postId AND (
         posts.privacy = 0 AND posts.group_id IS NULL OR
-        posts.author = ? OR
+        posts.author = :userId OR
         (posts.privacy = 1 AND f2.id IS NOT NULL) OR
         (posts.privacy = 2 AND post_audience.id IS NOT NULL) OR
         (posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
     )
-`, userId, userId, userId, postId, userId)
-
-	var post Post
-	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-		&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-		&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
+`, userId, postId).
+		Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
 
 	if err != nil {
 		return nil
@@ -92,19 +91,11 @@ func (db DB) AddPost(title, content, description string,
 
 func (db DB) AddPostAudience(postId, followId int) {
 	_, err := db.Exec(`
-					INSERT INTO post_audience (post_id, follow_id)
-					VALUES (?, ?)`, postId, followId)
+		INSERT OR IGNORE INTO post_audience (post_id, follow_id)
+			VALUES (?, ?)`, postId, followId)
 	if err != nil {
 		log.Panic(err)
 	}
-}
-
-func (db DB) GetPostFollowStatus(postId, followId int) bool {
-	err := db.QueryRow(`
-		SELECT id FROM post_audience 
-		    WHERE post_id = ? AND follow_id = ?
-		`, postId, followId).Err()
-	return err != nil
 }
 
 func (db DB) GetMePosts(userId int) []Post {
