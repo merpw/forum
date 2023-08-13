@@ -2,17 +2,29 @@ package auth
 
 import (
 	"bufio"
+	"encoding/json"
 	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
-// Events function returns a channel with revoked tokens.
+type EventType string
+
+const (
+	EventTypeTokenRevoked EventType = "token_revoked"
+)
+
+type Event struct {
+	Type EventType   `json:"type"`
+	Item interface{} `json:"item"`
+}
+
+// Events function connects to the auth service and returns a channel of Event objects
 //
-// Returns a channel with revoked tokens.
-func Events() <-chan string {
-	subscriber := make(chan string)
+// It reconnects automatically if the connection is lost.
+func Events() <-chan Event {
+	subscriber := make(chan Event)
 
 	reconnectDelay := 1
 	maxReconnectDelay := 60
@@ -56,11 +68,18 @@ func Events() <-chan string {
 		reader := bufio.NewReader(resp.Body)
 
 		for {
-			token, err := reader.ReadString('\n')
+			line, err := reader.ReadBytes('\n')
 			if err != nil {
 				panic(err)
 			}
-			subscriber <- token[:len(token)-1] // remove newline
+
+			var event Event
+			err = json.Unmarshal(line, &event)
+			if err != nil {
+				panic(err)
+			}
+
+			subscriber <- event
 		}
 	}
 	go reconnect()

@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"backend/common/integrations/auth"
 	"backend/common/server"
+	"encoding/json"
 	"log"
 	"net/http"
 )
@@ -27,7 +29,7 @@ func (h *Handlers) checkSession(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, userId)
 }
 
-// events returns an SSE stream of revoked sessions
+// events is an SSE stream of auth.Event objects
 func (h *Handlers) events(w http.ResponseWriter, r *http.Request) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
@@ -38,17 +40,23 @@ func (h *Handlers) events(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/event-stream")
 	flusher.Flush()
 
-	subscriber := make(chan string)
+	subscriber := make(chan auth.Event)
 
 	h.lock.Lock()
-	h.revokeSessionSubscribers = append(h.revokeSessionSubscribers, &subscriber)
+	h.eventSubscribers = append(h.eventSubscribers, &subscriber)
 	h.lock.Unlock()
 
 loop:
 	for {
 		select {
-		case token := <-subscriber:
-			_, err := w.Write([]byte(token + "\n"))
+		case event := <-subscriber:
+			eventJSON, err := json.Marshal(event)
+			if err != nil {
+				log.Println(err)
+				break loop
+			}
+
+			_, err = w.Write(append(eventJSON, '\n'))
 			if err != nil {
 				log.Println(err)
 				break loop
@@ -59,10 +67,10 @@ loop:
 		}
 	}
 
-	for i, s := range h.revokeSessionSubscribers {
+	for i, s := range h.eventSubscribers {
 		if s == &subscriber {
 			h.lock.Lock()
-			h.revokeSessionSubscribers = append(h.revokeSessionSubscribers[:i], h.revokeSessionSubscribers[i+1:]...)
+			h.eventSubscribers = append(h.eventSubscribers[:i], h.eventSubscribers[i+1:]...)
 			h.lock.Unlock()
 			close(subscriber)
 			break

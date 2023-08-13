@@ -34,10 +34,14 @@ func NewHub(messageHandler MessageHandler) *Hub {
 	}
 
 	go func() {
-		for token := range auth.Events() {
-			for _, c := range h.Clients {
-				if c.Token == token {
-					_ = c.Conn.Close()
+		for event := range auth.Events() {
+			switch event.Type {
+			case auth.EventTypeTokenRevoked:
+				token := event.Item.(string)
+				for _, c := range h.Clients {
+					if c.Token == token {
+						_ = c.Conn.Close()
+					}
 				}
 			}
 		}
