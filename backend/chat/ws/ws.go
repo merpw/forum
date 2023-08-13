@@ -4,6 +4,7 @@
 package ws
 
 import (
+	"backend/chat/database"
 	"backend/common/integrations/auth"
 	"encoding/json"
 	"log"
@@ -28,7 +29,7 @@ type Hub struct {
 type MessageHandler func(p []byte, client *Client)
 
 // NewHub creates new Hub with specified primary MessageHandler
-func NewHub(messageHandler MessageHandler) *Hub {
+func NewHub(messageHandler MessageHandler, db *database.DB) *Hub {
 	h := &Hub{
 		MessageHandler: messageHandler,
 	}
@@ -37,12 +38,39 @@ func NewHub(messageHandler MessageHandler) *Hub {
 		for event := range auth.Events() {
 			switch event.Type {
 			case auth.EventTypeTokenRevoked:
-				token := event.Item.(string)
+				token := string(event.Item.(json.RawMessage))
 				for _, c := range h.Clients {
 					if c.Token == token {
 						_ = c.Conn.Close()
 					}
 				}
+			case auth.EventTypeGroupJoin:
+				var item auth.EventGroupItem
+				err := json.Unmarshal(event.Item.(json.RawMessage), &item)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				chatId := db.GetGroupChat(item.GroupId)
+				if chatId != nil {
+					db.AddChatMember(*chatId, item.UserId)
+				}
+
+				message := BuildResponseMessage(getGroupChatMessage(item.GroupId), chatId)
+				h.Broadcast(message, item.UserId)
+			case auth.EventTypeGroupLeave:
+				var item auth.EventGroupItem
+				err := json.Unmarshal(event.Item.(json.RawMessage), &item)
+				if err != nil {
+					log.Println(err)
+					continue
+				}
+				chatId := db.GetGroupChat(item.GroupId)
+				if chatId != nil {
+					db.RemoveChatMember(*chatId, item.UserId)
+				}
+				message := BuildResponseMessage(getGroupChatMessage(item.GroupId), nil)
+				h.Broadcast(message, item.UserId)
 			}
 		}
 	}()

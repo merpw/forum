@@ -120,3 +120,29 @@ func (db DB) GetGroupChat(groupId int) (chatId *int) {
 	}
 	return chatId
 }
+
+type GroupChat struct {
+	Id      int
+	GroupId int
+}
+
+func (db DB) GetAllGroupChats() (chats []GroupChat) {
+	q, err := db.Query(`
+		SELECT id,group_id FROM chats WHERE type = 1
+`)
+	if err != nil {
+		panic(err)
+	}
+	defer q.Close()
+
+	chats = make([]GroupChat, 0)
+	for q.Next() {
+		var chat GroupChat
+		err = q.Scan(&chat.Id, &chat.GroupId)
+		if err != nil {
+			panic(err)
+		}
+		chats = append(chats, chat)
+	}
+	return chats
+}
