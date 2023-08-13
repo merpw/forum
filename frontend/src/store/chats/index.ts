@@ -129,6 +129,24 @@ const chatSlice = createSlice({
 
     handleGroupChat: {
       reducer: (state, action: PayloadAction<{ groupId: number; chatId: number | null }>) => {
+        if (action.payload.chatId === null) {
+          // User was removed from group
+          // TODO: maybe implement this in a better way
+          const oldChatId = state.groupChats[action.payload.groupId]
+          if (oldChatId) {
+            state.chatIds = state.chatIds?.filter((id) => id !== oldChatId)
+            state.chats[oldChatId] = null
+            state.groupChats[action.payload.groupId] = null
+            const oldChatMessages = state.chatMessages[oldChatId]
+            state.chatMessages[oldChatId] = undefined
+            oldChatMessages?.forEach((messageId) => {
+              state.messages[messageId] = null
+            })
+            state.unreadMessagesChatIds = state.unreadMessagesChatIds.filter(
+              (id) => !oldChatMessages?.includes(id)
+            )
+          }
+        }
         state.groupChats[action.payload.groupId] = action.payload.chatId
         if (action.payload.chatId !== null && !state.chatIds?.includes(action.payload.chatId)) {
           state.chatIds?.unshift(action.payload.chatId)
