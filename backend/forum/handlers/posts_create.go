@@ -132,6 +132,7 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		groupId = sql.NullInt64{Valid: false}
 	} else {
 		groupId = sql.NullInt64{Int64: *requestBody.GroupId, Valid: true}
+		requestBody.Privacy = int(Public)
 	}
 
 	id := h.DB.AddPost(
