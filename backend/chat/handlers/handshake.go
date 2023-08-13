@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"backend/chat/ws"
-	"backend/common/external"
+	"backend/common/integrations/auth"
 	"encoding/json"
 	"log"
 )
@@ -32,7 +32,7 @@ func (h *Handlers) handshake(messageBody []byte, client *ws.Client) {
 		return
 	}
 
-	userId := external.CheckSession(message.Item.Token)
+	userId := auth.CheckSession(message.Item.Token)
 	if userId == -1 {
 		log.Println("ERROR: invalid token")
 		return

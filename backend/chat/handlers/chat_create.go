@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"backend/chat/ws"
-	"backend/common/external"
+	"backend/common/integrations/auth"
 	"encoding/json"
 	"log"
 )
@@ -24,7 +24,7 @@ func (h *Handlers) chatCreate(message ws.Message, client *ws.Client) {
 		return
 	}
 
-	user := external.GetUser(data.UserId)
+	user := auth.GetUser(data.UserId)
 	if user == nil {
 		log.Println("ERROR: user not found")
 		return

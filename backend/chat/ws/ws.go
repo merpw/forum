@@ -4,7 +4,7 @@
 package ws
 
 import (
-	"backend/common/external"
+	"backend/common/integrations/auth"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -34,7 +34,7 @@ func NewHub(messageHandler MessageHandler) *Hub {
 	}
 
 	go func() {
-		for token := range external.AuthEvents() {
+		for token := range auth.Events() {
 			for _, c := range h.Clients {
 				if c.Token == token {
 					_ = c.Conn.Close()
