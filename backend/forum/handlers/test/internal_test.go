@@ -106,7 +106,7 @@ func TestBypassAuth(t *testing.T) {
 	cli.TestRequest(t, req, http.StatusUnauthorized)
 }
 
-func TestRevokedSessions(t *testing.T) {
+func TestEvents(t *testing.T) {
 	testServer := NewTestServer(t)
 	cli := testServer.TestClient()
 
@@ -132,7 +132,7 @@ func TestRevokedSessions(t *testing.T) {
 		}
 	}()
 
-	req := GenerateInternalRequest(t, testServer, "/api/internal/revoked-sessions")
+	req := GenerateInternalRequest(t, testServer, "/api/internal/events")
 	resp, err := cli.Do(req)
 	if err != nil {
 		t.Fatal(err)

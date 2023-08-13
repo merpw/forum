@@ -34,7 +34,7 @@ func NewHub(messageHandler MessageHandler) *Hub {
 	}
 
 	go func() {
-		for token := range external.RevokedSessions() {
+		for token := range external.AuthEvents() {
 			for _, c := range h.Clients {
 				if c.Token == token {
 					_ = c.Conn.Close()

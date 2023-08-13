@@ -27,8 +27,8 @@ func (h *Handlers) checkSession(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, userId)
 }
 
-// revokedSessions returns an SSE stream of revoked sessions
-func (h *Handlers) revokedSessions(w http.ResponseWriter, r *http.Request) {
+// events returns an SSE stream of revoked sessions
+func (h *Handlers) events(w http.ResponseWriter, r *http.Request) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		http.Error(w, "SSE not supported", http.StatusInternalServerError)

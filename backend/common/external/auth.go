@@ -95,10 +95,10 @@ func GetUser(userId int) (user *User) {
 	return user
 }
 
-// RevokedSessions creates a connection to the auth SSE stream endpoint.
+// AuthEvents creates a connection to the auth SSE stream endpoint.
 //
 // Returns a channel with revoked tokens.
-func RevokedSessions() <-chan string {
+func AuthEvents() <-chan string {
 	subscriber := make(chan string)
 
 	reconnectDelay := 1
@@ -121,7 +121,7 @@ func RevokedSessions() <-chan string {
 			}
 		}()
 
-		req, err := http.NewRequest(http.MethodGet, os.Getenv("AUTH_BASE_URL")+"/api/internal/revoked-sessions", nil)
+		req, err := http.NewRequest(http.MethodGet, os.Getenv("AUTH_BASE_URL")+"/api/internal/events", nil)
 		if err != nil {
 			panic(err)
 		}

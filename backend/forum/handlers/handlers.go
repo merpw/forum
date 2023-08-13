@@ -119,7 +119,7 @@ func (h *Handlers) Handler() http.Handler {
 
 	var internalRoutes = []server.Route{
 		server.NewRoute(http.MethodGet, `/api/internal/check-session`, h.checkSession),
-		server.NewRoute(http.MethodGet, `/api/internal/revoked-sessions`, h.revokedSessions),
+		server.NewRoute(http.MethodGet, `/api/internal/events`, h.events),
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
