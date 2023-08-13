@@ -12,12 +12,22 @@ import (
 type EventType string
 
 const (
+	// EventTypeTokenRevoked is sent when a token is revoked. The item is the revoked token (string).
 	EventTypeTokenRevoked EventType = "token_revoked"
+	// EventTypeGroupJoin is sent when a user joins a group. The item is EventGroupItem.
+	EventTypeGroupJoin EventType = "group_join"
+	// EventTypeGroupLeave is sent when a user leaves a group. The item is EventGroupItem.
+	EventTypeGroupLeave EventType = "group_leave"
 )
 
 type Event struct {
 	Type EventType   `json:"type"`
 	Item interface{} `json:"item"`
+}
+
+type EventGroupItem struct {
+	GroupId int `json:"group_id"`
+	UserId  int `json:"user_id"`
 }
 
 // Events function connects to the auth service and returns a channel of Event objects
@@ -73,13 +83,20 @@ func Events() <-chan Event {
 				panic(err)
 			}
 
-			var event Event
-			err = json.Unmarshal(line, &event)
+			type RawEvent struct {
+				Type EventType       `json:"type"`
+				Item json.RawMessage `json:"item"`
+			}
+			var rawEvent RawEvent
+			err = json.Unmarshal(line, &rawEvent)
 			if err != nil {
 				panic(err)
 			}
 
-			subscriber <- event
+			subscriber <- Event{
+				Type: rawEvent.Type,
+				Item: rawEvent.Item,
+			}
 		}
 	}
 	go reconnect()

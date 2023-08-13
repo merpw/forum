@@ -162,6 +162,8 @@ func TestEvents(t *testing.T) {
 			t.Fatal("Expected token", tokens[i], "got", event.Item)
 		}
 	}
+
+	// TODO: add tests for group SSE events
 }
 
 func GenerateInternalRequest(t *testing.T, testServer TestServer, path string) *http.Request {

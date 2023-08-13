@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/integrations/auth"
 	"backend/common/server"
 	. "backend/forum/database"
 	"database/sql"
@@ -227,6 +228,15 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 		server.ErrorResponse(w, http.StatusBadRequest)
 	case Accepted:
 		h.DB.DeleteGroupMembership(groupId, userId)
+
+		h.event <- auth.Event{
+			Type: auth.EventTypeGroupLeave,
+			Item: auth.EventGroupItem{
+				GroupId: groupId,
+				UserId:  userId,
+			},
+		}
+
 		server.SendObject(w, Inactive)
 	}
 }
