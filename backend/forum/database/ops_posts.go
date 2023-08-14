@@ -13,16 +13,16 @@ func (db DB) GetAllPosts(userId int) []Post {
 	query, err := db.Query(`
 		SELECT DISTINCT posts.* FROM posts 
 		LEFT JOIN post_audience ON posts.id = post_audience.post_id 
-		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = ?   
-		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = ?
-		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = ?
+		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId   
+		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
+		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
 		WHERE 
 			posts.privacy = 0 AND posts.group_id IS NULL OR
-			posts.author = ? OR
+			posts.author = :userId OR
 			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
-			(posts.privacy = 2 AND post_audience.id IS NOT NULL) OR
+			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL) OR
 			(posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
-	`, userId, userId, userId, userId)
+	`, userId)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -56,7 +56,7 @@ func (db DB) GetPostById(postId, userId int) *Post {
         posts.privacy = 0 AND posts.group_id IS NULL OR
         posts.author = :userId OR
         (posts.privacy = 1 AND f2.id IS NOT NULL) OR
-        (posts.privacy = 2 AND post_audience.id IS NOT NULL) OR
+        (posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL) OR
         (posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
     )
 `, userId, postId).
@@ -122,14 +122,17 @@ func (db DB) GetMePosts(userId int) []Post {
 
 func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 	query, err := db.Query(`
-		SELECT DISTINCT posts.* FROM posts
-		LEFT JOIN post_audience ON posts.id = post_audience.post_id AND post_audience.follow_id = ?
-		LEFT JOIN followers ON posts.author = followers.user_id AND followers.follower_id = ?
-		WHERE posts.author = ? 
-		AND (posts.privacy = 0 OR	
-			(posts.privacy = 1 AND followers.id IS NOT NULL) OR
-			(posts.privacy = 2 AND post_audience.post_id IS NOT NULL)
-		)`, followerId, followerId, userId)
+		SELECT DISTINCT posts.* FROM posts 
+		LEFT JOIN post_audience ON posts.id = post_audience.post_id 
+		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :followerId   
+		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :followerId
+		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
+		WHERE posts.author = :userId AND (
+			posts.privacy = 0 AND posts.group_id IS NULL OR
+			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
+			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL) OR
+			(posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
+		)`, followerId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
