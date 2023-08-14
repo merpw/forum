@@ -45,7 +45,6 @@ func (db DB) GetAllPosts(userId int) []Post {
 
 // GetPostById reads post from database by post_id
 func (db DB) GetPostById(postId, userId int) *Post {
-	log.Println("postId, userId", postId, userId)
 	var post Post
 	err := db.QueryRow(`
     SELECT posts.* FROM posts
@@ -155,12 +154,11 @@ func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 
 func (db DB) GetUserPostsLiked(userId int) []Post {
 	query, err := db.Query(`
-	SELECT * FROM posts WHERE id IN (SELECT post_id FROM post_reactions WHERE reaction = 1 AND author_id = ?) 
-		AND (
-		    privacy = 0 OR (
-		        author IN (SELECT user_id FROM followers WHERE follower_id = ?)
-	    )
-	)`, userId, userId)
+	SELECT * FROM posts
+	WHERE id IN (SELECT post_id FROM post_reactions WHERE post_reactions.reaction = 1 AND author_id = :userId) 
+	  AND privacy = 0 AND group_id IS NULL OR 
+		    author IN (SELECT user_id FROM followers WHERE follower_id = :userId)
+	    `, userId)
 
 	if err != nil {
 		log.Panic(err)
