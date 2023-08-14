@@ -3,7 +3,7 @@ package database
 const CreateChatMessage = "Chat created"
 
 // CreatePrivateChat creates a new user-user chat, adds members and sends a system message about it.
-func (db DB) CreatePrivateChat(creatorId, companionId int) (chatId int) {
+func (db DB) CreatePrivateChat(creatorId, userId int) (chatId int) {
 	r, err := db.Exec("INSERT INTO chats DEFAULT VALUES")
 	if err != nil {
 		panic(err)
@@ -17,7 +17,7 @@ func (db DB) CreatePrivateChat(creatorId, companionId int) (chatId int) {
 		INSERT INTO memberships (chat_id, user_id) VALUES (?, ?);
 		INSERT INTO memberships (chat_id, user_id) VALUES (?, ?);`,
 		id, creatorId,
-		id, companionId)
+		id, userId)
 	if err != nil {
 		panic(err)
 	}

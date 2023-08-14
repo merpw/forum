@@ -29,7 +29,7 @@ export const useChat = (id: number) => {
   return { chat }
 }
 
-type AssociationData = { companionId: number } | { groupId: number }
+type AssociationData = { userId: number } | { groupId: number }
 
 export const useCreateChat = () => {
   const dispatch = useAppDispatch()
@@ -40,10 +40,10 @@ export const useCreateChat = () => {
 }
 
 export const useAssociatedChat = (association: AssociationData) => {
-  const isUser = "companionId" in association
+  const isUser = "userId" in association
   const chatId = useAppSelector((state) =>
     isUser
-      ? state.chats.userChats?.[association.companionId]
+      ? state.chats.userChats?.[association.userId]
       : state.chats.groupChats?.[association.groupId]
   )
   const dispatch = useAppDispatch()
@@ -52,7 +52,7 @@ export const useAssociatedChat = (association: AssociationData) => {
     if (!chatId) {
       dispatch(
         wsActions.sendGet(
-          isUser ? `/users/${association.companionId}/chat` : `/groups/${association.groupId}/chat`
+          isUser ? `/users/${association.userId}/chat` : `/groups/${association.groupId}/chat`
         )
       )
     }

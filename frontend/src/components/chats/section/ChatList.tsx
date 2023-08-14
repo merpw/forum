@@ -66,7 +66,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
           (unreadMessagesCount > 0 ? "ring-2 ring-secondary" : "")
         }
       >
-        {"companionId" in chat && <CompanionAvatarWrapper userId={chat.companionId} />}
+        {"userId" in chat && <CompanionAvatarWrapper userId={chat.userId} />}
         {"groupId" in chat && <GroupAvatarWrapper groupId={chat.groupId} />}
         {unreadMessagesCount > 0 && (
           <div className={"absolute badge badge-secondary top-3 right-3 font-bold py-3"}>
@@ -74,7 +74,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
           </div>
         )}
         <div className={"w-full"}>
-          {"companionId" in chat && <CompanionData userId={chat.companionId} />}
+          {"userId" in chat && <CompanionData userId={chat.userId} />}
           {"groupId" in chat && <GroupData groupId={chat.groupId} />}
           {typingData ? (
             <div className={"flex items-center gap-1 mb-5 text-sm"}>

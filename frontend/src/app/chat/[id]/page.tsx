@@ -61,7 +61,7 @@ const Page = async ({ params }: Props) => {
     try {
       const userId = +params.id.slice(1)
       const companion = await getUserLocal(userId)
-      return <AssociatedIdChatPage companionId={companion.id} />
+      return <AssociatedIdChatPage userId={companion.id} />
     } catch (error) {
       return redirect("/chat")
     }

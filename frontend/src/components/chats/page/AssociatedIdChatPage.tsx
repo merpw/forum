@@ -8,7 +8,7 @@ import ChatInfo from "@/components/chats/ChatInfo"
 import WriteMessageForm from "@/components/chats/WriteMessageForm"
 import ChatIdPage from "@/components/chats/page/ChatIdPage"
 
-export const AssociatedIdChatPage: FC<{ companionId: number } | { groupId: number }> = (props) => {
+export const AssociatedIdChatPage: FC<{ userId: number } | { groupId: number }> = (props) => {
   const { chatId } = useAssociatedChat(props)
 
   const [firstMessage, setFirstMessage] = useState<string | null>(null)
