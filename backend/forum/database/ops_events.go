@@ -96,7 +96,7 @@ func (db DB) GetEventIdsByGroupId(groupId int) []int {
 		log.Panic(err)
 	}
 
-	var ids []int
+	var ids = make([]int, 0)
 
 	for query.Next() {
 		var id int
