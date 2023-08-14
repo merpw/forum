@@ -151,6 +151,10 @@ const chatSlice = createSlice({
         if (action.payload.chatId !== null && !state.chatIds?.includes(action.payload.chatId)) {
           state.chatIds?.unshift(action.payload.chatId)
         }
+
+        if (action.payload.chatId !== null && state.chats[action.payload.chatId] === null) {
+          state.chats[action.payload.chatId] = undefined
+        }
       },
       prepare: (response: WSGetResponse<number | null>) => {
         const groupId = +response.item.url.split("/")[2]

@@ -20,7 +20,7 @@ const ChatIdPage: FC<{ id: number }> = ({ id }) => {
 
   useEffect(() => {
     if (chat === null) {
-      router.push("/chat")
+      router.replace("/chat")
     }
     if (chat) {
       dispatch(chatActions.setActiveChatId(chat.id))
