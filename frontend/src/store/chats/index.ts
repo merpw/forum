@@ -15,6 +15,7 @@ const initialState: {
   chatMessages: ObjectMap<number, number[]>
   messages: ObjectMap<number, Message | null>
   userChats: ObjectMap<number, number | null>
+  groupChats: ObjectMap<number, number | null>
   usersOnline: number[] | undefined
   chatsTyping: ObjectMap<number, TypingData>
 } = {
@@ -25,6 +26,7 @@ const initialState: {
   chatMessages: {},
   messages: {},
   userChats: {},
+  groupChats: {},
   usersOnline: undefined,
   chatsTyping: {},
 }
@@ -54,7 +56,11 @@ const chatSlice = createSlice({
       reducer: (state, action: PayloadAction<{ chatId: number; data: Chat | null }>) => {
         state.chats[action.payload.chatId] = action.payload.data
         if (action.payload.data) {
-          state.userChats[action.payload.data.companionId] = action.payload.chatId
+          if ("companionId" in action.payload.data) {
+            state.userChats[action.payload.data.companionId] = action.payload.chatId
+          } else if ("groupId" in action.payload.data) {
+            state.groupChats[action.payload.data.groupId] = action.payload.chatId
+          }
         }
       },
       prepare: (response: WSGetResponse<Chat | null>) => {
@@ -121,10 +127,53 @@ const chatSlice = createSlice({
       },
     },
 
+    handleGroupChat: {
+      reducer: (state, action: PayloadAction<{ groupId: number; chatId: number | null }>) => {
+        if (action.payload.chatId === null) {
+          // User was removed from group
+          // TODO: maybe implement this in a better way
+          const oldChatId = state.groupChats[action.payload.groupId]
+          if (oldChatId) {
+            state.chatIds = state.chatIds?.filter((id) => id !== oldChatId)
+            state.chats[oldChatId] = null
+            state.groupChats[action.payload.groupId] = null
+            const oldChatMessages = state.chatMessages[oldChatId]
+            state.chatMessages[oldChatId] = undefined
+            oldChatMessages?.forEach((messageId) => {
+              state.messages[messageId] = null
+            })
+            state.unreadMessagesChatIds = state.unreadMessagesChatIds.filter(
+              (id) => !oldChatMessages?.includes(id)
+            )
+          }
+        }
+        state.groupChats[action.payload.groupId] = action.payload.chatId
+        if (action.payload.chatId !== null && !state.chatIds?.includes(action.payload.chatId)) {
+          state.chatIds?.unshift(action.payload.chatId)
+        }
+
+        if (action.payload.chatId !== null && state.chats[action.payload.chatId] === null) {
+          state.chats[action.payload.chatId] = undefined
+        }
+      },
+      prepare: (response: WSGetResponse<number | null>) => {
+        const groupId = +response.item.url.split("/")[2]
+        return { payload: { groupId, chatId: response.item.data } }
+      },
+    },
+
     handleChatCreate: {
-      reducer: (state, action: PayloadAction<{ chatId: number; userId: number }>) => {
+      reducer: (
+        state,
+        action: PayloadAction<{ chatId: number } & ({ userId: number } | { groupId: number })>
+      ) => {
         state.chatIds?.unshift(action.payload.chatId)
-        state.userChats[action.payload.userId] = action.payload.chatId
+        if ("groupId" in action.payload) {
+          state.groupChats[action.payload.groupId] = action.payload.chatId
+        }
+        if ("userId" in action.payload) {
+          state.userChats[action.payload.userId] = action.payload.chatId
+        }
       },
       prepare: (response: WSPostResponse<{ chatId: number; userId: number }>) => {
         return { payload: response.item.data }
@@ -188,6 +237,10 @@ export const chatHandlers = [
   {
     regex: /^\/users\/\d+\/chat$/,
     handler: chatActions.handleUserChat,
+  },
+  {
+    regex: /^\/groups\/\d+\/chat$/,
+    handler: chatActions.handleGroupChat,
   },
   {
     regex: /^\/chat\/create$/,

@@ -1,10 +1,20 @@
 import { FC } from "react"
+import Link from "next/link"
 
 import UserLink from "@/components/UserLink"
 import Avatar from "@/components/Avatar"
 import { useUser } from "@/api/users/hooks"
+import { useGroup } from "@/api/groups/hooks"
+import GroupAvatar from "@/components/groups/Avatar"
 
-const ChatInfo: FC<{ userId: number }> = ({ userId }) => {
+const ChatInfo: FC<{ groupId: number } | { companionId: number }> = (props) => {
+  if ("groupId" in props) {
+    return <GroupChatInfo groupId={props.groupId} />
+  }
+  return <UserChatInfo userId={props.companionId} />
+}
+
+const UserChatInfo: FC<{ userId: number }> = ({ userId }) => {
   const { user } = useUser(userId)
 
   if (!user) {
@@ -20,6 +30,28 @@ const ChatInfo: FC<{ userId: number }> = ({ userId }) => {
             {user.username}
           </span>
         </UserLink>
+      </div>
+    </div>
+  )
+}
+
+const GroupChatInfo: FC<{ groupId: number }> = ({ groupId }) => {
+  const { group } = useGroup(groupId)
+
+  if (!group) return null
+
+  return (
+    <div className={"flex font-light mb-auto p-2 items-center gap-3"}>
+      <GroupAvatar group={group} size={60} className={"w-16"} />
+      <div className={"text-info"}>
+        Group chat
+        <br />
+        <Link
+          href={`/group/${group.id}`}
+          className={"font-Yesteryear gradient-text text-4xl clickable px-1"}
+        >
+          {group.title}
+        </Link>
       </div>
     </div>
   )

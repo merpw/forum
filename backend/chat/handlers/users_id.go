@@ -17,15 +17,8 @@ func (h *Handlers) usersIdChat(message ws.Message, client *ws.Client) {
 		return
 	}
 
-	chatId := h.DB.GetUsersChat(client.UserId, companionId)
-
-	var data interface{} = chatId
-
-	if data == -1 {
-		data = nil
-	}
-
-	responseMessage := ws.BuildResponseMessage(message, data)
+	chatId := h.DB.GetPrivateChat(client.UserId, companionId)
+	responseMessage := ws.BuildResponseMessage(message, chatId)
 
 	h.Hub.Broadcast(responseMessage, client.UserId)
 }

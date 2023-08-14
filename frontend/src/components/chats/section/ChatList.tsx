@@ -15,6 +15,8 @@ import { useAppSelector } from "@/store/hooks"
 import Avatar from "@/components/Avatar"
 import UserName from "@/components/chats/UserName"
 import { useCollapseIfMobile } from "@/components/chats/section/ChatSection"
+import GroupAvatar from "@/components/groups/Avatar"
+import { useGroup } from "@/api/groups/hooks"
 
 const ChatList: FC<{ chatIds: number[] }> = ({ chatIds }) => {
   return (
@@ -64,14 +66,16 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
           (unreadMessagesCount > 0 ? "ring-2 ring-secondary" : "")
         }
       >
-        <CompanionAvatar userId={chat.companionId} />
+        {"companionId" in chat && <CompanionAvatarWrapper userId={chat.companionId} />}
+        {"groupId" in chat && <GroupAvatarWrapper groupId={chat.groupId} />}
         {unreadMessagesCount > 0 && (
           <div className={"absolute badge badge-secondary top-3 right-3 font-bold py-3"}>
             {unreadMessagesCount}
           </div>
         )}
         <div className={"w-full"}>
-          <CompanionData userId={chat.companionId} />
+          {"companionId" in chat && <CompanionData userId={chat.companionId} />}
+          {"groupId" in chat && <GroupData groupId={chat.groupId} />}
           {typingData ? (
             <div className={"flex items-center gap-1 mb-5 text-sm"}>
               <UserName userId={typingData.userId} /> is typing
@@ -80,7 +84,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
               ></span>
             </div>
           ) : (
-            <MessageInfo id={chat.lastMessageId} />
+            <MessageInfo id={chat.lastMessageId} isGroup={"groupId" in chat} />
           )}
         </div>
       </div>
@@ -88,7 +92,7 @@ const ChatCard: FC<{ chatId: number }> = ({ chatId }) => {
   )
 }
 
-const CompanionAvatar: FC<{ userId: number }> = ({ userId }) => {
+const CompanionAvatarWrapper: FC<{ userId: number }> = ({ userId }) => {
   const { user } = useUser(userId)
 
   if (!user) {
@@ -96,6 +100,16 @@ const CompanionAvatar: FC<{ userId: number }> = ({ userId }) => {
   }
 
   return <Avatar user={user} size={50} className={"mr-2 mt-2 w-12 mb-auto"} />
+}
+
+const GroupAvatarWrapper: FC<{ groupId: number }> = ({ groupId }) => {
+  const { group } = useGroup(groupId)
+
+  if (!group) {
+    return null
+  }
+
+  return <GroupAvatar group={group} size={50} className={"mr-2 mt-2 w-12 mb-auto"} />
 }
 
 const CompanionData: FC<{ userId: number }> = ({ userId }) => {
@@ -115,7 +129,24 @@ const CompanionData: FC<{ userId: number }> = ({ userId }) => {
   )
 }
 
-const MessageInfo: FC<{ id: number }> = ({ id }) => {
+const GroupData: FC<{ groupId: number }> = ({ groupId }) => {
+  const { group } = useGroup(groupId)
+
+  if (group === undefined) {
+    return <div className={"text-info"}>loading...</div>
+  }
+  if (group === null) {
+    return <div className={"text-info text-center"}>Group not found</div>
+  }
+
+  return (
+    <div>
+      <div className={"font-Alatsi text-lg text-primary"}>{group.title}</div>
+    </div>
+  )
+}
+
+const MessageInfo: FC<{ id: number; isGroup: boolean }> = ({ id, isGroup }) => {
   const fallbackMessage = useRef<null | Message>()
   const { message: newMessage } = useMessage(id)
   const { user } = useMe()
@@ -144,9 +175,11 @@ const MessageInfo: FC<{ id: number }> = ({ id }) => {
         {message.authorId !== -1 &&
           (message.authorId === user?.id ? (
             <span className={"end-dot text-info font-light"}>You</span>
-          ) : (
-            ""
-          ))}
+          ) : isGroup ? (
+            <span className={"end-dot text-info font-light"}>
+              <UserName userId={message.authorId} />
+            </span>
+          ) : null)}
         {MarkdownToPlain(message.content, { async: false, removeNewLines: true, limit: 50 })}
       </div>
       <div className={"flex justify-end text-info text-xs mt-1"}>
