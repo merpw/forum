@@ -56,8 +56,8 @@ const chatSlice = createSlice({
       reducer: (state, action: PayloadAction<{ chatId: number; data: Chat | null }>) => {
         state.chats[action.payload.chatId] = action.payload.data
         if (action.payload.data) {
-          if ("companionId" in action.payload.data) {
-            state.userChats[action.payload.data.companionId] = action.payload.chatId
+          if ("userId" in action.payload.data) {
+            state.userChats[action.payload.data.userId] = action.payload.chatId
           } else if ("groupId" in action.payload.data) {
             state.groupChats[action.payload.data.groupId] = action.payload.chatId
           }

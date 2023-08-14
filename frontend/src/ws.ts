@@ -12,7 +12,7 @@ export type Chat = {
   lastMessageId: number
 } & (
   | {
-      companionId: number
+      userId: number
     }
   | {
       groupId: number

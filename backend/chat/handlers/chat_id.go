@@ -9,7 +9,7 @@ import (
 
 type chatIdResponseData struct {
 	Id            int  `json:"id"`
-	CompanionId   *int `json:"companionId,omitempty"`
+	CompanionId   *int `json:"userId,omitempty"`
 	GroupId       *int `json:"groupId,omitempty"`
 	LastMessageId int  `json:"lastMessageId"`
 }

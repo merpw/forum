@@ -7,11 +7,11 @@ import { useUser } from "@/api/users/hooks"
 import { useGroup } from "@/api/groups/hooks"
 import GroupAvatar from "@/components/groups/Avatar"
 
-const ChatInfo: FC<{ groupId: number } | { companionId: number }> = (props) => {
+const ChatInfo: FC<{ groupId: number } | { userId: number }> = (props) => {
   if ("groupId" in props) {
     return <GroupChatInfo groupId={props.groupId} />
   }
-  return <UserChatInfo userId={props.companionId} />
+  return <UserChatInfo userId={props.userId} />
 }
 
 const UserChatInfo: FC<{ userId: number }> = ({ userId }) => {
