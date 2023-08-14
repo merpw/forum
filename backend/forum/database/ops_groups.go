@@ -157,14 +157,6 @@ func (db DB) DeleteGroupMembership(groupId, userId int) InviteStatus {
 		log.Panic(err)
 	}
 
-	_, err = db.Exec(`
-    DELETE FROM invitations WHERE TYPE = 2 AND associated_id = ? AND to_user_id = ?`,
-		2, userId, groupId)
-
-	if err != nil {
-		log.Panic(err)
-	}
-
 	return Inactive
 }
 

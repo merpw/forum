@@ -41,6 +41,7 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 		Description: event.Description,
 		TimeAndDate: event.TimeAndDate,
 		Timestamp:   event.Timestamp,
+		Responded:   h.DB.GetEventResponseStatus(eventId, userId),
 	}
 
 	server.SendObject(w, responseBody)

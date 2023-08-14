@@ -231,6 +231,7 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 		server.ErrorResponse(w, http.StatusBadRequest)
 	case Accepted:
 		h.DB.DeleteGroupMembership(groupId, userId)
+		h.DB.DeleteAllEventInvites(groupId, userId)
 		server.SendObject(w, Inactive)
 	}
 }

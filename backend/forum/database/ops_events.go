@@ -35,8 +35,8 @@ func (db DB) AddEvent(groupId, createdBy int, title, description, timeAndDate st
 
 func (db DB) DeleteAllEventInvites(groupId, userId int) {
 	_, err := db.Exec(`
-    DELETE * FROM invitations WHERE TYPE = 3 AND associated_id = ? AND to_user_id = ?`,
-		2, userId, groupId)
+    DELETE FROM invitations WHERE TYPE = 3 AND
+        associated_id IN (SELECT id FROM events WHERE group_id = ?) AND to_user_id = ?`, groupId, userId)
 
 	if err != nil {
 		log.Panic(err)
@@ -113,6 +113,12 @@ func (db DB) GetEventIdsByGroupId(groupId int) []int {
 
 	return ids
 
+}
+
+func (db DB) GetEventResponseStatus(eventId, userId int) bool {
+	err := db.QueryRow("SELECT id FROM invitations WHERE associated_id = ? AND user_id = ?",
+		eventId, userId).Err()
+	return err != nil
 }
 
 func (db DB) DeleteEventMember(eventId, userId int) {
