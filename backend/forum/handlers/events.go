@@ -9,21 +9,8 @@ import (
 )
 
 func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
-	groupIdStr := strings.Split(r.URL.Path, "/")[3]
-	// /api/groups/1/events/2 -> 1
 
-	groupId, err := strconv.Atoi(groupIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	if group := h.DB.GetGroupById(groupId); group == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	eventIdStr := strings.Split(r.URL.Path, "/")[5]
+	eventIdStr := strings.Split(r.URL.Path, "/")[3]
 	// /api/groups/1/events/2 -> 2
 
 	eventId, err := strconv.Atoi(eventIdStr)
@@ -32,14 +19,19 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId := h.getUserId(w, r)
+	event := h.DB.GetEventById(eventId)
 
-	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
-		server.ErrorResponse(w, code)
+	if event == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
-	event := h.DB.GetEventById(eventId)
+	userId := h.getUserId(w, r)
+
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+		server.ErrorResponse(w, http.StatusForbidden)
+		return
+	}
 
 	var responseBody = SafeEvent{
 		Id:          event.Id,
@@ -54,18 +46,9 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 	server.SendObject(w, responseBody)
 }
 
-func (h *Handlers) eventsIdUsers(w http.ResponseWriter, r *http.Request) {
-	groupIdStr := strings.Split(r.URL.Path, "/")[3]
-	// /api/groups/1/events/2/users -> 1
-
-	groupId, err := strconv.Atoi(groupIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	eventIdStr := strings.Split(r.URL.Path, "/")[5]
-	// /api/groups/1/events/2/users -> 2
+func (h *Handlers) eventsIdMembers(w http.ResponseWriter, r *http.Request) {
+	eventIdStr := strings.Split(r.URL.Path, "/")[3]
+	// /api/events/2/users -> 2
 
 	eventId, err := strconv.Atoi(eventIdStr)
 	if err != nil {
@@ -73,10 +56,17 @@ func (h *Handlers) eventsIdUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	event := h.DB.GetEventById(eventId)
+
+	if event == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
 	userId := h.getUserId(w, r)
 
-	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
-		server.ErrorResponse(w, code)
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
 
@@ -84,17 +74,8 @@ func (h *Handlers) eventsIdUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) eventsIdLeave(w http.ResponseWriter, r *http.Request) {
-	groupIdStr := strings.Split(r.URL.Path, "/")[3]
-	// /api/groups/1/events/2/leave -> 1
-
-	groupId, err := strconv.Atoi(groupIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	eventIdStr := strings.Split(r.URL.Path, "/")[5]
-	// /api/groups/1/events/2/leave -> 2
+	eventIdStr := strings.Split(r.URL.Path, "/")[3]
+	// /api/events/2/leave -> 2
 
 	eventId, err := strconv.Atoi(eventIdStr)
 	if err != nil {
@@ -102,10 +83,17 @@ func (h *Handlers) eventsIdLeave(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	event := h.DB.GetEventById(eventId)
+
+	if event == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
 	userId := h.getUserId(w, r)
 
-	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
-		server.ErrorResponse(w, code)
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
 
@@ -113,17 +101,8 @@ func (h *Handlers) eventsIdLeave(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handlers) eventsIdGoing(w http.ResponseWriter, r *http.Request) {
-	groupIdStr := strings.Split(r.URL.Path, "/")[3]
-	// /api/groups/1/events/2/going -> 1
-
-	groupId, err := strconv.Atoi(groupIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	eventIdStr := strings.Split(r.URL.Path, "/")[5]
-	// /api/groups/1/events/2/going -> 2
+	eventIdStr := strings.Split(r.URL.Path, "/")[3]
+	// /api/events/2/going -> 2
 
 	eventId, err := strconv.Atoi(eventIdStr)
 	if err != nil {
@@ -131,28 +110,18 @@ func (h *Handlers) eventsIdGoing(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	event := h.DB.GetEventById(eventId)
+	if event == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
 	userId := h.getUserId(w, r)
 
-	if code := h.validateEventsId(groupId, eventId, userId); code != http.StatusOK {
-		server.ErrorResponse(w, code)
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
 
 	h.DB.AddEventMember(eventId, userId)
-}
-
-func (h *Handlers) validateEventsId(groupId, eventId, userId int) int {
-	if group := h.DB.GetGroupById(groupId); group == nil {
-		return http.StatusNotFound
-	}
-
-	if event := h.DB.GetEventById(eventId); event == nil {
-		return http.StatusNotFound
-	}
-
-	if *h.DB.GetGroupMemberStatus(groupId, userId) != Accepted {
-		return http.StatusForbidden
-	}
-
-	return http.StatusOK
 }
