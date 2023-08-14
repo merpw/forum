@@ -11,7 +11,7 @@ var v010 = migrate.Migration{
 		_, err := db.Exec(`
 		ALTER TABLE posts ADD COLUMN privacy INT;
 		UPDATE posts
-			SET privacy = 1 WHERE privacy IS NULL;
+			SET privacy = 0 WHERE privacy IS NULL;
 		CREATE TABLE IF NOT EXISTS post_audience (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			post_id INTEGER NOT NULL,
