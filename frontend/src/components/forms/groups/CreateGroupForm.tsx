@@ -3,6 +3,7 @@
 import { FC, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import { useRouter } from "next/navigation"
+import { useSWRConfig } from "swr"
 
 import { FormError } from "@/components/error"
 import { trimInput } from "@/helpers/input"
@@ -18,6 +19,8 @@ const CreateGroupForm: FC = () => {
   const router = useRouter()
 
   const { followers } = useFollowers()
+
+  const { mutate } = useSWRConfig()
 
   return (
     <form
@@ -42,6 +45,7 @@ const CreateGroupForm: FC = () => {
 
         createGroup(formFields.title, formFields.description, formFields.invite.map(Number))
           .then((groupId) => {
+            mutate("/api/groups")
             router.push(`/group/${groupId}`)
           })
           .catch((error) => {

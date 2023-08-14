@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/integrations/auth"
 	"backend/common/server"
 	. "backend/forum/database"
 	"encoding/json"
@@ -85,13 +86,28 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		case FollowUser:
 			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
 		case GroupInvite:
-			h.DB.AddMembership(associatedId, invitation.ToUserId)
+			groupId := associatedId
+			h.DB.AddMembership(groupId, invitation.ToUserId)
+			h.event <- auth.Event{
+				Type: auth.EventTypeGroupJoin,
+				Item: auth.EventGroupItem{
+					GroupId: groupId,
+					UserId:  invitation.ToUserId,
+				},
+			}
 		case GroupJoin:
-			h.DB.AddMembership(associatedId, invitation.FromUserId)
+			groupId := associatedId
+			h.DB.AddMembership(groupId, invitation.FromUserId)
+			h.event <- auth.Event{
+				Type: auth.EventTypeGroupJoin,
+				Item: auth.EventGroupItem{
+					GroupId: groupId,
+					UserId:  invitation.FromUserId,
+				},
+			}
 		case Event:
 			h.DB.AddEventMember(associatedId, invitation.ToUserId)
 		}
-
 	}
 
 	h.DB.DeleteInvitationById(invitation.Id)

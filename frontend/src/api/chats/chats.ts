@@ -29,23 +29,47 @@ export const useChat = (id: number) => {
   return { chat }
 }
 
+type AssociationData = { userId: number } | { groupId: number }
+
 export const useCreateChat = () => {
   const dispatch = useAppDispatch()
 
-  return (userId: number) => {
-    dispatch(wsActions.sendPost("/chat/create", { userId }))
+  return (association: AssociationData) => {
+    dispatch(wsActions.sendPost("/chat/create", association))
   }
 }
 
-export const useUserChat = (userId: number) => {
-  const chatId = useAppSelector((state) => state.chats.userChats?.[userId])
+export const useAssociatedChat = (association: AssociationData) => {
+  const isUser = "userId" in association
+  const chatId = useAppSelector((state) =>
+    isUser
+      ? state.chats.userChats?.[association.userId]
+      : state.chats.groupChats?.[association.groupId]
+  )
   const dispatch = useAppDispatch()
 
   useEffect(() => {
     if (!chatId) {
-      dispatch(wsActions.sendGet(`/users/${userId}/chat`))
+      dispatch(
+        wsActions.sendGet(
+          isUser ? `/users/${association.userId}/chat` : `/groups/${association.groupId}/chat`
+        )
+      )
     }
-  }, [chatId, dispatch, userId])
+  }, [association, chatId, dispatch, isUser])
+
+  return { chatId }
+}
+
+export const useGroupChat = (groupId: number) => {
+  const chatId = useAppSelector((state) => state.chats.groupChats?.[groupId])
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if (!chatId) {
+      dispatch(wsActions.sendGet(`/groups/${groupId}/chat`))
+    }
+  }, [chatId, dispatch, groupId])
 
   return { chatId }
 }

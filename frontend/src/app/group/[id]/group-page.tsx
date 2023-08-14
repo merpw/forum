@@ -3,7 +3,7 @@
 import { FC, useRef } from "react"
 import { SWRConfig } from "swr"
 import Link from "next/link"
-import { HiOutlineUserAdd } from "react-icons/hi"
+import { HiChatAlt2, HiOutlineUserAdd } from "react-icons/hi"
 import { HiOutlinePencilSquare } from "react-icons/hi2"
 
 import { Group, useGroup } from "@/api/groups/hooks"
@@ -25,9 +25,12 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
       <GroupInfo group={group} />
       {group.member_status === 1 ? (
         <div className={"flex justify-center gap-3"}>
-          <button className={"button"} onClick={() => invitePopupRef.current?.showModal()}>
-            <HiOutlineUserAdd className={"w-5 h-5"} />
-            Invite
+          <button
+            className={"button h-12 w-12 rounded-full"}
+            onClick={() => invitePopupRef.current?.showModal()}
+            title={"Invite followers to the group"}
+          >
+            <HiOutlineUserAdd className={"w-full h-full"} />
           </button>
           <dialog ref={invitePopupRef} className={"modal"}>
             <InviteFollowersForm groupId={group.id} />
@@ -35,9 +38,19 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
               <button>close</button>
             </form>
           </dialog>
-          <Link href={`/group/${groupId}/compose`} className={"button"}>
-            <HiOutlinePencilSquare className={"w-5 h-5"} />
-            <span className={"ml-1 text-xs"}>Create a new post</span>
+          <Link
+            href={`/group/${groupId}/compose`}
+            className={"button h-12 w-12 rounded-full"}
+            title={"Create a new post in the group"}
+          >
+            <HiOutlinePencilSquare className={"w-full h-full"} />
+          </Link>
+          <Link
+            href={`/chat/g${groupId}`}
+            className={"button h-12 w-12 rounded-full"}
+            title={"Open the group chat"}
+          >
+            <HiChatAlt2 className={"w-full h-full"} />
           </Link>
         </div>
       ) : null}
