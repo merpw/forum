@@ -115,10 +115,28 @@ func (db DB) GetEventIdsByGroupId(groupId int) []int {
 
 }
 
-func (db DB) GetEventResponseStatus(eventId, userId int) bool {
-	err := db.QueryRow("SELECT id FROM invitations WHERE associated_id = ? AND user_id = ?",
-		eventId, userId).Err()
-	return err != nil
+func (db DB) GetEventStatus(eventId, userId int) *int {
+	row := db.QueryRow(`    
+		SELECT CASE 
+		WHEN (
+			SELECT 1 FROM invitations WHERE to_user_id = :userId AND associated_id = :eventId) THEN 0
+		ELSE (
+			SELECT CASE 
+			WHEN (
+				SELECT 1 FROM event_members WHERE user_id = :userId AND event_id = :eventId) THEN 1
+			ELSE 2
+			END
+		)
+		END 
+		AS event_status`, eventId, userId)
+
+	var status = new(int)
+	err := row.Scan(status)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return status
 }
 
 func (db DB) DeleteEventMember(eventId, userId int) {

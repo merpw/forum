@@ -52,7 +52,7 @@ type SafeEvent struct {
 	Description string `json:"description"`
 	TimeAndDate string `json:"time_and_date"`
 	Timestamp   string `json:"timestamp"`
-	Responded   bool   `json:"responded"`
+	Status      int    `json:"status"`
 }
 
 func isPresent(slice []string, item string) bool {
