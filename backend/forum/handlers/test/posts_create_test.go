@@ -114,6 +114,14 @@ func TestPostsCreate(t *testing.T) {
 			badPostData.Categories = []string{"spamCategoryThatDoesNotExist"}
 			cli.TestPost(t, "/api/posts/create", badPostData, http.StatusBadRequest)
 		})
+
+		t.Run("Privacy", func(t *testing.T) {
+			badPostData := generatePostData()
+
+			badPostData.Privacy = 3
+			cli.TestPost(t, "/api/posts/create", badPostData, http.StatusBadRequest)
+
+		})
 	})
 }
 

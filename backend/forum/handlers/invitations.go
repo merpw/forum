@@ -85,17 +85,9 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 		case FollowUser:
 			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
 		case GroupInvite:
-			if *h.DB.GetGroupMemberStatus(associatedId, invitation.ToUserId) != Accepted {
-				h.DB.AddMembership(associatedId, invitation.ToUserId)
-			} else {
-				server.ErrorResponse(w, http.StatusBadRequest)
-			}
+			h.DB.AddMembership(associatedId, invitation.ToUserId)
 		case GroupJoin:
-			if *h.DB.GetGroupMemberStatus(associatedId, invitation.FromUserId) != Accepted {
-				h.DB.AddMembership(associatedId, invitation.FromUserId)
-			} else {
-				server.ErrorResponse(w, http.StatusBadRequest)
-			}
+			h.DB.AddMembership(associatedId, invitation.FromUserId)
 		case Event:
 			h.DB.AddEventMember(associatedId, invitation.ToUserId)
 		}
