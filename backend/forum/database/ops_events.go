@@ -91,7 +91,7 @@ func (db DB) GetEventMembers(eventId int) []int {
 
 func (db DB) GetEventIdsByGroupId(groupId int) []int {
 
-	query, err := db.Query("SELECT id FROM events WHERE group_id = ?", groupId)
+	query, err := db.Query("SELECT id FROM events WHERE group_id = ? ORDER BY id DESC", groupId)
 	if err != nil {
 		log.Panic(err)
 	}
