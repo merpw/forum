@@ -106,7 +106,7 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if requestBody.Privacy > 2 {
+	if requestBody.Privacy < 0 || requestBody.Privacy > 2 {
 		http.Error(w, "invalid privacy", http.StatusBadRequest)
 		return
 	}

@@ -15,13 +15,13 @@ func (db DB) GetAllPosts(userId int) []Post {
 		LEFT JOIN post_audience ON posts.id = post_audience.post_id 
 		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId   
 		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
-		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
 		WHERE 
-			posts.privacy = 0 AND posts.group_id IS NULL OR
-			posts.author = :userId OR
-			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
-			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL) OR
-			(posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
+		    posts.group_id IS NULL AND (
+				posts.privacy = 0 OR
+				posts.author = :userId OR
+				(posts.privacy = 1 AND f2.id IS NOT NULL) OR
+				(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
+		)
 	`, userId)
 	if err != nil {
 		log.Panic(err)
@@ -45,19 +45,21 @@ func (db DB) GetAllPosts(userId int) []Post {
 
 // GetPostById reads post from database by post_id
 func (db DB) GetPostById(postId, userId int) *Post {
+	log.Println("postId, userId", postId, userId)
 	var post Post
 	err := db.QueryRow(`
     SELECT posts.* FROM posts
 		LEFT JOIN post_audience ON post_audience.post_id = posts.id 
 		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId  
 		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
-        LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
+        LEFT JOIN group_members ON posts.group_id = group_members.group_id AND group_members.user_id = :userId
     WHERE posts.id = :postId AND (
-        posts.privacy = 0 AND posts.group_id IS NULL OR
         posts.author = :userId OR
-        (posts.privacy = 1 AND f2.id IS NOT NULL) OR
-        (posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL) OR
-        (posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
+        posts.privacy = 0 AND posts.group_id IS NULL OR (
+			(posts.group_id IS NOT NULL AND group_members.id IS NOT NULL) OR
+			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
+			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
+    	)
     )
 `, userId, postId).
 		Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
@@ -126,12 +128,10 @@ func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 		LEFT JOIN post_audience ON posts.id = post_audience.post_id 
 		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :followerId   
 		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :followerId
-		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
-		WHERE posts.author = :userId AND (
-			posts.privacy = 0 AND posts.group_id IS NULL OR
+		WHERE posts.author = :userId AND posts.group_id IS NULL AND (
+			posts.privacy = 0 OR
 			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
-			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL) OR
-			(posts.group_id IS NOT NULL AND group_members.id IS NOT NULL)
+			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
 		)`, followerId, userId)
 	if err != nil {
 		log.Panic(err)
@@ -186,17 +186,18 @@ func (db DB) GetCategoryPosts(category string, userId int) []Post {
 	query, err := db.Query(`
 		SELECT DISTINCT posts.* FROM posts 
 		LEFT JOIN post_audience ON posts.id = post_audience.post_id 
-		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = ?   
-		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = ?
+		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId   
+		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
+		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
 		WHERE 
-			categories LIKE '%' || ? || '%' AND 
+			categories LIKE '%' || :category || '%' AND posts.group_id IS NULL AND
 			(
-				posts.author = ? OR
+				posts.author = :userId OR
 				posts.privacy = 0 OR
 				(posts.privacy = 1 AND followers.id IS NOT NULL) OR
 				(posts.privacy = 2 AND post_audience.post_id IS NOT NULL)
 			) 
-`, userId, userId, category, userId)
+`, userId, category)
 	if err != nil {
 		log.Panic(err)
 	}

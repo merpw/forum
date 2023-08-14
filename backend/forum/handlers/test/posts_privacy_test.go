@@ -177,7 +177,7 @@ func TestInvalidPostPrivacy(t *testing.T) {
 	t.Run("Wack privacy", func(t *testing.T) {
 		invalidPost := generatePostData()
 		invalidPost.Privacy = 666
-		cli1.TestPost(t, "/api/posts/create", nil, http.StatusBadRequest)
+		cli1.TestPost(t, "/api/posts/create", invalidPost, http.StatusBadRequest)
 	})
 
 	cli2.TestAuth(t)
