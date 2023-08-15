@@ -172,7 +172,7 @@ func (db DB) AddMembership(groupId, userId int) InviteStatus {
 	_, err = db.Exec(`
     INSERT INTO invitations
         (type, from_user_id, to_user_id, associated_id)
-        SELECT 2, creator_id, :userId, :groupId
+        SELECT 3, creator_id, :userId, id
         FROM events
         WHERE group_id = :groupId`, userId, groupId)
 

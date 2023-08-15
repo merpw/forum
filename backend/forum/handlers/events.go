@@ -49,7 +49,7 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) eventsIdMembers(w http.ResponseWriter, r *http.Request) {
 	eventIdStr := strings.Split(r.URL.Path, "/")[3]
-	// /api/events/2/users -> 2
+	// /api/events/2/members -> 2
 
 	eventId, err := strconv.Atoi(eventIdStr)
 	if err != nil {
