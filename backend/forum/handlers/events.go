@@ -99,6 +99,8 @@ func (h *Handlers) eventsIdLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.DB.DeleteEventMember(eventId, userId)
+
+	h.DB.DeleteEventInvitation(eventId, userId)
 }
 
 func (h *Handlers) eventsIdGoing(w http.ResponseWriter, r *http.Request) {
@@ -125,4 +127,6 @@ func (h *Handlers) eventsIdGoing(w http.ResponseWriter, r *http.Request) {
 	}
 
 	h.DB.AddEventMember(eventId, userId)
+
+	h.DB.DeleteEventInvitation(eventId, userId)
 }

@@ -67,7 +67,6 @@ func (db DB) GetFollowStatus(followerId, userId int) *InviteStatus {
 	if err != nil {
 		log.Panic(err)
 	}
-	log.Println("followStatus", *followStatus)
 	return followStatus
 }
 

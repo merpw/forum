@@ -145,3 +145,10 @@ func (db DB) DeleteEventMember(eventId, userId int) {
 		log.Panic(err)
 	}
 }
+
+func (db DB) DeleteEventInvitation(eventId, userId int) {
+	_, err := db.Exec("DELETE FROM invitations WHERE type = 3 AND associated_id = ? AND to_user_id = ?", eventId, userId)
+	if err != nil {
+		log.Panic(err)
+	}
+}
