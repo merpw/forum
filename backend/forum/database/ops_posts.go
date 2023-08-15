@@ -60,7 +60,7 @@ func (db DB) GetPostById(postId, userId int) *Post {
 			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
     	)
     )
-`, userId, postId).
+`, sql.Named("userId", userId), sql.Named("postId", postId)).
 		Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
 			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
 			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
@@ -131,7 +131,7 @@ func (db DB) GetPostsByUserId(userId, followerId int) []Post {
 			posts.privacy = 0 OR
 			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
 			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
-		)`, followerId, userId)
+		)`, sql.Named("followerId", followerId), sql.Named("userId", userId))
 	if err != nil {
 		log.Panic(err)
 	}
@@ -183,19 +183,16 @@ func (db DB) GetUserPostsLiked(userId int) []Post {
 func (db DB) GetCategoryPosts(category string, userId int) []Post {
 	query, err := db.Query(`
 		SELECT DISTINCT posts.* FROM posts 
-		LEFT JOIN post_audience ON posts.id = post_audience.post_id 
-		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId   
-		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
-		LEFT JOIN group_members ON group_members.group_id = posts.group_id AND group_members.user_id = :userId
-		WHERE 
-			categories LIKE '%' || :category || '%' AND posts.group_id IS NULL AND
-			(
+			LEFT JOIN post_audience ON posts.id = post_audience.post_id 
+			LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
+			LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId   
+		WHERE (categories LIKE '%' || :category || '%' AND posts.group_id IS NULL) AND (
 				posts.author = :userId OR
 				posts.privacy = 0 OR
 				(posts.privacy = 1 AND followers.id IS NOT NULL) OR
-				(posts.privacy = 2 AND post_audience.post_id IS NOT NULL)
+				(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
 			) 
-`, userId, category)
+`, sql.Named("userId", userId), sql.Named("category", category))
 	if err != nil {
 		log.Panic(err)
 	}
