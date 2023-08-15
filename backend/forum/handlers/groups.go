@@ -69,7 +69,7 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
-		server.ErrorResponse(w, http.StatusBadRequest)
+		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
 

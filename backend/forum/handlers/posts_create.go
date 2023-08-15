@@ -101,6 +101,19 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var groupId sql.NullInt64
+
+	if requestBody.GroupId == nil {
+		groupId = sql.NullInt64{Valid: false}
+	} else {
+		if group := h.DB.GetGroupById(int(*requestBody.GroupId)); group == nil {
+			server.ErrorResponse(w, http.StatusBadRequest)
+			return
+		}
+		groupId = sql.NullInt64{Int64: *requestBody.GroupId, Valid: true}
+		requestBody.Privacy = int(Public)
+	}
+
 	if requestBody.Privacy == int(SuperPrivate) && len(requestBody.PostFollowers) == 0 {
 		http.Error(w, "no followers in super private Post", http.StatusBadRequest)
 		return
@@ -124,15 +137,6 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "user is not following you", http.StatusBadRequest)
 			return
 		}
-	}
-
-	var groupId sql.NullInt64
-
-	if requestBody.GroupId == nil {
-		groupId = sql.NullInt64{Valid: false}
-	} else {
-		groupId = sql.NullInt64{Int64: *requestBody.GroupId, Valid: true}
-		requestBody.Privacy = int(Public)
 	}
 
 	id := h.DB.AddPost(
