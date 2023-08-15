@@ -4,7 +4,7 @@ import { FC, useState } from "react"
 import { SWRConfig } from "swr"
 import Link from "next/link"
 import { HiChatAlt2, HiOutlineUserAdd } from "react-icons/hi"
-import { HiOutlinePencilSquare } from "react-icons/hi2"
+import { HiOutlineCalendarDays, HiOutlinePencilSquare } from "react-icons/hi2"
 
 import { Group, useGroup } from "@/api/groups/hooks"
 import GroupInfo from "@/components/groups/GroupInfo"
@@ -14,11 +14,10 @@ import { usePostList } from "@/api/posts/hooks"
 import InviteFollowersForm from "@/components/forms/groups/InviteFollowersForm"
 import EventList from "@/components/events/EventList"
 import { useGroupEvents } from "@/api/events/hooks"
+import CreateEventForm from "@/components/forms/groups/CreateEventForm"
 
 const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
   const { group } = useGroup(groupId)
-
-  const invitePopupRef = useRef<HTMLDialogElement>(null)
 
   if (!group) return null
 
@@ -29,12 +28,12 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
         <div className={"flex justify-center gap-3"}>
           <button
             className={"button h-12 w-12 rounded-full"}
-            onClick={() => invitePopupRef.current?.showModal()}
+            onClick={(e) => (e.currentTarget.nextElementSibling as HTMLDialogElement).showModal()}
             title={"Invite followers to the group"}
           >
             <HiOutlineUserAdd className={"w-full h-full"} />
           </button>
-          <dialog ref={invitePopupRef} className={"modal"}>
+          <dialog className={"modal"}>
             <InviteFollowersForm groupId={group.id} />
             <form method={"dialog"} className={"modal-backdrop"}>
               <button>close</button>
@@ -54,6 +53,19 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
           >
             <HiChatAlt2 className={"w-full h-full"} />
           </Link>
+          <button
+            className={"button h-12 w-12 rounded-full"}
+            onClick={(e) => (e.currentTarget.nextElementSibling as HTMLDialogElement).showModal()}
+            title={"Create event"}
+          >
+            <HiOutlineCalendarDays className={"w-full h-full"} />
+          </button>
+          <dialog className={"modal"}>
+            <CreateEventForm groupId={group.id} />
+            <form method={"dialog"} className={"modal-backdrop"}>
+              <button>close</button>
+            </form>
+          </dialog>
         </div>
       ) : null}
 
