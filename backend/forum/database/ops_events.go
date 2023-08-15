@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql"
 	"log"
 )
 
@@ -114,7 +115,7 @@ func (db DB) GetEventIdsByGroupId(groupId int) []int {
 
 }
 
-func (db DB) GetEventStatus(eventId, userId int) InviteStatus {
+func (db DB) GetEventStatus(eventId, userId int) (status InviteStatus) {
 	row := db.QueryRow(`    
 	SELECT CASE 
 	WHEN (
@@ -128,15 +129,14 @@ func (db DB) GetEventStatus(eventId, userId int) InviteStatus {
 	)
 	END 
 	AS event_status
-	`, eventId, userId)
+	`, sql.Named("eventId", eventId), sql.Named("userId", userId))
 
-	var status = new(InviteStatus)
-	err := row.Scan(status)
+	err := row.Scan(&status)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return *status
+	return status
 }
 
 func (db DB) DeleteEventMember(eventId, userId int) {
