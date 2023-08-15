@@ -8,7 +8,7 @@ import { useFollowers } from "@/api/followers/hooks"
 const PostPrivacy = () => {
   const { followers } = useFollowers()
   const [privacy, setPrivacy] = useState(0)
-  const audience = [].map(Number);
+  const audience = [].map(Number)
 
   if (!followers) return null
 
@@ -18,11 +18,7 @@ const PostPrivacy = () => {
 
   return (
     <div className={"space-y-2 w-full"}>
-      <input
-          type={"hidden"}
-          name={"privacy"}
-            value={privacy}
-      />
+      <input type={"hidden"} name={"privacy"} value={privacy} />
       <div className={"flex flex-row items-center gap-1"}>
         <button
           onClick={() => handlePrivacyChange(0)}

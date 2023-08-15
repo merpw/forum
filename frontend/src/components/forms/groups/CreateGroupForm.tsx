@@ -87,12 +87,12 @@ const CreateGroupForm: FC = () => {
             <div className={"flex flex-row justify-between gap-3"}>
               {followers && (
                 <div className={"w-full"}>
-                <SelectUsers
-                  userIds={followers}
-                  name={"invite"}
-                  placeholder={"Invite your followers"}
-                  noOptionsMessage={() => "No followers to invite"}
-                />
+                  <SelectUsers
+                    userIds={followers}
+                    name={"invite"}
+                    placeholder={"Invite your followers"}
+                    noOptionsMessage={() => "No followers to invite"}
+                  />
                 </div>
               )}
               <div className={"form-control justify-end"}>
