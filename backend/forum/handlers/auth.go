@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/integrations/auth"
 	"backend/common/server"
 	"backend/forum/external"
 	"database/sql"
@@ -280,7 +281,11 @@ func (h *Handlers) logout(w http.ResponseWriter, r *http.Request) {
 		Path:    "/",
 	})
 	go func() {
-		h.revokeSession <- cookie.Value
+		event := auth.Event{
+			Type: auth.EventTypeTokenRevoked,
+			Item: cookie.Value,
+		}
+		h.event <- event
 	}()
 }
 
@@ -302,7 +307,11 @@ func (h *Handlers) getUserId(w http.ResponseWriter, r *http.Request) int {
 			Path:    "/",
 		})
 		go func() {
-			h.revokeSession <- cookie.Value
+			event := auth.Event{
+				Type: auth.EventTypeTokenRevoked,
+				Item: cookie.Value,
+			}
+			h.event <- event
 		}()
 		return -1
 	}

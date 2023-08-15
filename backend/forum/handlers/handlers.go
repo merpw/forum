@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/common/integrations/auth"
 	"backend/common/server"
 	"backend/forum/database"
 	"database/sql"
@@ -21,8 +22,8 @@ const (
 type Handlers struct {
 	DB *database.DB
 
-	revokeSession            chan string
-	revokeSessionSubscribers []*chan string
+	event            chan auth.Event
+	eventSubscribers []*chan auth.Event
 
 	lock sync.Mutex
 }
@@ -32,14 +33,14 @@ func New(db *sql.DB) *Handlers {
 
 	h := &Handlers{DB: database.NewDB(db)}
 
-	h.revokeSession = make(chan string)
-	h.revokeSessionSubscribers = make([]*chan string, 0)
+	h.event = make(chan auth.Event)
+	h.eventSubscribers = make([]*chan auth.Event, 0)
 
 	go func() {
-		for token := range h.revokeSession {
-			log.Printf("Revoked session: %s %v", token, len(h.revokeSessionSubscribers))
-			for _, subscriber := range h.revokeSessionSubscribers {
-				*subscriber <- token
+		for event := range h.event {
+			log.Printf("Event: %s %v", event, len(h.eventSubscribers))
+			for _, subscriber := range h.eventSubscribers {
+				*subscriber <- event
 			}
 		}
 	}()
@@ -69,6 +70,8 @@ func (h *Handlers) Handler() http.Handler {
 		// method POST endpoints
 		server.NewRoute(http.MethodPost, `/api/login`, h.login),
 		server.NewRoute(http.MethodPost, `/api/signup`, h.signup),
+
+		server.NewRoute(http.MethodGet, `/api/internal/events`, h.events),
 	}
 
 	var authRoutes = []server.Route{
@@ -94,8 +97,8 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/posts`, h.groupsIdPosts),
 		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/events`, h.groupsIdEvents),
 
-		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/events/(\d+)`, h.eventsId),
-		server.NewRoute(http.MethodGet, `/api/groups/(\d+)/events/(\d+)/users`, h.eventsIdUsers),
+		server.NewRoute(http.MethodGet, `/api/events/(\d+)`, h.eventsId),
+		server.NewRoute(http.MethodGet, `/api/events/(\d+)/members`, h.eventsIdMembers),
 
 		// method POST endpoints
 		server.NewRoute(http.MethodPost, `/api/logout`, h.logout),
@@ -121,13 +124,13 @@ func (h *Handlers) Handler() http.Handler {
 		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/leave`, h.groupsIdLeave),
 
 		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/events/create`, h.eventsCreate),
-		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/events/(\d+)/leave`, h.eventsIdLeave),
-		server.NewRoute(http.MethodPost, `/api/groups/(\d+)/events/(\d+)/going`, h.eventsIdGoing),
+		server.NewRoute(http.MethodPost, `/api/events/(\d+)/leave`, h.eventsIdLeave),
+		server.NewRoute(http.MethodPost, `/api/events/(\d+)/going`, h.eventsIdGoing),
 	}
 
 	var internalRoutes = []server.Route{
 		server.NewRoute(http.MethodGet, `/api/internal/check-session`, h.checkSession),
-		server.NewRoute(http.MethodGet, `/api/internal/revoked-sessions`, h.revokedSessions),
+		server.NewRoute(http.MethodGet, `/api/internal/events`, h.events),
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -4,7 +4,7 @@ package handlers
 import (
 	"backend/chat/database"
 	"backend/chat/ws"
-	"backend/common/external"
+	"backend/common/integrations/auth"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -25,6 +25,8 @@ func (h *Handlers) PrimaryHandler() ws.MessageHandler {
 
 		newEvent("get", `/users/\d+/chat`, h.usersIdChat),
 		newEvent("get", `/users/online`, h.usersOnline),
+
+		newEvent("get", `/groups/\d+/chat`, h.groupsIdChat),
 
 		// method POST endpoints
 		newEvent("post", `/chat/create`, h.chatCreate),
@@ -47,7 +49,7 @@ func (h *Handlers) PrimaryHandler() ws.MessageHandler {
 		}
 
 		// TODO: maybe remove, as we have a revoked-sessions endpoint
-		userId := external.CheckSession(client.Token)
+		userId := auth.CheckSession(client.Token)
 		if userId != client.UserId {
 			log.Println("ERROR: invalid token")
 			_ = client.Conn.Close()

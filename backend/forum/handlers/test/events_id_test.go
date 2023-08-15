@@ -48,11 +48,11 @@ func TestEventsId(t *testing.T) {
 	invitationIdRespond(t, cli1, 1, true)
 
 	cli1.TestGet(t, "/api/groups/1/events", http.StatusOK)
-	cli1.TestGet(t, "/api/groups/1/events/1", http.StatusOK)
+	cli1.TestGet(t, "/api/events/1", http.StatusOK)
 
 	t.Run("events/id/users", func(t *testing.T) {
 		var users []int
-		_, resp := cli1.TestGet(t, "/api/groups/1/events/1/users", http.StatusOK)
+		_, resp := cli1.TestGet(t, "/api/events/1/members", http.StatusOK)
 
 		if err := json.Unmarshal(resp, &users); err != nil {
 			t.Fatal(err)
@@ -63,12 +63,12 @@ func TestEventsId(t *testing.T) {
 		}
 	})
 
-	cli1.TestPost(t, "/api/groups/1/events/1/leave", nil, http.StatusOK)
+	cli1.TestPost(t, "/api/events/1/leave", nil, http.StatusOK)
 
 	t.Run("events/id/leave", func(t *testing.T) {
 		var users []int
 
-		_, resp := cli1.TestGet(t, "/api/groups/1/events/1/users", http.StatusOK)
+		_, resp := cli1.TestGet(t, "/api/events/1/members", http.StatusOK)
 
 		if err := json.Unmarshal(resp, &users); err != nil {
 			t.Fatal(err)
@@ -80,9 +80,9 @@ func TestEventsId(t *testing.T) {
 	})
 
 	t.Run("events/id/going", func(t *testing.T) {
-		cli1.TestPost(t, "/api/groups/1/events/1/going", nil, http.StatusOK)
+		cli1.TestPost(t, "/api/events/1/going", nil, http.StatusOK)
 		var users []int
-		_, resp := cli1.TestGet(t, "/api/groups/1/events/1/users", http.StatusOK)
+		_, resp := cli1.TestGet(t, "/api/events/1/members", http.StatusOK)
 
 		if err := json.Unmarshal(resp, &users); err != nil {
 			t.Fatal(err)
@@ -117,34 +117,28 @@ func TestEventsIdErrors(t *testing.T) {
 	})
 
 	t.Run(".../events/id", func(t *testing.T) {
-		cli1.TestGet(t, "/api/groups/9999999999999999999999999999999999/events/1", http.StatusNotFound)
-		cli1.TestGet(t, "/api/groups/1/events/999999999999999999999999999999999", http.StatusNotFound)
-		cli1.TestGet(t, "/api/groups/1/events/2", http.StatusNotFound)
-		cli1.TestGet(t, "/api/groups/2/events/1", http.StatusNotFound)
-		cli2.TestGet(t, "/api/groups/1/events/1", http.StatusForbidden)
+		cli1.TestGet(t, "/api/events/999999999999999999999999999999999", http.StatusNotFound)
+		cli1.TestGet(t, "/api/events/2", http.StatusNotFound)
+		cli2.TestGet(t, "/api/events/1", http.StatusForbidden)
 	})
 
-	t.Run(".../events/id/users", func(t *testing.T) {
-		cli1.TestGet(t, "/api/groups/9999999999999999999999999999999999/events/1/users", http.StatusNotFound)
-		cli1.TestGet(t, "/api/groups/1/events/999999999999999999999999999999999/users", http.StatusNotFound)
-		cli1.TestGet(t, "/api/groups/1/events/2/users", http.StatusNotFound)
-		cli1.TestGet(t, "/api/groups/2/events/1/users", http.StatusNotFound)
-		cli2.TestGet(t, "/api/groups/1/events/1/users", http.StatusForbidden)
+	t.Run(".../events/id/members", func(t *testing.T) {
+		cli1.TestGet(t, "/api/events/999999999999999999999999999999999/members", http.StatusNotFound)
+		cli1.TestGet(t, "/api/events/2/members", http.StatusNotFound)
+		cli2.TestGet(t, "/api/events/1/members", http.StatusForbidden)
 	})
 
 	t.Run(".../events/id/leave", func(t *testing.T) {
-		cli1.TestPost(t, "/api/groups/9999999999999999999999999999999999/events/1/leave", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/1/events/999999999999999999999999999999999/leave", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/1/events/2/leave", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/2/events/1/leave", nil, http.StatusNotFound)
-		cli2.TestPost(t, "/api/groups/1/events/1/leave", nil, http.StatusForbidden)
+		cli1.TestPost(t, "/api/events/999999999999999999999999999999999/leave",
+			nil, http.StatusNotFound)
+		cli1.TestPost(t, "/api/events/2/leave", nil, http.StatusNotFound)
+		cli2.TestPost(t, "/api/events/1/leave", nil, http.StatusForbidden)
 	})
 
 	t.Run(".../events/id/going", func(t *testing.T) {
-		cli1.TestPost(t, "/api/groups/9999999999999999999999999999999999/events/1/going", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/1/events/999999999999999999999999999999999/going", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/1/events/2/going", nil, http.StatusNotFound)
-		cli1.TestPost(t, "/api/groups/2/events/1/going", nil, http.StatusNotFound)
-		cli2.TestPost(t, "/api/groups/1/events/1/going", nil, http.StatusForbidden)
+		cli1.TestPost(t, "/api/events/999999999999999999999999999999999/going",
+			nil, http.StatusNotFound)
+		cli1.TestPost(t, "/api/events/2/going", nil, http.StatusNotFound)
+		cli2.TestPost(t, "/api/events/1/going", nil, http.StatusForbidden)
 	})
 }

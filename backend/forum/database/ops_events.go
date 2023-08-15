@@ -35,8 +35,8 @@ func (db DB) AddEvent(groupId, createdBy int, title, description, timeAndDate st
 
 func (db DB) DeleteAllEventInvites(groupId, userId int) {
 	_, err := db.Exec(`
-    DELETE * FROM invitations WHERE TYPE = 3 AND associated_id = ? AND to_user_id = ?`,
-		2, userId, groupId)
+    DELETE FROM invitations WHERE TYPE = 3 AND
+        associated_id IN (SELECT id FROM events WHERE group_id = ?) AND to_user_id = ?`, groupId, userId)
 
 	if err != nil {
 		log.Panic(err)
@@ -71,7 +71,7 @@ func (db DB) GetEventMembers(eventId int) []int {
 		log.Panic(err)
 	}
 
-	var ids []int
+	var ids = make([]int, 0)
 
 	for query.Next() {
 		var id int
@@ -91,12 +91,12 @@ func (db DB) GetEventMembers(eventId int) []int {
 
 func (db DB) GetEventIdsByGroupId(groupId int) []int {
 
-	query, err := db.Query("SELECT id FROM events WHERE group_id = ?", groupId)
+	query, err := db.Query("SELECT id FROM events WHERE group_id = ? ORDER BY id DESC", groupId)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	var ids []int
+	var ids = make([]int, 0)
 
 	for query.Next() {
 		var id int
@@ -113,6 +113,30 @@ func (db DB) GetEventIdsByGroupId(groupId int) []int {
 
 	return ids
 
+}
+
+func (db DB) GetEventStatus(eventId, userId int) *int {
+	row := db.QueryRow(`    
+		SELECT CASE 
+		WHEN (
+			SELECT 1 FROM invitations WHERE to_user_id = :userId AND associated_id = :eventId) THEN 0
+		ELSE (
+			SELECT CASE 
+			WHEN (
+				SELECT 1 FROM event_members WHERE user_id = :userId AND event_id = :eventId) THEN 1
+			ELSE 2
+			END
+		)
+		END 
+		AS event_status`, eventId, userId)
+
+	var status = new(int)
+	err := row.Scan(status)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return status
 }
 
 func (db DB) DeleteEventMember(eventId, userId int) {
