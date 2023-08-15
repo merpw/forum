@@ -1,6 +1,9 @@
 package ws
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // Message is a basic websocket message
 type Message struct {
@@ -26,6 +29,18 @@ func BuildResponseMessage(requestMessage Message, data interface{}) Message {
 		}{
 			URL:  requestMessage.Item.URL,
 			Data: dataRawMessage,
+		},
+	}
+}
+
+func getGroupChatMessage(groupId int) Message {
+	return Message{
+		Type: "get",
+		Item: struct {
+			URL  string          `json:"url"`
+			Data json.RawMessage `json:"data"`
+		}{
+			URL: fmt.Sprintf("/groups/%d/chat", groupId),
 		},
 	}
 }

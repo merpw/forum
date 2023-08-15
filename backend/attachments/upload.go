@@ -1,7 +1,7 @@
 package main
 
 import (
-	"backend/common/external"
+	"backend/common/integrations/auth"
 	"backend/common/server"
 	"fmt"
 	"io"
@@ -29,7 +29,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userId := external.CheckSession(cookie.Value)
+	userId := auth.CheckSession(cookie.Value)
 	if userId == -1 {
 		server.ErrorResponse(w, http.StatusUnauthorized)
 		return

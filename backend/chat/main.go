@@ -40,7 +40,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	hub := ws.NewHub(h.PrimaryHandler())
+	hub := ws.NewHub(h.PrimaryHandler(), h.DB)
 	h.Hub = hub
 
 	http.HandleFunc("/ws", hub.UpgradeHandler)

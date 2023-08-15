@@ -56,8 +56,6 @@ const WriteMessageForm: FC<{
       onSubmit={async (e) => {
         e.preventDefault()
 
-        console.log(inputRef.current)
-
         const inputMessage = inputRef.current as HTMLTextAreaElement
         const trimmedInput = inputMessage.value.trim()
         if (!trimmedInput) return

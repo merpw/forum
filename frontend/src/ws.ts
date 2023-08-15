@@ -10,8 +10,14 @@ export type Message = {
 export type Chat = {
   id: number
   lastMessageId: number
-  companionId: number
-}
+} & (
+  | {
+      userId: number
+    }
+  | {
+      groupId: number
+    }
+)
 
 export type TypingData = {
   userId: number
