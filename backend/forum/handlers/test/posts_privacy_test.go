@@ -124,7 +124,7 @@ func TestSuperPrivatePost(t *testing.T) {
 
 	validPost := generatePostData()
 	validPost.Privacy = int(SuperPrivate)
-	validPost.PostFollowers = []int{2}
+	validPost.Audience = []int{2}
 
 	followAndRespond(t, cli1, cli2, 1, 1, true)
 
@@ -191,12 +191,12 @@ func TestInvalidPostPrivacy(t *testing.T) {
 			cli1.TestPost(t, "/api/posts/create", invalidPost, http.StatusBadRequest)
 		})
 
-		invalidPost.PostFollowers = []int{1}
+		invalidPost.Audience = []int{1}
 		t.Run("Add self to followers", func(t *testing.T) {
 			cli1.TestPost(t, "/api/posts/create", invalidPost, http.StatusBadRequest)
 		})
 
-		invalidPost.PostFollowers = []int{2}
+		invalidPost.Audience = []int{2}
 		t.Run("Add non-follower to followers", func(t *testing.T) {
 			cli1.TestPost(t, "/api/posts/create", invalidPost, http.StatusBadRequest)
 		})
@@ -208,7 +208,7 @@ func TestInvalidPostPrivacy(t *testing.T) {
 		t.Run("Add follower to post", func(t *testing.T) {
 			invalidPost := generatePostData()
 			invalidPost.Privacy = int(Private)
-			invalidPost.PostFollowers = []int{2}
+			invalidPost.Audience = []int{2}
 			cli1.TestPost(t, "/api/posts/create", invalidPost, http.StatusBadRequest)
 		})
 
@@ -264,7 +264,7 @@ func TestInvalidPostPrivacy(t *testing.T) {
 	cli3.TestAuth(t)
 
 	validPost.Privacy = int(SuperPrivate)
-	validPost.PostFollowers = []int{2}
+	validPost.Audience = []int{2}
 
 	followAndRespond(t, cli1, cli2, 1, 1, true)
 

@@ -28,13 +28,13 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
 	requestBody := struct {
-		Title         string   `json:"title"`
-		Content       string   `json:"content"`
-		Description   string   `json:"description"`
-		Categories    []string `json:"categories"`
-		Privacy       int      `json:"privacy"`
-		PostFollowers []int    `json:"post_followers"`
-		GroupId       *int64   `json:"group_id"`
+		Title       string   `json:"title"`
+		Content     string   `json:"content"`
+		Description string   `json:"description"`
+		Categories  []string `json:"categories"`
+		Privacy     int      `json:"privacy"`
+		Audience    []int    `json:"audience"`
+		GroupId     *int64   `json:"group_id"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
@@ -114,27 +114,35 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		requestBody.Privacy = int(Public)
 	}
 
-	if requestBody.Privacy == int(SuperPrivate) && len(requestBody.PostFollowers) == 0 {
-		http.Error(w, "no followers in super private Post", http.StatusBadRequest)
+	if requestBody.Privacy == int(SuperPrivate) && len(requestBody.Audience) == 0 {
+		http.Error(w, "No audience specified for super private post", http.StatusBadRequest)
 		return
 	}
 
 	if requestBody.Privacy < 0 || requestBody.Privacy > 2 {
-		http.Error(w, "invalid privacy", http.StatusBadRequest)
+		http.Error(w, "Privacy is not valid", http.StatusBadRequest)
 		return
 	}
 
-	for _, follower := range requestBody.PostFollowers {
+	for _, follower := range requestBody.Audience {
 		if requestBody.Privacy != int(SuperPrivate) {
-			http.Error(w, "followers in non super-private post", http.StatusBadRequest)
+			http.Error(w, "Unexpected audience, post is not super private", http.StatusBadRequest)
 			return
 		}
 		if follower == userId {
-			http.Error(w, "can't follow your own post", http.StatusBadRequest)
+			http.Error(w, "Can't add yourself as an audience", http.StatusBadRequest)
 			return
 		}
+
+		user := h.DB.GetUserById(follower)
+		if user == nil {
+			http.Error(w, "One of the audience users does not exist", http.StatusBadRequest)
+			return
+		}
+
 		if *h.DB.GetFollowStatus(follower, userId) != Accepted {
-			http.Error(w, "user is not following you", http.StatusBadRequest)
+			http.Error(w, fmt.Sprintf("Audience is not valid, %s is not your follower", user.Username),
+				http.StatusBadRequest)
 			return
 		}
 	}
@@ -148,9 +156,8 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		Privacy(requestBody.Privacy),
 		groupId)
 
-	// Check for duplicates in PostFollowers array
 	if requestBody.Privacy == int(SuperPrivate) {
-		for _, follower := range requestBody.PostFollowers {
+		for _, follower := range requestBody.Audience {
 			h.DB.AddPostAudience(id, *h.DB.GetFollowId(follower, userId))
 		}
 	}

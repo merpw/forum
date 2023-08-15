@@ -134,12 +134,12 @@ func BenchmarkCreatePosts(b *testing.B) {
 }
 
 type PostData struct {
-	Id            int    `json:"id"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Content       string `json:"content"`
-	PostFollowers []int  `json:"post_followers"`
-	Privacy       int    `json:"privacy"`
+	Id          int    `json:"id"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	Content     string `json:"content"`
+	Audience    []int  `json:"audience"`
+	Privacy     int    `json:"privacy"`
 
 	// []string for requests, string for responses
 	Categories interface{} `json:"categories"`
@@ -147,12 +147,12 @@ type PostData struct {
 
 func generatePostData() PostData {
 	return PostData{
-		Title:         uuid.Must(uuid.NewV4()).String()[0:8],
-		Content:       "content",
-		Description:   "description",
-		Categories:    []string{"facts"},
-		PostFollowers: []int{},
-		Privacy:       int(Public),
+		Title:       uuid.Must(uuid.NewV4()).String()[0:8],
+		Content:     "content",
+		Description: "description",
+		Categories:  []string{"facts"},
+		Audience:    []int{},
+		Privacy:     int(Public),
 	}
 }
 
