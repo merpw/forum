@@ -19,6 +19,11 @@ const (
 	postIdCtxKey
 )
 
+const (
+	isPrivate = "true"
+	// isPublic  = "false"
+)
+
 type Handlers struct {
 	DB *database.DB
 
@@ -143,7 +148,7 @@ func (h *Handlers) Handler() http.Handler {
 					return
 				}
 
-				if os.Getenv("FORUM_IS_PRIVATE") == "true" {
+				if os.Getenv("FORUM_IS_PRIVATE") == isPrivate {
 					h.withAuth(h.withPermissions(route.Handler))(w, r)
 					return
 				}

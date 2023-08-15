@@ -79,14 +79,14 @@ func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
 		r = r.WithContext(ctx)
 
 		// Forum is private, server side rendering.
-		if os.Getenv("FORUM_IS_PRIVATE") == "true" && userId == -1 {
+		if os.Getenv("FORUM_IS_PRIVATE") == isPrivate && userId == -1 {
 			r.Header.Set("Internal-Auth", "SSR")
 			handler(w, r)
 			return
 		}
 
 		// Forum is public, user is not logged in, only show public non-group posts
-		if os.Getenv("FORUM_IS_PRIVATE") != "true" && userId == -1 {
+		if os.Getenv("FORUM_IS_PRIVATE") != isPrivate && userId == -1 {
 			r.Header.Set("Internal-Auth", "Public")
 			handler(w, r)
 			return

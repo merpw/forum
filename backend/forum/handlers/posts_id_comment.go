@@ -204,11 +204,6 @@ func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
 	// posts := srv.DB.GetUserPosts(usersId)
 	comments := h.DB.GetPostComments(postId)
 
