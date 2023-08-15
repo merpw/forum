@@ -1,9 +1,17 @@
+"use client"
+
 import { FC } from "react"
 
-import { Post } from "@/custom"
 import { PostList } from "@/components/posts/list"
+import { usePosts } from "@/api/posts/hooks"
 
-const Home: FC<{ posts: Post[] }> = ({ posts }) => {
+const Home: FC = () => {
+  const { posts } = usePosts()
+
+  if (!posts) {
+    return null
+  }
+
   return (
     <>
       <div className={"flex flex-col"}>

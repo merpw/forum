@@ -5,14 +5,15 @@ import { FC, useRef } from "react"
 import Link from "next/link"
 import { SWRConfig } from "swr"
 
-import { Post, User } from "@/custom"
+import { User } from "@/custom"
 import { PostList } from "@/components/posts/list"
 import { followUser, useUser } from "@/api/users/hooks"
 import { UserInfo } from "@/components/profiles/UserInfo"
+import { useUserPosts } from "@/api/posts/hooks"
 
-const UserPage: FC<{ userId: number; posts: Post[] }> = ({ userId, posts }) => {
+const UserPage: FC<{ userId: number }> = ({ userId }) => {
   const { user } = useUser(userId)
-
+  const { posts } = useUserPosts(userId)
   if (!user) return null
 
   return (
@@ -32,7 +33,7 @@ const UserPage: FC<{ userId: number; posts: Post[] }> = ({ userId, posts }) => {
             {"'s posts"}
           </h2>
         </div>
-        <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />
+        {posts && <PostList posts={posts.sort((a, b) => b.date.localeCompare(a.date))} />}
       </div>
     </>
   )
@@ -153,7 +154,7 @@ const FollowButton: FC<{ userId: number }> = ({ userId }) => {
   )
 }
 
-const UserPageWrapper: NextPage<{ user: User; posts: Post[] }> = ({ user, posts }) => {
+const UserPageWrapper: NextPage<{ user: User }> = ({ user }) => {
   return (
     <SWRConfig
       value={{
@@ -162,7 +163,7 @@ const UserPageWrapper: NextPage<{ user: User; posts: Post[] }> = ({ user, posts 
         },
       }}
     >
-      <UserPage userId={user.id} posts={posts} />
+      <UserPage userId={user.id} />
     </SWRConfig>
   )
 }
