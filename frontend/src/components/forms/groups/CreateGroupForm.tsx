@@ -84,38 +84,39 @@ const CreateGroupForm: FC = () => {
               maxLength={205}
             />
 
-            {followers && (
-              <SelectUsers
-                userIds={followers}
-                name={"invite"}
-                placeholder={"Invite your followers"}
-                noOptionsMessage={() => "No followers to invite"}
-              />
-            )}
-
-            <FormError error={formError} />
-
-            <div className={"form-control mt-3"}>
-              <button type={"submit"} className={"button self-center"}>
-                <svg
-                  xmlns={"http://www.w3.org/2000/svg"}
-                  fill={"none"}
-                  viewBox={"0 0 24 24"}
-                  strokeWidth={1.5}
-                  stroke={"currentColor"}
-                  className={"w-4 h-4"}
-                >
-                  <path
-                    strokeLinecap={"round"}
-                    strokeLinejoin={"round"}
-                    d={
-                      "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                    }
-                  />
-                </svg>
-                SUBMIT
-              </button>
+            <div className={"flex flex-row justify-between gap-3"}>
+              {followers && (
+                <div className={"w-full"}>
+                <SelectUsers
+                  userIds={followers}
+                  name={"invite"}
+                  placeholder={"Invite your followers"}
+                  noOptionsMessage={() => "No followers to invite"}
+                />
+                </div>
+              )}
+              <div className={"form-control justify-end"}>
+                <button type={"submit"} className={"btn gradient-accent-light rounded-full p-3"}>
+                  <svg
+                    xmlns={"http://www.w3.org/2000/svg"}
+                    fill={"none"}
+                    viewBox={"0 0 24 24"}
+                    strokeWidth={2}
+                    stroke={"currentColor"}
+                    className={"w-6 text-primary-content"}
+                  >
+                    <path
+                      strokeLinecap={"round"}
+                      strokeLinejoin={"round"}
+                      d={
+                        "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                      }
+                    />
+                  </svg>
+                </button>
+              </div>
             </div>
+            <FormError error={formError} />
           </div>
         </div>
       </div>
