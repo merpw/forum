@@ -45,14 +45,14 @@ type SafeReaction struct {
 }
 
 type SafeEvent struct {
-	Id          int    `json:"id"`
-	GroupId     int    `json:"group_id"`
-	CreatedBy   int    `json:"created_by"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	TimeAndDate string `json:"time_and_date"`
-	Timestamp   string `json:"timestamp"`
-	Status      int    `json:"status"`
+	Id          int          `json:"id"`
+	GroupId     int          `json:"group_id"`
+	CreatedBy   int          `json:"created_by"`
+	Title       string       `json:"title"`
+	Description string       `json:"description"`
+	TimeAndDate string       `json:"time_and_date"`
+	Timestamp   string       `json:"timestamp"`
+	Status      InviteStatus `json:"status"`
 }
 
 func isPresent(slice []string, item string) bool {

@@ -2,7 +2,6 @@ package database
 
 import (
 	"log"
-	"time"
 )
 
 func (db DB) AddEvent(groupId, createdBy int, title, description, timeAndDate string) int {
@@ -21,11 +20,11 @@ func (db DB) AddEvent(groupId, createdBy int, title, description, timeAndDate st
 
 	_, invitationErr := db.Exec(`
     INSERT INTO invitations
-        (type, from_user_id, to_user_id, timestamp, associated_id)
-        SELECT ?, ?, user_id, ?, ?
+        (type, from_user_id, to_user_id, associated_id)
+        SELECT 3, :createdBy, user_id, :id
         FROM group_members
-        WHERE group_id = ? AND user_id IS NOT ?`,
-		3, createdBy, time.Now().Format(time.RFC3339), id, groupId, createdBy)
+        WHERE group_id = :groupId`,
+		createdBy, id, groupId)
 
 	if invitationErr != nil {
 		log.Panic(err)
@@ -115,28 +114,29 @@ func (db DB) GetEventIdsByGroupId(groupId int) []int {
 
 }
 
-func (db DB) GetEventStatus(eventId, userId int) *int {
+func (db DB) GetEventStatus(eventId, userId int) InviteStatus {
 	row := db.QueryRow(`    
+	SELECT CASE 
+	WHEN (
+		SELECT 1 FROM event_members WHERE user_id = :userId AND event_id = :eventId) THEN 1
+	ELSE (
 		SELECT CASE 
 		WHEN (
-			SELECT 1 FROM invitations WHERE to_user_id = :userId AND associated_id = :eventId) THEN 0
-		ELSE (
-			SELECT CASE 
-			WHEN (
-				SELECT 1 FROM event_members WHERE user_id = :userId AND event_id = :eventId) THEN 1
-			ELSE 2
-			END
-		)
-		END 
-		AS event_status`, eventId, userId)
+			SELECT 1 FROM invitations WHERE type = 3 AND to_user_id = :userId AND associated_id = :eventId) THEN 2
+		ELSE 0
+		END
+	)
+	END 
+	AS event_status
+	`, eventId, userId)
 
-	var status = new(int)
+	var status = new(InviteStatus)
 	err := row.Scan(status)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return status
+	return *status
 }
 
 func (db DB) DeleteEventMember(eventId, userId int) {
