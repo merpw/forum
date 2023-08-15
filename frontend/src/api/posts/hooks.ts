@@ -50,7 +50,7 @@ export const usePostList = (postIds: number[]) => {
   )
 
   return {
-    posts: data,
+    posts: postIds.length > 0 ? data : [],
     isLoading: !error && !data,
     error,
   }

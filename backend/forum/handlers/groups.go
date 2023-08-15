@@ -33,6 +33,12 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userId := h.getUserId(w, r)
+
+	var memberStatus *InviteStatus
+	if userId != -1 {
+		memberStatus = h.DB.GetGroupMemberStatus(group.Id, userId)
+	}
+
 	responseBody := struct {
 		Id           int           `json:"id"`
 		Title        string        `json:"title"`
@@ -45,7 +51,7 @@ func (h *Handlers) groupsId(w http.ResponseWriter, r *http.Request) {
 		Title:        group.Title,
 		Description:  group.Description,
 		CreatorId:    group.CreatorId,
-		MemberStatus: h.DB.GetGroupMemberStatus(group.Id, userId),
+		MemberStatus: memberStatus,
 		MemberCount:  h.DB.GetGroupMemberCount(group.Id),
 	}
 
