@@ -1,18 +1,13 @@
-const checkSession = async (token: string) => {
-  const response = await fetch(
-    `${process.env.FORUM_BACKEND_PRIVATE_URL}/api/internal/check-session?token=${token}`,
-    {
-      headers: {
-        "Internal-Auth": process.env.FORUM_BACKEND_SECRET || "secret",
-      },
-    }
-  )
+import edgeFetcher from "@/api/edge-fetcher"
 
-  const body = await response.json()
-  if (body.error) {
-    throw new Error(body.error)
+const checkSession = async (token: string) => {
+  const response = await edgeFetcher<{ error: string } | number>(
+    "/api/internal/check-session?token=" + token
+  )
+  if (typeof response === "object" && response.error) {
+    throw new Error(response.error)
   }
 
-  return body as number
+  return response as number
 }
 export default checkSession

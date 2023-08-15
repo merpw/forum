@@ -1,11 +1,4 @@
 import { User } from "@/custom"
+import edgeFetcher from "@/api/edge-fetcher"
 
-export const getUserLocal = (id: number): Promise<User> =>
-  fetch(`${process.env.FORUM_BACKEND_PRIVATE_URL}/api/users/${id}`, {
-    headers: {
-      "Internal-Auth": process.env.FORUM_BACKEND_SECRET || "secret",
-    },
-  }).then((res) => {
-    if (!res.ok) throw new Error("Network response was not ok")
-    return res.json()
-  })
+export const getUserLocal = (id: number) => edgeFetcher<User>(`/api/users/${id}`)
