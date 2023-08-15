@@ -1,6 +1,6 @@
 "use client"
 
-import { FC, useRef } from "react"
+import { FC, useState } from "react"
 import { SWRConfig } from "swr"
 import Link from "next/link"
 import { HiChatAlt2, HiOutlineUserAdd } from "react-icons/hi"
@@ -12,6 +12,8 @@ import { PostList } from "@/components/posts/list"
 import { useGroupPosts } from "@/api/groups/posts"
 import { usePostList } from "@/api/posts/hooks"
 import InviteFollowersForm from "@/components/forms/groups/InviteFollowersForm"
+import EventList from "@/components/events/EventList"
+import { useGroupEvents } from "@/api/events/hooks"
 
 const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
   const { group } = useGroup(groupId)
@@ -54,19 +56,43 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
           </Link>
         </div>
       ) : null}
-      <div className={"mt-5"}>
-        <div className={"text-center"}>
-          <h2 className={"tab tab-bordered tab-active cursor-default self-center mb-3"}>Posts</h2>
-        </div>
-        {group.member_status === 1 ? (
-          <GroupPosts groupId={groupId} />
-        ) : (
-          <div className={"text-info text-center mt-5 mb-7"}>
-            You need to be a member to see posts
-          </div>
-        )}
-      </div>
+
+      <GroupFooter groupId={groupId} />
     </>
+  )
+}
+
+const GroupFooter: FC<{ groupId: number }> = ({ groupId }) => {
+  const [activeTab, setActiveTab] = useState<number>(0)
+
+  const ActiveTabComponent = Tabs[activeTab].Component
+
+  const { group } = useGroup(groupId)
+
+  if (!group || group.member_status === undefined) return null
+
+  if (group.member_status === 0)
+    return (
+      <div className={"text-info text-center mt-5 mb-7"}>
+        You need to be a member to see posts and events
+      </div>
+    )
+
+  return (
+    <div className={"mt-5"}>
+      <div className={"text-center mb-2"}>
+        {Tabs.map(({ name }, key) => (
+          <h2
+            key={key}
+            className={`tab tab-bordered ${activeTab === key ? "tab-active" : ""}`}
+            onClick={() => setActiveTab(key)}
+          >
+            {name}
+          </h2>
+        ))}
+      </div>
+      <ActiveTabComponent groupId={groupId} />
+    </div>
   )
 }
 
@@ -79,6 +105,25 @@ const GroupPosts: FC<{ groupId: number }> = ({ groupId }) => {
 
   return <PostList posts={posts} />
 }
+
+const GroupEvents: FC<{ groupId: number }> = ({ groupId }) => {
+  const { events } = useGroupEvents(groupId)
+
+  if (!events) return null
+
+  return <EventList events={events} />
+}
+
+const Tabs = [
+  {
+    name: "Posts",
+    Component: GroupPosts,
+  },
+  {
+    name: "Events",
+    Component: GroupEvents,
+  },
+] as const
 
 const GroupPageWrapper: FC<{ group: Group }> = ({ group }) => {
   return (
