@@ -11,11 +11,9 @@ export type Post = {
   comments: Comment[]
   categories: string
   group_id?: number
-  privacy: Privacy
-  selectedUsers?: number[]
+  privacy: number
+  audience: number[]
 }
-
-export type Privacy = "Public" | "Private" | "SuperPrivate"
 
 export type User = {
   username: string

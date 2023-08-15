@@ -13,7 +13,6 @@ import { GenerateDescriptionButton } from "@/components/forms/create-post/Genera
 import SelectCategories from "@/components/forms/create-post/SelectCategories"
 import { Group } from "@/api/groups/hooks"
 import PostPrivacy from "@/components/forms/create-post/PostPrivacy"
-import { Privacy } from "@/custom"
 
 const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: Group }> = ({
   categories,
@@ -47,7 +46,8 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: G
           description: formData.get("description") as string,
           categories: formData.getAll("categories") as string[],
           group_id: group?.id,
-          privacy: formData.get("privacy") as Privacy,
+          privacy: parseInt(formData.get("privacy") as string),
+          audience: (formData.getAll("audience") as string[]).map((value) => parseInt(value)),
         }
 
         if (formError != null) setFormError(null)
