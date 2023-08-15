@@ -2,10 +2,39 @@ package server_test
 
 import (
 	. "backend/forum/handlers/test/server"
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 )
+
+type TestEvent struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	TimeAndDate string `json:"time_and_date"`
+}
+
+func generateEventData() TestEvent {
+	return TestEvent{
+		Title:       "Title",
+		Description: "Valid description",
+		TimeAndDate: time.Now().Add(24 * time.Hour).Format(time.RFC3339)[0:16],
+	}
+}
+
+func createEvent(t *testing.T, cli *TestClient, groupId int) (int, TestEvent) {
+	t.Helper()
+	testEvent := generateEventData()
+	var eventId int
+	_, resp := cli.TestPost(t, fmt.Sprintf("/api/groups/%d/events/create", groupId),
+		testEvent, http.StatusOK)
+	if err := json.Unmarshal(resp, &eventId); err != nil {
+		t.Fatal(err)
+	}
+	return eventId, testEvent
+}
 
 func TestCreateEvent(t *testing.T) {
 	testServer := NewTestServer(t)
@@ -36,34 +65,39 @@ func TestCreateEvent(t *testing.T) {
 		})
 
 		t.Run("Title - too short", func(t *testing.T) {
-			invalidEventBody := createEventData("", "testdesc", "2024-01-01")
+			invalidEventBody := generateEventData()
+			invalidEventBody.Title = ""
 			cli1.TestPost(t, "/api/groups/1/events/create", invalidEventBody, http.StatusBadRequest)
 		})
 		t.Run("Title - too long", func(t *testing.T) {
-			// 101 characters
-			invalidEventBody := createEventData(strings.Repeat("a", 101), "test", "2024-01-01")
+			invalidEventBody := generateEventData()
+			invalidEventBody.Title = strings.Repeat("a", 101)
 
 			cli1.TestPost(t, "/api/groups/1/events/create", invalidEventBody, http.StatusBadRequest)
 		})
 
 		t.Run("Description - too short", func(t *testing.T) {
-			invalidEventBody := createEventData("test", "", "2024-01-01")
+			invalidEventBody := generateEventData()
+			invalidEventBody.Description = ""
 			cli1.TestPost(t, "/api/groups/1/events/create", invalidEventBody, http.StatusBadRequest)
 		})
 
 		t.Run("Description - too long", func(t *testing.T) {
 			// 201 characters
-			invalidEventBody := createEventData("test", strings.Repeat("a", 201), "2024-01-01")
+			invalidEventBody := generateEventData()
+			invalidEventBody.Description = strings.Repeat("a", 201)
 			cli1.TestPost(t, "/api/groups/1/events/create", invalidEventBody, http.StatusBadRequest)
 		})
 
 		t.Run("Time and date", func(t *testing.T) {
-			invalidEventBody := createEventData("test", "desc", "")
+			invalidEventBody := generateEventData()
+			invalidEventBody.TimeAndDate = ""
 			cli1.TestPost(t, "/api/groups/1/events/create", invalidEventBody, http.StatusBadRequest)
 		})
 
 		t.Run("Time and date - past", func(t *testing.T) {
-			invalidEventBody := createEventData("test", "desc", "1984-01-01")
+			invalidEventBody := generateEventData()
+			invalidEventBody.TimeAndDate = "1984-01-01T10:00"
 			cli1.TestPost(t, "/api/groups/1/events/create", invalidEventBody, http.StatusBadRequest)
 		})
 
@@ -75,7 +109,7 @@ func TestCreateEvent(t *testing.T) {
 
 	t.Run("Valid", func(t *testing.T) {
 		t.Run("Create event", func(t *testing.T) {
-			eventBody := createEventData("test", "test", "2024-01-01")
+			eventBody := generateEventData()
 			cli1.TestPost(t, "/api/groups/1/events/create", eventBody, http.StatusOK)
 		})
 	})

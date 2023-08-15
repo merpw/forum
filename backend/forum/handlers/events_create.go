@@ -3,9 +3,7 @@ package handlers
 import (
 	"backend/common/server"
 	. "backend/forum/database"
-	"backend/forum/external"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -33,34 +31,34 @@ func (h *Handlers) eventsCreate(w http.ResponseWriter, r *http.Request) {
 
 	event.Title = strings.TrimSpace(event.Title)
 	if len(event.Title) < MinTitleLength {
-		http.Error(w, "title is too short", http.StatusBadRequest)
+		http.Error(w, "Title is too short", http.StatusBadRequest)
 		return
 	}
 
 	if len(event.Title) > MaxTitleLength {
-		http.Error(w, "title is too long", http.StatusBadRequest)
+		http.Error(w, "Title is too long", http.StatusBadRequest)
 		return
 	}
 
 	event.Description = strings.TrimSpace(event.Description)
 	if len(event.Description) < MinDescriptionLength {
-		http.Error(w, "description is too short", http.StatusBadRequest)
+		http.Error(w, "Description is too short", http.StatusBadRequest)
 		return
 	}
 
 	if len(event.Description) > MaxDescriptionLength {
-		http.Error(w, "description is too long", http.StatusBadRequest)
+		http.Error(w, "Description is too long", http.StatusBadRequest)
 		return
 	}
 
-	timeAndDate, timeErr := time.Parse("2006-01-02", event.TimeAndDate)
+	timeAndDate, timeErr := time.Parse("2006-01-02T15:04", event.TimeAndDate)
 	if timeErr != nil {
-		http.Error(w, "time and date is invalid", http.StatusBadRequest)
+		http.Error(w, "Time and date is invalid", http.StatusBadRequest)
 		return
 	}
 
 	if timeAndDate.Before(time.Now()) {
-		http.Error(w, "time and date is invalid", http.StatusBadRequest)
+		http.Error(w, "Time and date is invalid", http.StatusBadRequest)
 		return
 	}
 
@@ -68,9 +66,4 @@ func (h *Handlers) eventsCreate(w http.ResponseWriter, r *http.Request) {
 	id := h.DB.AddEvent(groupId, userId, event.Title, event.Description, event.TimeAndDate)
 
 	server.SendObject(w, id)
-
-	external.RevalidateURL(fmt.Sprintf("/groups/%d/events/%d", groupId, id))
-
-	external.RevalidateURL("/")
-
 }

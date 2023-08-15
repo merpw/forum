@@ -3,35 +3,9 @@ package server_test
 import (
 	. "backend/forum/handlers/test/server"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"testing"
 )
-
-type TestEvent struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	TimeAndDate string `json:"time_and_date"`
-}
-
-func createEventData(title, description, timeAndDate string) *TestEvent {
-	return &TestEvent{
-		Title:       title,
-		Description: description,
-		TimeAndDate: timeAndDate,
-	}
-}
-
-func createEvent(cli *TestClient, t *testing.T, groupId int) (int, TestEvent) {
-	testEvent := *createEventData("test", "test", "2023-10-10")
-	var eventId int
-	_, resp := cli.TestPost(t, fmt.Sprintf("/api/groups/%d/events/create", groupId),
-		testEvent, http.StatusOK)
-	if err := json.Unmarshal(resp, &eventId); err != nil {
-		t.Fatal(err)
-	}
-	return eventId, testEvent
-}
 
 func TestEventsId(t *testing.T) {
 	testServer := NewTestServer(t)
@@ -43,7 +17,7 @@ func TestEventsId(t *testing.T) {
 
 	cli1.TestPost(t, "/api/groups/create", group, http.StatusOK)
 
-	createEvent(cli1, t, 1)
+	createEvent(t, cli1, 1)
 
 	invitationIdRespond(t, cli1, 1, true)
 
@@ -106,7 +80,7 @@ func TestEventsIdErrors(t *testing.T) {
 
 	cli1.TestPost(t, "/api/groups/create", group, http.StatusOK)
 
-	createEvent(cli1, t, 1)
+	createEvent(t, cli1, 1)
 
 	invitationIdRespond(t, cli1, 1, true)
 

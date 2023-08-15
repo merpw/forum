@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -261,7 +262,7 @@ func generateTestEventData() TestEventData {
 		CreatedBy:   1,
 		Title:       "TestTitle",
 		Description: "TestDescription",
-		TimeAndDate: "2024-01-01",
+		TimeAndDate: time.Now().Add(24 * time.Hour).Format(time.RFC3339)[0:16],
 	}
 }
 
