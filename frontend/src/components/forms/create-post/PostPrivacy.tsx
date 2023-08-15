@@ -4,59 +4,58 @@ import { useState } from "react"
 
 import SelectUsers from "@/components/forms/SelectUsers"
 import { useFollowers } from "@/api/followers/hooks"
-import { Privacy } from "@/custom"
 
 const PostPrivacy = () => {
   const { followers } = useFollowers()
-  const [privacy, setPrivacy] = useState<Privacy>("Public")
-  const [selected, setSelected] = useState<string[]>([])
+  const [privacy, setPrivacy] = useState(0)
+  const audience = [].map(Number);
 
   if (!followers) return null
 
-  const handlePrivacyChange = (selectedPrivacy: Privacy) => {
-    console.log("Selected Privacy:", selectedPrivacy)
+  const handlePrivacyChange = (selectedPrivacy: number) => {
     setPrivacy(selectedPrivacy)
   }
 
   return (
     <div className={"space-y-2 w-full"}>
+      <input
+          type={"hidden"}
+          name={"privacy"}
+            value={privacy}
+      />
       <div className={"flex flex-row items-center gap-1"}>
         <button
-          onClick={() => handlePrivacyChange("Public")}
-          name={"privacy"}
-          value={"Public"}
+          onClick={() => handlePrivacyChange(0)}
+          value={0}
           type={"button"}
-          className={`btn btn-xs ${privacy === "Public" ? "btn-primary" : "btn-neutral"} `}
+          className={`btn btn-xs ${privacy === 0 ? "btn-primary" : "btn-neutral"} `}
         >
           public
         </button>
         <button
-          onClick={() => handlePrivacyChange("Private")}
-          name={"privacy"}
-          value={"Private"}
+          onClick={() => handlePrivacyChange(1)}
+          value={1}
           type={"button"}
-          className={`btn btn-xs ${privacy === "Private" ? "btn-primary" : "btn-neutral"} `}
+          className={`btn btn-xs ${privacy === 1 ? "btn-primary" : "btn-neutral"} `}
         >
           private
         </button>
         <button
-          onClick={() => handlePrivacyChange("SuperPrivate")}
-          name={"privacy"}
-          value={"select"}
+          onClick={() => handlePrivacyChange(2)}
+          value={2}
           type={"button"}
-          className={`btn btn-xs ${privacy === "SuperPrivate" ? "btn-primary" : "btn-neutral"}`}
+          className={`btn btn-xs ${privacy === 2 ? "btn-primary" : "btn-neutral"}`}
         >
           select
         </button>
       </div>
-      {privacy === "SuperPrivate" && (
+      {privacy === 2 && (
         <div className={"w-full"}>
           <SelectUsers
-            key={"select_" + selected.join(",")}
-            name={"selected_users"}
-            value={selected}
+            key={"select_" + audience.join(",")}
+            name={"audience"}
             userIds={followers}
-            onChange={(newValue) => setSelected(newValue as never)}
+            placeholder={"Select followers"}
             escapeClearsValue={true}
             noOptionsMessage={() =>
               followers.length > 0 ? "All followers are already invited" : "No followers to invite"
