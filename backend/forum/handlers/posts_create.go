@@ -140,7 +140,7 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if *h.DB.GetFollowStatus(follower, userId) != Accepted {
+		if *h.DB.GetFollowStatus(follower, userId) != InviteStatusAccepted {
 			http.Error(w, fmt.Sprintf("Audience is not valid, %s is not your follower", user.Username),
 				http.StatusBadRequest)
 			return

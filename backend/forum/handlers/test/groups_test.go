@@ -3,8 +3,10 @@ package server_test
 import (
 	. "backend/forum/handlers/test/server"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -240,5 +242,53 @@ func TestGroupsIdPosts(t *testing.T) {
 		if postIds[0] != 1 {
 			t.Errorf("invalid post id, expected %d, got %d", 1, postIds[0])
 		}
+	})
+}
+
+type TestEventData struct {
+	Id          int    `json:"id"`
+	GroupId     int    `json:"group_id"`
+	CreatedBy   int    `json:"created_by"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	TimeAndDate string `json:"time_and_date"`
+}
+
+func generateTestEventData() TestEventData {
+	return TestEventData{
+		Id:          1,
+		GroupId:     1,
+		CreatedBy:   1,
+		Title:       "TestTitle",
+		Description: "TestDescription",
+		TimeAndDate: time.Now().Add(24 * time.Hour).Format(time.RFC3339)[0:16],
+	}
+}
+
+// /api/groups/(\d+)/events
+func TestGroupsIdEvents(t *testing.T) {
+	testServer := NewTestServer(t)
+	cli := testServer.TestClient()
+	cli2 := testServer.TestClient()
+	cli2.TestAuth(t)
+	cli.TestAuth(t)
+
+	t.Run("Invalid", func(t *testing.T) {
+		t.Run("Invalid group Id", func(t *testing.T) {
+			group := CreateGroup("test", "test", []int{})
+			cli.TestPost(t, "/api/groups/create", group, http.StatusOK)
+			cli.TestGet(t, fmt.Sprintf("/api/groups/%s/events", "999000000000000000000"), http.StatusNotFound)
+			cli.TestGet(t, "/api/groups/2/events", http.StatusNotFound)
+			cli2.TestGet(t, "/api/groups/1/events", http.StatusForbidden)
+		})
+	})
+
+	t.Run("Valid", func(t *testing.T) {
+		event := generateTestEventData()
+		// create a group, and create a post
+		group := CreateGroup("test", "test", []int{})
+		cli.TestPost(t, "/api/groups/create", group, http.StatusOK)
+		cli.TestPost(t, "/api/groups/1/events/create", event, http.StatusOK)
+		cli.TestGet(t, "/api/groups/1/events", http.StatusOK)
 	})
 }

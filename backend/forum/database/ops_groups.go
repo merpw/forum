@@ -150,14 +150,17 @@ func (db DB) GetGroupPostsById(groupId int) (postIds []int) {
 	return postIds
 }
 
-func (db DB) DeleteGroupMembership(groupId, userId int) {
+// Delete userId from group_members, also delete from
+func (db DB) DeleteGroupMembership(groupId, userId int) InviteStatus {
 	_, err := db.Exec("DELETE FROM group_members WHERE group_id = ? AND user_id = ?", groupId, userId)
 	if err != nil {
 		log.Panic(err)
 	}
+
+	return InviteStatusUnset
 }
 
-func (db DB) AddMembership(groupId, userId int) {
+func (db DB) AddMembership(groupId, userId int) InviteStatus {
 	_, err := db.Exec(`INSERT INTO group_members 
     	(group_id, user_id, timestamp)
 		VALUES (?, ?, ?)`,
@@ -165,4 +168,16 @@ func (db DB) AddMembership(groupId, userId int) {
 	if err != nil {
 		log.Panic(err)
 	}
+
+	_, err = db.Exec(`
+    INSERT INTO invitations
+        (type, from_user_id, to_user_id, associated_id)
+        SELECT 3, creator_id, :userId, id
+        FROM events
+        WHERE group_id = :groupId`, userId, groupId)
+
+	if err != nil {
+		log.Panic(err)
+	}
+	return InviteStatusAccepted
 }

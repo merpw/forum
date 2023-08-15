@@ -73,7 +73,7 @@ func TestGroupIdJoin(t *testing.T) {
 
 			endpoint := fmt.Sprintf("/api/invitations/%d/respond", invites[0])
 			cli1.TestPost(t, endpoint, response, http.StatusOK)
-
+			cli2.TestPost(t, "/api/groups/1/leave", nil, http.StatusOK)
 		})
 	})
 }

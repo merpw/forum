@@ -69,7 +69,7 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
+	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != InviteStatusAccepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
@@ -103,7 +103,7 @@ func (h *Handlers) groupsIdMembers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if *h.DB.GetGroupMemberStatus(groupId, userId) != Accepted {
+	if *h.DB.GetGroupMemberStatus(groupId, userId) != InviteStatusAccepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
@@ -134,19 +134,19 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 	fromUserId := h.getUserId(w, r)
 
 	switch *h.DB.GetGroupMemberStatus(groupId, fromUserId) {
-	case Inactive:
+	case InviteStatusUnset:
 		server.SendObject(w, h.DB.AddInvitation(
-			GroupJoin,
+			InviteTypeGroupJoin,
 			fromUserId,
 			group.CreatorId,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
-	case Pending:
+	case InviteStatusPending:
 		server.SendObject(w, h.DB.DeleteInvitationByUserId(
-			GroupJoin,
+			InviteTypeGroupJoin,
 			fromUserId,
 			group.CreatorId,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
-	case Accepted:
+	case InviteStatusAccepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
 }
@@ -188,15 +188,15 @@ func (h *Handlers) groupsIdInvite(w http.ResponseWriter, r *http.Request) {
 	fromUserId := h.getUserId(w, r)
 
 	switch *h.DB.GetGroupMemberStatus(groupId, toUser.Id) {
-	case Inactive:
+	case InviteStatusUnset:
 		server.SendObject(w, h.DB.AddInvitation(
-			GroupInvite,
+			InviteTypeGroupInvite,
 			fromUserId,
 			toUser.Id,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
-	case Pending:
+	case InviteStatusPending:
 		fallthrough
-	case Accepted:
+	case InviteStatusAccepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
 	}
 }
@@ -226,12 +226,13 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch *h.DB.GetGroupMemberStatus(groupId, userId) {
-	case Inactive:
+	case InviteStatusUnset:
 		server.ErrorResponse(w, http.StatusBadRequest)
-	case Pending:
+	case InviteStatusPending:
 		server.ErrorResponse(w, http.StatusBadRequest)
-	case Accepted:
+	case InviteStatusAccepted:
 		h.DB.DeleteGroupMembership(groupId, userId)
+		h.DB.DeleteAllEventInvites(groupId, userId)
 
 		h.event <- auth.Event{
 			Type: auth.EventTypeGroupLeave,
@@ -241,6 +242,33 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 
-		server.SendObject(w, Inactive)
+		server.SendObject(w, InviteStatusUnset)
 	}
+}
+
+func (h *Handlers) groupsIdEvents(w http.ResponseWriter, r *http.Request) {
+	groupIdStr := strings.TrimPrefix(r.URL.Path, "/api/groups/")
+	groupIdStr = strings.TrimSuffix(groupIdStr, "/events")
+	// /api/groups/1/events -> 1
+
+	groupId, err := strconv.Atoi(groupIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	group := h.DB.GetGroupById(groupId)
+	if group == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
+	userId := h.getUserId(w, r)
+	if *h.DB.GetGroupMemberStatus(groupId, userId) != InviteStatusAccepted {
+		server.ErrorResponse(w, http.StatusForbidden)
+		return
+	}
+
+	server.SendObject(w, h.DB.GetEventIdsByGroupId(groupId))
+
 }

@@ -133,9 +133,9 @@ skipUserNameCheck:
 	}
 
 	now := time.Now()
-	mindate := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
+	minDate := time.Date(1900, time.January, 1, 0, 0, 0, 0, time.UTC)
 
-	if dob.After(now) || dob.Before(mindate) {
+	if dob.After(now) || dob.Before(minDate) {
 		http.Error(w, "date of birth is invalid", http.StatusBadRequest)
 		return
 	}
