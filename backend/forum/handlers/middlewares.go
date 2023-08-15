@@ -59,6 +59,7 @@ func (h *Handlers) withInternal(handler http.HandlerFunc) http.HandlerFunc {
 // withPermissions is a middleware that checks if the user has permissions
 func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		// r.URL.Path does not match any posts endpoint, therefore it skips it
 		if !regexp.MustCompile(`^/api/posts/\d+`).MatchString(r.URL.Path) {
 			handler(w, r)
@@ -72,20 +73,33 @@ func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
 		}
 
 		userId := h.getUserId(w, r)
+
+		ctx := context.WithValue(r.Context(), postIdCtxKey, postId)
+
+		r = r.WithContext(ctx)
+
+		// Forum is private, server side rendering.
 		if os.Getenv("FORUM_IS_PRIVATE") == "true" && userId == -1 {
+			r.Header.Set("Internal-Auth", "SSR")
+			handler(w, r)
+			return
+		}
+
+		// Forum is public, user is not logged in, only show public non-group posts
+		if os.Getenv("FORUM_IS_PRIVATE") != "true" && userId == -1 {
+			r.Header.Set("Internal-Auth", "Public")
+			handler(w, r)
 			return
 		}
 
 		// User does not have post permissions, get status forbidden
+		// TODO: utilize this in middleware
 		if !h.DB.GetPostPermissions(userId, postId) {
 			server.ErrorResponse(w, http.StatusForbidden)
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), postIdCtxKey, postId)
-		r = r.WithContext(ctx)
-
-		// user has permissions, send post
+		// user has permissions
 		handler(w, r)
 	}
 }

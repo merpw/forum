@@ -58,6 +58,23 @@ func (db DB) GetPostById(postId int) *Post {
 	return &post
 }
 
+func (db DB) GetPublicPostById(postId int) *Post {
+	var post Post
+	err := db.QueryRow(`SELECT * FROM posts
+         WHERE id = ? 
+           AND group_id IS NULL
+           AND privacy = 0`, postId).
+		Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
+
+	if err != nil {
+		return nil
+	}
+
+	return &post
+}
+
 func (db DB) GetPostPermissions(userId, postId int) bool {
 	err := db.QueryRow(`
     SELECT posts.* FROM posts

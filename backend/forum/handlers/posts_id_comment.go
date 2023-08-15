@@ -16,8 +16,16 @@ const (
 
 // postsIdCommentIdLike likes a comment on a specific post
 func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) {
-
 	userId := r.Context().Value(userIdCtxKey).(int)
+
+	postId := r.Context().Value(postIdCtxKey).(int)
+
+	post := h.validatedPost(r, userId, postId)
+
+	if post == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
 
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	// /api/posts/1/comment/2/like ->2
@@ -29,11 +37,6 @@ func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) 
 	comment := h.DB.GetCommentById(commentId)
 	if comment == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	if post := h.DB.GetPostById(comment.PostId, userId); post == nil {
-		server.ErrorResponse(w, http.StatusBadRequest)
 		return
 	}
 
@@ -67,6 +70,15 @@ func (h *Handlers) postsIdCommentIdLike(w http.ResponseWriter, r *http.Request) 
 func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
+	postId := r.Context().Value(postIdCtxKey).(int)
+
+	post := h.validatedPost(r, userId, postId)
+
+	if post == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	if err != nil {
 		server.ErrorResponse(w, http.StatusNotFound)
@@ -75,11 +87,6 @@ func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Reques
 	comment := h.DB.GetCommentById(commentId)
 	if comment == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	if post := h.DB.GetPostById(comment.PostId, userId); post == nil {
-		server.ErrorResponse(w, http.StatusBadRequest)
 		return
 	}
 
@@ -113,6 +120,15 @@ func (h *Handlers) postsIdCommentIdDislike(w http.ResponseWriter, r *http.Reques
 func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
+	postId := r.Context().Value(postIdCtxKey).(int)
+
+	post := h.validatedPost(r, userId, postId)
+
+	if post == nil {
+		server.ErrorResponse(w, http.StatusNotFound)
+		return
+	}
+
 	commentId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[5])
 	if err != nil {
 		server.ErrorResponse(w, http.StatusNotFound)
@@ -122,11 +138,6 @@ func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Reque
 	comment := h.DB.GetCommentById(commentId)
 	if comment == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	if post := h.DB.GetPostById(comment.PostId, userId); post == nil {
-		server.ErrorResponse(w, http.StatusBadRequest)
 		return
 	}
 
@@ -143,17 +154,11 @@ func (h *Handlers) postsIdCommentIdReaction(w http.ResponseWriter, r *http.Reque
 func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 
-	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
-	postIdStr = strings.TrimSuffix(postIdStr, "/comment")
-	// /api/posts/1/comment -> 1
+	postId := r.Context().Value(postIdCtxKey).(int)
 
-	postId, err := strconv.Atoi(postIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
+	post := h.validatedPost(r, userId, postId)
 
-	if post := h.DB.GetPostById(postId, userId); post == nil {
+	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
@@ -162,7 +167,7 @@ func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) 
 		Content string `json:"content"`
 	}{}
 
-	err = json.NewDecoder(r.Body).Decode(&requestBody)
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	if err != nil {
 		http.Error(w, "Body is not valid", http.StatusBadRequest)
 		return
@@ -190,15 +195,16 @@ func (h *Handlers) postsIdCommentCreate(w http.ResponseWriter, r *http.Request) 
 
 // postsIdComments returns all comments on a specific post
 func (h *Handlers) postsIdComments(w http.ResponseWriter, r *http.Request) {
-	postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
-	// /api/posts/1/comments -> 1
+	postId := r.Context().Value(postIdCtxKey).(int)
 
-	if err != nil {
+	post := h.validatedPost(r, h.getUserId(w, r), postId)
+
+	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
-	userId := h.getUserId(w, r)
-	if post := h.DB.GetPostById(postId, userId); post == nil {
+
+	if post == nil {
 		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
