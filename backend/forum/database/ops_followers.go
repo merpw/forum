@@ -50,23 +50,24 @@ func (db DB) GetFollowStatus(followerId, userId int) *InviteStatus {
 	row := db.QueryRow(`
     SELECT CASE 
     WHEN (
-       SELECT 1 FROM followers WHERE user_id = ? AND follower_id = ?) THEN 1
+       SELECT 1 FROM followers WHERE user_id = :userId AND follower_id = :followerId) THEN 1
     ELSE (
         SELECT CASE 
         WHEN (
-        	SELECT 1 FROM invitations WHERE from_user_id = ? AND to_user_id = ?) THEN 2
+        	SELECT 1 FROM invitations WHERE from_user_id = :followerId AND to_user_id = :userId) THEN 2
         ELSE 0
     	END
     )
     END 
     AS follow_status
-    `, userId, followerId, followerId, userId)
+    `, userId, followerId)
 
 	var followStatus = new(InviteStatus)
 	err := row.Scan(followStatus)
 	if err != nil {
 		log.Panic(err)
 	}
+	log.Println("followStatus", *followStatus)
 	return followStatus
 }
 
@@ -95,6 +96,13 @@ func (db DB) AddFollower(followerId, userId int) InviteStatus {
 		userId, followerId, time.Now().Format(time.RFC3339))
 	if err != nil {
 		log.Panic(err)
+	}
+
+	_, err2 := db.Exec(`DELETE FROM invitations
+		WHERE type = 0 AND from_user_id = :followerId AND to_user_id = :userId`, followerId, userId)
+
+	if err2 != nil {
+		log.Panic(err2)
 	}
 
 	return Accepted
