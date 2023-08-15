@@ -58,7 +58,7 @@ func (db DB) DeleteFollowRequest(fromUserId, toUserId int) InviteStatus {
 		log.Panic(err)
 	}
 
-	return Inactive
+	return InviteStatusUnset
 }
 
 func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId int,
@@ -72,7 +72,7 @@ func (db DB) DeleteInvitationByUserId(invType InviteType, fromUserId, toUserId i
 		log.Panic(err)
 	}
 
-	return Inactive
+	return InviteStatusUnset
 }
 
 func (db DB) AddInvitation(inviteType InviteType, fromUserId, toUserId int, associatedId sql.NullInt64) InviteStatus {
@@ -83,5 +83,5 @@ func (db DB) AddInvitation(inviteType InviteType, fromUserId, toUserId int, asso
 	if err != nil {
 		log.Panic(err)
 	}
-	return Pending
+	return InviteStatusPending
 }

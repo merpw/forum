@@ -19,7 +19,7 @@ func (h *Handlers) eventsCreate(w http.ResponseWriter, r *http.Request) {
 		server.ErrorResponse(w, http.StatusNotFound)
 	}
 
-	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
+	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != InviteStatusAccepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 	}
 

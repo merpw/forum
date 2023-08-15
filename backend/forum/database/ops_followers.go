@@ -86,7 +86,7 @@ func (db DB) RemoveFollower(followerId, userId int) InviteStatus {
 	if err != nil {
 		log.Panic(err)
 	}
-	return Inactive
+	return InviteStatusUnset
 }
 
 func (db DB) AddFollower(followerId, userId int) InviteStatus {
@@ -105,5 +105,5 @@ func (db DB) AddFollower(followerId, userId int) InviteStatus {
 		log.Panic(err2)
 	}
 
-	return Accepted
+	return InviteStatusAccepted
 }

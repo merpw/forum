@@ -83,9 +83,9 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 
 	if requestBody.Response {
 		switch invitation.Type {
-		case FollowUser:
+		case InviteTypeFollowUser:
 			h.DB.AddFollower(invitation.FromUserId, invitation.ToUserId)
-		case GroupInvite:
+		case InviteTypeGroupInvite:
 			groupId := associatedId
 			h.DB.AddMembership(groupId, invitation.ToUserId)
 			h.event <- auth.Event{
@@ -95,7 +95,7 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 					UserId:  invitation.ToUserId,
 				},
 			}
-		case GroupJoin:
+		case InviteTypeGroupJoin:
 			groupId := associatedId
 			h.DB.AddMembership(groupId, invitation.FromUserId)
 			h.event <- auth.Event{
@@ -105,7 +105,7 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 					UserId:  invitation.FromUserId,
 				},
 			}
-		case Event:
+		case InviteTypeEvent:
 			h.DB.AddEventMember(associatedId, invitation.ToUserId)
 		}
 	}

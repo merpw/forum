@@ -28,7 +28,7 @@ func (h *Handlers) eventsId(w http.ResponseWriter, r *http.Request) {
 
 	userId := h.getUserId(w, r)
 
-	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != InviteStatusAccepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
@@ -66,7 +66,7 @@ func (h *Handlers) eventsIdMembers(w http.ResponseWriter, r *http.Request) {
 
 	userId := h.getUserId(w, r)
 
-	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != InviteStatusAccepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
@@ -93,7 +93,7 @@ func (h *Handlers) eventsIdLeave(w http.ResponseWriter, r *http.Request) {
 
 	userId := h.getUserId(w, r)
 
-	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != InviteStatusAccepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}
@@ -119,7 +119,7 @@ func (h *Handlers) eventsIdGoing(w http.ResponseWriter, r *http.Request) {
 
 	userId := h.getUserId(w, r)
 
-	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != Accepted {
+	if *h.DB.GetGroupMemberStatus(event.GroupId, userId) != InviteStatusAccepted {
 		server.ErrorResponse(w, http.StatusForbidden)
 		return
 	}

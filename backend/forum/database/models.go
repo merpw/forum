@@ -7,18 +7,18 @@ import (
 type InviteStatus uint8
 
 const (
-	Inactive InviteStatus = iota
-	Accepted
-	Pending
+	InviteStatusUnset InviteStatus = iota
+	InviteStatusAccepted
+	InviteStatusPending
 )
 
 type InviteType uint8
 
 const (
-	FollowUser InviteType = iota
-	GroupInvite
-	GroupJoin
-	Event
+	InviteTypeFollowUser InviteType = iota
+	InviteTypeGroupInvite
+	InviteTypeGroupJoin
+	InviteTypeEvent
 )
 
 type Privacy uint8
@@ -92,7 +92,7 @@ type Group struct {
 	CreatorId   int
 }
 
-type EventData struct {
+type Event struct {
 	Id          int
 	Title       string
 	Description string

@@ -52,8 +52,8 @@ func (db DB) AddEventMember(eventId, userId int) {
 	}
 }
 
-func (db DB) GetEventById(eventId int) *EventData {
-	var e = EventData{}
+func (db DB) GetEventById(eventId int) *Event {
+	var e Event
 	err := db.QueryRow(
 		"SELECT * FROM events WHERE id = ?", eventId).
 		Scan(&e.Id, &e.GroupId, &e.CreatedBy, &e.Title, &e.Description, &e.TimeAndDate, &e.Timestamp)

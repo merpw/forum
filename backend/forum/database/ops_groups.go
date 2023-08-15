@@ -157,7 +157,7 @@ func (db DB) DeleteGroupMembership(groupId, userId int) InviteStatus {
 		log.Panic(err)
 	}
 
-	return Inactive
+	return InviteStatusUnset
 }
 
 func (db DB) AddMembership(groupId, userId int) InviteStatus {
@@ -179,5 +179,5 @@ func (db DB) AddMembership(groupId, userId int) InviteStatus {
 	if err != nil {
 		log.Panic(err)
 	}
-	return Accepted
+	return InviteStatusAccepted
 }

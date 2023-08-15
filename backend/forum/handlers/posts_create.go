@@ -120,7 +120,7 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "can't follow your own post", http.StatusBadRequest)
 			return
 		}
-		if *h.DB.GetFollowStatus(follower, userId) != Accepted {
+		if *h.DB.GetFollowStatus(follower, userId) != InviteStatusAccepted {
 			http.Error(w, "user is not following you", http.StatusBadRequest)
 			return
 		}
