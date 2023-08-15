@@ -44,8 +44,21 @@ func (db DB) GetAllPosts(userId int) []Post {
 }
 
 // GetPostById reads post from database by post_id
-func (db DB) GetPostById(postId, userId int) *Post {
+func (db DB) GetPostById(postId int) *Post {
 	var post Post
+	err := db.QueryRow(`SELECT * FROM posts WHERE id = ?`, postId).
+		Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
+			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
+			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
+
+	if err != nil {
+		return nil
+	}
+
+	return &post
+}
+
+func (db DB) GetPostPermissions(userId, postId int) bool {
 	err := db.QueryRow(`
     SELECT posts.* FROM posts
 		LEFT JOIN post_audience ON post_audience.post_id = posts.id 
@@ -60,16 +73,8 @@ func (db DB) GetPostById(postId, userId int) *Post {
 			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
     	)
     )
-`, sql.Named("userId", userId), sql.Named("postId", postId)).
-		Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
-			&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
-			&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
-
-	if err != nil {
-		return nil
-	}
-
-	return &post
+`, sql.Named("userId", userId), sql.Named("postId", postId)).Err()
+	return err == nil
 }
 
 // AddPost adds post to database, returns id of new post

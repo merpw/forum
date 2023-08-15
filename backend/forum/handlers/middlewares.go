@@ -5,6 +5,9 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"regexp"
+	"strconv"
+	"strings"
 )
 
 // withAuth is a middleware that checks if the user is authenticated
@@ -50,5 +53,39 @@ func (h *Handlers) withInternal(handler http.HandlerFunc) http.HandlerFunc {
 		} else {
 			server.ErrorResponse(w, http.StatusUnauthorized)
 		}
+	}
+}
+
+// withPermissions is a middleware that checks if the user has permissions
+func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// r.URL.Path does not match any posts endpoint, therefore it skips it
+		if !regexp.MustCompile(`^/api/posts/\d+`).MatchString(r.URL.Path) {
+			handler(w, r)
+			return
+		}
+
+		postId, err := strconv.Atoi(strings.Split(r.URL.Path, "/")[3])
+		if err != nil {
+			server.ErrorResponse(w, http.StatusNotFound)
+			return
+		}
+
+		userId := h.getUserId(w, r)
+		if os.Getenv("FORUM_IS_PRIVATE") == "true" && userId == -1 {
+			return
+		}
+
+		// User does not have post permissions, get status forbidden
+		if !h.DB.GetPostPermissions(userId, postId) {
+			server.ErrorResponse(w, http.StatusForbidden)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), postIdCtxKey, postId)
+		r = r.WithContext(ctx)
+
+		// user has permissions, send post
+		handler(w, r)
 	}
 }

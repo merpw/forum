@@ -4,6 +4,7 @@ import (
 	"backend/common/server"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // checkSession checks if the session token is valid
@@ -68,4 +69,23 @@ loop:
 			break
 		}
 	}
+}
+
+// checkPermission is an internal handler for checking permissions of content before serving it
+func (h *Handlers) checkPermissions(w http.ResponseWriter, r *http.Request) {
+	userIdStr := r.URL.Query().Get("userId")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusBadRequest)
+		return
+	}
+
+	postIdStr := r.URL.Query().Get("postId")
+	postId, err := strconv.Atoi(postIdStr)
+	if err != nil {
+		server.ErrorResponse(w, http.StatusBadRequest)
+		return
+	}
+
+	server.SendObject(w, h.DB.GetPostPermissions(userId, postId))
 }

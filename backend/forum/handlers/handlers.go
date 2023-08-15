@@ -16,6 +16,7 @@ type ctxKey int
 
 const (
 	userIdCtxKey ctxKey = iota
+	postIdCtxKey
 )
 
 type Handlers struct {
@@ -120,6 +121,8 @@ func (h *Handlers) Handler() http.Handler {
 	var internalRoutes = []server.Route{
 		server.NewRoute(http.MethodGet, `/api/internal/check-session`, h.checkSession),
 		server.NewRoute(http.MethodGet, `/api/internal/revoked-sessions`, h.revokedSessions),
+		server.NewRoute(http.MethodGet, `/api/internal/check-permissions?userId=(\d+)&postId=(\d+)`,
+			h.checkPermissions),
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -141,11 +144,11 @@ func (h *Handlers) Handler() http.Handler {
 				}
 
 				if os.Getenv("FORUM_IS_PRIVATE") == "true" {
-					h.withAuth(route.Handler)(w, r)
+					h.withAuth(h.withPermissions(route.Handler))(w, r)
 					return
 				}
 
-				route.Handler(w, r)
+				h.withPermissions(route.Handler)(w, r)
 				return
 			}
 		}
@@ -169,7 +172,7 @@ func (h *Handlers) Handler() http.Handler {
 					return
 				}
 
-				h.withAuth(route.Handler)(w, r)
+				h.withAuth(h.withPermissions(route.Handler))(w, r)
 				return
 			}
 		}
