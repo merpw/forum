@@ -76,21 +76,34 @@ func (db DB) GetPublicPostById(postId int) *Post {
 }
 
 func (db DB) GetPostPermissions(userId, postId int) bool {
-	err := db.QueryRow(`
-    SELECT posts.* FROM posts
-		LEFT JOIN post_audience ON post_audience.post_id = posts.id 
-		LEFT JOIN followers ON post_audience.follow_id = followers.id AND followers.follower_id = :userId  
-		LEFT JOIN followers AS f2 ON posts.author = f2.user_id AND f2.follower_id = :userId
-        LEFT JOIN group_members ON posts.group_id = group_members.group_id AND group_members.user_id = :userId
-    WHERE posts.id = :postId AND (
-        posts.author = :userId OR
-        posts.privacy = 0 AND posts.group_id IS NULL OR (
-			(posts.group_id IS NOT NULL AND group_members.id IS NOT NULL) OR
-			(posts.privacy = 1 AND f2.id IS NOT NULL) OR
-			(posts.privacy = 2 AND post_audience.id IS NOT NULL AND followers.id IS NOT NULL)
-    	)
-    )
-`, sql.Named("userId", userId), sql.Named("postId", postId)).Err()
+	var post Post
+	row := db.QueryRow(`
+    SELECT p.*
+    FROM posts AS p
+    WHERE p.id = :postId AND 
+		p.privacy = 0 OR
+        p.author = :userId OR
+		(p.privacy = 1 AND EXISTS (
+			SELECT 1 FROM followers AS f
+			WHERE f.user_id = p.author AND f.follower_id = :userId 
+		)) OR
+		(p.privacy = 2 AND EXISTS (
+			SELECT 1 FROM post_audience AS pa
+			WHERE pa.post_id = p.id AND pa.follow_id IN (
+				SELECT id FROM followers
+				WHERE follower_id = :userId
+			)
+		)) OR
+		EXISTS (
+			SELECT 1 FROM group_members AS gm
+			WHERE gm.group_id = p.group_id AND gm.user_id = :userId
+		)
+		
+`, sql.Named("userId", userId), sql.Named("postId", postId))
+	err := row.Scan(&post.Id, &post.Title, &post.Content, &post.AuthorId, &post.Date,
+		&post.LikesCount, &post.DislikesCount, &post.CommentsCount,
+		&post.Categories, &post.Description, &post.GroupId, &post.Privacy)
+
 	return err == nil
 }
 

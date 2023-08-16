@@ -216,23 +216,40 @@ func TestInvalidPostPrivacy(t *testing.T) {
 		invalidPost.Privacy = int(Private)
 
 		cli1.TestPost(t, "/api/posts/create", invalidPost, http.StatusOK)
-
+		comment := generateComment()
 		t.Run("Post reactions and comment", func(t *testing.T) {
 
 			t.Run("Like", func(t *testing.T) {
-				cli2.TestPost(t, "/api/posts/1/like", nil, http.StatusNotFound)
+				cli2.TestPost(t, "/api/posts/1/like", nil, http.StatusForbidden)
 			})
 
 			t.Run("Dislike", func(t *testing.T) {
-				cli2.TestPost(t, "/api/posts/1/dislike", nil, http.StatusNotFound)
+				cli2.TestPost(t, "/api/posts/1/dislike", nil, http.StatusForbidden)
 			})
 
 			t.Run("Comment", func(t *testing.T) {
-				cli2.TestPost(t, "/api/posts/1/comment", nil, http.StatusNotFound)
+				cli2.TestPost(t, "/api/posts/1/comment", comment, http.StatusForbidden)
 			})
 
 			t.Run("Get comments", func(t *testing.T) {
-				cli2.TestGet(t, "/api/posts/1/comments", http.StatusNotFound)
+				cli2.TestGet(t, "/api/posts/1/comments", http.StatusForbidden)
+			})
+		})
+
+		cli1.TestPost(t, "/api/posts/1/comment", comment, http.StatusOK)
+
+		t.Run("Private post/id/comments", func(t *testing.T) {
+
+			t.Run("Like", func(t *testing.T) {
+				cli2.TestPost(t, "/api/posts/1/comment/1/like", nil, http.StatusForbidden)
+			})
+
+			t.Run("Dislike", func(t *testing.T) {
+				cli2.TestPost(t, "/api/posts/1/comment/1/dislike", nil, http.StatusForbidden)
+			})
+
+			t.Run("Reaction", func(t *testing.T) {
+				cli2.TestGet(t, "/api/posts/1/comment/1/reaction", http.StatusForbidden)
 			})
 		})
 	})
@@ -240,51 +257,31 @@ func TestInvalidPostPrivacy(t *testing.T) {
 	validPost := generatePostData()
 	validPost.Privacy = int(Private)
 
-	comment := generateComment()
-
-	cli1.TestPost(t, "/api/posts/create", validPost, http.StatusOK)
-	cli1.TestPost(t, "/api/posts/1/comment", comment, http.StatusOK)
-
-	t.Run("Private post/id/comments", func(t *testing.T) {
-
-		t.Run("Like", func(t *testing.T) {
-			cli2.TestPost(t, "/api/posts/1/comment/1/like", nil, http.StatusBadRequest)
-		})
-
-		t.Run("Dislike", func(t *testing.T) {
-			cli2.TestPost(t, "/api/posts/1/comment/1/dislike", nil, http.StatusBadRequest)
-		})
-
-		t.Run("Reaction", func(t *testing.T) {
-			cli2.TestGet(t, "/api/posts/1/comment/1/reaction", http.StatusBadRequest)
-		})
-	})
-
 	cli3 := testServer.TestClient()
 	cli3.TestAuth(t)
 
 	validPost.Privacy = int(SuperPrivate)
-	validPost.Audience = []int{2}
+	validPost.Audience = []int{3}
 
-	followAndRespond(t, cli1, cli2, 1, 1, true)
+	followAndRespond(t, cli1, cli3, 1, 1, true)
 
 	t.Run("SuperPrivate comments", func(t *testing.T) {
 
 		cli1.TestPost(t, "/api/posts/create", validPost, http.StatusOK)
-		comment := createComments(t, cli1, 1, 1)[0]
+		comment := createComments(t, cli1, 2, 1)[0]
 
 		cli1.TestPost(t, "/api/posts/2/comment", comment, http.StatusOK)
 
 		t.Run("Like", func(t *testing.T) {
-			cli3.TestPost(t, "/api/posts/2/comment/2/like", nil, http.StatusBadRequest)
+			cli2.TestPost(t, "/api/posts/2/comment/2/like", nil, http.StatusForbidden)
 		})
 
 		t.Run("Dislike", func(t *testing.T) {
-			cli3.TestPost(t, "/api/posts/2/comment/2/dislike", nil, http.StatusBadRequest)
+			cli2.TestPost(t, "/api/posts/2/comment/2/dislike", nil, http.StatusForbidden)
 		})
 
 		t.Run("Reaction", func(t *testing.T) {
-			cli3.TestGet(t, "/api/posts/2/comment/2/reaction", http.StatusBadRequest)
+			cli2.TestGet(t, "/api/posts/2/comment/2/reaction", http.StatusForbidden)
 		})
 
 	})

@@ -161,6 +161,8 @@ func (h *Handlers) validatedPost(r *http.Request, userId, postId int) *Post {
 		if h.DB.GetPostPermissions(userId, postId) {
 			return h.DB.GetPostById(postId)
 		}
+
+		return nil
 	}
 
 	if r.Header.Get("Internal-Auth") == "SSR" ||

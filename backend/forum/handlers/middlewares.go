@@ -72,6 +72,11 @@ func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
+		if post := h.DB.GetPostById(postId); post == nil {
+			server.ErrorResponse(w, http.StatusNotFound)
+			return
+		}
+
 		userId := h.getUserId(w, r)
 
 		ctx := context.WithValue(r.Context(), postIdCtxKey, postId)
@@ -93,7 +98,6 @@ func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// User does not have post permissions, get status forbidden
-		// TODO: utilize this in middleware
 		if !h.DB.GetPostPermissions(userId, postId) {
 			server.ErrorResponse(w, http.StatusForbidden)
 			return
