@@ -15,11 +15,6 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 
 	post := h.validatedPost(r, userId, postId)
 
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
 	postAuthor := h.DB.GetUserById(post.AuthorId)
 	safePost := SafePost{
 		Id:          post.Id,
@@ -49,13 +44,6 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 	postId := r.Context().Value(postIdCtxKey).(int)
-
-	post := h.validatedPost(r, userId, postId)
-
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
 
 	reaction := h.DB.GetPostReaction(postId, userId)
 
@@ -90,13 +78,6 @@ func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
 	postId := r.Context().Value(postIdCtxKey).(int)
 
-	post := h.validatedPost(r, userId, postId)
-
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
 	reaction := h.DB.GetPostReaction(postId, userId)
 
 	switch reaction {
@@ -130,11 +111,6 @@ func (h *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
 
 	post := h.validatedPost(r, userId, postId)
 
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
 	reaction := h.DB.GetPostReaction(postId, userId)
 	safeReaction := SafeReaction{
 		Reaction:      reaction,
@@ -161,8 +137,6 @@ func (h *Handlers) validatedPost(r *http.Request, userId, postId int) *Post {
 		if h.DB.GetPostPermissions(userId, postId) {
 			return h.DB.GetPostById(postId)
 		}
-
-		return nil
 	}
 
 	if r.Header.Get("Internal-Auth") == "SSR" ||
@@ -170,8 +144,6 @@ func (h *Handlers) validatedPost(r *http.Request, userId, postId int) *Post {
 		return h.DB.GetPostById(postId)
 	}
 
-	if r.Header.Get("Internal-Auth") == "Public" {
-		return h.DB.GetPublicPostById(postId)
-	}
-	return nil
+	// not logged in, not SSR. Send public post
+	return h.DB.GetPublicPostById(postId)
 }
