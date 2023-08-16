@@ -15,6 +15,10 @@ func TestCommentCreate(t *testing.T) {
 	testServer := NewTestServer(t)
 
 	cli := testServer.TestClient()
+	cli2 := testServer.TestClient()
+
+	cli2.TestAuth(t)
+	post := createPosts(t, cli2, 1)[0]
 
 	t.Run("Unauthorized", func(t *testing.T) {
 		cli.TestPost(t, "/api/posts/1/comment", nil, http.StatusUnauthorized)
@@ -23,19 +27,16 @@ func TestCommentCreate(t *testing.T) {
 	cli.TestAuth(t)
 
 	t.Run("Not found", func(t *testing.T) {
-		cli.TestPost(t, "/api/posts/1/comment", nil, http.StatusNotFound)
+		cli.TestPost(t, "/api/posts/2/comment", nil, http.StatusNotFound)
 		cli.TestPost(t, "/api/posts/214748364712312214748364712312/comment", nil, http.StatusNotFound)
 	})
 
 	t.Run("Valid", func(t *testing.T) {
-		post := createPosts(t, cli, 1)[0]
 
 		cli.TestPost(t, fmt.Sprintf("/api/posts/%d/comment", post.Id), generateComment(), http.StatusOK)
 	})
 
 	t.Run("Invalid", func(t *testing.T) {
-		post := createPosts(t, cli, 1)[0]
-
 		goodComment := generateComment()
 
 		t.Run("Body", func(t *testing.T) {

@@ -78,6 +78,7 @@ func TestPrivatePost(t *testing.T) {
 			cli2.TestPost(t, "/api/posts/1/like", nil, http.StatusOK)
 
 			var posts []PostData
+
 			_, respData := cli2.TestGet(t, "/api/me/posts/liked", http.StatusOK)
 			err := json.Unmarshal(respData, &posts)
 			if err != nil {
@@ -124,6 +125,12 @@ func TestSuperPrivatePost(t *testing.T) {
 
 	validPost := generatePostData()
 	validPost.Privacy = int(SuperPrivate)
+
+	t.Run("Invalid follower", func(t *testing.T) {
+		validPost.Audience = []int{10}
+		cli1.TestPost(t, "/api/posts/create", validPost, http.StatusBadRequest)
+	})
+
 	validPost.Audience = []int{2}
 
 	followAndRespond(t, cli1, cli2, 1, 1, true)

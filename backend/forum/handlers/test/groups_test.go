@@ -197,24 +197,31 @@ func TestGroupsId(t *testing.T) {
 func TestGroupsIdPosts(t *testing.T) {
 	testServer := NewTestServer(t)
 	cli := testServer.TestClient()
+	cli2 := testServer.TestClient()
+	cli2.TestAuth(t)
 
-	t.Run("Invalid", func(t *testing.T) {
-		t.Run("Unauthorized", func(t *testing.T) {
-			cli.TestGet(t, "/api/groups/1", http.StatusUnauthorized)
-		})
-		cli.TestAuth(t)
-		t.Run("Not found", func(t *testing.T) {
-			cli.TestGet(t, "/api/groups/1/posts", http.StatusNotFound)
-			cli.TestGet(t, "/api/groups/999999999999999999999999999999/posts", http.StatusNotFound)
-		})
+	t.Run("Unauthorized", func(t *testing.T) {
+		cli.TestGet(t, "/api/groups/1", http.StatusUnauthorized)
+	})
+
+	cli.TestAuth(t)
+
+	// create a group
+	group := CreateGroup("test", "test", []int{})
+	cli.TestPost(t, "/api/groups/create", group, http.StatusOK)
+
+	t.Run("Not found", func(t *testing.T) {
+		cli.TestGet(t, "/api/groups/10/posts", http.StatusNotFound)
+		cli.TestGet(t, "/api/groups/999999999999999999999999999999/posts", http.StatusNotFound)
+	})
+
+	t.Run("Forbidden", func(t *testing.T) {
+		cli2.TestGet(t, "/api/groups/1/posts", http.StatusForbidden)
+
 	})
 
 	t.Run("Valid", func(t *testing.T) {
-
-		// create a group, and create a post
-		group := CreateGroup("test", "test", []int{})
-		cli.TestPost(t, "/api/groups/create", group, http.StatusOK)
-
+		// Create a post
 		post := GroupPostData(1)
 		cli.TestPost(t, "/api/posts/create", post, http.StatusOK)
 

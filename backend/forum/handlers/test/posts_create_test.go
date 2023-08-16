@@ -114,6 +114,16 @@ func TestPostsCreate(t *testing.T) {
 			badPostData.Categories = []string{"spamCategoryThatDoesNotExist"}
 			cli.TestPost(t, "/api/posts/create", badPostData, http.StatusBadRequest)
 		})
+
+		t.Run("Group", func(t *testing.T) {
+			badPostData := generatePostData()
+
+			var groupId = new(int)
+			*groupId = 1
+			badPostData.GroupId = groupId
+			cli.TestPost(t, "/api/posts/create", badPostData, http.StatusBadRequest)
+
+		})
 	})
 }
 
@@ -139,6 +149,7 @@ type PostData struct {
 	Description string `json:"description"`
 	Content     string `json:"content"`
 	Audience    []int  `json:"audience"`
+	GroupId     *int   `json:"group_id"`
 	Privacy     int    `json:"privacy"`
 
 	// []string for requests, string for responses
@@ -152,6 +163,7 @@ func generatePostData() PostData {
 		Description: "description",
 		Categories:  []string{"facts"},
 		Audience:    []int{},
+		GroupId:     nil,
 		Privacy:     int(Public),
 	}
 }
