@@ -84,14 +84,14 @@ func (h *Handlers) checkPermissions(w http.ResponseWriter, r *http.Request) {
 	userIdStr := r.URL.Query().Get("userId")
 	userId, err := strconv.Atoi(userIdStr)
 	if err != nil {
-		server.ErrorResponse(w, http.StatusBadRequest)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
 	postIdStr := r.URL.Query().Get("postId")
 	postId, err := strconv.Atoi(postIdStr)
 	if err != nil {
-		server.ErrorResponse(w, http.StatusBadRequest)
+		server.ErrorResponse(w, http.StatusNotFound)
 		return
 	}
 
