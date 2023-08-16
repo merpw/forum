@@ -151,7 +151,7 @@ func (h *Handlers) Handler() http.Handler {
 				}
 
 				if os.Getenv("FORUM_IS_PRIVATE") == isPrivate {
-					h.withAuth(h.withPermissions(route.Handler))(w, r)
+					h.withPermissions(h.withAuth(route.Handler))(w, r)
 					return
 				}
 
@@ -179,7 +179,7 @@ func (h *Handlers) Handler() http.Handler {
 					return
 				}
 
-				h.withAuth(h.withPermissions(route.Handler))(w, r)
+				h.withPermissions(h.withAuth(route.Handler))(w, r)
 				return
 			}
 		}
