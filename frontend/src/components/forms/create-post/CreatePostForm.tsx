@@ -130,8 +130,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: G
             <FormError error={formError} />
 
             <div className={"flex flex-row justify-between gap-3"}>
-              <PostPrivacy />
-
+              {group ? null : <PostPrivacy />}
               <div className={"form-control justify-end"}>
                 <button type={"submit"} className={"btn gradient-accent-light rounded-full p-3"}>
                   <svg
