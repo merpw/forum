@@ -2,6 +2,7 @@ import { FC, useState } from "react"
 import ReactTextAreaAutosize from "react-textarea-autosize"
 import dayjs from "dayjs"
 import { useSWRConfig } from "swr"
+import { useRouter } from "next/navigation"
 
 import { FormError } from "@/components/error"
 import createEvent from "@/api/events/create"
@@ -10,6 +11,8 @@ const CreateEventForm: FC<{ groupId: number }> = ({ groupId }) => {
   const [formError, setFormError] = useState<string | null>(null)
 
   const { mutate } = useSWRConfig()
+
+  const router = useRouter()
 
   return (
     <form
@@ -37,6 +40,7 @@ const CreateEventForm: FC<{ groupId: number }> = ({ groupId }) => {
           .then(() => {
             form.reset()
             form.closest("dialog")?.close()
+            router.push(`/group/${groupId}/events`)
             mutate(`/api/groups/${groupId}/events`)
           })
           .catch((error) => {

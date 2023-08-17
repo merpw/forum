@@ -1,6 +1,6 @@
 "use client"
 
-import { FC, useState } from "react"
+import { FC } from "react"
 import { SWRConfig } from "swr"
 import Link from "next/link"
 import { HiChatAlt2, HiOutlineUserAdd } from "react-icons/hi"
@@ -16,7 +16,7 @@ import EventList from "@/components/events/EventList"
 import { useGroupEvents } from "@/api/events/hooks"
 import CreateEventForm from "@/components/forms/groups/CreateEventForm"
 
-const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
+const GroupPage: FC<{ groupId: number; tab?: TabName }> = ({ groupId, tab }) => {
   const { group } = useGroup(groupId)
 
   if (!group) return null
@@ -69,15 +69,15 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
         </div>
       ) : null}
 
-      <GroupFooter groupId={groupId} />
+      <GroupFooter groupId={groupId} tab={tab} />
     </>
   )
 }
 
-const GroupFooter: FC<{ groupId: number }> = ({ groupId }) => {
-  const [activeTab, setActiveTab] = useState<number>(0)
+const GroupFooter: FC<{ groupId: number; tab?: TabName }> = ({ groupId, tab }) => {
+  const activeTab = tab ?? Tabs[0].name
 
-  const ActiveTabComponent = Tabs[activeTab].Component
+  const ActiveTabComponent = Tabs.find((tab) => tab.name === activeTab)?.Component ?? (() => null)
 
   const { group } = useGroup(groupId)
 
@@ -93,14 +93,12 @@ const GroupFooter: FC<{ groupId: number }> = ({ groupId }) => {
   return (
     <div className={"mt-5"}>
       <div className={"text-center mb-2"}>
-        {Tabs.map(({ name }, key) => (
-          <h2
-            key={key}
-            className={`tab tab-bordered ${activeTab === key ? "tab-active" : ""}`}
-            onClick={() => setActiveTab(key)}
-          >
-            {name}
-          </h2>
+        {Tabs.map(({ name, route }, key) => (
+          <Link href={`/group/${groupId}` + route} key={key}>
+            <h2 key={key} className={`tab tab-bordered ${activeTab === name ? "tab-active" : ""}`}>
+              {name}
+            </h2>
+          </Link>
         ))}
       </div>
       <ActiveTabComponent groupId={groupId} />
@@ -129,15 +127,19 @@ const GroupEvents: FC<{ groupId: number }> = ({ groupId }) => {
 const Tabs = [
   {
     name: "Posts",
+    route: "/",
     Component: GroupPosts,
   },
   {
     name: "Events",
+    route: "/events",
     Component: GroupEvents,
   },
 ] as const
 
-const GroupPageWrapper: FC<{ group: Group }> = ({ group }) => {
+type TabName = (typeof Tabs)[number]["name"]
+
+const GroupPageWrapper: FC<{ group: Group; tab?: TabName }> = ({ group, tab }) => {
   return (
     <SWRConfig
       value={{
@@ -146,7 +148,7 @@ const GroupPageWrapper: FC<{ group: Group }> = ({ group }) => {
         },
       }}
     >
-      <GroupPage groupId={group.id} />
+      <GroupPage groupId={group.id} tab={tab} />
     </SWRConfig>
   )
 }

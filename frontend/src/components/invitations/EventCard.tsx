@@ -17,8 +17,7 @@ export const EventCard: FC<{ invitation: Invitation & { type: 3 } }> = ({ invita
 
   return (
     <div className={"flex flex-col"}>
-      {/*TODO: add link to 'events' tab */}
-      <Link href={`/group/${event.group_id}`} className={"flex gap-2 items-center mr-auto"}>
+      <Link href={`/group/${event.group_id}/events`} className={"flex gap-2 items-center mr-auto"}>
         <Avatar user={user} size={10} className={"w-12"} />
         <span>
           <span className={"text-primary"}>{user.username}</span> created an event{" "}
