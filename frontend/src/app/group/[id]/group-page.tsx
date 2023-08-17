@@ -1,10 +1,10 @@
 "use client"
 
-import { FC, useRef } from "react"
+import { FC } from "react"
 import { SWRConfig } from "swr"
 import Link from "next/link"
 import { HiChatAlt2, HiOutlineUserAdd } from "react-icons/hi"
-import { HiOutlinePencilSquare } from "react-icons/hi2"
+import { HiOutlineCalendarDays, HiOutlinePencilSquare } from "react-icons/hi2"
 
 import { Group, useGroup } from "@/api/groups/hooks"
 import GroupInfo from "@/components/groups/GroupInfo"
@@ -12,11 +12,12 @@ import { PostList } from "@/components/posts/list"
 import { useGroupPosts } from "@/api/groups/posts"
 import { usePostList } from "@/api/posts/hooks"
 import InviteFollowersForm from "@/components/forms/groups/InviteFollowersForm"
+import EventList from "@/components/events/EventList"
+import { useGroupEvents } from "@/api/events/hooks"
+import CreateEventForm from "@/components/forms/groups/CreateEventForm"
 
-const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
+const GroupPage: FC<{ groupId: number; tab?: TabName }> = ({ groupId, tab }) => {
   const { group } = useGroup(groupId)
-
-  const invitePopupRef = useRef<HTMLDialogElement>(null)
 
   if (!group) return null
 
@@ -27,12 +28,12 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
         <div className={"flex justify-center gap-3"}>
           <button
             className={"button h-12 w-12 rounded-full"}
-            onClick={() => invitePopupRef.current?.showModal()}
+            onClick={(e) => (e.currentTarget.nextElementSibling as HTMLDialogElement).showModal()}
             title={"Invite followers to the group"}
           >
             <HiOutlineUserAdd className={"w-full h-full"} />
           </button>
-          <dialog ref={invitePopupRef} className={"modal"}>
+          <dialog className={"modal"}>
             <InviteFollowersForm groupId={group.id} />
             <form method={"dialog"} className={"modal-backdrop"}>
               <button>close</button>
@@ -52,21 +53,56 @@ const GroupPage: FC<{ groupId: number }> = ({ groupId }) => {
           >
             <HiChatAlt2 className={"w-full h-full"} />
           </Link>
+          <button
+            className={"button h-12 w-12 rounded-full"}
+            onClick={(e) => (e.currentTarget.nextElementSibling as HTMLDialogElement).showModal()}
+            title={"Create event"}
+          >
+            <HiOutlineCalendarDays className={"w-full h-full"} />
+          </button>
+          <dialog className={"modal"}>
+            <CreateEventForm groupId={group.id} />
+            <form method={"dialog"} className={"modal-backdrop"}>
+              <button>close</button>
+            </form>
+          </dialog>
         </div>
       ) : null}
-      <div className={"mt-5"}>
-        <div className={"text-center"}>
-          <h2 className={"tab tab-bordered tab-active cursor-default self-center mb-3"}>Posts</h2>
-        </div>
-        {group.member_status === 1 ? (
-          <GroupPosts groupId={groupId} />
-        ) : (
-          <div className={"text-info text-center mt-5 mb-7"}>
-            You need to be a member to see posts
-          </div>
-        )}
-      </div>
+
+      <GroupFooter groupId={groupId} tab={tab} />
     </>
+  )
+}
+
+const GroupFooter: FC<{ groupId: number; tab?: TabName }> = ({ groupId, tab }) => {
+  const activeTab = tab ?? Tabs[0].name
+
+  const ActiveTabComponent = Tabs.find((tab) => tab.name === activeTab)?.Component ?? (() => null)
+
+  const { group } = useGroup(groupId)
+
+  if (!group || group.member_status === undefined) return null
+
+  if (group.member_status !== 1)
+    return (
+      <div className={"text-info text-center mt-5 mb-7"}>
+        You need to be a member to see posts and events
+      </div>
+    )
+
+  return (
+    <div className={"mt-5"}>
+      <div className={"text-center mb-2"}>
+        {Tabs.map(({ name, route }, key) => (
+          <Link href={`/group/${groupId}` + route} key={key}>
+            <h2 key={key} className={`tab tab-bordered ${activeTab === name ? "tab-active" : ""}`}>
+              {name}
+            </h2>
+          </Link>
+        ))}
+      </div>
+      <ActiveTabComponent groupId={groupId} />
+    </div>
   )
 }
 
@@ -80,7 +116,30 @@ const GroupPosts: FC<{ groupId: number }> = ({ groupId }) => {
   return <PostList posts={posts} />
 }
 
-const GroupPageWrapper: FC<{ group: Group }> = ({ group }) => {
+const GroupEvents: FC<{ groupId: number }> = ({ groupId }) => {
+  const { events } = useGroupEvents(groupId)
+
+  if (!events) return null
+
+  return <EventList events={events} />
+}
+
+const Tabs = [
+  {
+    name: "Posts",
+    route: "/",
+    Component: GroupPosts,
+  },
+  {
+    name: "Events",
+    route: "/events",
+    Component: GroupEvents,
+  },
+] as const
+
+type TabName = (typeof Tabs)[number]["name"]
+
+const GroupPageWrapper: FC<{ group: Group; tab?: TabName }> = ({ group, tab }) => {
   return (
     <SWRConfig
       value={{
@@ -89,7 +148,7 @@ const GroupPageWrapper: FC<{ group: Group }> = ({ group }) => {
         },
       }}
     >
-      <GroupPage groupId={group.id} />
+      <GroupPage groupId={group.id} tab={tab} />
     </SWRConfig>
   )
 }

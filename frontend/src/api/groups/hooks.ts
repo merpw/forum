@@ -7,7 +7,7 @@ export type Group = {
   title: string
   description: string
 
-  member_status: GroupMemberStatus
+  member_status?: GroupMemberStatus
   member_count: number
 
   creator_id: number
