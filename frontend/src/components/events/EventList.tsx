@@ -37,7 +37,9 @@ const EventCard: FC<{ eventId: number }> = ({ eventId }) => {
           "bg-base-100 m-1 rounded-lg flex flex-wrap justify-between items-center py-1.5 px-3 gap-x-1"
         }
       >
-        <span>{formatDate(event.time_and_date)}</span>
+        <span>
+          {formatDate(event.time_and_date)} {dayjs(event.time_and_date).format("HH:mm")}
+        </span>
         <EventResponse event={event} />
       </div>
     </div>
