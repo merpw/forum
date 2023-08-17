@@ -50,7 +50,7 @@ const UserPage: NextPage = () => {
       </div>
       <div className={"mt-5 space-y-3"}>
         <div className={"text-center"}>
-          <ul className={"tab tab-lg p-0"}>
+          <ul className={"tab tab-lg mb-8"}>
             {tabs.map(({ title }, key) => (
               <li key={key}>
                 <button
@@ -108,7 +108,7 @@ const UserFollowers = () => {
     )
 
   return (
-    <div className={"w-96 m-5 mx-auto"}>
+    <div className={"w-full sm:w-96 m-5 p-3 mx-auto space-y-2 border border-neutral rounded-lg"}>
       {followers.map((follower) => (
         <UserCard id={follower} key={follower} />
       ))}
@@ -125,7 +125,7 @@ const UserFollowed = () => {
     return <div className={"text-info text-center mt-5 mb-7"}>{"You don't follow anyone yet"}</div>
 
   return (
-    <div className={"w-96 m-5 mx-auto"}>
+    <div className={"w-full sm:w-96 m-5 p-3 mx-auto space-y-2 border border-neutral rounded-lg"}>
       {following.map((userId) => (
         <UserCard id={userId} key={userId} />
       ))}
