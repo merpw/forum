@@ -84,26 +84,28 @@ const CreateGroupForm: FC = () => {
               maxLength={205}
             />
 
-            {followers && (
-              <SelectUsers
-                userIds={followers}
-                name={"invite"}
-                placeholder={"Invite your followers"}
-                noOptionsMessage={() => "No followers to invite"}
-              />
-            )}
-
-            <FormError error={formError} />
-
-            <div className={"form-control mt-3"}>
-              <button type={"submit"} className={"button self-center"}>
+            <div className={"flex flex-row justify-between gap-3"}>
+              {followers && (
+                <div className={"w-full"}>
+                  <SelectUsers
+                    userIds={followers}
+                    name={"invite"}
+                    placeholder={"Invite your followers"}
+                    noOptionsMessage={() => "No followers to invite"}
+                  />
+                </div>
+              )}
+              <button
+                type={"submit"}
+                className={"btn gradient-accent-light rounded-full p-3 ml-auto mt-auto"}
+              >
                 <svg
                   xmlns={"http://www.w3.org/2000/svg"}
                   fill={"none"}
                   viewBox={"0 0 24 24"}
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                   stroke={"currentColor"}
-                  className={"w-4 h-4"}
+                  className={"w-6 text-primary-content"}
                 >
                   <path
                     strokeLinecap={"round"}
@@ -113,9 +115,9 @@ const CreateGroupForm: FC = () => {
                     }
                   />
                 </svg>
-                SUBMIT
               </button>
             </div>
+            <FormError error={formError} />
           </div>
         </div>
       </div>

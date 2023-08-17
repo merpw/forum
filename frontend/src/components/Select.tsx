@@ -5,7 +5,6 @@ const Select: ReactSelect = (props) => {
     <ReactSelect
       {...props}
       unstyled={true}
-      className={""}
       styles={{
         control: (provided) => ({
           ...provided,
@@ -15,7 +14,7 @@ const Select: ReactSelect = (props) => {
       }}
       classNames={{
         control: ({ isFocused }) =>
-          "input pr-0" +
+          "input pr-0 h-fit" +
           " " +
           (isFocused ? "outline outline-offset-2 outline-base-content/20" : "text-gray-400"),
 

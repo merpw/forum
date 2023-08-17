@@ -151,7 +151,7 @@ func (h *Handlers) usersIdPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	posts := h.DB.GetUserPosts(userId)
+	posts := h.DB.GetPostsByUserId(userId, h.getUserId(w, r))
 
 	response := make([]SafePost, 0)
 	for _, post := range posts {

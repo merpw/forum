@@ -166,6 +166,33 @@ func TestEvents(t *testing.T) {
 	// TODO: add tests for group SSE events
 }
 
+func TestCheckPermissions(t *testing.T) {
+
+	t.Run("Valid", func(t *testing.T) {
+		testServer := NewTestServer(t)
+		cli1 := testServer.TestClient()
+
+		endpoint := "/api/internal/check-permissions?userId=1&postId=1"
+		req := GenerateInternalRequest(t, testServer, endpoint)
+
+		cli1.TestRequest(t, req, http.StatusOK)
+	})
+
+	t.Run("Not found", func(t *testing.T) {
+		testServer := NewTestServer(t)
+		cli1 := testServer.TestClient()
+		cli2 := testServer.TestClient()
+
+		endpoint := "/api/internal/check-permissions?userId=999999999999999999999999999999999999999&postId=1"
+		req1 := GenerateInternalRequest(t, testServer, endpoint)
+		cli1.TestRequest(t, req1, http.StatusNotFound)
+
+		endpoint2 := "/api/internal/check-permissions?userId=1&postId=1999999999999999999999999999999999"
+		req2 := GenerateInternalRequest(t, testServer, endpoint2)
+		cli2.TestRequest(t, req2, http.StatusNotFound)
+	})
+}
+
 func GenerateInternalRequest(t *testing.T, testServer TestServer, path string) *http.Request {
 	t.Helper()
 	req, err := http.NewRequest(http.MethodGet, testServer.URL+path, nil)

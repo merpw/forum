@@ -95,18 +95,7 @@ func (db DB) GetGroupMemberStatus(groupId, userId int) (memberStatus *InviteStat
 	return memberStatus
 }
 
-func (db DB) GetGroupCreatorId(groupId int) *int {
-	var creatorId int
-	err := db.QueryRow("SELECT creator_id FROM groups WHERE id = ?", groupId).Scan(&creatorId)
-	if err != nil {
-		return nil
-	}
-
-	return &creatorId
-}
-
 func (db DB) GetGroupMembers(groupId int, withPending bool) (members []int) {
-
 	var q string
 	if withPending {
 		q = `

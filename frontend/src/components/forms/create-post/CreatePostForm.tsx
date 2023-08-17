@@ -12,6 +12,7 @@ import { trimInput } from "@/helpers/input"
 import { GenerateDescriptionButton } from "@/components/forms/create-post/GenerateDescriptionButton"
 import SelectCategories from "@/components/forms/create-post/SelectCategories"
 import { Group } from "@/api/groups/hooks"
+import PostPrivacy from "@/components/forms/create-post/PostPrivacy"
 
 const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: Group }> = ({
   categories,
@@ -45,6 +46,8 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: G
           description: formData.get("description") as string,
           categories: formData.getAll("categories") as string[],
           group_id: group?.id,
+          privacy: parseInt(formData.get("privacy") as string),
+          audience: (formData.getAll("audience").filter(Boolean) as string[]).map(Number),
         }
 
         if (formError != null) setFormError(null)
@@ -126,15 +129,19 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: G
 
             <FormError error={formError} />
 
-            <div className={"form-control"}>
-              <button type={"submit"} className={"button self-center"}>
+            <div className={"flex flex-row justify-between gap-3"}>
+              {group ? null : <PostPrivacy />}
+              <button
+                type={"submit"}
+                className={"btn gradient-accent-light rounded-full p-3 ml-auto mt-auto"}
+              >
                 <svg
                   xmlns={"http://www.w3.org/2000/svg"}
                   fill={"none"}
                   viewBox={"0 0 24 24"}
-                  strokeWidth={1.5}
+                  strokeWidth={2}
                   stroke={"currentColor"}
-                  className={"w-4 h-4"}
+                  className={"w-6 text-primary-content"}
                 >
                   <path
                     strokeLinecap={"round"}
@@ -144,7 +151,6 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: G
                     }
                   />
                 </svg>
-                SUBMIT
               </button>
             </div>
           </div>

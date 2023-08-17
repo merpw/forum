@@ -10,6 +10,9 @@ export type Post = {
   author: User
   comments: Comment[]
   categories: string
+  group_id?: number
+  privacy: number
+  audience: number[]
 }
 
 export type User = {
