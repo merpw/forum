@@ -10,4 +10,17 @@ const checkSession = async (token: string) => {
 
   return response as number
 }
+
+/** check if the user has permission to see the post */
+export const checkPermissions = async (postId: number, userId: number | null) => {
+  const response = await edgeFetcher<{ error: string } | boolean>(
+    `/api/internal/check-permissions?postId=${postId}` + (userId ? `&userId=${userId}` : "")
+  )
+  if (typeof response === "object" && response.error) {
+    throw new Error(response.error)
+  }
+
+  return response as boolean
+}
+
 export default checkSession
