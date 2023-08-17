@@ -153,7 +153,9 @@ const MarkdownEditor: ForwardRefRenderFunction<
           setUploadError(null)
         }}
         className={
-          isPreview ? "hidden" : props.className + " " + (props.withSubmit ? "py-3 px-3 pr-10" : "")
+          "textarea" +
+          " " +
+          (isPreview ? "hidden" : props.className + " " + (props.withSubmit ? "pr-10" : ""))
         }
         onPaste={(e) => {
           if (e.clipboardData.files.length > 0) {
