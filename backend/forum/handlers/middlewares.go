@@ -72,16 +72,17 @@ func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
+		// Post does not exist -> StatusNotFound
 		if post := h.DB.GetPostById(postId); post == nil {
 			server.ErrorResponse(w, http.StatusNotFound)
 			return
 		}
 
-		userId := h.getUserId(w, r)
-
 		ctx := context.WithValue(r.Context(), postIdCtxKey, postId)
 
 		r = r.WithContext(ctx)
+
+		userId := h.getUserId(w, r)
 
 		// Forum is private, server side rendering.
 		if os.Getenv("FORUM_IS_PRIVATE") == isPrivate && userId == -1 {
@@ -91,7 +92,7 @@ func (h *Handlers) withPermissions(handler http.HandlerFunc) http.HandlerFunc {
 		}
 
 		// Forum is public, user is not logged in, only show public non-group posts
-		if os.Getenv("FORUM_IS_PRIVATE") != isPrivate && userId == -1 {
+		if os.Getenv("FORUM_IS_PRIVATE") == isPublic && userId == -1 {
 			r.Header.Set("Internal-Auth", "Public")
 			handler(w, r)
 			return

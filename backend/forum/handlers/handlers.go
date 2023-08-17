@@ -22,7 +22,7 @@ const (
 
 const (
 	isPrivate = "true"
-	// isPublic  = "false"
+	isPublic  = "false"
 )
 
 type Handlers struct {
