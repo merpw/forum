@@ -21,6 +21,17 @@ services:
     depends_on:
       - backend-forum
     platform: linux/amd64
+  backend-attachments:
+    image: ghcr.io/merpw/forum/backend-attachments:latest
+    command: "server --port 8080 --dir /app/attachments"
+    environment:
+      - AUTH_BASE_URL=http://backend-forum:8080
+      - FORUM_BACKEND_SECRET=${FORUM_BACKEND_SECRET}
+    volumes:
+      - attachments:/app/attachments
+    depends_on:
+      - backend-forum
+    platform: linux/amd64
   frontend:
     image: ghcr.io/merpw/forum/frontend:latest
     container_name: forum-frontend
@@ -47,3 +58,4 @@ services:
 volumes:
   db:
   cache:
+  attachments:
