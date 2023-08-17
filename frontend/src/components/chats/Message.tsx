@@ -109,7 +109,7 @@ const MarkdownMessage: FC<{ message: MessageType }> = ({ message }) => {
         }
       >
         {shouldShowName && (
-          <span className={"badge bg-base-300 text-white"}>
+          <span className={"badge badge-info"}>
             <UserName userId={message.authorId} />
           </span>
         )}

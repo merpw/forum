@@ -75,6 +75,7 @@ const LoginPage = () => {
                     type={"button"}
                     onClick={() => setShowPassword(!showPassword)}
                     className={"label-text text-info clickable"}
+                    tabIndex={-1}
                   >
                     {showPassword ? (
                       <svg

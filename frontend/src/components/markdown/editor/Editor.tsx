@@ -153,7 +153,9 @@ const MarkdownEditor: ForwardRefRenderFunction<
           setUploadError(null)
         }}
         className={
-          isPreview ? "hidden" : props.className + " " + (props.withSubmit ? "py-3 px-3 pr-10" : "")
+          "textarea" +
+          " " +
+          (isPreview ? "hidden" : props.className + " " + (props.withSubmit ? "pr-10" : ""))
         }
         onPaste={(e) => {
           if (e.clipboardData.files.length > 0) {
@@ -193,7 +195,9 @@ const MarkdownEditor: ForwardRefRenderFunction<
           <button
             type={"button"}
             className={
-              "text-sm  px-2 pb-1 rounded-md" + " " + (uploadError ? "text-error" : "text-info")
+              "text-sm  px-2 pb-1 rounded-md" +
+              " " +
+              (uploadError ? "text-error-content" : "text-info")
             }
             onClick={() => {
               setUploadError(null)
@@ -204,7 +208,7 @@ const MarkdownEditor: ForwardRefRenderFunction<
               ? "Drop the files here ..."
               : uploadError
               ? uploadError
-              : "Attach images by dragging & dropping, selecting or pasting them."}
+              : "Drag & drop, select or paste images here."}
           </button>
         </>
       )}
