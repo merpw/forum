@@ -2,10 +2,10 @@
 
 ---
 
-Authors:  [@maximihajlov](https://github.com/maximihajlov), 
-          [@nattikim](https://github.com/nattikim), 
-          [@sagarishere](https://github.com/sagarishere), 
-          [@bomanviktor](https://github.com/bomanviktor)
+Contributors: [@maximihajlov](https://github.com/maximihajlov),
+[@nattikim](https://github.com/nattikim),
+[@bomanviktor](https://github.com/bomanviktor),
+[@FinnTune](https://github.com/FinnTune)
 
 Solved during studying in Grit:lab coding school on Åland, 2023
 
