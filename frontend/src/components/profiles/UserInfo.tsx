@@ -127,15 +127,22 @@ const calculateAge = (dob: string): string | null => {
 const PrivacyToggle: FC<{ user: User }> = ({ user }) => {
   const [privacy, setPrivacy] = useState(user.privacy)
   return (
-    <div className={"form-control mt-3"}>
-      <label className={"label cursor-pointer"}>
-        <span className={"label-text"}>Private</span>
+    <div className={"form-control mt-5 w-36 mx-auto"}>
+      <label className={"relative label cursor-pointer"}>
+        {!privacy && (
+          <span className={"absolute inset-y-0 left-0 label-text text-info"}>public</span>
+        )}
+
         <input
           type={"checkbox"}
-          className={"toggle ml-3 mr-auto"}
+          className={"absolute m-auto inset-0 toggle " + (privacy && "toggle-primary")}
           checked={Boolean(privacy)}
           onChange={() => togglePrivacy().then(setPrivacy)}
         />
+
+        {privacy && (
+          <span className={"absolute inset-y-0 right-0 label-text text-info"}>private</span>
+        )}
       </label>
     </div>
   )
