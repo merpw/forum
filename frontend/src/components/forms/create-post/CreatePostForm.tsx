@@ -47,7 +47,7 @@ const CreatePostForm: FC<{ categories: string[]; isAIEnabled: boolean; group?: G
           categories: formData.getAll("categories") as string[],
           group_id: group?.id,
           privacy: parseInt(formData.get("privacy") as string),
-          audience: (formData.getAll("audience") as string[]).map((value) => parseInt(value)),
+          audience: (formData.getAll("audience").filter(Boolean) as string[]).map(Number),
         }
 
         if (formError != null) setFormError(null)

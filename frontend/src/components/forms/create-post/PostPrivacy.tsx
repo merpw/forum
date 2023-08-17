@@ -56,6 +56,7 @@ const PostPrivacy = () => {
             noOptionsMessage={() =>
               followers.length > 0 ? "All followers are already invited" : "No followers to invite"
             }
+            required
           />
         </div>
       )}
