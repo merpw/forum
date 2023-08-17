@@ -83,7 +83,7 @@ const GroupFooter: FC<{ groupId: number; tab?: TabName }> = ({ groupId, tab }) =
 
   if (!group || group.member_status === undefined) return null
 
-  if (group.member_status === 0)
+  if (group.member_status !== 1)
     return (
       <div className={"text-info text-center mt-5 mb-7"}>
         You need to be a member to see posts and events
