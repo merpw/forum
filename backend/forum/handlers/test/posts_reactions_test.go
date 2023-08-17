@@ -20,6 +20,11 @@ func TestReactionsPost(t *testing.T) {
 
 	cli := testServer.TestClient()
 
+	cli2 := testServer.TestClient()
+	cli2.TestAuth(t)
+
+	post := createPosts(t, cli2, 1)[0]
+
 	t.Run("Unauthorized", func(t *testing.T) {
 		cli.TestPost(t, "/api/posts/1/like", nil, http.StatusUnauthorized)
 		cli.TestPost(t, "/api/posts/1/dislike", nil, http.StatusUnauthorized)
@@ -29,18 +34,17 @@ func TestReactionsPost(t *testing.T) {
 	cli.TestAuth(t)
 
 	t.Run("Not found", func(t *testing.T) {
-		cli.TestPost(t, "/api/posts/1/like", nil, http.StatusNotFound)
+		cli.TestPost(t, "/api/posts/2/like", nil, http.StatusNotFound)
 		cli.TestPost(t, "/api/posts/214748364712312214748364712312/like", nil, http.StatusNotFound)
 
-		cli.TestPost(t, "/api/posts/1/dislike", nil, http.StatusNotFound)
+		cli.TestPost(t, "/api/posts/2/dislike", nil, http.StatusNotFound)
 		cli.TestPost(t, "/api/posts/214748364712312214748364712312/dislike", nil, http.StatusNotFound)
 
-		cli.TestGet(t, "/api/posts/1/reaction", http.StatusNotFound)
+		cli.TestGet(t, "/api/posts/2/reaction", http.StatusNotFound)
 		cli.TestGet(t, "/api/posts/214748364712312214748364712312/reaction", http.StatusNotFound)
 	})
 
 	t.Run("Like", func(t *testing.T) {
-		post := createPosts(t, cli, 1)[0]
 
 		_, respBody := cli.TestPost(t, fmt.Sprintf("/api/posts/%d/like", post.Id), nil, http.StatusOK)
 		checkReaction(t, respBody, 1)

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"backend/common/server"
+	. "backend/forum/database"
 	"backend/forum/external"
 	"database/sql"
 	"encoding/json"
@@ -31,6 +32,8 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		Content     string   `json:"content"`
 		Description string   `json:"description"`
 		Categories  []string `json:"categories"`
+		Privacy     int      `json:"privacy"`
+		Audience    []int    `json:"audience"`
 		GroupId     *int64   `json:"group_id"`
 	}{}
 
@@ -103,7 +106,45 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 	if requestBody.GroupId == nil {
 		groupId = sql.NullInt64{Valid: false}
 	} else {
+		if group := h.DB.GetGroupById(int(*requestBody.GroupId)); group == nil {
+			server.ErrorResponse(w, http.StatusBadRequest)
+			return
+		}
 		groupId = sql.NullInt64{Int64: *requestBody.GroupId, Valid: true}
+		requestBody.Privacy = int(Public)
+	}
+
+	if requestBody.Privacy == int(SuperPrivate) && len(requestBody.Audience) == 0 {
+		http.Error(w, "No audience specified for super private post", http.StatusBadRequest)
+		return
+	}
+
+	if requestBody.Privacy < 0 || requestBody.Privacy > 2 {
+		http.Error(w, "Privacy is not valid", http.StatusBadRequest)
+		return
+	}
+
+	for _, follower := range requestBody.Audience {
+		if requestBody.Privacy != int(SuperPrivate) {
+			http.Error(w, "Unexpected audience, post is not super private", http.StatusBadRequest)
+			return
+		}
+		if follower == userId {
+			http.Error(w, "Can't add yourself as an audience", http.StatusBadRequest)
+			return
+		}
+
+		user := h.DB.GetUserById(follower)
+		if user == nil {
+			http.Error(w, "One of the audience users does not exist", http.StatusBadRequest)
+			return
+		}
+
+		if *h.DB.GetFollowStatus(follower, userId) != Accepted {
+			http.Error(w, fmt.Sprintf("Audience is not valid, %s is not your follower", user.Username),
+				http.StatusBadRequest)
+			return
+		}
 	}
 
 	id := h.DB.AddPost(
@@ -112,7 +153,15 @@ func (h *Handlers) postsCreate(w http.ResponseWriter, r *http.Request) {
 		requestBody.Description,
 		userId,
 		strings.Join(requestBody.Categories, ","),
+		Privacy(requestBody.Privacy),
 		groupId)
+
+	if requestBody.Privacy == int(SuperPrivate) {
+		for _, follower := range requestBody.Audience {
+			h.DB.AddPostAudience(id, *h.DB.GetFollowId(follower, userId))
+		}
+	}
+
 	server.SendObject(w, id)
 
 	external.RevalidateURL(fmt.Sprintf("/post/%v", id))

@@ -66,7 +66,7 @@ func (h *Handlers) invitationsIdRespond(w http.ResponseWriter, r *http.Request) 
 
 	invitation := h.DB.GetInvitationById(invitationId)
 	if invitation == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
+		http.Error(w, "Invitation not found", http.StatusNotFound)
 		return
 	}
 

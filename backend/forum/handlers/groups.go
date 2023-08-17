@@ -69,6 +69,11 @@ func (h *Handlers) groupsIdPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if *h.DB.GetGroupMemberStatus(groupId, h.getUserId(w, r)) != Accepted {
+		server.ErrorResponse(w, http.StatusForbidden)
+		return
+	}
+
 	server.SendObject(w, h.DB.GetGroupPostsById(groupId))
 }
 
@@ -127,20 +132,19 @@ func (h *Handlers) groupsIdJoin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fromUserId := h.getUserId(w, r)
-	toUserId := h.DB.GetGroupCreatorId(groupId)
 
 	switch *h.DB.GetGroupMemberStatus(groupId, fromUserId) {
 	case Inactive:
 		server.SendObject(w, h.DB.AddInvitation(
 			GroupJoin,
 			fromUserId,
-			*toUserId,
+			group.CreatorId,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Pending:
 		server.SendObject(w, h.DB.DeleteInvitationByUserId(
 			GroupJoin,
 			fromUserId,
-			*toUserId,
+			group.CreatorId,
 			sql.NullInt64{Int64: int64(groupId), Valid: true}))
 	case Accepted:
 		server.ErrorResponse(w, http.StatusBadRequest)
@@ -216,7 +220,7 @@ func (h *Handlers) groupsIdLeave(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userId := h.getUserId(w, r)
-	if userId == *h.DB.GetGroupCreatorId(groupId) {
+	if userId == group.CreatorId {
 		http.Error(w, "Creator can't leave group", http.StatusBadRequest)
 		return
 	}

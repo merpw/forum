@@ -26,6 +26,7 @@ type Privacy uint8
 const (
 	Public Privacy = iota
 	Private
+	SuperPrivate
 )
 
 type Post struct {
@@ -40,6 +41,7 @@ type Post struct {
 	Categories    string
 	Description   string
 	GroupId       *int
+	Privacy       Privacy
 }
 
 type User struct {

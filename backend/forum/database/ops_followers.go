@@ -70,6 +70,16 @@ func (db DB) GetFollowStatus(followerId, userId int) *InviteStatus {
 	return followStatus
 }
 
+func (db DB) GetFollowId(followerId, userId int) *int {
+	var id *int
+	if err := db.QueryRow("SELECT id FROM followers WHERE follower_id = ? AND user_id = ?",
+		followerId, userId).Scan(&id); err != nil {
+		return nil
+	}
+
+	return id
+}
+
 func (db DB) RemoveFollower(followerId, userId int) InviteStatus {
 	_, err := db.Exec("DELETE FROM followers WHERE user_id = ? AND follower_id = ?", userId, followerId)
 	if err != nil {

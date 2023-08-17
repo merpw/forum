@@ -2,28 +2,18 @@ package handlers
 
 import (
 	"backend/common/server"
+	. "backend/forum/database"
 	"net/http"
-	"strconv"
-	"strings"
+	"os"
 )
 
 // postsId returns the post with the given id
 func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
-	idStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
-	// /api/posts/1 -> 1
+	postId := r.Context().Value(postIdCtxKey).(int)
 
-	id, err := strconv.Atoi(idStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
+	userId := h.getUserId(w, r)
 
-	// Get the post from the database
-	post := h.DB.GetPostById(id)
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
+	post := h.validatedPost(r, userId, postId)
 
 	postAuthor := h.DB.GetUserById(post.AuthorId)
 	safePost := SafePost{
@@ -52,23 +42,8 @@ func (h *Handlers) postsId(w http.ResponseWriter, r *http.Request) {
 //
 // returns current reaction
 func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
-
 	userId := r.Context().Value(userIdCtxKey).(int)
-
-	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
-	postIdStr = strings.TrimSuffix(postIdStr, "/like")
-	// /api/posts/1/like -> 1
-
-	postId, err := strconv.Atoi(postIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-	}
-
-	post := h.DB.GetPostById(postId)
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
+	postId := r.Context().Value(postIdCtxKey).(int)
 
 	reaction := h.DB.GetPostReaction(postId, userId)
 
@@ -101,20 +76,7 @@ func (h *Handlers) postsIdLike(w http.ResponseWriter, r *http.Request) {
 // returns current reaction
 func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
-	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
-	postIdStr = strings.TrimSuffix(postIdStr, "/dislike")
-	// /api/posts/1/dislike -> 1
-
-	postId, err := strconv.Atoi(postIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-	}
-
-	post := h.DB.GetPostById(postId)
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
+	postId := r.Context().Value(postIdCtxKey).(int)
 
 	reaction := h.DB.GetPostReaction(postId, userId)
 
@@ -145,22 +107,9 @@ func (h *Handlers) postsIdDislike(w http.ResponseWriter, r *http.Request) {
 // postsIdReaction returns the current reaction of the user to the post
 func (h *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(userIdCtxKey).(int)
+	postId := r.Context().Value(postIdCtxKey).(int)
 
-	postIdStr := strings.TrimPrefix(r.URL.Path, "/api/posts/")
-	postIdStr = strings.TrimSuffix(postIdStr, "/reaction")
-	// /api/posts/1/reaction -> 1
-
-	postId, err := strconv.Atoi(postIdStr)
-	if err != nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
-
-	post := h.DB.GetPostById(postId)
-	if post == nil {
-		server.ErrorResponse(w, http.StatusNotFound)
-		return
-	}
+	post := h.validatedPost(r, userId, postId)
 
 	reaction := h.DB.GetPostReaction(postId, userId)
 	safeReaction := SafeReaction{
@@ -181,4 +130,20 @@ func (h *Handlers) postsIdReaction(w http.ResponseWriter, r *http.Request) {
 		SafeReaction:  safeReaction,
 		DislikesCount: post.DislikesCount,
 	})
+}
+
+func (h *Handlers) validatedPost(r *http.Request, userId, postId int) *Post {
+	if userId != -1 {
+		if h.DB.GetPostPermissions(userId, postId) {
+			return h.DB.GetPostById(postId)
+		}
+	}
+
+	if r.Header.Get("Internal-Auth") == "SSR" ||
+		r.Header.Get("Internal-Auth") == os.Getenv("FORUM_BACKEND_SECRET") {
+		return h.DB.GetPostById(postId)
+	}
+
+	// not logged in, not SSR. Send public post
+	return h.DB.GetPublicPostById(postId)
 }
