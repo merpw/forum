@@ -30,7 +30,7 @@ const Avatar: FC<{ user: User; className?: string; size: number }> = ({
       >
         {user?.avatar ? (
           <Image
-            className={"rounded-full w-full h-full"}
+            className={"rounded-full w-full h-full p-0.5"}
             src={`/avatars/${user.avatar}`}
             alt={user.username === reqUser?.username ? "Your avatar" : `${user.username}'s avatar`}
             width={size}
